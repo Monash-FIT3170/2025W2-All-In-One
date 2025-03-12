@@ -6,3 +6,4 @@
 * Akash Kamlesh Kapadia - kapadia.akash.k@gmail.com
 * tom macauley - thomas123mac@gmail.com
 * Thomas Higgins - thig0003@student.monash.edu / thomas.higgins.574@gmail.com 
+* Tristan Nguyen - tngu0294@student.monash.edu
