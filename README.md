@@ -4,7 +4,7 @@
 * Rehan Ali - rali0010@student.monash.edu / ra3702672@gmail.com
 * Shen Jiang - sjia0047@student.monash.edu
 * Akash Kamlesh Kapadia - kapadia.akash.k@gmail.com
-* tom macauley - thomas123mac@gmail.com
+* tom macauley - tmac0014@student.monash.edu | thomas123mac@gmail.com
 * Thomas Higgins - thig0003@student.monash.edu / thomas.higgins.574@gmail.com 
 * Dylan Hoang - dhoa0009@student.monash.edu / dylanhoang9@gmail.com
 * Ryan Park - rpar0034@student.monash.edu / r.park2801@gmail.com
