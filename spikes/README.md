@@ -1,5 +1,5 @@
 # Technology Tutorial Plan
-This tutorial will follow the [Meteorjs 3 + React tutorial](https://docs.meteor.com/tutorials/react/) ...
+This tutorial will follow the [Meteorjs 3 + React tutorial] (https://docs.meteor.com/tutorials/react/) Steps 1,2 and 8 with added features specific to All in One
 ## Table of Contents
 - [Set Up](#set-up)
 
@@ -140,21 +140,4 @@ export const App = () => {
 ```
 
 ---
-### Task Form
-Next we will create a form which will encapsulate all of our logic 
-In `imports/ui/TaskForm.jsx` 
-```
-import React, { useState } from "react";
-
-export const TaskForm = () => {
-  const [text, setText] = useState("");
-
-  return (
-    <form className="task-form">
-      <input type="text" placeholder="Type to add new tasks" />
-
-      <button type="submit">Add Task</button>
-    </form>
-  );
-};
-```
+### Deployment
