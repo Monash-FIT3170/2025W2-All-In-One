@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { db } from '/imports/api/links';
-import "../imports/api/refresh"
+import "../imports/api/publish"
 
 
 const insertTask = (taskText) => db.insertAsync( {text: taskText});
