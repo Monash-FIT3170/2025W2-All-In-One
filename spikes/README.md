@@ -9,7 +9,11 @@ We first need to install meteor, if you don't have meteor installed use:
 ``` 
 npx meteor
 ``` 
-
+if `npx meteor` gives an error run
+```
+npx clear-npx-cache
+npm install -g meteor --foreground-script
+```
 Go into your preferred directory and create your meteor app using
 ```
 meteor create todo
