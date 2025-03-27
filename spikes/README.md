@@ -145,3 +145,23 @@ export const App = () => {
 
 ---
 ### Deployment
+For now we will deploy our app using Meteorjs' very own deployment **Galaxy**, sign up [here](https://cloud.meteor.com/?isSignUp=true) 
+
+Thankfully Galaxy will set up a free database for us,
+```
+meteor deploy react-meteor-3.meteorapp.com --free --mongo
+```
+Feel free to change `react-meteor-3` to whatever you want
+
+You should see two important URLS
+
+The mongodb url, 
+![image](./todo/images/mongo_url.png)
+You can use this URL to connect to your database!
+
+and the link to your application dashboard, use this to reach your application.
+![image](./todo/images/link.png)
+Or use `react-meteor-3.meteorapp.com`. Or what you used to replace `react-meteor-3`
+
+You should see something like this.
+![app](./todo/images/app.png)

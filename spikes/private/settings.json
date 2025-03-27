@@ -1,0 +1,2 @@
+{
+    "galaxy.meteor.com": { "env": { "MONGO_URL": "mongodb://ttristannguyen:gmeeQ8XZYwKAWp6H4@galaxyadmin_galaxyfreedb-01.mongodb.galaxy-cloud.io:30025,galaxyadmin_galaxyfreedb-02.mongodb.galaxy-cloud.io:30025,galaxyadmin_galaxyfreedb-03.mongodb.galaxy-cloud.io:30025/react-mytodo-app-meteorapp-com?replicaSet=galaxyadmin_galaxyfreedb&ssl=true" } } }
