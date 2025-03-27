@@ -1,7 +1,9 @@
-# Technology Tutorial Plan
+- [Basic App Tutorial](#basic-app-tutorial)
+    - [Set up](#set-up)
+    - [To-do App](#to-do-app)
+    - [Deployment](#deployment)
+# Basic App Tutorial
 This tutorial will follow the [Meteorjs 3 + React tutorial] (https://docs.meteor.com/tutorials/react/) Steps 1,2 and 8 with added features specific to All in One
-## Table of Contents
-- [Set Up](#set-up)
 
 ---
 ### Set up
