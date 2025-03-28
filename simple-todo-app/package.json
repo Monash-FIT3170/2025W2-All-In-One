@@ -22,6 +22,8 @@
     "testModule": "tests/main.js"
   },
   "devDependencies": {
-    "@types/react": "^19.0.12"
+    "@types/prop-types": "^15.7.14",
+    "@types/react": "^19.0.12",
+    "ts-node": "^10.9.2"
   }
 }
