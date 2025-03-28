@@ -2,6 +2,7 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import jseslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import reacteslint from "eslint-plugin-react";
+import globals from "globals";
 
 let parseIgnoreList = [
   "**/node_modules/**/*",
@@ -28,6 +29,11 @@ let reactRecommendedConfig = {
     "react/jsx-no-target-blank": "warn",
     "react/jsx-key": "warn",
   },
+  languageOptions: {
+    globals: {
+      ...globals.browser
+    }
+  }
 };
 
 let reactJSXConfig = reacteslint.configs.flat["jsx-runtime"];
