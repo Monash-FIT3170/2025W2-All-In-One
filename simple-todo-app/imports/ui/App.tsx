@@ -4,10 +4,11 @@ import { useTracker, useSubscribe } from "meteor/react-meteor-data";
 import { TasksCollection } from "../api/TasksCollection";
 import { ApiTask } from "../definitions/data";
 
-
 export const App = () => {
   const isLoading = useSubscribe("tasks");
-  const tasks: Array<ApiTask> = useTracker(() => TasksCollection.find({}).fetch());
+  const tasks: Array<ApiTask> = useTracker(() =>
+    TasksCollection.find({}).fetch()
+  ) as Array<ApiTask>;
 
   if (isLoading()) {
     return <div>Loading...</div>;
