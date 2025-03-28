@@ -2,6 +2,7 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import jseslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import reacteslint from "eslint-plugin-react";
+import globals from "globals";
 
 let parseIgnoreList = [
   "**/node_modules/**/*",
@@ -20,6 +21,11 @@ let reactRecommendedConfig = {
   settings: {
     react: {
       version: "detect",
+    },
+  },
+  languageOptions: {
+    globals: {
+      ...globals.browser,
     },
   },
   rules: {
