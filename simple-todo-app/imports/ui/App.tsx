@@ -2,16 +2,12 @@ import React from "react";
 import { Task } from "./Task";
 import { useTracker, useSubscribe } from "meteor/react-meteor-data";
 import { TasksCollection } from "../api/TasksCollection";
+import { ApiTask } from "../definitions/data";
 
-// Would usually be centralised in a data model definition
-type Task = {
-  _id: number;
-  text: string;
-};
 
 export const App = () => {
   const isLoading = useSubscribe("tasks");
-  const tasks: Array<Task> = useTracker(() => TasksCollection.find({}).fetch());
+  const tasks: Array<ApiTask> = useTracker(() => TasksCollection.find({}).fetch());
 
   if (isLoading()) {
     return <div>Loading...</div>;
