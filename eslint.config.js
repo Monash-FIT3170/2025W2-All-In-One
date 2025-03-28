@@ -23,17 +23,18 @@ let reactRecommendedConfig = {
       version: "detect",
     },
   },
+  languageOptions: {
+    globals: {
+      ...globals.browser,
+    },
+  },
   rules: {
     ...reacteslint.configs.flat.recommended.rules,
     "react/no-unescaped-entities": "off",
     "react/jsx-no-target-blank": "warn",
     "react/jsx-key": "warn",
+    "react/prop-types": "warn",
   },
-  languageOptions: {
-    globals: {
-      ...globals.browser
-    }
-  }
 };
 
 let reactJSXConfig = reacteslint.configs.flat["jsx-runtime"];
