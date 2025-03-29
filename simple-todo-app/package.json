@@ -22,6 +22,7 @@
     "testModule": "tests/main.js"
   },
   "devDependencies": {
+    "@types/meteor": "^2.9.8",
     "@types/prop-types": "^15.7.14",
     "@types/react": "^19.0.12",
     "ts-node": "^10.9.2"
