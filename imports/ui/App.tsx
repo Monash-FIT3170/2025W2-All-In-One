@@ -1,8 +1,8 @@
 import React from "react";
 import { Task } from "./Task";
 import { useTracker, useSubscribe } from "meteor/react-meteor-data";
-import { TasksCollection } from "/imports/api/TasksCollection";
-import { ApiTask } from "/imports/definitions/data";
+import { TasksCollection } from "../api/TasksCollection";
+import { ApiTask } from "../definitions/data";
 
 export const App = () => {
   const isLoading = useSubscribe("tasks");

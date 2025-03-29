@@ -17,7 +17,7 @@
   "meteor": {
     "mainModule": {
       "client": "client/main.jsx",
-      "server": "server/main.js"
+      "server": "server/main.ts"
     },
     "testModule": "tests/main.js"
   },
@@ -28,7 +28,6 @@
     "@types/react": "^19.0.12",
     "eslint": "^9.23.0",
     "eslint-plugin-react": "^7.37.4",
-    "ts-node": "^10.9.2",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.28.0"
   }
