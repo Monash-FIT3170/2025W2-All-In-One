@@ -32,7 +32,6 @@ let reactRecommendedConfig = {
     ...reacteslint.configs.flat.recommended.rules,
     "react/no-unescaped-entities": "off",
     "react/jsx-no-target-blank": "warn",
-    "react/jsx-key": "warn",
     "react/prop-types": "warn",
   },
 };
@@ -50,6 +49,7 @@ let tsRecommendedConfig = tseslint.configs.recommended.map((config) => {
     rules: {
       ...config.rules,
       "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-explicit-any": "warn",
     },
   };
 });
