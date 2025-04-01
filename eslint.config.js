@@ -4,14 +4,14 @@ import tseslint from "typescript-eslint";
 import reacteslint from "eslint-plugin-react";
 import globals from "globals";
 
-let parseIgnoreList = [
+let parseIgnoreGlobList = [
   "**/node_modules/**/*",
   "**/.meteor/**/*",
   "**/.git/**/*",
   "**/.vscode/**/*",
 ];
 
-let globalConfigList = [globalIgnores(parseIgnoreList)];
+let globalConfigList = [globalIgnores(parseIgnoreGlobList)];
 
 // React eslint config
 // https://www.npmjs.com/package/eslint-plugin-react
@@ -67,7 +67,15 @@ let jsRecommendedConfig = {
   },
 };
 
-let jsConfigList = [jsRecommendedConfig];
+let jsMochaConfig = {
+  languageOptions: {
+    globals: {
+      ...globals.mocha
+    }
+  }
+}
+
+let jsConfigList = [jsRecommendedConfig, jsMochaConfig];
 
 export default defineConfig([
   ...reactConfigList,
