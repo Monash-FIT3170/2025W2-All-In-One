@@ -15,7 +15,7 @@ export const App = () => {
   } else {
     return (
       <div>
-        <h1>Welcome to Meteor!</h1>
+        <h1 className="font-bold">Welcome to Meteor!</h1>
         <ul>
           {tasks.map((task) => (
             <Task key={task._id} task={task} />
