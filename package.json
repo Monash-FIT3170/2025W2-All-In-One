@@ -1,7 +1,7 @@
 {
   "name": "meteor-app",
   "private": true,
-  "type": "module",
+  "postinstall": "patch-package",
   "scripts": {
     "start": "meteor run",
     "test": "meteor test --once --driver-package meteortesting:mocha",
@@ -12,11 +12,13 @@
     "@babel/runtime": "^7.20.7",
     "@tailwindcss/postcss": "^4.0.17",
     "meteor-node-stubs": "^1.2.5",
+    "patch-package": "^8.0.0",
     "postcss": "^8.5.3",
     "postcss-load-config": "^6.0.1",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router": "^7.4.1",
     "tailwindcss": "^4.0.17"
   },
   "meteor": {
