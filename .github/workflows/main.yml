@@ -9,5 +9,10 @@ jobs:
     steps:
       - name: Install meteor
         run: npx meteor
+      - name: Set meteor path
+        run: export PATH=/home/runner/.meteor:$PATH
+      - name: List environment variables
+        run: env
       - name: Deploy
+        working-directory: ./
         run: PATH=/home/runner/.meteor:$PATH METEOR_SESSION_FILE=token.json meteor deploy testdeployment123.meteorapp.com --free --mongo
