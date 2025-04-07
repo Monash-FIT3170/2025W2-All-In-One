@@ -5,14 +5,13 @@ on:
 jobs:
   galaxy-deployment:
     runs-on: ubuntu-latest
-    name: Deployment to galaxy
+    name: Deployment to Galaxy
     steps:
       - name: Install meteor
         run: npx meteor
-      - name: Set meteor path
-        run: export PATH=/home/runner/.meteor:$PATH
-      - name: List environment variables
-        run: env
+      - name: Ls test
+        working-directory: ./
+        run: ls
       - name: Deploy
         working-directory: ./
         run: PATH=/home/runner/.meteor:$PATH METEOR_SESSION_FILE=token.json meteor deploy testdeployment123.meteorapp.com --free --mongo
