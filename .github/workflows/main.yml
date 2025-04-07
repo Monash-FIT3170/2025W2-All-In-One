@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main
+      - shen-spike
 jobs:
   galaxy-deployment:
     runs-on: ubuntu-latest
