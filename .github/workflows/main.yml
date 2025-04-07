@@ -13,4 +13,5 @@ jobs:
       - name: Install meteor
         run: npx meteor
       - name: Deploy
+        working-directory: ./clientc
         run: PATH=/home/runner/.meteor:$PATH METEOR_SESSION_FILE=token.json meteor deploy testdeployment123.meteorapp.com --free --mongo
