@@ -13,6 +13,10 @@ jobs:
       - name: Install meteor
         run: npx meteor
       - name: Deploy
+        env:
+          METEOR_DEPLOY_KEY: ${{ secrets.METEOR_DEPLOY_KEY }}
         run: |
-          export PATH=/home/runner/.meteor:$PATH 
-          METEOR_SESSION_FILE=/home/runner/work/2025W2-All-In-One/2025W2-All-In-One/deploy_token.json meteor deploy testdeployment123.meteorapp.com --free --mongo
+          echo $METEOR_DEPLOY_KEY > $GITHUB_WORKSPACE/deploy_secret.json
+          export PATH=/home/runner/.meteor:$PATH
+          export METEOR_SESSION_FILE=$GITHUB_WORKSPACE/deploy_secret.json
+          meteor deploy testdeployment123.meteorapp.com --free --mongo
