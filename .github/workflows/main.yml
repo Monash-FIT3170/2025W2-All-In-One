@@ -1,0 +1,13 @@
+on:
+  push:
+    branches:
+      - main
+jobs:
+  galaxy-deployment:
+    runs-on: ubuntu-latest
+    name: Deployment to galaxy
+    steps:
+      - name: Install meteor
+        run: npx meteor
+      - name: Deploy
+        run: METEOR_SESSION_FILE=token.json meteor deploy 20251pm-all-in-one.meteorapp.com --free --mongo
