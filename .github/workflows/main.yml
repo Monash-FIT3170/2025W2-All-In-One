@@ -15,4 +15,4 @@ jobs:
       - name: Deploy
         run: |
           export PATH=/home/runner/.meteor:$PATH 
-          METEOR_SESSION_FILE="$GITHUB_WORKSPACE/deploy_token.json" meteor deploy testdeployment123.meteorapp.com --free --mongo
+          METEOR_SESSION_FILE=/home/runner/work/2025W2-All-In-One/2025W2-All-In-One/deploy_token.json meteor deploy testdeployment123.meteorapp.com --free --mongo
