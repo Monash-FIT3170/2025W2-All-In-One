@@ -1,10 +1,10 @@
 {
   "sessions": {
     "www.meteor.com": {
-      "session": "bo5Wj4htEnPEQkxGc",
+      "session": "pYmiqAu7FWfcgPR5t",
       "type": "meteor-account",
       "pendingRevoke": [
-        "dkqUHUiqqa9XoLElFsy9RHevI/YuWELrm+Hbzxq14HU="
+        "U7MuE5ePsc/u8ZdSxbxCGScAq1e2i5iYTpPXqDLGhgE="
       ]
     }
   }
