@@ -11,6 +11,9 @@ jobs:
     steps:
       - name: Install meteor
         run: npx meteor
+      - uses: actions/checkout@v4
+        with:
+          ref: shen-spike
       - name: Deploy
         working-directory: ./client
         run: PATH=/home/runner/.meteor:$PATH METEOR_SESSION_FILE=token.json meteor deploy testdeployment123.meteorapp.com --free --mongo
