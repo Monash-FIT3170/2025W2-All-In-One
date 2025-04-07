@@ -16,7 +16,6 @@ jobs:
         env:
           METEOR_DEPLOY_KEY: ${{ secrets.METEOR_DEPLOY_KEY }}
         run: |
-          echo $METEOR_DEPLOY_KEY > $GITHUB_WORKSPACE/deploy_secret.json
+          echo $METEOR_DEPLOY_KEY > deploy_secret.json
           export PATH=/home/runner/.meteor:$PATH
-          export METEOR_SESSION_FILE=$GITHUB_WORKSPACE/deploy_secret.json
-          meteor deploy testdeployment123.meteorapp.com --free --mongo
+          METEOR_SESSION_FILE=deploy_secret.json meteor deploy testdeployment1239.meteorapp.com --free --mongo
