@@ -20,7 +20,9 @@ jobs:
         env:
           GALAXY_USERNAME: ${{ secrets.GALAXY_USERNAME }}
           GALAXY_PASSWORD: ${{ secrets.GALAXY_PASSWORD }}
-        run: scripts/galaxy-login.sh
+        run: |
+          chmod +x scripts/galaxy-login.sh
+          scripts/galaxy-login.sh
 
       - name: Deploy
         run: |
