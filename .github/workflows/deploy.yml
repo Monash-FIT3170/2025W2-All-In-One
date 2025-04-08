@@ -12,7 +12,9 @@ jobs:
         run: npx meteor
 
       - name: Install expect
-        run: brew install expect
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew install expect
 
       - name: Galaxy login
         env:
