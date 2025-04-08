@@ -1,4 +1,4 @@
-#!/bin/expect -f
+#!/usr/local/bin/expect -f
 
 spawn PATH=/home/runner/.meteor:$PATH meteor login
 
