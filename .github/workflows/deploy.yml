@@ -7,13 +7,20 @@ jobs:
     name: Deployment to Galaxy
     steps:
       - uses: actions/checkout@v4
+
       - name: Install meteor
         run: npx meteor
-      - name: Deploy
+
+      - name: Install expect
+        run: brew install expect
+
+      - name: Galaxy login
         env:
           GALAXY_USERNAME: ${{ secrets.GALAXY_USERNAME }}
           GALAXY_PASSWORD: ${{ secrets.GALAXY_PASSWORD }}
+        run: scripts/galaxy-login.sh
+
+      - name: Deploy
         run: |
           export PATH=/home/runner/.meteor:$PATH
-          printf "$GALAXY_USERNAME\n$GALAXY_PASSWORD\n" | meteor login
           meteor deploy testdeployment1239.meteorapp.com --free --mongo
