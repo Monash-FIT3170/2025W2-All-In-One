@@ -8,13 +8,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install meteor
-        run: npx meteor
+      # - name: Install meteor
+      #   run: npx meteor
 
-      - name: Install expect
-        run: |
-          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          brew install expect
+      # - name: Install expect
+      #   run: |
+      #     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+      #     brew install expect
 
       - name: Galaxy login
         working-directory: ./scripts
@@ -22,7 +22,7 @@ jobs:
           GALAXY_USERNAME: ${{ secrets.GALAXY_USERNAME }}
           GALAXY_PASSWORD: ${{ secrets.GALAXY_PASSWORD }}
         run: |
-          chmod +x ./galaxy-logxin.sh
+          chmod +x ./galaxy-login.sh
           ./galaxy-login.sh
 
       - name: Deploy
