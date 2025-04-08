@@ -11,10 +11,10 @@ jobs:
       # - name: Install meteor
       #   run: npx meteor
 
-      # - name: Install expect
-      #   run: |
-      #     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-      #     brew install expect
+      - name: Install expect
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew install expect
 
       - name: Galaxy login
         working-directory: ./scripts
