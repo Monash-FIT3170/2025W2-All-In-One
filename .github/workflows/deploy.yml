@@ -5,8 +5,6 @@ jobs:
   galaxy-deployment:
     runs-on: ubuntu-latest
     name: Deployment to Galaxy
-    env:
-      PATH: /home/runner/.meteor:$PATH
     steps:
       - uses: actions/checkout@v4
 
@@ -28,4 +26,5 @@ jobs:
 
       - name: Deploy
         run: |
+          export PATH=/home/runner/.meteor:$PATH
           meteor deploy testdeployment1239.meteorapp.com --free --mongo

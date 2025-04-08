@@ -1,6 +1,6 @@
 #!/usr/bin/expect -f
 
-spawn meteor login
+spawn PATH=/home/runner/.meteor:$PATH meteor login
 
 expect "Username:"
 send "$GALAXY_USERNAME\r"
