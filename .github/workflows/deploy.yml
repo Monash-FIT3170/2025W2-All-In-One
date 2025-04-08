@@ -16,17 +16,14 @@ jobs:
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           brew install expect
 
-      - name: Add executable permission to galaxy-login.sh
-        run: 
-
       - name: Galaxy login
+        working-directory: ./scripts
         env:
           GALAXY_USERNAME: ${{ secrets.GALAXY_USERNAME }}
           GALAXY_PASSWORD: ${{ secrets.GALAXY_PASSWORD }}
         run: |
           chmod +x ./galaxy-login.sh
           ./galaxy-login.sh
-        working-directory: ./scripts
 
       - name: Deploy
         run: |
