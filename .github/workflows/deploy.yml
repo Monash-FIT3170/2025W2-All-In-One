@@ -9,9 +9,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install meteor
-        run: |
-          npx meteor
-          export PATH="/home/runner/.meteor:$PATH"
+        run: npx meteor
 
       - name: Install expect
         run: |
@@ -24,8 +22,11 @@ jobs:
           GALAXY_USERNAME: ${{ secrets.GALAXY_USERNAME }}
           GALAXY_PASSWORD: ${{ secrets.GALAXY_PASSWORD }}
         run: |
+          export PATH="/home/runner/.meteor:$PATH"
           chmod +x ./galaxy-login.sh
           ./galaxy-login.sh
 
       - name: Deploy
-        run: meteor deploy testdeployment1239.meteorapp.com --free --mongo
+        run: |
+          export PATH="/home/runner/.meteor:$PATH"
+          meteor deploy testdeployment1239.meteorapp.com --free --mongo
