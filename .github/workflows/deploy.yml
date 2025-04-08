@@ -15,7 +15,6 @@ jobs:
         run: |
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           brew install expect
-          which expect
 
       - name: Galaxy login
         working-directory: ./scripts
