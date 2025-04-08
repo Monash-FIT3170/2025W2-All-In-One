@@ -21,12 +21,12 @@ jobs:
         env:
           GALAXY_USERNAME: ${{ secrets.GALAXY_USERNAME }}
           GALAXY_PASSWORD: ${{ secrets.GALAXY_PASSWORD }}
-          PATH: "/home/runner/.meteor:$PATH"
         run: |
+          export PATH="/home/runner/.meteor:$PATH"
           chmod +x ./galaxy-login.sh
           ./galaxy-login.sh
 
       - name: Deploy
-        env:
-          PATH: "/home/runner/.meteor:$PATH"
-        run: meteor deploy testdeployment1239.meteorapp.com --free --mongo
+        run: |
+          export PATH="/home/runner/.meteor:$PATH"
+          meteor deploy testdeployment1239.meteorapp.com --free --mongo
