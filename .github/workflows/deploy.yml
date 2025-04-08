@@ -1,7 +1,4 @@
 on:
-  push:
-    branches:
-      - shen-spike
   workflow_dispatch:
 
 jobs:
