@@ -5,6 +5,8 @@ jobs:
   galaxy-deployment:
     runs-on: ubuntu-latest
     name: Deployment to Galaxy
+    env:
+      PATH: /home/runner/.meteor:$PATH
     steps:
       - uses: actions/checkout@v4
 
@@ -21,10 +23,9 @@ jobs:
           GALAXY_USERNAME: ${{ secrets.GALAXY_USERNAME }}
           GALAXY_PASSWORD: ${{ secrets.GALAXY_PASSWORD }}
         run: |
-          chmod +x scripts/galaxy-login.sh
-          scripts/galaxy-login.sh
+          chmod +x ./scripts/galaxy-login.sh
+          ./scripts/galaxy-login.sh
 
       - name: Deploy
         run: |
-          export PATH=/home/runner/.meteor:$PATH
           meteor deploy testdeployment1239.meteorapp.com --free --mongo
