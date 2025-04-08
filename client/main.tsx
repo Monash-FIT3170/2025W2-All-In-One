@@ -1,14 +1,21 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { Meteor } from 'meteor/meteor';
-import { App } from '/imports/ui/App';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import { Meteor } from "meteor/meteor";
+import { App } from "/imports/ui/App";
 import { BrowserRouter, Routes, Route } from "react-router";
-import '/client/main.css';
+import "/client/main.css";
 
-Meteor.startup(() => {
-  const container = document.getElementById('react-target');
+Meteor.startup(initialiseReactRoot);
+
+function initialiseReactRoot(): void {
+  const container = document.getElementById("react-target");
   const root = createRoot(container);
-  root.render(
+
+  root.render(<AppRoot />);
+}
+
+function AppRoot(): React.JSX.Element {
+  return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
@@ -16,4 +23,4 @@ Meteor.startup(() => {
       </Routes>
     </BrowserRouter>
   );
-});
+}
