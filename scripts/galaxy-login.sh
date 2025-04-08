@@ -3,9 +3,9 @@
 spawn meteor login
 
 expect "Username:"
-send "$GALAXY_USERNAME\r"
+send "$env(GALAXY_USERNAME)\r"
 
 expect "Password:"
-send "$GALAXY_PASSWORD\r"
+send "$env(GALAXY_PASSWORD)\r"
 
 expect eof
