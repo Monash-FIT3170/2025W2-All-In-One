@@ -19,3 +19,4 @@ A web-app to optimise the renting process between tenants/landlord and agents.
 ## Documentation links
 * [Setup](documentation/setup.md)
 * [App architecture](documentation/app-architecture.md)
+* [File structure](documentation/file-structure.md)
