@@ -23,10 +23,10 @@
   },
   "meteor": {
     "mainModule": {
-      "client": "client/main.tsx",
-      "server": "server/main.ts"
+      "client": "app/client/main.tsx",
+      "server": "app/server/main.ts"
     },
-    "testModule": "tests/main.js"
+    "testModule": "app/tests/main.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.23.0",
