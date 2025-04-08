@@ -1,8 +1,10 @@
 # 2025W2-All-In-One
+A web-app to optimise the renting process between tenants/landlord and agents.
 
+## Contributors
 * Shannon Wallis - swal0059@student.monash.edu | shanwal001@gmail.com 
 * Rehan Ali - rali0010@student.monash.edu / ra3702672@gmail.com
-* Shen Jiang - sjia0047@student.monash.edu
+* Shen Jiang - sjia0047@student.monash.edu / shen.jng1@gmail.com
 * Akash Kamlesh Kapadia - kapadia.akash.k@gmail.com
 * tom macauley - tmac0014@student.monash.edu | thomas123mac@gmail.com
 * Thomas Higgins - thig0003@student.monash.edu / thomas.higgins.574@gmail.com 
@@ -13,3 +15,6 @@
 * Sona Hariharan - shar0108@student.monash.edu | sonahariharan067@gmail.com
 * Tristan Nguyen - tngu0294@student.monash.edu
 * Bahar Abbas Pour - babb0004@student.monash.edu
+
+## Documentation links
+* [Setup](documentation/setup.md)
