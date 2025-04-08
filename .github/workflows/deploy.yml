@@ -11,8 +11,9 @@ jobs:
         run: npx meteor
       - name: Deploy
         env:
-          METEOR_DEPLOY_KEY: ${{ secrets.METEOR_DEPLOY_KEY }}
+          GALAXY_USERNAME: ${{ secrets.GALAXY_USERNAME }}
+          GALAXY_PASSWORD: ${{ secrets.GALAXY_PASSWORD }}
         run: |
-          echo $METEOR_DEPLOY_KEY > deploy_secret.json
           export PATH=/home/runner/.meteor:$PATH
-          METEOR_SESSION_FILE=deploy_secret.json meteor deploy testdeployment1239.meteorapp.com --free --mongo
+          printf "$GALAXY_USERNAME\n$GALAXY_PASSWORD" | meteor login
+          meteor deploy testdeployment1239.meteorapp.com --free --mongo
