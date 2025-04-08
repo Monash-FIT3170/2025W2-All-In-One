@@ -7,3 +7,5 @@ send "$GALAXY_USERNAME\r"
 
 expect "Password:"
 send "$GALAXY_PASSWORD\r"
+
+expect eof

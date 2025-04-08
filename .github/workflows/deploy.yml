@@ -22,7 +22,7 @@ jobs:
           GALAXY_USERNAME: ${{ secrets.GALAXY_USERNAME }}
           GALAXY_PASSWORD: ${{ secrets.GALAXY_PASSWORD }}
         run: |
-          chmod +x ./galaxy-login.sh
+          chmod +x ./galaxy-logxin.sh
           ./galaxy-login.sh
 
       - name: Deploy
