@@ -27,7 +27,7 @@ jobs:
         run: |
           export PATH="/home/runner/.meteor:$PATH"
           chmod +x ./galaxy-login.sh
-          ./galaxy-login.sh
+          ./galaxy-login.sh "$GALAXY_USERNAME" "$GALAXY_PASSWORD"
 
       - name: Deploy
         run: |
