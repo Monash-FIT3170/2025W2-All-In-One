@@ -11,6 +11,9 @@ jobs:
       - name: Install meteor
         run: npx meteor
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Install expect
         run: |
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -25,9 +28,6 @@ jobs:
           export PATH="/home/runner/.meteor:$PATH"
           chmod +x ./galaxy-login.sh
           ./galaxy-login.sh
-
-      - name: Install dependencies
-        run: npm install
 
       - name: Deploy
         run: |
