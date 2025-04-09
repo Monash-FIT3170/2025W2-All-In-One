@@ -26,6 +26,9 @@ jobs:
           chmod +x ./galaxy-login.sh
           ./galaxy-login.sh
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Deploy
         run: |
           export PATH="/home/runner/.meteor:$PATH"
