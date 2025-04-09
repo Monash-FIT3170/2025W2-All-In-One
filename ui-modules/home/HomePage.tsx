@@ -13,14 +13,18 @@ export const HomePage = () => {
     return <div>Loading...</div>;
   } else {
     return (
-      <div>
-        <h1 className="font-bold italic">Welcome to Meteor!</h1>
-        <ul>
+      <div className="p-5">
+        <h1 className="font-bold italic">Welcome to All in One!</h1>
+
+        <ul className="list-disc list-inside">
           {tasks.map((task) => (
             <Task key={task.id} text={task.text} />
           ))}
         </ul>
-        <AddTaskButton onClick={() => { addNewTask("hi") }} />
+
+        {/* temp */}
+        <AddTaskButton onClick={() => { addNewTask("hi") }} /> 
+
       </div>
     );
   }
