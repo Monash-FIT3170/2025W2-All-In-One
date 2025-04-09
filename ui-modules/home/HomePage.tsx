@@ -2,11 +2,11 @@ import React from "react";
 import { Task } from "./components/Task";
 import { useTracker, useSubscribe } from "meteor/react-meteor-data";
 import { addNewTask, getAllTasks } from "/library-modules/apis/example-tasks/repositories/task-repository";
-import { PublicationIdentifier } from "/library-modules/apis/core/publication-identifier";
+import { MeteorPublicationIdentifier } from "/library-modules/apis/core-enums/meteor-publication-identifier";
 import { AddTaskButton } from "./components/AddTaskButton";
 
 export const HomePage = () => {
-  const isLoading = useSubscribe(PublicationIdentifier.TASK);
+  const isLoading = useSubscribe(MeteorPublicationIdentifier.TASK);
   const tasks = useTracker(() => getAllTasks())
 
   if (isLoading()) {

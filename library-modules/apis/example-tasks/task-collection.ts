@@ -1,4 +1,4 @@
 import { Mongo } from "meteor/mongo";
-import { ApiTask } from "./models/api-task";
+import { DbTask } from "./models/DbTask";
 
-export const TasksCollection: Mongo.Collection<ApiTask> = new Mongo.Collection("tasks");
+export const TasksCollection: Mongo.Collection<DbTask> = new Mongo.Collection("tasks");

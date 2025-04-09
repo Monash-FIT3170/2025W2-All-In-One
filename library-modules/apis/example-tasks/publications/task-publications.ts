@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { TasksCollection } from "../task-collection";
-import { PublicationIdentifier } from "/library-modules/apis/core/publication-identifier";
+import { MeteorPublicationIdentifier } from "../../core-enums/meteor-publication-identifier";
 
-Meteor.publish(PublicationIdentifier.TASK, () => {
-  return TasksCollection.find();
-});
+Meteor.publish(
+  MeteorPublicationIdentifier.TASK, () => { return TasksCollection.find() }
+);

@@ -1,10 +1,10 @@
-import { mapApiTasksToTasks } from "../mappers/task-mapper";
-import { addNewTaskToDb, getAllApiTasks } from "../task-api";
+import { mapDbTasksToTasks } from "../mappers/task-mapper";
+import { addNewTaskToDb, getAllDbTasks } from "../task-api";
 import { Task } from "/library-modules/domain-models/task";
 
 export function getAllTasks(): Task[] {
-  const apiTasks = getAllApiTasks();
-  const mappedTasks = mapApiTasksToTasks(apiTasks)
+  const dbTasks = getAllDbTasks();
+  const mappedTasks = mapDbTasksToTasks(dbTasks)
 
   return mappedTasks;
 }
