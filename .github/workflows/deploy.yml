@@ -32,4 +32,5 @@ jobs:
       - name: Deploy
         run: |
           export PATH="/home/runner/.meteor:$PATH"
-          meteor deploy testdeployment1239.meteorapp.com --free --mongo
+          export DEPLOY_HOSTNAME=ap-southeast-2.galaxy.meteor.com
+          meteor deploy 20251pm-allinone.au.meteorapp.com --free --mongo
