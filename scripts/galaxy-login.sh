@@ -1,6 +1,6 @@
 #!/home/linuxbrew/.linuxbrew/bin/expect -f
 
-if ($argc != 2) {
+if {$argc != 2} {
   puts "The script takes exactly two arguments, username and password in sequence."
   exit
 }
