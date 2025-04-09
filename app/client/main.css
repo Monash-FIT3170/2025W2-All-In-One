@@ -1,5 +1,1 @@
 @import "tailwindcss";
-
-.button-example-style {
-  @apply px-3 py-1 bg-blue-200 text-white rounded-md
-}

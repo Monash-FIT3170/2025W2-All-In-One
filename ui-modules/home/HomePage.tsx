@@ -14,9 +14,9 @@ export const HomePage = () => {
   } else {
     return (
       <div className="p-5">
-        <h1 className="font-bold italic">Welcome to All in One!</h1>
+        <h1 className="title-example-style">Welcome to All in One!</h1>
 
-        <ul className="list-disc list-inside">
+        <ul className="list-example-style">
           {tasks.map((task) => (
             <Task key={task.id} text={task.text} />
           ))}
