@@ -13,3 +13,5 @@
 * Sona Hariharan - shar0108@student.monash.edu | sonahariharan067@gmail.com
 * Tristan Nguyen - tngu0294@student.monash.edu
 * Bahar Abbas Pour - babb0004@student.monash.edu
+
+* Test commit for git policy documentation purposes. This line will be removed after I have completed my documentation requirements
