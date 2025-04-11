@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { TasksCollection } from "../task-collection";
+import { TasksCollection } from "../TasksCollection";
 import { MeteorPublicationIdentifier } from "../../core-enums/meteor-publication-identifier";
 
 Meteor.publish(

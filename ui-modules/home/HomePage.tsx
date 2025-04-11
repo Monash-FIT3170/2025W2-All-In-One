@@ -1,7 +1,7 @@
 import React from "react";
 import { Task } from "./components/Task";
 import { useTracker, useSubscribe } from "meteor/react-meteor-data";
-import { addNewTask, getAllTasks } from "/library-modules/apis/example-tasks/repositories/task-repository";
+import { addNewTask, getAllTasks } from "/library-modules/domain-models/task-example/repositories/task-repository";
 import { MeteorPublicationIdentifier } from "/library-modules/apis/core-enums/meteor-publication-identifier";
 import { AddTaskButton } from "./components/AddTaskButton";
 

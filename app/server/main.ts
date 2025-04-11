@@ -1,5 +1,5 @@
 import { Meteor } from "meteor/meteor";
-import { TasksCollection } from "/library-modules/apis/example-tasks/task-collection";
+import { TasksCollection } from "../../library-modules/apis/example-tasks/TasksCollection";
 import "/library-modules/apis/example-tasks/publications/task-publications";
 import "/library-modules/apis/example-tasks/methods/task-methods";
 

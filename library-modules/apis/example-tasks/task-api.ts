@@ -1,6 +1,6 @@
 import { MeteorMethodIdentifier } from "../core-enums/meteor-method-identifier";
 import { DbTask } from "./models/DbTask";
-import { TasksCollection } from "./task-collection";
+import { TasksCollection } from "./TasksCollection";
 import { Mongo } from "meteor/mongo";
 import { Meteor } from "meteor/meteor";
 
