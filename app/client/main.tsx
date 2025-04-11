@@ -19,12 +19,14 @@ function AppRoot(): React.JSX.Element {
   return (
     <React.StrictMode>
       <Provider store={store}>
+
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<ExampleHomePage />} />
             <Route path="/test" element={<ExampleHomePage />} />
           </Routes>
         </BrowserRouter>
+        
       </Provider>
     </React.StrictMode>
   );
