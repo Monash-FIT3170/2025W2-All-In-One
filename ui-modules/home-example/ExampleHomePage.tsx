@@ -1,49 +1,26 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect } from "react";
 import { Task } from "./components/Task";
-import {
-  addNewTask,
-  getAllTasks,
-} from "/library-modules/domain-models/task-example/repositories/task-repository";
 import { AddTaskButton } from "./components/AddTaskButton";
 import { HomePageUiState } from "./state/HomePageUiState";
-import { HomePageActionType, homePageReducer } from "./state/reducers/homePageReducer";
-
-const initialHomePageUiState: HomePageUiState = {
-  isLoading: true,
-  taskDescriptions: [],
-  taskIds: [],
-  exampleTextboxValue: "",
-};
+import { addNewTask, loadTasks, selectHomePageUiState, updateTextboxValue } from "./state/reducers/home-page-slice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "/app/store";
 
 // VM equivalent. VMs should be at section or page level if the entire page is similar to one section (such as for this example).
 export function ExampleHomePage(): React.JSX.Element {
-  const [homePageUiState, dispatch] = useReducer(homePageReducer, initialHomePageUiState)
+  const dispatch = useDispatch<AppDispatch>();
+  const homePageUiState: HomePageUiState = useSelector(selectHomePageUiState)
 
   useEffect(() => {
-    fetchTasks();
+    dispatch(loadTasks());
   }, []);
 
-  async function fetchTasks() {
-    const tasks = await getAllTasks();
-    dispatch({
-      type: HomePageActionType.LOAD_TASKS,
-      payload: tasks,
-    });
-  }
-
-  async function handleNewTaskAdded(text: string): Promise<void> {
-    const newTaskId = await addNewTask(text);
-    dispatch({
-      type: HomePageActionType.ADD_NEW_TASK,
-      payload: {id: newTaskId, text: text},
-    });
+  function handleNewTaskAdded(text: string): void {
+    dispatch(addNewTask(text));
   }
 
   function handleTextboxChange(newValue: string): void {
-    dispatch({
-      type: HomePageActionType.SET_TEXTBOX_VALUE,
-      payload: newValue,
-    });
+    dispatch(updateTextboxValue(newValue));
   }
 
   return (
