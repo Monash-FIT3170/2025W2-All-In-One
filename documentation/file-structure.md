@@ -9,7 +9,7 @@ notifications, agent-dashboard, etc.
 
 ## Structure
 * `app`: The core module for the app. Contains the entry points for both the client and server
-* `library-modules`: Modules which contain functionality for the ui-module modules.
+* `library-modules`: Modules which contain functionalities not directly related to the ui-module modules.
 * `ui-modules`: Modules for the UI of the app
 * `scripts`: Any shell scripts go here
 * `documentation`: Any documentation for the project goes here
