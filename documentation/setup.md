@@ -19,17 +19,53 @@ This document describes how to get started with development.
     * Prettier
     * ESLint
     * vscode-icons (optional)
-3. Configure ESLint for linting by following the section immediately below.
+2. Configure ESLint for linting by following the section immediately below.
 
 #### Configuring ESLint
-1. Enter the settings for ESLint by clicking the cog icon next to the ESLint extension 
-in the 'Extensions' tab of vscode
-3. Find the `Eslint: Use Flat Config` option and enable it.
+1. In vscode, Enter the settings for ESLint by clicking the cog icon next to the ESLint extension 
+in the `Extensions` tab of vscode
+2. Find the `Eslint: Use Flat Config` option and enable it.
 
 ### Step 3: Configure vscode settings
 1. Enter the settings of vscode by clicking on the cog on the bottom left of your screen.
 2. Search for the `Editor: Tab Size` option and set it to `2`.
 
-### Step 4: Testing your configuration
+### Step 4: Setting up debugging in vscode
+1. In vscode, click the `Run` tab in the navbar, and click `Add Configuration...`
+2. In the dropdown, click `Web App (Chrome)`
+3. Replace the file contents with the following:
+```
+{
+  "version": "0.2.0",
+  "configurations": [
+      {
+          "type": "chrome",
+          "request": "launch",
+          "name": "Meteor: Chrome",
+          "url": "http://localhost:3000",
+          "webRoot": "${workspaceFolder}",
+          "outputCapture": "std"
+      },
+      {
+          "type": "node",
+          "request": "launch",
+          "name": "Meteor: Node",
+          "runtimeExecutable": "npm",
+          "runtimeArgs": ["start"],
+          "outputCapture": "std",
+      }
+  ],
+  "compounds": [
+      {
+          "name": "Meteor: All",
+          "configurations": ["Meteor: Node", "Meteor: Chrome"]
+      }
+  ]
+}
+```
+4. Debugging is now configured. Everytime you want to debug, ensure the app is running 
+(aka `meteor run` has been run) before beginning a debugging session.
+
+### Step 5: Testing your configuration
 1. Open up a terminal at the root of the project and run `meteor run`
 2. Check to see that the app successfully builds.
