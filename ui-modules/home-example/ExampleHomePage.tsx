@@ -1,43 +1,53 @@
-import React, { useState } from "react";
+import React, { useEffect, useReducer } from "react";
 import { Task } from "./components/Task";
-import { useTracker, useSubscribe } from "meteor/react-meteor-data";
 import {
   addNewTask,
   getAllTasks,
 } from "/library-modules/domain-models/task-example/repositories/task-repository";
-import { MeteorPublicationIdentifier } from "/library-modules/apis/core-enums/meteor-publication-identifier";
 import { AddTaskButton } from "./components/AddTaskButton";
-import { HomePageUiState } from "./definitions/HomePageUiState";
+import { HomePageUiState } from "./state/HomePageUiState";
+import { HomePageActionType, homePageReducer } from "./state/reducers/homePageReducer";
+
+const initialHomePageUiState: HomePageUiState = {
+  isLoading: true,
+  taskDescriptions: [],
+  taskIds: [],
+  exampleTextboxValue: "",
+};
 
 // VM equivalent. VMs should be at section or page level if the entire page is similar to one section (such as for this example).
-export function HomePage(): React.JSX.Element {
-  const isLoading = useSubscribe(MeteorPublicationIdentifier.TASK);
-  const tasks = useTracker(() => getAllTasks());
+export function ExampleHomePage(): React.JSX.Element {
+  const [homePageUiState, dispatch] = useReducer(homePageReducer, initialHomePageUiState)
 
-  const [exampleFlag, setExampleFlag] = useState(false);
-  const [exampleTextboxValue, setExampleTextboxValue] = useState("");
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
-  const homePageUiState = {
-    isLoading: isLoading(),
-    taskDescriptions: tasks.map((task) => task.text),
-    taskIds: tasks.map((task) => task.id),
-    exampleFlag: exampleFlag,
-    exampleTextboxValue: exampleTextboxValue,
-  };
+  async function fetchTasks() {
+    const tasks = await getAllTasks();
+    dispatch({
+      type: HomePageActionType.LOAD_TASKS,
+      payload: tasks,
+    });
+  }
 
-  function handleNewTaskAdded(text: string): void {
-    if (true) {
-      setExampleFlag(true); // Example of setting a flag based on some condition or validation
-    }
-    addNewTask(text);
+  async function handleNewTaskAdded(text: string): Promise<void> {
+    const newTaskId = await addNewTask(text);
+    dispatch({
+      type: HomePageActionType.ADD_NEW_TASK,
+      payload: {id: newTaskId, text: text},
+    });
   }
 
   function handleTextboxChange(newValue: string): void {
-    setExampleTextboxValue(newValue);
+    dispatch({
+      type: HomePageActionType.SET_TEXTBOX_VALUE,
+      payload: newValue,
+    });
   }
 
   return (
-    <HomePageBase
+    <ExampleHomePageBase
       homePageUiState={homePageUiState}
       onNewTaskAdded={handleNewTaskAdded}
       onTextboxChange={handleTextboxChange}
@@ -46,7 +56,7 @@ export function HomePage(): React.JSX.Element {
   );
 }
 
-function HomePageBase({
+function ExampleHomePageBase({
   homePageUiState,
   onNewTaskAdded,
   onTextboxChange,

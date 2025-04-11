@@ -10,6 +10,13 @@ const taskInsertMethod = {
   }
 }
 
+const taskGetAllMethod = {
+  [MeteorMethodIdentifier.TASK_GET_ALL]: () => {
+    return TasksCollection.find({}).fetch();
+  }
+}
+
 Meteor.methods({
   ...taskInsertMethod,
+  ...taskGetAllMethod
 });

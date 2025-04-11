@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Meteor } from "meteor/meteor";
-import { HomePage } from "../../ui-modules/home-example/HomePage";
+import { ExampleHomePage } from "/ui-modules/home-example/ExampleHomePage";
 import { BrowserRouter, Routes, Route } from "react-router";
 import "./main.css";
 
@@ -18,8 +18,8 @@ function AppRoot(): React.JSX.Element {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/test" element={<HomePage />} />
+        <Route path="/" element={<ExampleHomePage />} />
+        <Route path="/test" element={<ExampleHomePage />} />
       </Routes>
     </BrowserRouter>
   );

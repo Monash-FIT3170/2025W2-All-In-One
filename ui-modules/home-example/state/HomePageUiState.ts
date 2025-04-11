@@ -2,7 +2,6 @@
 export type HomePageUiState = {
   isLoading: boolean,
   taskDescriptions: string[],
-  taskIds: number[],
-  exampleFlag: boolean,
+  taskIds: string[],
   exampleTextboxValue: string,
 }

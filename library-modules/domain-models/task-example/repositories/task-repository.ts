@@ -2,13 +2,13 @@ import { mapDbTasksToTasks } from "./mappers/task-mapper";
 import { addNewTaskToDb, getAllDbTasks } from "../../../apis/example-tasks/task-api";
 import { Task } from "../Task";
 
-export function getAllTasks(): Task[] {
-  const dbTasks = getAllDbTasks();
+export async function getAllTasks(): Promise<Task[]> {
+  const dbTasks = await getAllDbTasks();
   const mappedTasks = mapDbTasksToTasks(dbTasks)
 
   return mappedTasks;
 }
 
-export function addNewTask(text: string): void {
-  addNewTaskToDb(text)
+export async function addNewTask(text: string): Promise<string> {
+  return addNewTaskToDb(text)
 }
