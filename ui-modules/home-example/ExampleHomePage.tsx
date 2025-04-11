@@ -6,7 +6,6 @@ import { addNewTask, loadTasks, selectHomePageUiState, updateTextboxValue } from
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "/app/store";
 
-// VM equivalent. VMs should be at section or page level if the entire page is similar to one section (such as for this example).
 export function ExampleHomePage(): React.JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
   const homePageUiState: HomePageUiState = useSelector(selectHomePageUiState)
