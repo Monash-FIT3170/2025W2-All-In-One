@@ -3,5 +3,6 @@ export type HomePageUiState = {
   isLoading: boolean,
   taskDescriptions: string[],
   taskIds: number[],
-  exampleFlag: boolean
+  exampleFlag: boolean,
+  exampleTextboxValue: string,
 }

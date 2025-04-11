@@ -9,41 +9,51 @@ import { MeteorPublicationIdentifier } from "/library-modules/apis/core-enums/me
 import { AddTaskButton } from "./components/AddTaskButton";
 import { HomePageUiState } from "./definitions/HomePageUiState";
 
-// Acts similar to a a VM; All business logic and validation should happen here. All data from APIs should be passed down from here
+// VM equivalent. VMs should be at section or page level if the entire page is similar to one section (such as for this example).
 export function HomePage(): React.JSX.Element {
   const isLoading = useSubscribe(MeteorPublicationIdentifier.TASK);
   const tasks = useTracker(() => getAllTasks());
-  const [exampleFlag, setExampleFlag] = useState(false)
-  
+
+  const [exampleFlag, setExampleFlag] = useState(false);
+  const [exampleTextboxValue, setExampleTextboxValue] = useState("");
+
   const homePageUiState = {
     isLoading: isLoading(),
     taskDescriptions: tasks.map((task) => task.text),
     taskIds: tasks.map((task) => task.id),
-    exampleFlag: exampleFlag
+    exampleFlag: exampleFlag,
+    exampleTextboxValue: exampleTextboxValue,
   };
 
-  // Some business logic for adding a new task
   function handleNewTaskAdded(text: string): void {
-    // Validation logic can be added here. E.g. if something went wrong, 
-    // set exampleFlag to true, which will cause a rerender and update homePageUiState
-    setExampleFlag(true)
+    if (true) {
+      setExampleFlag(true); // Example of setting a flag based on some condition or validation
+    }
     addNewTask(text);
+  }
+
+  function handleTextboxChange(newValue: string): void {
+    setExampleTextboxValue(newValue);
   }
 
   return (
     <HomePageBase
       homePageUiState={homePageUiState}
       onNewTaskAdded={handleNewTaskAdded}
+      onTextboxChange={handleTextboxChange}
     />
+    // Some other components here too that would also receive homePageUiState
   );
 }
 
 function HomePageBase({
   homePageUiState,
   onNewTaskAdded,
+  onTextboxChange,
 }: {
   homePageUiState: HomePageUiState;
   onNewTaskAdded: (text: string) => void;
+  onTextboxChange: (text: string) => void;
 }): React.JSX.Element {
   if (homePageUiState.isLoading) {
     return <div>Loading...</div>;
@@ -65,6 +75,15 @@ function HomePageBase({
           onClick={() => {
             onNewTaskAdded("New Task");
           }}
+        />
+
+        {/* This should be a seperate react component */}
+        <input
+          type="text"
+          className="textbox-example-style"
+          placeholder="Type something..."
+          value={homePageUiState.exampleTextboxValue}
+          onChange={(e) => onTextboxChange(e.target.value)}
         />
       </div>
     );
