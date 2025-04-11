@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Meteor } from "meteor/meteor";
-import { HomePage } from "../../ui-modules/home/HomePage";
+import { HomePage } from "../../ui-modules/home-example/HomePage";
 import { BrowserRouter, Routes, Route } from "react-router";
 import "./main.css";
 
