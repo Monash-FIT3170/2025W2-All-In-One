@@ -33,7 +33,7 @@ in the `Extensions` tab of vscode
 ### Step 4: Setting up debugging in vscode
 1. In vscode, click the `Run` tab in the navbar, and click `Add Configuration...`
 2. In the dropdown, click `Web App (Chrome)`
-3. Replace the file contents with the following:
+3. Replace the file contents with the following and save:
 ```
 {
   "version": "0.2.0",
@@ -64,7 +64,8 @@ in the `Extensions` tab of vscode
 }
 ```
 4. Debugging is now configured. Everytime you want to debug, ensure the app is running 
-(aka `meteor run` has been run) before beginning a debugging session.
+(aka `meteor run` has been run) before beginning a debugging session. To run a debugging
+session, set a breakpoint and select `Run` in the navbar and click `Start Debugging`.
 
 ### Step 5: Testing your configuration
 1. Open up a terminal at the root of the project and run `meteor run`
