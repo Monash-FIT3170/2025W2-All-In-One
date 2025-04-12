@@ -1,5 +1,5 @@
 
 export type DbTask = {
-  _id: number;
+  _id: string;
   text: string;
 };
