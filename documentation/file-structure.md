@@ -1,7 +1,6 @@
 # File structure
-This file describes the file structure we will aim to follow. We have decided 
-to move foward with a module based approach, which is the most common approach 
-to file structure in the industry.
+This file describes the file structure we will aim to follow. We will aim to
+follow a module based approach.
 
 ## What is a module?
 A module encompasses files related to one domain concept, for example: property-listing, 
