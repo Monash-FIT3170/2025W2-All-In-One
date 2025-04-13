@@ -5,8 +5,8 @@ import { MeteorMethodIdentifier } from "/library-modules/apis/core-enums/meteor-
 import { TaskDocument } from "/library-modules/database/example-tasks/models/TaskDocument";
 
 export async function apiGetAllTasks(): Promise<ApiTask[]> {
-  const allTasks: TaskDocument[] = await Meteor.callAsync(MeteorMethodIdentifier.TASK_GET_ALL);
-  const mappedTasks: ApiTask[] = allTasks.map(mapTaskDocumentToApiTask);
+  const fetchedTaskDocuments: TaskDocument[] = await Meteor.callAsync(MeteorMethodIdentifier.TASK_GET_ALL);
+  const mappedTasks: ApiTask[] = fetchedTaskDocuments.map(mapTaskDocumentToApiTask);
 
   return mappedTasks
 }
