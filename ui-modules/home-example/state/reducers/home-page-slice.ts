@@ -28,10 +28,8 @@ export const homePageSlice = createSlice({
       })
       .addCase(loadTasks.fulfilled, (state, action) => {
         state.isLoading = false;
-        action.payload.forEach((task) => {
-          state.taskDescriptions.push(task.text);
-          state.taskIds.push(task.id);
-        });
+        state.taskDescriptions = action.payload.map((task) => task.text);
+        state.taskIds = action.payload.map((task) => task.id);
       })
       .addCase(addNewTask.fulfilled, (state, action) => {
         state.taskDescriptions.push(action.payload.text);

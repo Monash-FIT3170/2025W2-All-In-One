@@ -1,10 +1,10 @@
-import { mapDbTasksToTasks } from "./mappers/task-mapper";
+import { mapApiTasksToTasks } from "./mappers/task-mapper";
 import { apiAddNewTask, apiGetAllTasks } from "../../../apis/example-tasks/task-api";
 import { Task } from "../Task";
 
 export async function getAllTasks(): Promise<Task[]> {
   const dbTasks = await apiGetAllTasks();
-  const mappedTasks = mapDbTasksToTasks(dbTasks)
+  const mappedTasks = mapApiTasksToTasks(dbTasks)
 
   return mappedTasks;
 }
