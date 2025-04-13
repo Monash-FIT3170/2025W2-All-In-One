@@ -1,17 +1,17 @@
 import { Meteor } from "meteor/meteor";
-import { TasksCollection } from "../TasksCollection";
-import { MeteorMethodIdentifier } from "/library-modules/apis/core-enums/meteor-method-identifier";
 import { Mongo } from "meteor/mongo";
-import { DbTask } from "../models/DbTask";
+import { TasksCollection } from "/library-modules/database/example-tasks/TasksCollection";
+import { TaskDocument } from "/library-modules/database/example-tasks/models/TaskDocument";
+import { MeteorMethodIdentifier } from "/library-modules/apis/core-enums/meteor-method-identifier";
 
 const taskInsertMethod = {
-  [MeteorMethodIdentifier.TASK_INSERT]: (doc: Mongo.OptionalId<DbTask>) => {
+  [MeteorMethodIdentifier.TASK_INSERT]: (doc: Mongo.OptionalId<TaskDocument>): Promise<string> => {
     return TasksCollection.insertAsync(doc);
   }
 }
 
 const taskGetAllMethod = {
-  [MeteorMethodIdentifier.TASK_GET_ALL]: () => {
+  [MeteorMethodIdentifier.TASK_GET_ALL]: (): TaskDocument[] => {
     return TasksCollection.find({}).fetch();
   }
 }
