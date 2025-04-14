@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { HomePageUiState } from "/ui-modules/home-example/state/HomePageUiState";
 import {
-  addNewTask as addNewTaskRepo,
+  addNewTask as repoAddNewTask,
   getAllTasks,
 } from "/library-modules/domain-models/task-example/repositories/task-repository";
 import { RootState } from "/app/store";
@@ -46,7 +46,7 @@ export const loadTasks = createAsyncThunk("homePage/loadTasks", async () => {
 export const addNewTask = createAsyncThunk(
   "homePage/addNewTask",
   async (text: string) => {
-    const id = await addNewTaskRepo(text);
+    const id = await repoAddNewTask(text);
     const newTask = { id: id, text: text };
     return newTask;
   }
