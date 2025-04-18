@@ -1,0 +1,111 @@
+@import "tailwindcss";
+/* === Primary Button Base === */
+.button-primary {
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: normal; /* Reduced font weight */
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
+  display: inline-block;
+  border: none;
+}
+
+/* === Variants === */
+
+/* Black background, white text */
+.button-primary.--black {
+  background-color: black;
+  color: white;
+}
+
+.button-primary.--black:hover {
+  background-color: #333;
+}
+
+/* White background, black text */
+.button-primary.--white {
+  background-color: white;
+  color: black;
+  border: none;
+}
+
+.button-primary.--white:hover {
+  background-color: #f0f0f0;
+}
+
+/* Transparent with grey border; black background on hover */
+.button-primary.--outline-black {
+  background-color: transparent;
+  color: black;
+  border: 2px solid #d1d5db;
+}
+
+.button-primary.--outline-black:hover {
+  background-color: black;
+  color: white;
+}
+
+.button-primary.--outline-black.clicked,
+.button-primary.--outline-black:focus,
+.button-primary.--outline-black:active {
+  border-color: black;
+  color: black;
+}
+
+/* Transparent with grey border; white background on hover */
+.button-primary.--outline-white {
+  background-color: transparent;
+  color: black;
+  border: 2px solid #d1d5db;
+}
+
+.button-primary.--outline-white:hover {
+  background-color: white;
+}
+
+.button-primary.--outline-white.clicked,
+.button-primary.--outline-white:focus,
+.button-primary.--outline-white:active {
+  border-color: black;
+  color: black;
+}
+
+/* Disabled button */
+.button-primary.--disabled {
+  background-color: #d3d3d3;
+  color: #b0b0b0;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* === Grey Outline Button === */
+.button-outline-grey {
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: normal;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-block;
+  background-color: transparent;
+  color: black;
+  border: 2px solid #d1d5db;
+  transition: border 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Hover state: optional background */
+.button-outline-grey:hover {
+  background-color: white;
+}
+
+/* Clicked or focused state: black border */
+.button-outline-grey.clicked,
+.button-outline-grey:focus,
+.button-outline-grey:active {
+  border-color: black;
+  color: black;
+}

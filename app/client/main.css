@@ -1,1 +1,35 @@
 @import "tailwindcss";
+body {
+  font-family: "Geist", sans-serif;
+}
+
+html,
+body,
+#react-target {
+  height: 100%;
+}
+
+/* Geist Body Text */
+.geist-body {
+  font-family: "Geist", sans-serif;
+  font-weight: 400; /* Regular weight for body text */
+  font-optical-sizing: auto;
+}
+
+/* Geist Header 1 */
+.geist-h1 {
+  font-family: "Geist", sans-serif;
+  font-weight: 700; /* Bold weight for headers */
+  font-optical-sizing: auto;
+}
+
+/* Geist Header 2 */
+.geist-h2 {
+  font-family: "Geist", sans-serif;
+  font-weight: 600; /* Semibold weight for headers */
+  font-optical-sizing: auto;
+}
+
+input::placeholder {
+  color: var(--dark-grey);
+}
