@@ -1,0 +1,8 @@
+{
+    "private": {
+        "AZURE_CLIENT_ID": "d10ee6e1-39d8-4066-8947-45f4eb41a801",
+        "AZURE_TENANT_ID": "145b9cc6-1afc-46bd-a458-17bc0530381e",
+        "AZURE_CLIENT_SECRET": "DsI8Q~f.qK8AAVPGIyGfr5kdI7kMt8-jQZtC7cgB",
+        "AZURE_CONNECTION_STRING": "DefaultEndpointsProtocol=https;AccountName=allinonepropertymediadev;AccountKey=EVzQ7Mxp9L8EuYlg09sqIstmIHF4mmU0zVqtUUKT4E+x5l1AXV7nSdRNtU0UsjicXeAThb3S9dnQ+AStPmBqtQ==;EndpointSuffix=core.windows.net"
+    }
+  }
