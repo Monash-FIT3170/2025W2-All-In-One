@@ -1,6 +1,6 @@
 import React from "react";
-import { MultipleHousesIcon } from "../../theming/Icons/MultipleHousesIcon";
-import { CalendarIcon } from "../../theming/Icons/CalendarIcon";
+import { MultipleHousesIcon } from "../../theming/icons/MultipleHousesIcon";
+import { CalendarIcon } from "../../theming/icons/CalendarIcon";
 
 export const tenantLinks = [
   { to: "/", label: "Overview" },

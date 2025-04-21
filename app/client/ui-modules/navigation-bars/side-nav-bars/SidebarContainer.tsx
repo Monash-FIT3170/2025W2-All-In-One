@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "../../../../../@/components/ui/button";
-import { EscapeIcon } from "../../theming/Icons/EscapeIcon";
+import { EscapeIcon } from "../../theming/icons/EscapeIcon";
 
 interface SidebarContainerProps {
   isOpen: boolean;

@@ -1,9 +1,8 @@
 import { Mongo } from "meteor/mongo";
 import { Meteor } from "meteor/meteor";
-import { ApiTask } from "/library-modules/apis/example-tasks/models/ApiTask";
-import { MeteorMethodIdentifier } from "/library-modules/apis/core-enums/meteor-method-identifier";
-import { TaskDocument } from "/library-modules/database/example-tasks/models/TaskDocument";
-
+import { ApiTask } from "./models/ApiTask";
+import { MeteorMethodIdentifier } from "../core-enums/meteor-method-identifier";
+import { TaskDocument } from "../../database/example-tasks/models/TaskDocument";
 export async function apiGetAllTasks(): Promise<ApiTask[]> {
   const fetchedTaskDocuments: TaskDocument[] = await Meteor.callAsync(MeteorMethodIdentifier.TASK_GET_ALL);
   const mappedTasks: ApiTask[] = fetchedTaskDocuments.map(mapTaskDocumentToApiTask);
