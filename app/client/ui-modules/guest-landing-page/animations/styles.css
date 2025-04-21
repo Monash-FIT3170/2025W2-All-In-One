@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+.title-example-style {
+  @apply font-bold italic
+}
+
+.list-example-style {
+  @apply list-disc list-inside
+}
+
+.button-example-style {
+  @apply px-3 py-1 bg-blue-200 text-white rounded-md
+}
+
+.textbox-example-style {
+  @apply shadow block
+}
+

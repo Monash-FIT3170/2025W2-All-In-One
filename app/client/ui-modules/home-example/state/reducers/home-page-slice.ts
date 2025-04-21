@@ -1,10 +1,16 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { HomePageUiState } from "../HomePageUiState";
+<<<<<<< HEAD:app/client/ui-modules/home-example/state/reducers/home-page-slice.ts
 import {
   repoAddNewTask,
   repoGetAllTasks,
 } from "/app/client/library-modules/domain-models/task-example/repositories/task-repository";
 import { RootState } from "/app/client/store";
+=======
+import { repoAddNewTask } from "../../../../library-modules/domain-models/task-example/repositories/task-repository";
+import { repoGetAllTasks } from "../../../../library-modules/domain-models/task-example/repositories/task-repository";
+import { RootState } from "@/app/store";
+>>>>>>> 86cymwjqt-Create-side-top-bottom-nav-bar:ui-modules/home-example/state/reducers/home-page-slice.ts
 
 const initialState: HomePageUiState = {
   isLoading: true,
@@ -53,6 +59,7 @@ export const addNewTask = createAsyncThunk(
 );
 
 export const { updateTextboxValue } = homePageSlice.actions;
-export const selectHomePageUiState = (state: RootState) => state.homePage
+export const selectHomePageUiState = (state: RootState) =>
+  state.exampleHomePage;
 
 export default homePageSlice.reducer;
