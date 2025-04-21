@@ -1,27 +1,20 @@
-import { Mongo } from "meteor/mongo";
 import { Meteor } from "meteor/meteor";
 import { ApiTask } from "./models/ApiTask";
-import { MeteorMethodIdentifier } from "../core-enums/meteor-method-identifier";
-import { TaskDocument } from "../../database/example-tasks/models/TaskDocument";
+import { MeteorMethodIdentifier } from "@/app/shared/meteor-method-identifier";
+
 export async function apiGetAllTasks(): Promise<ApiTask[]> {
-  const fetchedTaskDocuments: TaskDocument[] = await Meteor.callAsync(MeteorMethodIdentifier.TASK_GET_ALL);
-  const mappedTasks: ApiTask[] = fetchedTaskDocuments.map(mapTaskDocumentToApiTask);
+  const fetchedTasks: ApiTask[] = await Meteor.callAsync(
+    MeteorMethodIdentifier.TASK_GET_ALL
+  );
 
-  return mappedTasks
-}
-
-function mapTaskDocumentToApiTask(task: TaskDocument): ApiTask {
-  return {
-    taskId: task._id,
-    text: task.text
-  };
+  return fetchedTasks;
 }
 
 export async function apiAddNewTask(text: string): Promise<string> {
-  const newTask: Mongo.OptionalId<TaskDocument> = {
-    text: text
-  }
-  const taskId: string = await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT, newTask); 
+  const taskId: string = await Meteor.callAsync(
+    MeteorMethodIdentifier.TASK_INSERT,
+    text
+  );
 
-  return taskId
+  return taskId;
 }
