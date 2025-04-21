@@ -4,7 +4,7 @@ import { AddTaskButton } from "./components/AddTaskButton";
 import { HomePageUiState } from "./state/HomePageUiState";
 import { addNewTask, loadTasks, selectHomePageUiState, updateTextboxValue } from "./state/reducers/home-page-slice";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../app/store";
+import { AppDispatch } from "../../store";
 
 export function ExampleHomePage(): React.JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
