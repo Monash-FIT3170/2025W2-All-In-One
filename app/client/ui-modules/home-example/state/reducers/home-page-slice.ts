@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { HomePageUiState } from "../HomePageUiState";
-import { RootState } from "@/app/client/store";
+import { RootState } from "/app/client/store";
 import { repoAddNewTask } from "../../../../library-modules/domain-models/task-example/repositories/task-repository";
 import { repoGetAllTasks } from "../../../../library-modules/domain-models/task-example/repositories/task-repository";
 

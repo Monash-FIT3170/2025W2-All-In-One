@@ -1,6 +1,6 @@
 import { Meteor } from "meteor/meteor";
-import { ApiTask } from "./models/ApiTask";
-import { MeteorMethodIdentifier } from "@/app/shared/meteor-method-identifier";
+import { ApiTask } from "/app/client/library-modules/apis/example-tasks/models/ApiTask";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 export async function apiGetAllTasks(): Promise<ApiTask[]> {
   const fetchedTasks: ApiTask[] = await Meteor.callAsync(
