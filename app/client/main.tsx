@@ -7,6 +7,7 @@ import { Provider } from "react-redux";
 import { store } from "./store";
 import { DraftListingPage } from "./ui-modules/property-listing/DraftListingPage";
 import { DefaultTheme } from "./ui-modules/theming/themes/DefaultTheme";
+import { TenantDashboard } from "./ui-modules/tenant-dashboard/pages/TenantDashboard";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -28,11 +29,12 @@ function AppRoot(): React.JSX.Element {
             <Routes>
               <Route path="/" element={<ExampleHomePage />} />
               <Route path="/test" element={<DraftListingPage />} />
+              <Route path ="/tenant-dashboard" element={<TenantDashboard />} />
             </Routes>
           </BrowserRouter>
 
         </DefaultTheme>
-      
+
       </Provider>
     </React.StrictMode>
   );
