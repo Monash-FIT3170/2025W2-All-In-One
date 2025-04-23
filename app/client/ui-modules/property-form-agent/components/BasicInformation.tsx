@@ -3,6 +3,22 @@ import React from "react";
 import * as z from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../../theming/components/shadcn/Form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "../../theming/components/shadcn/Select";
+import { Input}  from "../../theming/components/shadcn/Input";
 
 
 const basicInformationSchema = z.object({
@@ -26,6 +42,33 @@ const form = useForm < z.infer < typeof basicInformationSchema >> ({
 
   return (
     <div>
+<Form {...form}>
+<form className="space-y-8 max-w-3xl mx-auto py-10">
+  
+  <FormField
+    control={form.control}
+    name="landlord"
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>Select Landlord</FormLabel>
+        <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <FormControl>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a landlord" />
+            </SelectTrigger>
+          </FormControl>
+          <SelectContent className="bg-white">
+            <SelectItem value="Dylan Hoang">Dylan Hoang</SelectItem>
+            <SelectItem value="Marcus Bontempelli">Marcus Bontempelli</SelectItem>
+            <SelectItem value="Nick Daicos">Nick Daicos</SelectItem>
+          </SelectContent>
+        </Select>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+</form>
+</Form>
 </div>
   )
 }
