@@ -67,6 +67,29 @@ const form = useForm < z.infer < typeof basicInformationSchema >> ({
       </FormItem>
     )}
   />
+
+<FormField
+control={form.control}
+name="property_type"
+render={({ field }) => (
+  <FormItem>
+    <FormLabel>Property Type</FormLabel>
+    <Select onValueChange={field.onChange} defaultValue={field.value}>
+      <FormControl>
+        <SelectTrigger>
+          <SelectValue placeholder="Select property type" />
+        </SelectTrigger>
+      </FormControl>
+      <SelectContent className="bg-white">
+        <SelectItem value="house">House</SelectItem>
+        <SelectItem value="apartment">Apartment</SelectItem>
+      </SelectContent>
+    </Select>
+      
+    <FormMessage />
+  </FormItem>
+)}
+/>
 </form>
 </Form>
 </div>
