@@ -162,6 +162,56 @@ render={({ field }) => (
 </div>
 
 </div>
+
+
+
+<div className="grid grid-cols-12 gap-4">
+
+<div className="col-span-6">
+  
+<FormField
+control={form.control}
+name="postal_code"
+render={({ field }) => (
+  <FormItem>
+    <FormLabel>Postal Code</FormLabel>
+    <FormControl>
+      <Input 
+      placeholder="3000"
+      
+      type=""
+      {...field} />
+    </FormControl>
+    
+    <FormMessage />
+  </FormItem>
+)}
+/>
+</div>
+
+<div className="col-span-6">
+  
+<FormField
+control={form.control}
+name="apartment_number"
+render={({ field }) => (
+  <FormItem>
+    <FormLabel>Unit/Apt #</FormLabel>
+    <FormControl>
+      <Input 
+      placeholder="Apt 4B"
+      
+      type=""
+      {...field} />
+    </FormControl>
+    
+    <FormMessage />
+  </FormItem>
+)}
+/>
+</div>
+
+</div>
 </form>
 </Form>
 </div>
