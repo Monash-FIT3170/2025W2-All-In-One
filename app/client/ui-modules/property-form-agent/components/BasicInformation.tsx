@@ -42,7 +42,7 @@ export default function BasicInformation() {
       <h1 className="text-xl mt-5 mb-2 space-y-8 max-w-3xl mx-auto font-semibold">Basic Information</h1>
       <h3 className="text-sm  max-w-3xl mx-auto text-[#71717A]">Enter the basic details of the property</h3>
       <Form {...form}>
-        <form className="space-y-8 max-w-3xl mx-auto py-7">
+        <form className="space-y-4 max-w-3xl mx-auto py-7">
           <FormField
             control={form.control}
             name="landlord"
