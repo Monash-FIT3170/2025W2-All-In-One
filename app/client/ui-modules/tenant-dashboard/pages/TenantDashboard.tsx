@@ -1,47 +1,55 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { UpcomingTasks } from "../components/UpcomingTasks";
 import { PropertyDetails } from "../components/PropertyDetails";
 import { DashboardCard } from "../components/DashboardCard";
+import { useAppDispatch, useAppSelector } from "../../../store";
+import { selectPropertyDetails, selectTasks, setPropertyDetails, setTasks } from "../state/tenant-dashboard-slice";
 
 export function TenantDashboard(): React.JSX.Element {
-  // Dummy data
-  const sampleTasks = [
-    {
-      title: "Rent Payment Due",
-      address: "123 Main St, Apt 4B",
-      datetime: "May 1, 2024",
-      status: "Due Soon" as const,
-    },
-    {
-      title: "Maintenance Request",
-      address: "123 Main St, Apt 4B",
-      datetime: "April 25, 2024",
-      status: "Upcoming" as const,
-    },
-  ];
+  const dispatch = useAppDispatch();
+  const propertyDetails = useAppSelector(selectPropertyDetails);
+  const tasks = useAppSelector(selectTasks);
 
-  const propertyDetails = {
-    propertyManager: {
-      name: "Bob Builder",
-      email: "bob.builder@example.com",
-      initials: "BB",
-    },
-    leaseTerm: {
-      startDate: "Jan 1, 2024",
-      endDate: "Dec 31, 2024",
-      monthsLeft: 8,
-    },
-    address: {
-      street: "123 Main Street",
-      city: "Melbourne",
-      state: "VIC",
-      zip: "12345",
-    },
-    rent: {
-      amount: 2000,
-      dueDate: "1st",
-    },
-  };
+  useEffect(() => {
+    // Dummy data to be replaced with API calls
+    dispatch(setPropertyDetails({
+      propertyManager: {
+        name: "Bob Builder",
+        email: "bob.builder@example.com",
+        initials: "BB",
+      },
+      leaseTerm: {
+        startDate: "Jan 1, 2024",
+        endDate: "Dec 31, 2024",
+        monthsLeft: 8,
+      },
+      address: {
+        street: "123 Main Street",
+        city: "Melbourne",
+        state: "VIC",
+        zip: "12345",
+      },
+      rent: {
+        amount: 2000,
+        dueDate: "1st",
+      },
+    }));
+
+    dispatch(setTasks([
+      {
+        title: "Rent Payment Due",
+        address: "123 Main St, Apt 4B",
+        datetime: "May 1, 2024",
+        status: "Due Soon" as const,
+      },
+      {
+        title: "Maintenance Request",
+        address: "123 Main St, Apt 4B",
+        datetime: "April 25, 2024",
+        status: "Upcoming" as const,
+      },
+    ]));
+  }, [dispatch]);
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -66,8 +74,8 @@ export function TenantDashboard(): React.JSX.Element {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <PropertyDetails {...propertyDetails} />
-        <UpcomingTasks tasks={sampleTasks} />
+        {propertyDetails && <PropertyDetails {...propertyDetails} />}
+        <UpcomingTasks tasks={tasks} />
       </div>
     </div>
   );
