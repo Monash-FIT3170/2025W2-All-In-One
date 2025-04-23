@@ -4,7 +4,7 @@ interface Task {
   title: string;
   address: string;
   datetime: string;
-  status: "Upcoming" | "Due Soon" | "Overdue";
+  status: "Upcoming" | "Due Soon" | "Overdue" | "Pending";
 }
 
 interface UpcomingTasksProps {
