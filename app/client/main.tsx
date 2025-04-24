@@ -8,11 +8,8 @@ import { Provider } from "react-redux";
 import { store } from "./store";
 import { DraftListingPage } from "./ui-modules/property-listing/DraftListingPage";
 import { DefaultTheme } from "./ui-modules/theming/themes/DefaultTheme";
-<<<<<<< HEAD
 import { AgentDashboard } from "./ui-modules/agent-dashboard/pages/AgentDashboard";
-=======
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottonNavbar";
->>>>>>> 281d9377111a8f3fc64bbb6487ee9ebb9ac1151c
 
 Meteor.startup(initialiseReactRoot);
 
@@ -32,19 +29,13 @@ function AppRoot(): React.JSX.Element {
             <Routes>
               <Route path="/" element={<GuestLandingPage />} />
               <Route path="/test" element={<DraftListingPage />} />
-<<<<<<< HEAD
               <Route path ="/agent-dashboard" element={<AgentDashboard />} />
-=======
               <Route path="/home-example" element={<ExampleHomePage />} />
->>>>>>> 281d9377111a8f3fc64bbb6487ee9ebb9ac1151c
             </Routes>
             <BottomNavbar />
           </BrowserRouter>
         </DefaultTheme>
-<<<<<<< HEAD
 
-=======
->>>>>>> 281d9377111a8f3fc64bbb6487ee9ebb9ac1151c
       </Provider>
     </React.StrictMode>
   );
