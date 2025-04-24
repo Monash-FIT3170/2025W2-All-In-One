@@ -1,4 +1,6 @@
 import React from "react";
+import { Link } from "react-router";
+import { Button } from "../../theming-shadcn/Button";
 
 interface Property {
   address: string;
@@ -64,6 +66,13 @@ export function PropertyOverview({
       <button className="w-full mt-4 py-2 text-center text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg">
         View All Properties
       </button>
+      <div className="flex justify-between items-center mt-4">
+        <Link to="/properties">
+          <Button>
+            View All Properties
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }

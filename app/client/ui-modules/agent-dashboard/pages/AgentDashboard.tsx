@@ -4,8 +4,12 @@ import { PropertyOverview } from "../components/PropertyOverview";
 import { DashboardCard } from "../components/DashboardCard";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { selectProperties, selectTasks, setProperties, setTasks } from "../state/agent-dashboard-slice";
+import { SideNavBar } from "../../navigation-bars/side-nav-bars/SideNavbar";
+import { agentLinks } from "../../navigation-bars/side-nav-bars/side-nav-link-definitions";
+import { AgentTopNavbar} from "../../navigation-bars/TopNavbar";
 
 export function AgentDashboard(): React.JSX.Element {
+  const [isSidebarOpen, onSideBarOpened] = React.useState(false);
   const dispatch = useAppDispatch();
   const properties = useAppSelector(selectProperties);
   const tasks = useAppSelector(selectTasks);
@@ -52,8 +56,16 @@ export function AgentDashboard(): React.JSX.Element {
   }, [dispatch]);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Agent Dashboard</h1>
+    <div className="min-h-screen">
+      <AgentTopNavbar onSideBarOpened={onSideBarOpened} />
+      <div className="flex">
+        <SideNavBar
+          isOpen={isSidebarOpen}
+          onClose={() => onSideBarOpened(false)}
+          navLinks={agentLinks}
+        />
+        <div className="flex-1 p-6">
+          <h1 className="text-2xl font-bold mb-6">Agent Dashboard</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <DashboardCard
@@ -80,6 +92,8 @@ export function AgentDashboard(): React.JSX.Element {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <UpcomingTasks tasks={tasks} />
         <PropertyOverview properties={properties} />
+      </div>
+        </div>
       </div>
     </div>
   );

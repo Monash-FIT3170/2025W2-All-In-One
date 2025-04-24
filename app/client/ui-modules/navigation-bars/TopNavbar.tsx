@@ -3,8 +3,43 @@ import { Link } from "react-router";
 import { PropManagerLogoIcon } from "../theming/components/logo/PropManagerLogoIcon";
 import { PropManagerLogoText } from "../theming/components/logo/PropManagerLogoText";
 import { Button } from "../theming-shadcn/Button";
+import { BellIcon } from "../theming/icons/BellIcon";
+import { SidebarSliderIcon } from "../theming/icons/SideBarSliderIcon";
 interface TopNavbarProps {
   onSideBarOpened: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+interface AgentTopNavbarProps {
+  onSideBarOpened: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function AgentTopNavbar({
+  onSideBarOpened,
+}: AgentTopNavbarProps): React.JSX.Element {
+  return (
+    <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
+      <div className="flex justify-between items-center px-4">
+        {/* Left section: Menu icon and logo */}
+        <div className="flex items-center gap-4">
+          <SidebarSliderIcon
+            onClick={() => onSideBarOpened(prev => !prev)}
+            className="text-gray-600"
+          />
+          <div className="flex items-center gap-2">
+            <PropManagerLogoIcon variant="light" />
+            <PropManagerLogoText />
+          </div>
+        </div>
+
+        {/* Right-aligned actions */}
+        <div className="flex items-center gap-4">
+          <div className="ml-2">
+            <BellIcon hasNotifications={true} className="text-gray-600" />
+          </div>
+        </div>
+      </div>
+    </header>
+  );
 }
 
 export function TopNavbar({
