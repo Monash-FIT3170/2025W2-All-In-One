@@ -1,4 +1,5 @@
 import React from "react";
+import { twMerge } from "tailwind-merge";
 
 export function ListingDescription({
   description,
@@ -8,8 +9,8 @@ export function ListingDescription({
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={`flex flex-col ${className}`}>
-      <span className="geist-semibold mb-1">Description</span>
+    <div className={twMerge("flex flex-col", className)}>
+      <span className="geist-semibold text-[18px] mb-1">Description</span>
       <span className="geist-regular text-[16px]">{description}</span>
     </div>
   );

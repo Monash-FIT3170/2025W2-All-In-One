@@ -1,6 +1,7 @@
 import React from "react";
+import { twMerge } from "tailwind-merge";
 
-export enum ListingStatusPillState {
+export enum PropertyStatusPillVariant {
   VACANT,
 }
 
@@ -11,8 +12,8 @@ export function ListingSummary({
   province,
   postcode,
   summaryDescription,
-  listingStatusText,
-  listingStatusPillState,
+  propertyStatusText,
+  propertyStatusPillVariant,
   className = "",
 }: {
   streetNumber: string;
@@ -21,12 +22,12 @@ export function ListingSummary({
   province: string;
   postcode: string;
   summaryDescription: string;
-  listingStatusText: string;
-  listingStatusPillState: ListingStatusPillState;
+  propertyStatusText: string;
+  propertyStatusPillVariant: PropertyStatusPillVariant;
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={`flex flex-col ${className}`}>
+    <div className={twMerge("flex flex-col", className)}>
       <div className="flex flex-row items-center">
         <Address
           streetNumber={streetNumber}
@@ -36,7 +37,7 @@ export function ListingSummary({
           postcode={postcode}
           className="mr-6"
         />
-        <StatusPill text={listingStatusText} state={listingStatusPillState} />
+        <StatusPill text={propertyStatusText} variant={propertyStatusPillVariant} />
       </div>
 
       <Description description={summaryDescription} />
@@ -60,7 +61,7 @@ function Address({
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={`flex flex-row items-end ${className}`}>
+    <div className={twMerge("flex flex-row items-end", className)}>
       <span className="geist-semibold text-[20px] mr-3">{`${streetNumber} ${street}`}</span>
       <span className="geist-regular text-[17px]">{`${suburb}, ${province}, ${postcode}`}</span>
     </div>
@@ -75,7 +76,7 @@ function Description({
   className?: string;
 }): React.JSX.Element {
   return (
-    <span className={`geist-regular text-(--body-tertiary-color) ${className}`}>
+    <span className={twMerge("geist-regular text-(--body-tertiary-color)", className)}>
       {description}
     </span>
   );
@@ -83,23 +84,23 @@ function Description({
 
 function StatusPill({
   text,
-  state,
+  variant,
   className = "",
 }: {
   text: string;
-  state: ListingStatusPillState;
+  variant: PropertyStatusPillVariant;
   className?: string;
 }): React.JSX.Element {
   const bgColorClass = (() => {
-    switch (state) {
-      case ListingStatusPillState.VACANT:
+    switch (variant) {
+      case PropertyStatusPillVariant.VACANT:
         return "bg-(--status-green-color)";
     }
   })();
 
   return (
     <span
-      className={`px-5 py-0.5 h-min text-[12px] rounded-full ${bgColorClass} ${className}`}
+      className={twMerge(`px-5 py-0.5 text-[12px] rounded-full ${bgColorClass}`, className)}
     >
       {text}
     </span>

@@ -1,9 +1,12 @@
 
 :root {
-  --body-secondary-color: #6b7280;
+  --body-secondary-color: #71717A;
   --body-tertiary-color: #979797;
   --body-quaternary-color: #f4f4F5;
-  --active-primary-color: #3b82f6;
+  --status-dark-blue-color: #1e40af;
+  --status-orange-color: #f97316;
   --status-green-color: #8ee1ad;
-  --divider-color: #ebebeb
+  --button-blue-color: #3b82f6;
+  --button-black-color: #18181b;
+  --divider-color: #e4e4e7;
 } 

@@ -3,7 +3,7 @@ import { Mongo } from "meteor/mongo";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { TaskDocument } from "/app/server/database/example-tasks/models/TaskDocument";
 import { TasksCollection } from "/app/server/database/example-tasks/TasksCollection";
-import { TaskDTO } from "/app/server/model/TaskDTO";
+import { TaskDTO } from "./models/TaskDTO";
 
 const taskInsertMethod = {
   [MeteorMethodIdentifier.TASK_INSERT]: async (text: string): Promise<string> => {

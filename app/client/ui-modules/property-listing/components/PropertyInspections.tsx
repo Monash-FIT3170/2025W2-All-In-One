@@ -1,7 +1,12 @@
 import React from "react";
-import { ThemedButton } from "../../theming/components/ThemedButton";
+import {
+  ThemedButton,
+  ThemedButtonVariant,
+} from "../../theming/components/ThemedButton";
 import { Divider } from "../../theming/components/Divider";
 import { CalendarIcon } from "../../theming/icons/CalendarIcon";
+import { twMerge } from "tailwind-merge";
+import { SubHeading } from "/app/client/ui-modules/theming/components/SubHeading";
 
 export type InspectionBookingListUiState = {
   date: string;
@@ -9,7 +14,7 @@ export type InspectionBookingListUiState = {
   endingTime: string;
 };
 
-export function InspectionBookingList({
+export function PropertyInspections({
   bookingUiStateList,
   onBook,
   className = "",
@@ -19,8 +24,31 @@ export function InspectionBookingList({
   className?: string;
 }): React.JSX.Element {
   return (
+    <div className={twMerge("flex flex-col", className)}>
+      <SubHeading text="Upcoming Inspections" className="mb-2" />
+      <InspectionBookingList
+        bookingUiStateList={bookingUiStateList}
+        onBook={onBook}
+      />
+    </div>
+  );
+}
+
+function InspectionBookingList({
+  bookingUiStateList,
+  onBook,
+  className,
+}: {
+  bookingUiStateList: InspectionBookingListUiState[];
+  onBook: (index: number) => void;
+  className?: string;
+}): React.JSX.Element {
+  return (
     <div
-      className={`flex flex-col w-[520px] border-[1.5px] border-(--divider-color) rounded-lg py-3 px-4 ${className}`}
+      className={twMerge(
+        "flex flex-col w-[520px] border-[1.5px] border-(--divider-color) rounded-lg py-3 px-4",
+        className
+      )}
     >
       {bookingUiStateList.map((state, i) => (
         <BookingEntry
@@ -49,7 +77,7 @@ function BookingEntry({
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={`flex flex-col ${className}`}>
+    <div className={twMerge("flex flex-col", className)}>
       {shouldDisplayDivider ? <Divider /> : ""}
 
       <div className="flex flex-row items-center">
@@ -60,7 +88,7 @@ function BookingEntry({
           className="mr-auto"
         />
         <CalendarIcon className="w-[22px] h-[20px] mr-6" />
-        <BookingButton index={index} onBook={onBook} />
+        <BookingButton index={index} onClick={onBook} />
       </div>
     </div>
   );
@@ -87,21 +115,22 @@ function BookingDateTime({
 
 function BookingButton({
   index,
-  onBook,
+  onClick,
   className = "",
 }: {
   index: number;
-  onBook: (index: number) => void;
+  onClick: (index: number) => void;
   className?: string;
 }): React.JSX.Element {
   return (
     <ThemedButton
+      variant={ThemedButtonVariant.TERTIARY}
       onClick={() => {
-        onBook(index);
+        onClick(index);
       }}
-      className={`w-[117px] h-[36px] ${className}`}
+      className={twMerge("w-[117px] h-[36px]", className)}
     >
-      <span className="text-white">Book</span>
+      Book
     </ThemedButton>
   );
 }

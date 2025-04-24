@@ -1,4 +1,5 @@
 import React from "react";
+import { twMerge } from "tailwind-merge";
 
 export function IconButton({
   icon,
@@ -10,7 +11,7 @@ export function IconButton({
   className?: string;
 }): React.JSX.Element {
   return (
-    <button onClick={onClick} className={`cursor-pointer ${className}`}>
+    <button onClick={onClick} className={twMerge("cursor-pointer", className)}>
       {icon}
     </button>
   );

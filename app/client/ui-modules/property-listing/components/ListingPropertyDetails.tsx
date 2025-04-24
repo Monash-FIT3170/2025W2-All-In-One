@@ -1,4 +1,5 @@
 import React from "react";
+import { twMerge } from "tailwind-merge";
 
 export function ListingPropertyDetails({
   propertyType,
@@ -19,21 +20,21 @@ export function ListingPropertyDetails({
 }): React.JSX.Element {
   return (
     <div
-      className={`grid grid-cols-3 grid-rows-3 gap-y-4 w-[300px] ${className}`}
+      className={twMerge("grid grid-cols-2 grid-rows-3 gap-y-3 gap-x-5 w-[830px]", className)}
     >
       <PropertyDetailEntry label="Type" text={propertyType} />
-      <PropertyDetailEntry label="Area" text={area} className="col-span-2" />
-
-      <PropertyDetailEntry label="Bathrooms" text={bathrooms} />
-      <PropertyDetailEntry label="Parking" text={parking} />
-      <PropertyDetailEntry label="Bedrooms" text={bedrooms} />
-
       <PropertyDetailEntry
         label="Price"
         text={price}
-        textColorClass="text-(--active-primary-color)"
-        className="col-span-full"
+        textColorClass="text-(--button-blue-color)"
       />
+      
+      <PropertyDetailEntry label="Bedrooms" text={bedrooms} />
+      <PropertyDetailEntry label="Parking" text={parking} />
+
+      <PropertyDetailEntry label="Bathrooms" text={bathrooms} />
+      <PropertyDetailEntry label="Area" text={area} />
+      
     </div>
   );
 }
@@ -50,7 +51,7 @@ function PropertyDetailEntry({
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={`flex flex-col ${className}`}>
+    <div className={twMerge("flex flex-col border border-(--divider-color) rounded-md p-2", className)}>
       <span className="geist-regular text-[14px] text-(--body-secondary-color)">
         {label}
       </span>
