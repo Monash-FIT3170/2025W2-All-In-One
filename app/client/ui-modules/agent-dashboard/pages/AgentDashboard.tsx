@@ -4,9 +4,9 @@ import { PropertyOverview } from "../components/PropertyOverview";
 import { DashboardCard } from "../components/DashboardCard";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { selectProperties, selectTasks, setProperties, setTasks } from "../state/agent-dashboard-slice";
-import { SideNavBar } from "../../navigation-bars/side-nav-bars/SideNavbar";
-import { agentLinks } from "../../navigation-bars/side-nav-bars/side-nav-link-definitions";
+import { DashboardSideNavBar } from "../../navigation-bars/side-nav-bars/SideNavbar";
 import { AgentTopNavbar} from "../../navigation-bars/TopNavbar";
+import { agentDashboardLinks, settingLinks } from "../../navigation-bars/side-nav-bars/side-nav-link-definitions";
 
 export function AgentDashboard(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
@@ -59,40 +59,39 @@ export function AgentDashboard(): React.JSX.Element {
     <div className="min-h-screen">
       <AgentTopNavbar onSideBarOpened={onSideBarOpened} />
       <div className="flex">
-        <SideNavBar
+        <DashboardSideNavBar
           isOpen={isSidebarOpen}
           onClose={() => onSideBarOpened(false)}
-          navLinks={agentLinks}
+          dashboardLinks={agentDashboardLinks}
+          settingsLinks={settingLinks}
         />
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-bold mb-6">Agent Dashboard</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <DashboardCard
-          title="Total Properties"
-          value= "12"
-          subtitle="+2 from last month"
-        />
-        <DashboardCard
-          title="Occupancy Rate"
-          value="85%"
-        />
-        <DashboardCard
-          title="Pending Tasks"
-          value="7"
-          subtitle="5 due this week"
-        />
-        <DashboardCard
-          title = "Monthly Revenue"
-          value = "$24,500"
-          subtitle = "+5% from last month"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <UpcomingTasks tasks={tasks} />
-        <PropertyOverview properties={properties} />
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <DashboardCard
+              title="Total Properties"
+              value="12"
+              subtitle="+2 from last month"
+            />
+            <DashboardCard
+              title="Occupancy Rate"
+              value="85%"
+            />
+            <DashboardCard
+              title="Pending Tasks"
+              value="7"
+              subtitle="5 due this week"
+            />
+            <DashboardCard
+              title="Monthly Revenue"
+              value="$24,500"
+              subtitle="+5% from last month"
+            />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <UpcomingTasks tasks={tasks} />
+            <PropertyOverview properties={properties} />
+          </div>
         </div>
       </div>
     </div>

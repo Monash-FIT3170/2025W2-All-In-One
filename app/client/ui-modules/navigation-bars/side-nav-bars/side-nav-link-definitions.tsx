@@ -9,6 +9,37 @@ export interface NavLinkItem {
   icon?: React.ReactNode;
 }
 
+export const agentDashboardLinks = [
+    { to: "/dashboard",
+      label: "Overview"
+    },
+    { to: "/properties",
+      label: "Properties"
+    },
+    { to: "/calendar",
+      label: "Calendar"
+    },
+    { to: "/tasks",
+      label: "Tasks"
+    },
+    { to: "/messages",
+      label: "Messages"
+    },
+    { to: "/analytics",
+      label: "Analytics"
+    },
+  ];
+
+export const settingLinks: NavLinkItem[] = [
+    { to: "/profile",
+      label: "Profile"
+    },
+    { to: "/settings",
+      label: "Settings"
+    },
+  ];
+
+
 export const agentLinks: NavLinkItem[] = [
   { to: "/", label: "Overview" },
   {
@@ -27,6 +58,8 @@ export const agentLinks: NavLinkItem[] = [
     icon: <CalendarIcon />,
   },
 ];
+
+
 
 export const landlordLinks: NavLinkItem[] = [
   { to: "/", label: "Overview" },
