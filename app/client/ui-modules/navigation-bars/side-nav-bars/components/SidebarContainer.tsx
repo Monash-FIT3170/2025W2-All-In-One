@@ -52,8 +52,7 @@ export const SidebarContent = ({ nav, bottom }: SidebarContentProps) => (
       <div className="flex flex-col gap-2 p-4 border-t border-gray-200">
         {bottom}
       </div>
-    )}
-  </div>
+    )}  </div>
 );
 
 interface SidebarHeaderProps {
