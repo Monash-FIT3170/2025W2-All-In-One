@@ -6,15 +6,15 @@ interface Property {
   rent: number;
 }
 
-interface PropertyDetailsProps {
+interface PropertyOverviewProps {
   properties: Property[];
   className?: string;
 }
 
-export function PropertyDetails({
+export function PropertyOverview({
   properties,
   className = "",
-}: PropertyDetailsProps): React.JSX.Element {
+}: PropertyOverviewProps): React.JSX.Element {
   return (
     <div className={`bg-white rounded-lg p-6 ${className}`}>
       <div className="flex items-center justify-between mb-4">
@@ -47,6 +47,8 @@ export function PropertyDetails({
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                     property.status === "Closed" ? "bg-gray-100 text-gray-800" :
                     property.status === "Draft" ? "bg-yellow-100 text-yellow-800" :
+                    property.status === "Listed" ? "bg-green-100 text-green-800" :
+                    property.status === "Maintenance" ? "bg-blue-100 text-blue-800" :
                     "bg-red-100 text-red-800"
                   }`}>
                     {property.status}

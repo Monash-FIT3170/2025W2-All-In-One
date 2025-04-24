@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { UpcomingTasks } from "../components/UpcomingTasks";
-import { PropertyDetails } from "../components/PropertyDetails";
+import { PropertyOverview } from "../components/PropertyOverview";
 import { DashboardCard } from "../components/DashboardCard";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { selectProperties, selectTasks, setProperties, setTasks } from "../state/agent-dashboard-slice";
@@ -79,7 +79,7 @@ export function AgentDashboard(): React.JSX.Element {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <UpcomingTasks tasks={tasks} />
-        <PropertyDetails properties={properties} />
+        <PropertyOverview properties={properties} />
       </div>
     </div>
   );

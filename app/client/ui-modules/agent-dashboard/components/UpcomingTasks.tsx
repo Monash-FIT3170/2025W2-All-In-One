@@ -16,6 +16,7 @@ export function UpcomingTasks({ tasks, className = "" }: UpcomingTasksProps): Re
   return (
     <div className={`bg-white rounded-lg p-6 ${className}`}>
       <h2 className="text-xl font-semibold mb-4">Upcoming Tasks</h2>
+      <p className="text-sm text-gray-500">Your scheduled tasks and appointments</p>
       <div className="space-y-4">
         {tasks.map((task, index) => (
           <TaskItem key={index} task={task} />
@@ -37,6 +38,8 @@ function TaskItem({ task }: { task: Task }): React.JSX.Element {
         return "bg-yellow-100 text-yellow-800";
       case "Overdue":
         return "bg-red-100 text-red-800";
+      case "Pending":
+        return "bg-gray-100 text-gray-800";
     }
   };
 
