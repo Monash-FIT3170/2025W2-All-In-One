@@ -4,7 +4,7 @@ import { PropManagerLogoIcon } from "../theming/components/logo/PropManagerLogoI
 import { PropManagerLogoText } from "../theming/components/logo/PropManagerLogoText";
 import { Button } from "../theming-shadcn/Button";
 import { BellIcon } from "../theming/icons/BellIcon";
-import { SidebarSliderIcon } from "../theming/icons/SideBarSliderIcon";
+import { SideBarSliderIcon } from "../theming/icons/SideBarSlider";
 interface TopNavbarProps {
   onSideBarOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -21,7 +21,7 @@ export function AgentTopNavbar({
       <div className="flex justify-between items-center px-4">
         {/* Left section: Menu icon and logo */}
         <div className="flex items-center gap-4">
-          <SidebarSliderIcon
+          <SideBarSliderIcon
             onClick={() => onSideBarOpened(prev => !prev)}
             className="text-gray-600"
           />

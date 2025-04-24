@@ -1,11 +1,11 @@
 import React from 'react';
 
-interface SidebarSliderIconProps {
+interface SideBarSliderIconProps {
   className?: string;
   onClick?: () => void;
 }
 
-export function SidebarSliderIcon({ className = '', onClick }: SidebarSliderIconProps): React.JSX.Element {
+export function SideBarSliderIcon({ className = '', onClick }: SideBarSliderIconProps): React.JSX.Element {
   return (
     <button
       onClick={onClick}
@@ -21,7 +21,7 @@ export function SidebarSliderIcon({ className = '', onClick }: SidebarSliderIcon
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="feather feather-SidebarSlider"
+        className="feather feather-menu"
       >
         <line x1="3" y1="12" x2="21" y2="12" />
         <line x1="3" y1="6" x2="21" y2="6" />
