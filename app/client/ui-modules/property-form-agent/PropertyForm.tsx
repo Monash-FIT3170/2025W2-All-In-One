@@ -10,7 +10,7 @@ import PropertyDetails from "./components/PropertyDetails";
 import PropertyImages from "./components/PropertyImages";
 import ListingOptions from "./components/ListingOptions";
 import { Button } from "../theming/components/shadcn/Button";
-import { ArrowBigLeft, ArrowLeftFromLine, ArrowLeftIcon, SquareArrowDownLeft } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
 
 export const formSchema = z.object({
   landlord: z.string(),
