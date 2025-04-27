@@ -1,10 +1,7 @@
 "use client";
 import React from "react";
-import * as z from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { z }from "zod";
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -19,30 +16,17 @@ import {
   SelectValue,
 } from "../../theming/components/shadcn/Select";
 import { Input } from "../../theming/components/shadcn/Input";
+import { UseFormReturn } from "react-hook-form";
+import { formSchema } from "../PropertyForm";
 
-const basicInformationSchema = z.object({
-  landlord: z.string(),
-  property_type: z.string(),
-  address: z.string(),
-  city: z.string(),
-  state: z.string(),
-  postal_code: z.string(),
-  apartment_number: z.string().optional(),
-  monthly_rent: z.string(),
-  bond: z.string(),
-});
+type FormSchemaType = z.infer<typeof formSchema>
 
-export default function BasicInformation() {
-  const form = useForm<z.infer<typeof basicInformationSchema>>({
-    resolver: zodResolver(basicInformationSchema),
-  });
+export default function BasicInformation({ form }: { form: UseFormReturn<FormSchemaType>}) {
 
   return (
-    <div className="border border-[#E4E4E7]">
-      <h1 className="text-xl mt-5 mb-2 space-y-8 max-w-3xl mx-auto font-semibold">Basic Information</h1>
-      <h3 className="text-sm  max-w-3xl mx-auto text-[#71717A]">Enter the basic details of the property</h3>
-      <Form {...form}>
-        <form className="space-y-4 max-w-3xl mx-auto py-7">
+    <div className="border border-[#E4E4E7] w-full p-7 rounded-md">
+      <h1 className="text-xl mb-1 space-y-8 max-w-3xl mx-auto font-semibold">Basic Information</h1>
+      <h3 className="text-sm mb-8 max-w-3xl mx-auto text-[#71717A]">Enter the basic details of the property</h3>
           <FormField
             control={form.control}
             name="landlord"
@@ -75,7 +59,7 @@ export default function BasicInformation() {
             control={form.control}
             name="property_type"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="py-2">
                 <FormLabel>Property Type</FormLabel>
                 <Select
                   onValueChange={field.onChange}
@@ -102,7 +86,7 @@ export default function BasicInformation() {
                 control={form.control}
                 name="address"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="py-2">
                     <FormLabel>Street Address</FormLabel>
                     <FormControl>
                       <Input placeholder="123 Main St" type="" {...field} />
@@ -121,7 +105,7 @@ export default function BasicInformation() {
                 control={form.control}
                 name="city"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="py-2">
                     <FormLabel>City</FormLabel>
                     <FormControl>
                       <Input placeholder="Melbourne" type="text" {...field} />
@@ -138,7 +122,7 @@ export default function BasicInformation() {
                 control={form.control}
                 name="state"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="py-2">
                     <FormLabel>State</FormLabel>
                     <FormControl>
                       <Input placeholder="VIC" type="text" {...field} />
@@ -157,7 +141,7 @@ export default function BasicInformation() {
                 control={form.control}
                 name="postal_code"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="py-2">
                     <FormLabel>Postal Code</FormLabel>
                     <FormControl>
                       <Input placeholder="3000" type="" {...field} />
@@ -174,8 +158,8 @@ export default function BasicInformation() {
                 control={form.control}
                 name="apartment_number"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Unit/Apt #</FormLabel>
+                  <FormItem className="py-2">
+                    <FormLabel>Unit/Apt # (Optional)</FormLabel>
                     <FormControl>
                       <Input placeholder="Apt 4B" type="" {...field} />
                     </FormControl>
@@ -191,7 +175,7 @@ export default function BasicInformation() {
             control={form.control}
             name="monthly_rent"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="py-2">
                 <FormLabel>Monthly Rent</FormLabel>
                 <FormControl>
                   <Input placeholder="2500" type="number" {...field} />
@@ -206,7 +190,7 @@ export default function BasicInformation() {
             control={form.control}
             name="bond"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="py-2">
                 <FormLabel>Bond / Security Deposit</FormLabel>
                 <FormControl>
                   <Input placeholder="2500" type="number" {...field} />
@@ -215,8 +199,6 @@ export default function BasicInformation() {
               </FormItem>
             )}
           />
-        </form>
-      </Form>
     </div>
   );
 }
