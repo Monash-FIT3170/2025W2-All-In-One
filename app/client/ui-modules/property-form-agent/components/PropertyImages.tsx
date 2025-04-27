@@ -30,7 +30,7 @@ export default function PropertyImages({
   // Updates form when files states changes i.e. submitting file
   useEffect(() => {
     if (files) {
-      form.setValue("images", files);
+      form.setValue("images", files, { shouldValidate: true });
     }
   }, [files]);
 
