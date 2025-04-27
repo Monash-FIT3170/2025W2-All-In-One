@@ -22,7 +22,7 @@ import { FormHeading } from "./FormHeading";
 
 type FormSchemaType = z.infer<typeof formSchema>;
 
-export default function BasicInformation({
+export default function FormBasicInformation({
   form,
 }: {
   form: UseFormReturn<FormSchemaType>;

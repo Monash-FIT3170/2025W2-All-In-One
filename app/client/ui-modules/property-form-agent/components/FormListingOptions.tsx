@@ -29,7 +29,7 @@ import { FormHeading } from "./FormHeading";
 
 type FormSchemaType = z.infer<typeof formSchema>;
 
-export default function ListingOptions({
+export default function FormListingOptions({
   form,
 }: {
   form: UseFormReturn<FormSchemaType>;

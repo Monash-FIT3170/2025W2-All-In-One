@@ -5,10 +5,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form } from "../theming/components/shadcn/Form";
-import BasicInformation from "./components/BasicInformation";
-import PropertyDetails from "./components/PropertyDetails";
-import PropertyImages from "./components/PropertyImages";
-import ListingOptions from "./components/ListingOptions";
+import FormBasicInformation from "./components/FormBasicInformation";
+import FormPropertyDetails from "./components/FormPropertyDetails";
+import FormPropertyImages from "./components/FormPropertyImages";
+import FormListingOptions from "./components/FormListingOptions";
 import { Button } from "../theming/components/shadcn/Button";
 import { ArrowLeftIcon } from "lucide-react";
 import { PageHeading } from "./components/PageHeading";
@@ -99,10 +99,10 @@ export function PropertyForm(): React.JSX.Element {
       <div className="max-w-3xl mx-auto px-6 py-10 rounded-md">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
-            <BasicInformation form={form} />
-            <PropertyDetails form={form} />
-            <PropertyImages form={form} />
-            <ListingOptions form={form} />
+            <FormBasicInformation form={form} />
+            <FormPropertyDetails form={form} />
+            <FormPropertyImages form={form} />
+            <FormListingOptions form={form} />
 
             <div className="flex justify-end">
               <Button variant="black" onClick={() => onSubmit}>

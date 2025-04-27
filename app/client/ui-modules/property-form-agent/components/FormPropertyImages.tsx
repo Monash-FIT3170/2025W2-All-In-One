@@ -20,7 +20,7 @@ import { FormHeading } from "./FormHeading";
 
 type FormSchemaType = z.infer<typeof formSchema>;
 
-export default function PropertyImages({
+export default function FormPropertyImages({
   form,
 }: {
   form: UseFormReturn<FormSchemaType>;
