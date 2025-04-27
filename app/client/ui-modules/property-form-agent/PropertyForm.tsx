@@ -14,25 +14,26 @@ import { ArrowLeftIcon } from "lucide-react";
 import { PageHeading } from "./components/PageHeading";
 
 export const formSchema = z.object({
-  landlord: z.string(),
-  property_type: z.string(),
-  address: z.string(),
-  city: z.string(),
-  state: z.string(),
-  postal_code: z.string().length(4, {message: "Post code must be 4 digits long"}),
+  landlord: z.string().min(1, { message: "Please assign a landlord" }),
+  property_type: z.string().min(1, { message: "Please select a property type" }),
+  address: z.string().min(1, { message: "Please fill out field" }),
+  city: z.string().min(1, { message: "Please fill out field"}),
+  state: z.string().min(1, { message: "Please fill out field" }),
+  postal_code: z.string().length(4, { message: "Postal code must be 4 digits long" }),
   apartment_number: z.string().optional(),
-  monthly_rent: z.coerce.number().min(0),
-  bond: z.coerce.number().min(0),
-  bedroom_number: z.coerce.number().min(0),
-  bathroom_number: z.coerce.number().min(0),
-  space: z.coerce.number().min(0),
-  description: z.string(),
-  amenities: z.string(),
-  images: z.string(),
+  monthly_rent: z.coerce.number().min(1, { message: "Monthly rent must be greater than 0" }),
+  bond: z.coerce.number().min(1, { message: "Please fill out field" }),
+  bedroom_number: z.coerce.number().min(1, { message: "Please fill out field" }),
+  bathroom_number: z.coerce.number().min(1, { message: "Please fill out field" }),
+  space: z.coerce.number().min(1, { message: "Please fill out field" }),
+  description: z.string().min(1, { message: "Please fill out field" }),
+  amenities: z.string().min(1, { message: "Please fill out field" }),
+  images: z.array(z.instanceof(File)).min(1, { message: "At least one image is required" }),
   available_dates: z.coerce.date(),
-  lease_term: z.string(),
+  lease_term: z.string().min(1, { message: "Lease term is required" }),
   show_contact_boolean: z.boolean().optional()
 });
+
 
 export function PropertyForm(): React.JSX.Element {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -52,7 +53,7 @@ export function PropertyForm(): React.JSX.Element {
       space: 0,
       description: "",
       amenities: "",
-      images: "",
+      images: [],
       available_dates: new Date(),
       lease_term: "",
       show_contact_boolean: false,
