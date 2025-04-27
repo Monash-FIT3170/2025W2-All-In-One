@@ -1,10 +1,7 @@
 "use client";
 import React from "react";
 import * as z from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Form,
   FormControl,
   FormDescription,
   FormField,
@@ -14,38 +11,26 @@ import {
 } from "../../theming/components/shadcn/Form";
 import { Input } from "../../theming/components/shadcn/Input";
 import { Textarea } from "../../theming/components/shadcn/Textarea";
+import { formSchema } from "../PropertyForm";
+import { UseFormReturn } from "react-hook-form";
 
-const formSchema = z.object({
-  bedroom_number: z.number().min(0),
-  bathroom_number: z.number().min(0),
-  space: z.number().min(0),
-  description: z.string(),
-  amenities: z.string()
-});
+type FormSchemaType = z.infer<typeof formSchema>
 
-export default function PropertyDetails() {
+export default function PropertyDetails({ form }: { form: UseFormReturn<FormSchemaType>}) {
 
-  const form = useForm < z.infer < typeof formSchema >> ({
-    resolver: zodResolver(formSchema),
-
-  });
 
   return (
-    <div className="border border-[#0c0c2d]">
-            <h1 className="text-xl mt-5 mb-2 space-y-8 max-w-3xl mx-auto font-semibold">Property Details</h1>
-            <h3 className="text-sm  max-w-3xl mx-auto text-[#71717A]">Enter specific details about the property</h3>
-    <Form {...form}>
-      <form className="space-y-4 max-w-3xl mx-auto py-10">
+    <div className="border border-[#E4E4E7] w-full p-7 rounded-md">
+            <h1 className="text-xl mb-1 space-y-8 max-w-3xl mx-auto font-semibold">Property Details</h1>
+            <h3 className="text-sm mb-2 max-w-3xl mx-auto text-[#71717A]">Enter specific details about the property</h3>
         
         <div className="grid grid-cols-12 gap-4">
-          
           <div className="col-span-4">
-            
         <FormField
           control={form.control}
           name="bedroom_number"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="py-2">
               <FormLabel>Bedrooms</FormLabel>
               <FormControl>
                 <Input 
@@ -67,7 +52,7 @@ export default function PropertyDetails() {
           control={form.control}
           name="bathroom_number"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="py-2">
               <FormLabel>Bathrooms</FormLabel>
               <FormControl>
                 <Input 
@@ -88,7 +73,7 @@ export default function PropertyDetails() {
           control={form.control}
           name="space"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="py-2">
               <FormLabel>Space (m²)</FormLabel>
               <FormControl>
                 <Input 
@@ -110,7 +95,7 @@ export default function PropertyDetails() {
           control={form.control}
           name="description"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="py-2">
               <FormLabel>Property Description</FormLabel>
               <FormControl>
                 <Textarea
@@ -129,7 +114,7 @@ export default function PropertyDetails() {
           control={form.control}
           name="amenities"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="py-2">
               <FormLabel>Amenities</FormLabel>
               <FormControl>
                 <Textarea
@@ -143,8 +128,6 @@ export default function PropertyDetails() {
             </FormItem>
           )}
         />
-      </form>
-    </Form>
     </div>
   )
 }
