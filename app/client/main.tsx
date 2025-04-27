@@ -19,6 +19,7 @@ import { LandlordProperty } from "./ui-modules/role-dashboard/landlord-dashboard
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottonNavbar";
 import { PropertyListingPage } from "/app/client/ui-modules/property-listing-page/PropertyListingPage";
 import { SettingsPage } from "./ui-modules/settings-page/SettingsPage";
+import { PropertyForm } from "./ui-modules/property-form-agent/PropertyForm";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -49,6 +50,9 @@ function AppRoot(): React.JSX.Element {
               <Route path="/test" element={<PropertyListingPage />} />
               <Route path="/home-example" element={<ExampleHomePage />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/" element={<ExampleHomePage />} />
+              <Route path="/test" element={<DraftListingPage />} />
+              <Route path="/propertyform" element={<PropertyForm />} />
             </Routes>
             <BottomNavbar />
           </BrowserRouter>
