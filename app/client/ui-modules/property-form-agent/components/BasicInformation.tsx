@@ -18,6 +18,7 @@ import {
 import { Input } from "../../theming/components/shadcn/Input";
 import { UseFormReturn } from "react-hook-form";
 import { formSchema } from "../PropertyForm";
+import { FormHeading } from "./FormHeading";
 
 type FormSchemaType = z.infer<typeof formSchema>
 
@@ -25,8 +26,7 @@ export default function BasicInformation({ form }: { form: UseFormReturn<FormSch
 
   return (
     <div className="border border-[#E4E4E7] w-full p-7 rounded-md">
-      <h1 className="text-xl mb-1 space-y-8 max-w-3xl mx-auto font-semibold">Basic Information</h1>
-      <h3 className="text-sm mb-8 max-w-3xl mx-auto text-[#71717A]">Enter the basic details of the property</h3>
+      <FormHeading title="Basic Information" subtitle="Enter the basic details of the property"></FormHeading>
           <FormField
             control={form.control}
             name="landlord"

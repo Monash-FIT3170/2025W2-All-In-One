@@ -19,6 +19,7 @@ import {
 } from "../../theming/components/shadcn/FileUpload";
 import { formSchema } from "../PropertyForm";
 import { UseFormReturn } from "react-hook-form";
+import { FormHeading } from "./FormHeading";
 
 type FormSchemaType = z.infer<typeof formSchema>
 
@@ -34,8 +35,7 @@ export default function PropertyImages({ form }: { form: UseFormReturn<FormSchem
 
   return (
     <div className="border border-[#E4E4E7] w-full p-7 rounded-md">
-      <h1 className="text-xl mb-1 space-y-8 max-w-3xl mx-auto font-semibold">Property Images</h1>
-      <h3 className="text-sm mb-2 max-w-3xl mx-auto text-[#71717A]">Upload high-quality images of the property</h3>
+      <FormHeading title="Property Images" subtitle="Upload high-quality images of the property"/>
             <FormField
               control={form.control}
               name="images"

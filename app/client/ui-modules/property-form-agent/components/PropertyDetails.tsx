@@ -13,6 +13,7 @@ import { Input } from "../../theming/components/shadcn/Input";
 import { Textarea } from "../../theming/components/shadcn/Textarea";
 import { formSchema } from "../PropertyForm";
 import { UseFormReturn } from "react-hook-form";
+import { FormHeading } from "./FormHeading";
 
 type FormSchemaType = z.infer<typeof formSchema>
 
@@ -21,9 +22,7 @@ export default function PropertyDetails({ form }: { form: UseFormReturn<FormSche
 
   return (
     <div className="border border-[#E4E4E7] w-full p-7 rounded-md">
-            <h1 className="text-xl mb-1 space-y-8 max-w-3xl mx-auto font-semibold">Property Details</h1>
-            <h3 className="text-sm mb-2 max-w-3xl mx-auto text-[#71717A]">Enter specific details about the property</h3>
-        
+      <FormHeading title="Property Details" subtitle="Enter specific details about the property"/>
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-4">
         <FormField

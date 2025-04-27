@@ -33,6 +33,7 @@ import { Button } from "../../theming/components/shadcn/Button";
 import { cn } from "/app/client/lib/utils";
 import { formSchema } from "../PropertyForm";
 import { UseFormReturn } from "react-hook-form";
+import { FormHeading } from "./FormHeading";
 
 type FormSchemaType = z.infer<typeof formSchema>
 
@@ -54,8 +55,7 @@ export default function ListingOptions({ form }: { form: UseFormReturn<FormSchem
 
   return (
     <div className="border border-[#E4E4E7] w-full p-7 rounded-md">
-            <h1 className="text-xl mb-1 space-y-8 max-w-3xl mx-auto font-semibold">Listing Options</h1>
-            <h3 className="text-sm mb-2 max-w-3xl mx-auto text-[#71717A]">Configure additional listing settings</h3>
+      <FormHeading title="Listing Options" subtitle="Configure additional listing settings"/>
       <FormField
       control={form.control}
       name="available_dates"
@@ -143,7 +143,6 @@ export default function ListingOptions({ form }: { form: UseFormReturn<FormSchem
                       onCheckedChange={field.onChange}
                       aria-readonly
                       className="flex justify-start"
-                      
                     />
                   </FormControl>
                     <FormLabel className="font-light pb-2">Show my contact information</FormLabel>

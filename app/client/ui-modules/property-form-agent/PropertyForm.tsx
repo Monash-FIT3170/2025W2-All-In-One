@@ -11,6 +11,7 @@ import PropertyImages from "./components/PropertyImages";
 import ListingOptions from "./components/ListingOptions";
 import { Button } from "../theming/components/shadcn/Button";
 import { ArrowLeftIcon } from "lucide-react";
+import { PageHeading } from "./components/PageHeading";
 
 export const formSchema = z.object({
   landlord: z.string(),
@@ -68,13 +69,12 @@ export function PropertyForm(): React.JSX.Element {
 
   return (
     <div className="mt-6 ml-10">
-      <div className="text-[#71717A] mb-2">
-      <button onClick={onClick} className="flex items-center gap-2 text-sm hover:underline">
+      <div className="flex flex-col items-start">
+      <button onClick={onClick} className="flex items-center text-[#71717A] mb-2 gap-2 text-sm hover:underline">
       <ArrowLeftIcon className="scale-75"/> <span className="text-md">Back to Properties</span>
       </button>
+      <PageHeading title="Property Listing" subtitle="Create a new rental property listing for a landlord" className=""/>
       </div>
-            <h1 className="text-2xl font-bold mb-1">Create Property Listing</h1>
-            <h3 className="text-sm text-[#71717A]">Create a new rental property listing for a landlord</h3>
 
     <div className="max-w-3xl mx-auto px-6 py-10 rounded-md">
     <Form {...form}>
