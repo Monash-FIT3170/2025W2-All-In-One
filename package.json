@@ -10,12 +10,14 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@azure/identity": "^4.9.0",
+    "@azure/arm-subscriptions": "^5.1.0",
+    "@azure/identity": "^4.9.1",
     "@azure/storage-blob": "^12.27.0",
     "@babel/runtime": "^7.20.7",
     "@radix-ui/react-progress": "^1.1.4",
     "@reduxjs/toolkit": "^2.6.1",
     "@tailwindcss/postcss": "^4.0.17",
+    "dotenv": "^16.5.0",
     "meteor-node-stubs": "^1.2.5",
     "patch-package": "^8.0.0",
     "postcss": "^8.5.3",
