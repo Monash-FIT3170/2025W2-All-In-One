@@ -4,7 +4,7 @@ import { PropertyOverview } from "../components/PropertyOverview";
 import { DashboardCard } from "../components/DashboardCard";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { selectProperties, selectTasks, setProperties, setTasks } from "../state/agent-dashboard-slice";
-import { DashboardSideNavBar } from "../../navigation-bars/side-nav-bars/SideNavbar";
+import { RoleSideNavBar } from "../../navigation-bars/side-nav-bars/SideNavbar";
 import { AgentTopNavbar} from "../../navigation-bars/TopNavbar";
 import { agentDashboardLinks, settingLinks } from "../../navigation-bars/side-nav-bars/side-nav-link-definitions";
 
@@ -59,7 +59,7 @@ export function AgentDashboard(): React.JSX.Element {
     <div className="min-h-screen">
       <AgentTopNavbar onSideBarOpened={onSideBarOpened} />
       <div className="flex">
-        <DashboardSideNavBar
+        <RoleSideNavBar
           isOpen={isSidebarOpen}
           onClose={() => onSideBarOpened(false)}
           dashboardLinks={agentDashboardLinks}

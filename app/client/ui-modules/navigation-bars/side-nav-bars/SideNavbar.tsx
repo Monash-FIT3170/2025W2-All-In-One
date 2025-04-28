@@ -62,19 +62,19 @@ export function SideNavBar({ isOpen, onClose, navLinks }: SideNavBarProps) {
 }
 
 
-interface DashboardSideNavBarProps {
+interface RoleSideNavBarProps {
   isOpen: boolean;
   onClose: () => void;
   dashboardLinks: NavLinkItem[];
   settingsLinks: NavLinkItem[];
 }
 
-export function DashboardSideNavBar({
+export function RoleSideNavBar({
   isOpen,
   onClose,
   dashboardLinks = [],
   settingsLinks = []
-}: DashboardSideNavBarProps) {
+}: RoleSideNavBarProps) {
   return (
     <>
       <SidebarContainer isOpen={isOpen}>
