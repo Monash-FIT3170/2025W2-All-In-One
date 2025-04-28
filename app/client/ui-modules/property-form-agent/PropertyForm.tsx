@@ -12,6 +12,7 @@ import FormListingOptions from "./components/FormListingOptions";
 import { Button } from "../theming/components/shadcn/Button";
 import { ArrowLeftIcon } from "lucide-react";
 import { PageHeading } from "./components/PageHeading";
+import { FormDefaultValue } from "./components/FormDefaultValues";
 
 export const formSchema = z.object({
   landlord: z.string().min(1, { message: "Please assign a landlord" }),
@@ -49,26 +50,7 @@ export const formSchema = z.object({
 export function PropertyForm(): React.JSX.Element {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      landlord: "",
-      property_type: "",
-      address: "",
-      city: "",
-      state: "",
-      postal_code: "",
-      apartment_number: "",
-      monthly_rent: 0,
-      bond: 0,
-      bedroom_number: 0,
-      bathroom_number: 0,
-      space: 0,
-      description: "",
-      amenities: "",
-      images: [],
-      available_dates: new Date(),
-      lease_term: "",
-      show_contact_boolean: false,
-    },
+    defaultValues: FormDefaultValue,
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
