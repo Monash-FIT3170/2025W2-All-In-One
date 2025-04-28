@@ -49,7 +49,7 @@ export default function FormPropertyImages({
       <FormField
         control={form.control}
         name="images"
-        render={({ field }) => (
+        render={() => (
           <FormItem>
             <FormControl>
               <FileUploader
