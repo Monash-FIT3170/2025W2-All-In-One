@@ -6,6 +6,7 @@ interface DashboardCardProps {
   icon?: React.ReactNode;
   subtitle?: string;
   className?: string;
+  children?: React.ReactNode;
 }
 
 export function DashboardCard({
@@ -14,6 +15,7 @@ export function DashboardCard({
   icon,
   subtitle,
   className = "",
+  children,
 }: DashboardCardProps): React.JSX.Element {
   return (
     <div className={`bg-white rounded-lg p-4 shadow-sm ${className}`}>
@@ -25,6 +27,7 @@ export function DashboardCard({
         </div>
         {icon && <div className="text-gray-400">{icon}</div>}
       </div>
+      {children}
     </div>
   );
 }

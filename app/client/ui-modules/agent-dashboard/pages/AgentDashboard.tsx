@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { UpcomingTasks } from "../components/UpcomingTasks";
 import { PropertyOverview } from "../components/PropertyOverview";
 import { DashboardCard } from "../components/DashboardCard";
+import { Progress } from "../components/ProgressBar";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { selectProperties, selectTasks, setProperties, setTasks } from "../state/agent-dashboard-slice";
 import { RoleSideNavBar } from "../../navigation-bars/side-nav-bars/SideNavbar";
@@ -76,7 +77,9 @@ export function AgentDashboard(): React.JSX.Element {
             <DashboardCard
               title="Occupancy Rate"
               value="85%"
-            />
+            >
+              <Progress value={85} className="mt-2" />
+            </DashboardCard>
             <DashboardCard
               title="Pending Tasks"
               value="7"
