@@ -1,6 +1,6 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import { homePageSlice } from "./ui-modules/home-example/state/reducers/home-page-slice";
-import { agentDashboardSlice } from "./ui-modules/agent-dashboard/state/agent-dashboard-slice";
+import { agentDashboardSlice } from "./ui-modules/role-dashboard/agent-dashboard/state/agent-dashboard-slice";
 import { guestLandingPageSlice } from "./ui-modules/guest-landing-page/state/reducers/guest-landing-page-slice";
 export const store = configureStore({
   reducer: {

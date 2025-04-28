@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
-import { UpcomingTasks } from "../components/UpcomingTasks";
+import { UpcomingTasks } from "../../components/UpcomingTasks";
 import { PropertyOverview } from "../components/PropertyOverview";
-import { DashboardCard } from "../components/DashboardCard";
-import { Progress } from "../components/ProgressBar";
-import { useAppDispatch, useAppSelector } from "../../../store";
+import { DashboardCards } from "../components/DashboardCard";
+import { useAppDispatch, useAppSelector } from "../../../../store";
 import { selectProperties, selectTasks, setProperties, setTasks } from "../state/agent-dashboard-slice";
-import { RoleSideNavBar } from "../../navigation-bars/side-nav-bars/SideNavbar";
-import { AgentTopNavbar} from "../../navigation-bars/TopNavbar";
-import { agentDashboardLinks, settingLinks } from "../../navigation-bars/side-nav-bars/side-nav-link-definitions";
+import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
+import { AgentTopNavbar} from "../../../navigation-bars/TopNavbar";
+import { agentDashboardLinks, settingLinks } from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
 
 export function AgentDashboard(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
@@ -68,29 +67,7 @@ export function AgentDashboard(): React.JSX.Element {
         />
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-bold mb-6">Agent Dashboard</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <DashboardCard
-              title="Total Properties"
-              value="12"
-              subtitle="+2 from last month"
-            />
-            <DashboardCard
-              title="Occupancy Rate"
-              value="85%"
-            >
-              <Progress value={85} className="mt-2" />
-            </DashboardCard>
-            <DashboardCard
-              title="Pending Tasks"
-              value="7"
-              subtitle="5 due this week"
-            />
-            <DashboardCard
-              title="Monthly Revenue"
-              value="$24,500"
-              subtitle="+5% from last month"
-            />
-          </div>
+          <DashboardCards />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <UpcomingTasks tasks={tasks} />
             <PropertyOverview properties={properties} />

@@ -8,7 +8,7 @@ import { Provider } from "react-redux";
 import { store } from "./store";
 import { DraftListingPage } from "./ui-modules/property-listing/DraftListingPage";
 import { DefaultTheme } from "./ui-modules/theming/themes/DefaultTheme";
-import { AgentDashboard } from "./ui-modules/agent-dashboard/pages/AgentDashboard";
+import { AgentDashboard } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentDashboard";
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottonNavbar";
 
 Meteor.startup(initialiseReactRoot);
