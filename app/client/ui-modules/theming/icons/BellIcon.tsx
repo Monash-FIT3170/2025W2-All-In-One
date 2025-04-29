@@ -3,11 +3,15 @@ import React from 'react';
 interface BellIconProps {
   className?: string;
   hasNotifications?: boolean;
+  onClick?: () => void;
 }
 
-export function BellIcon({ className = '', hasNotifications = false }: BellIconProps): React.JSX.Element {
+export function BellIcon({ className = '', hasNotifications = false, onClick }: BellIconProps): React.JSX.Element {
   return (
-    <div className={`relative inline-block ${className}`}>
+    <div
+      className={`relative inline-block ${className} hover:text-gray-400 cursor-pointer transition-colors duration-200`}
+      onClick={onClick}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"

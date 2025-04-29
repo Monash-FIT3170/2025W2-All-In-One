@@ -38,10 +38,17 @@ export function AgentTopNavbar({
         {/* Right-aligned actions */}
         <div className="flex items-center gap-4">
           <div className="ml-2">
-            <BellIcon hasNotifications={true} className="text-gray-600" />
+            <BellIcon
+              hasNotifications={true}
+              className="text-gray-600"
+              onClick={() => console.log('Notification clicked')}
+            />
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
+            <div
+              className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-400 cursor-pointer transition-colors duration-200"
+              onClick={() => console.log('Profile clicked')}
+            >
               {name.split(' ').map(part => part.charAt(0)).join('')}
             </div>
           </div>
