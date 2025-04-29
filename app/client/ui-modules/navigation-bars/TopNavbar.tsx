@@ -11,10 +11,14 @@ interface TopNavbarProps {
 
 interface AgentTopNavbarProps {
   onSideBarOpened: React.Dispatch<React.SetStateAction<boolean>>;
+  name?: string;
+  title?: string;
 }
 
 export function AgentTopNavbar({
   onSideBarOpened,
+  name = "Bob Builder",
+  title = "Agent",
 }: AgentTopNavbarProps): React.JSX.Element {
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
@@ -35,6 +39,11 @@ export function AgentTopNavbar({
         <div className="flex items-center gap-4">
           <div className="ml-2">
             <BellIcon hasNotifications={true} className="text-gray-600" />
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
+              {name.split(' ').map(part => part.charAt(0)).join('')}
+            </div>
           </div>
         </div>
       </div>
