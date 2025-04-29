@@ -51,7 +51,7 @@ function TaskItem({ task }: { task: Task }): React.JSX.Element {
   };
 
   return (
-    <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:border-gray-300 transition-colors">
+    <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:bg-gray-50">
       <div className="flex justify-between items-start">
         <div>
           <h3 className="font-medium">{task.title}</h3>

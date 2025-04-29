@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { UpcomingTasks } from "../../components/UpcomingTasks";
+import { UpcomingTasks } from "../../components/UpcomingTask";
 import { PropertyOverview } from "../components/PropertyOverview";
 import { DashboardCards } from "../components/DashboardCard";
 import { useAppDispatch, useAppSelector } from "../../../../store";

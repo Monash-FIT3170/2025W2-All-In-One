@@ -10,22 +10,22 @@ export interface NavLinkItem {
 }
 
 export const agentDashboardLinks = [
-    { to: "/dashboard",
+    { to: "/agent-dashboard",
       label: "Overview"
     },
-    { to: "/properties",
+    { to: "/agent-properties",
       label: "Properties"
     },
-    { to: "/calendar",
+    { to: "/agent-calendar",
       label: "Calendar"
     },
-    { to: "/tasks",
+    { to: "/agent-tasks",
       label: "Tasks"
     },
-    { to: "/messages",
+    { to: "/agent-messages",
       label: "Messages"
     },
-    { to: "/analytics",
+    { to: "/agent-analytics",
       label: "Analytics"
     },
   ];
