@@ -8,11 +8,14 @@ import { Provider } from "react-redux";
 import { store } from "./store";
 import { DefaultTheme } from "./ui-modules/theming/themes/DefaultTheme";
 import { AgentDashboard } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentDashboard";
-import { LandlordDashboard } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordDashboard";
 import { AgentCalendar } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentCalendar";
 import { AgentMessage } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentMessage";
 import { AgentTask } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentTask";
 import { AgentProperty } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentProperty";
+import { LandlordDashboard } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordDashboard";
+import { LandlordCalendar } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordCalendar";
+import { LandlordTask } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordTask";
+import { LandlordProperty } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordProperty";
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottonNavbar";
 import { PropertyListingPage } from "/app/client/ui-modules/property-listing-page/PropertyListingPage";
 
@@ -34,11 +37,14 @@ function AppRoot(): React.JSX.Element {
             <Routes>
               <Route path="/" element={<GuestLandingPage />} />
               <Route path="/agent-dashboard" element={<AgentDashboard />} />
-              <Route path="/landlord-dashboard" element={<LandlordDashboard />} />
               <Route path="/agent-properties" element={<AgentProperty />} />
               <Route path="/agent-calendar" element={<AgentCalendar />} />
               <Route path="/agent-messages" element={<AgentMessage />} />
               <Route path="/agent-tasks" element={<AgentTask />} />
+              <Route path="/landlord-dashboard" element={<LandlordDashboard />} />
+              <Route path="/landlord-properties" element={<LandlordProperty />} />
+              <Route path="/landlord-calendar" element={<LandlordCalendar />} />
+              <Route path="/landlord-tasks" element={<LandlordTask />} />
               <Route path="/test" element={<PropertyListingPage />} />
               <Route path="/home-example" element={<ExampleHomePage />} />
             </Routes>
