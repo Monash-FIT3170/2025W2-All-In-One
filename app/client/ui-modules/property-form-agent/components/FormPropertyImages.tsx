@@ -14,11 +14,9 @@ import {
   FileUploaderItem,
   FileInput,
 } from "../../theming/components/shadcn/FileUpload";
-import { formSchema } from "./FormSchema";
+import { FormSchemaType } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
-
-type FormSchemaType = z.infer<typeof formSchema>;
 
 export default function FormPropertyImages({
   form,

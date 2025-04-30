@@ -23,11 +23,9 @@ import {
 import { Switch } from "../../theming/components/shadcn/Switch";
 import { Button } from "../../theming/components/shadcn/Button";
 import { cn } from "/app/client/lib/utils";
-import { formSchema } from "./FormSchema";
+import { FormSchemaType } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
-
-type FormSchemaType = z.infer<typeof formSchema>;
 
 export default function FormListingOptions({
   form,

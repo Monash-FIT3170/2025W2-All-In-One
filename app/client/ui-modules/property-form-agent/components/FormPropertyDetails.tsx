@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import * as z from "zod";
 import {
   FormControl,
   FormDescription,
@@ -11,11 +10,9 @@ import {
 } from "../../theming/components/shadcn/Form";
 import { Input } from "../../theming/components/shadcn/Input";
 import { Textarea } from "../../theming/components/shadcn/Textarea";
-import { formSchema } from "./FormSchema";
+import { FormSchemaType } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
-
-type FormSchemaType = z.infer<typeof formSchema>;
 
 export default function FormPropertyDetails({
   form,
