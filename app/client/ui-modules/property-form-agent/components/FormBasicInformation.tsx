@@ -28,7 +28,7 @@ export default function FormBasicInformation({
   form: UseFormReturn<FormSchemaType>;
 }) {
   return (
-    <div className="border border-[#E4E4E7] w-full p-7 rounded-md">
+    <div className="border border-(--divider-color) w-full p-7 rounded-md">
       <FormHeading
         title="Basic Information"
         subtitle="Enter the basic details of the property"

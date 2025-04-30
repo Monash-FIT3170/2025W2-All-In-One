@@ -36,7 +36,7 @@ export default function FormListingOptions({
 }) {
 
   return (
-    <div className="border border-[#E4E4E7] w-full p-7 rounded-md">
+    <div className="border border-(--divider-color) w-full p-7 rounded-md">
       <FormHeading
         title="Listing Options"
         subtitle="Configure additional listing settings"
@@ -53,7 +53,7 @@ export default function FormListingOptions({
                   <Button
                     variant={"outline"}
                     className={cn(
-                      "w-[240px] pl-3 text-left font-normal border-[#E4E4E7]",
+                      "w-[240px] pl-3 text-left font-normal border-(--divider-color)",
                       !field.value && "text-muted-foreground"
                     )}
                   >
@@ -67,7 +67,7 @@ export default function FormListingOptions({
                 </FormControl>
               </PopoverTrigger>
               <PopoverContent
-                className="w-auto p-0 border-[#E4E4E7] bg-white"
+                className="w-auto p-0 border-(--divider-color) bg-white"
                 align="start"
               >
                 <Calendar

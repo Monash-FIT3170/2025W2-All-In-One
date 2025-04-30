@@ -41,7 +41,7 @@ export default function FormPropertyImages({
   };
 
   return (
-    <div className="border border-[#E4E4E7] w-full p-7 rounded-md">
+    <div className="border border-(--divider-color) w-full p-7 rounded-md">
       <FormHeading
         title="Property Images"
         subtitle="Upload high-quality images of the property"
@@ -60,7 +60,7 @@ export default function FormPropertyImages({
               >
                 <FileInput
                   id="fileInput"
-                  className="outline-dashed outline-1 outline-[#E4E4E7]"
+                  className="outline-dashed outline-1 outline-(--divider-color)"
                 >
                   <div className="flex items-center justify-center flex-col p-8 w-full ">
                     <CloudUpload className="text-gray-500 w-10 h-10" />
