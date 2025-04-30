@@ -3,33 +3,14 @@ import { useAppDispatch, useAppSelector } from "../../../../store";
 
 import { LandlordDashboardCards } from "../components/LandlordDashboardCard";
 import { UpcomingTasks } from "../../components/UpcomingTask";
-import { selectTasks, setTasks } from "../state/landlord-dashboard-slice";
-
-/* 
-
-  const sampleProperties = [
-    {
-      address: "42 Bondi Road",
-      status: "Occupied" as const,
-      rent: "$650/week",
-    },
-    {
-      address: "15 Chapel Street",
-      status: "Vacant" as const,
-      rent: "$720/week",
-    },
-    {
-      address: "78 Brunswick Street",
-      status: "Occupied" as const,
-      rent: "$480/week",
-    },
-  ];
- */
+import { MyProperties } from "../components/MyProperties";
+import { selectTasks, setTasks, selectProperties, setProperties } from "../state/landlord-dashboard-slice";
 
 export function LandlordDashboard(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const tasks = useAppSelector(selectTasks);
-
+  const properties = useAppSelector(selectProperties);
+  
   useEffect(() => {
     dispatch(
       setTasks([
@@ -59,6 +40,24 @@ export function LandlordDashboard(): React.JSX.Element {
         },
       ])
     );
+    dispatch(
+      setProperties([
+      {
+        address: "42 Bondi Road",
+        status: "Occupied" as const,
+        rent: 650,
+      },
+      {
+        address: "15 Chapel Street",
+        status: "Vacant" as const,
+        rent: 720,
+      },
+      {
+        address: "78 Brunswick Street",
+        status: "Occupied" as const,
+        rent: 480,
+      },
+    ]));
   }, [dispatch]);
 
   return (
@@ -68,6 +67,7 @@ export function LandlordDashboard(): React.JSX.Element {
           <h1 className="text-2xl font-bold mb-6">Landlord Dashboard</h1>
           <LandlordDashboardCards />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <MyProperties properties={properties} />
             <UpcomingTasks tasks={tasks} />
           </div>
         </div>
