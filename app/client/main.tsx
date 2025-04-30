@@ -8,6 +8,7 @@ import { Provider } from "react-redux";
 import { store } from "./store";
 import { DefaultTheme } from "./ui-modules/theming/themes/DefaultTheme";
 import { AgentDashboard } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentDashboard";
+import { LandlordDashboard } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordDashboard";
 import { AgentCalendar } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentCalendar";
 import { AgentMessage } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentMessage";
 import { AgentTask } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentTask";
@@ -33,6 +34,7 @@ function AppRoot(): React.JSX.Element {
             <Routes>
               <Route path="/" element={<GuestLandingPage />} />
               <Route path="/agent-dashboard" element={<AgentDashboard />} />
+              <Route path="/agent-dashboard" element={<LandlordDashboard />} />
               <Route path="/agent-properties" element={<AgentProperty />} />
               <Route path="/agent-calendar" element={<AgentCalendar />} />
               <Route path="/agent-messages" element={<AgentMessage />} />
