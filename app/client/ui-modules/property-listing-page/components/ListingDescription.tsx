@@ -1,5 +1,6 @@
 import React from "react";
 import { twMerge } from "tailwind-merge";
+import { SubHeading } from "/app/client/ui-modules/theming/components/SubHeading";
 
 export function ListingDescription({
   description,
@@ -10,7 +11,7 @@ export function ListingDescription({
 }): React.JSX.Element {
   return (
     <div className={twMerge("flex flex-col", className)}>
-      <span className="geist-semibold text-[18px] mb-1">Description</span>
+      <SubHeading text="Description" className="mb-1" />
       <span className="geist-regular text-[16px]">{description}</span>
     </div>
   );

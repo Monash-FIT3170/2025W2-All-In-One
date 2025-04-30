@@ -20,7 +20,7 @@ export function ListingPropertyDetails({
 }): React.JSX.Element {
   return (
     <div
-      className={twMerge("grid grid-cols-2 grid-rows-3 gap-y-3 gap-x-5 w-[830px]", className)}
+      className={twMerge("grid grid-cols-2 grid-rows-3 gap-y-3 gap-x-5 w-fit", className)}
     >
       <PropertyDetailEntry label="Type" text={propertyType} />
       <PropertyDetailEntry

@@ -6,7 +6,6 @@ import { GuestLandingPage } from "./ui-modules/guest-landing-page/GuestLandingPa
 import { BrowserRouter, Routes, Route } from "react-router";
 import { Provider } from "react-redux";
 import { store } from "./store";
-import { DraftListingPage } from "./ui-modules/property-listing/DraftListingPage";
 import { DefaultTheme } from "./ui-modules/theming/themes/DefaultTheme";
 import { AgentDashboard } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentDashboard";
 import { AgentCalendar } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentCalendar";
@@ -14,6 +13,7 @@ import { AgentMessage } from "./ui-modules/role-dashboard/agent-dashboard/pages/
 import { AgentTask } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentTask";
 import { AgentProperty } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentProperty";
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottonNavbar";
+import { PropertyListingPage } from "/app/client/ui-modules/property-listing-page/PropertyListingPage";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -32,12 +32,12 @@ function AppRoot(): React.JSX.Element {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<GuestLandingPage />} />
-              <Route path="/test" element={<DraftListingPage />} />
               <Route path="/agent-dashboard" element={<AgentDashboard />} />
               <Route path="/agent-properties" element={<AgentProperty />} />
               <Route path="/agent-calendar" element={<AgentCalendar />} />
               <Route path="/agent-messages" element={<AgentMessage />} />
               <Route path="/agent-tasks" element={<AgentTask />} />
+              <Route path="/test" element={<PropertyListingPage />} />
               <Route path="/home-example" element={<ExampleHomePage />} />
             </Routes>
             <BottomNavbar />

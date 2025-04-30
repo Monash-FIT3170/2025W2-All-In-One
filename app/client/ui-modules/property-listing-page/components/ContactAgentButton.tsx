@@ -7,7 +7,7 @@ import { twMerge } from "tailwind-merge";
 
 export function ContactAgentButton({
   onClick,
-  className,
+  className="",
 }: {
   onClick: () => void;
   className?: string;

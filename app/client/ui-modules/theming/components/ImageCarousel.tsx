@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useImagePreload } from "../../hooks/useImagePreload";
-import { IconButton } from "./IconButton";
+import { useImagePreload } from "/app/client/ui-modules/hooks/useImagePreload";
+import { IconButton } from "/app/client/ui-modules/common/IconButton";
 import { twMerge } from "tailwind-merge";
 
 export function ImageCarousel({
@@ -16,10 +16,14 @@ export function ImageCarousel({
 }): React.JSX.Element {
   const [imagesLoaded, failedUrls] = useImagePreload(imageUrls);
   const [currentImageI, setCurrentImageI] = useState(0);
-
   const images = imageUrls.map((url) => (
-    <img key={url} src={url} className="h-full w-full rounded-lg" />
+    <img
+      key={url}
+      src={url}
+      className="h-full w-full object-cover rounded-lg"
+    />
   ));
+
   const isFirstImage = currentImageI === 0;
   const isLastImage = currentImageI === images.length - 1;
 
@@ -27,7 +31,7 @@ export function ImageCarousel({
     return <ImageCarouselLoadingSkeleton className={className} />;
   } else {
     return (
-      <div className={twMerge("h-[445px] w-[724px] relative", className)}>
+      <div className={twMerge("aspect-3/2 w-[620px] relative", className)}>
         {images[currentImageI]}
         <ImageCarouselButtons
           className="absolute top-0 left-0"
