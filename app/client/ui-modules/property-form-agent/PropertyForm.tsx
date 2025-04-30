@@ -33,14 +33,14 @@ export function PropertyForm(): React.JSX.Element {
       <div className="flex flex-col items-start">
         <button
           onClick={onClick}
-          className="flex items-center text-[#71717A] mb-2 gap-2 text-sm hover:underline"
+          className="flex items-center text-(--body-secondary-color) mb-2 gap-2 text-sm hover:underline"
         >
           <ArrowLeftIcon className="scale-75" />{" "}
           <span className="text-md">Back to Properties</span>
         </button>
         <div>
           <h1 className="text-2xl font-bold mb-1">Property Listing</h1>
-          <h3 className="text-sm text-[#71717A]">
+          <h3 className="text-sm text-(--body-secondary-color)">
             Create a new rental property listing for a landlord
           </h3>
         </div>

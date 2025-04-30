@@ -14,7 +14,7 @@ export function FormHeading({
   return (
     <div className="max-w-3xl mx-auto mb-8">
       <h1 className="text-xl font-semibold mb-1">{title}</h1>
-      <h3 className="text-sm text-[#71717A]">{subtitle}</h3>
+      <h3 className="text-sm text-(--body-secondary-color)">{subtitle}</h3>
     </div>
   );
 }

@@ -112,7 +112,7 @@ export default function FormPropertyDetails({
                 {...field}
               />
             </FormControl>
-            <FormDescription className="text-[#71717A]">
+            <FormDescription className="text-(--body-secondary-color)">
               Separate amenities with commas or new lines
             </FormDescription>
             <FormMessage />
