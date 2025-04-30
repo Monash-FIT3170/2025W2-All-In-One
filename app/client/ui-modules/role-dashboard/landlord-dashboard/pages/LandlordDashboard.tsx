@@ -1,4 +1,5 @@
 import React from "react";
+import { LandlordDashboardCards }  from "../components/LandlordDashboardCard"
 
 export function LandlordDashboard(): React.JSX.Element {
   const sampleProperties = [
@@ -49,6 +50,7 @@ export function LandlordDashboard(): React.JSX.Element {
   return (
     <div className="flex-1 p-6">
       <h1 className="text-2xl font-bold mb-6">Landlord Dashboard</h1>
+      <LandlordDashboardCards/>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       </div>
     </div>
