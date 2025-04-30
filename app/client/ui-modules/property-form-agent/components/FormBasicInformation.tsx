@@ -17,7 +17,7 @@ import {
 } from "../../theming/components/shadcn/Select";
 import { Input } from "../../theming/components/shadcn/Input";
 import { UseFormReturn } from "react-hook-form";
-import { formSchema } from "../PropertyForm";
+import { formSchema } from "./FormSchema";
 import { FormHeading } from "./FormHeading";
 
 type FormSchemaType = z.infer<typeof formSchema>;

@@ -1,6 +1,6 @@
 import React from "react";
 import { z } from "zod";
-import { formSchema } from "../PropertyForm";
+import { formSchema } from "./FormSchema";
 
 export const FormDefaultValue: z.infer<typeof formSchema> = {
   landlord: "",

@@ -14,7 +14,7 @@ import {
   FileUploaderItem,
   FileInput,
 } from "../../theming/components/shadcn/FileUpload";
-import { formSchema } from "../PropertyForm";
+import { formSchema } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
 

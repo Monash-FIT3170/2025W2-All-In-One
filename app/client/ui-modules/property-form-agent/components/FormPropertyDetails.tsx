@@ -11,7 +11,7 @@ import {
 } from "../../theming/components/shadcn/Form";
 import { Input } from "../../theming/components/shadcn/Input";
 import { Textarea } from "../../theming/components/shadcn/Textarea";
-import { formSchema } from "../PropertyForm";
+import { formSchema } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
 
