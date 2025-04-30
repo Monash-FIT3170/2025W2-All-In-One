@@ -28,7 +28,7 @@ import { selectTasks, setTasks } from "../state/landlord-dashboard-slice";
 
 export function LandlordDashboard(): React.JSX.Element {
   const dispatch = useAppDispatch();
-  const tasks = useAppSelector(selectTasks)
+  const tasks = useAppSelector(selectTasks);
 
   useEffect(() => {
     dispatch(
@@ -62,11 +62,15 @@ export function LandlordDashboard(): React.JSX.Element {
   }, [dispatch]);
 
   return (
-    <div className="flex-1 p-6">
-      <h1 className="text-2xl font-bold mb-6">Landlord Dashboard</h1>
-      <LandlordDashboardCards />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <UpcomingTasks tasks={tasks} />
+    <div className="min-h-screen">
+      <div className="flex">
+        <div className="flex-1 p-6">
+          <h1 className="text-2xl font-bold mb-6">Landlord Dashboard</h1>
+          <LandlordDashboardCards />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <UpcomingTasks tasks={tasks} />
+          </div>
+        </div>
       </div>
     </div>
   );

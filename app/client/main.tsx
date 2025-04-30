@@ -34,7 +34,7 @@ function AppRoot(): React.JSX.Element {
             <Routes>
               <Route path="/" element={<GuestLandingPage />} />
               <Route path="/agent-dashboard" element={<AgentDashboard />} />
-              <Route path="/agent-dashboard" element={<LandlordDashboard />} />
+              <Route path="/landlord-dashboard" element={<LandlordDashboard />} />
               <Route path="/agent-properties" element={<AgentProperty />} />
               <Route path="/agent-calendar" element={<AgentCalendar />} />
               <Route path="/agent-messages" element={<AgentMessage />} />
