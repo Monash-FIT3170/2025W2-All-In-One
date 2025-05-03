@@ -20,8 +20,8 @@ export const agentDashboardLinks = [
 
 export const landlordDashboardLinks = [
   { to: "/landlord-dashboard", label: "Overview" },
-  { to: "/landord-properties", label: "Properties" },
-  { to: "/landord-calendar", label: "Calendar" },
+  { to: "/landlord-properties", label: "Properties" },
+  { to: "/landlord-calendar", label: "Calendar" },
   { to: "/landlord-tasks", label: "Tasks" },
 ];
 
