@@ -1,5 +1,6 @@
 import React from "react";
 import { twMerge } from "tailwind-merge";
+import { RoundedButton } from "/app/client/ui-modules/common/RoundedButton";
 
 export function SubmitDraftListingButton({
   onClick,
@@ -9,16 +10,13 @@ export function SubmitDraftListingButton({
   className?: string;
 }): React.JSX.Element {
   return (
-    <button
+    <RoundedButton
       onClick={onClick}
-      className={twMerge(
-        "px-7 py-2 rounded-full bg-(--status-orange-color)",
-        className
-      )}
+      className={twMerge("bg-(--status-orange-color) px-7 py-2", className)}
     >
       <span className="geist-semibold text-[20px] text-white">
-        CONTACT AGENT
+        SUBMIT DRAFT
       </span>
-    </button>
+    </RoundedButton>
   );
 }

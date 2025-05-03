@@ -6,8 +6,8 @@ import {
   ListingSummary,
 } from "./components/ListingSummary";
 import { ListingDescription } from "./components/ListingDescription";
-import { LeftCircularArrowIcon } from "../theming/icons/LeftCircularArrowIcon";
-import { RightCircularArrowIcon } from "../theming/icons/RightCircularArrowIcon";
+import { LeftCircularArrowIcon } from "/app/client/ui-modules/theming/icons/LeftCircularArrowIcon";
+import { RightCircularArrowIcon } from "/app/client/ui-modules/theming/icons/RightCircularArrowIcon";
 import { ImageCarousel } from "../theming/components/ImageCarousel";
 import {
   InspectionBookingListUiState,
@@ -19,7 +19,7 @@ import {
   ListingStatusPill,
   ListingStatusPillVariant,
 } from "/app/client/ui-modules/property-listing-page/components/ListingStatusPill";
-import { BackLink } from "/app/client/ui-modules/theming/components/BackLink";
+import { BackLink } from "../theming/components/BackLink";
 import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonIcon";
 import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";

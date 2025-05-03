@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useImagePreload } from "../../hooks/useImagePreload";
-import { IconButton } from "./IconButton";
+import { useImagePreload } from "/app/client/ui-modules/hooks/useImagePreload";
+import { IconButton } from "/app/client/ui-modules/common/IconButton";
 import { twMerge } from "tailwind-merge";
 
 export function ImageCarousel({
