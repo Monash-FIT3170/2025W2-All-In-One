@@ -14,7 +14,13 @@ import { AgentTask } from "./ui-modules/role-dashboard/agent-dashboard/pages/Age
 import { AgentProperty } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentProperty";
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottonNavbar";
 import { PropertyListingPage } from "/app/client/ui-modules/property-listing-page/PropertyListingPage";
-import TenantDashboard from "./ui-modules/tenant-dashboard/pages/TenantDashboard";
+import TenantDashboard from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDashboard";
+import TenantProperty from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantProperty";
+import TenantCalender from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantCalender";
+import TenantMaintenance from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMaintenance";
+import TenantMessages from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMessages";
+import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDocument";
+import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -41,11 +47,22 @@ function AppRoot(): React.JSX.Element {
               <Route path="/test" element={<PropertyListingPage />} />
               <Route path="/home-example" element={<ExampleHomePage />} />
               <Route path="/tenant-dashboard" element={<TenantDashboard />} />
+              <Route path="/tenant-property" element={<TenantProperty />} />
+              <Route path="/tenant-calender" element={<TenantCalender />} />
+              <Route
+                path="/tenant-maintenance"
+                element={<TenantMaintenance />}
+              />
+              <Route path="/tenant-messages" element={<TenantMessages />} />
+              <Route path="/tenant-documents" element={<TenantDocument />} />
+              <Route
+                path="/tenant-search-properties"
+                element={<TenantSearchProperties />}
+              />
             </Routes>
             <BottomNavbar />
           </BrowserRouter>
         </DefaultTheme>
-
       </Provider>
     </React.StrictMode>
   );
