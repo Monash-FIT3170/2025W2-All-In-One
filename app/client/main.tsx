@@ -14,6 +14,7 @@ import { AgentTask } from "./ui-modules/role-dashboard/agent-dashboard/pages/Age
 import { AgentProperty } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentProperty";
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottonNavbar";
 import { PropertyListingPage } from "/app/client/ui-modules/property-listing-page/PropertyListingPage";
+import { SettingsPage } from "./ui-modules/settings-page/SettingsPage";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -39,6 +40,7 @@ function AppRoot(): React.JSX.Element {
               <Route path="/agent-tasks" element={<AgentTask />} />
               <Route path="/test" element={<PropertyListingPage />} />
               <Route path="/home-example" element={<ExampleHomePage />} />
+              <Route path="/settings" element={<SettingsPage />} />
             </Routes>
             <BottomNavbar />
           </BrowserRouter>
