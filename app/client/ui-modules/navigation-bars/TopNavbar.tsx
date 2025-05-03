@@ -26,7 +26,7 @@ export function AgentTopNavbar({
         {/* Left section: Menu icon and logo */}
         <div className="flex items-center gap-4">
           <SideBarSliderIcon
-            onClick={() => onSideBarOpened(prev => !prev)}
+            onClick={() => onSideBarOpened((prev) => !prev)}
             className="text-gray-600"
           />
           <div className="flex items-center gap-2">
@@ -41,15 +41,64 @@ export function AgentTopNavbar({
             <BellIcon
               hasNotifications={true}
               className="text-gray-600"
-              onClick={() => console.log('Notification clicked')}
+              onClick={() => console.log("Notification clicked")}
             />
           </div>
           <div className="flex items-center gap-3">
             <div
               className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-400 cursor-pointer transition-colors duration-200"
-              onClick={() => console.log('Profile clicked')}
+              onClick={() => console.log("Profile clicked")}
             >
-              {name.split(' ').map(part => part.charAt(0)).join('')}
+              {name
+                .split(" ")
+                .map((part) => part.charAt(0))
+                .join("")}
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export function TenantTopNavbar({
+  onSideBarOpened,
+  name = "Bob Builder",
+  title = "Agent",
+}: AgentTopNavbarProps): React.JSX.Element {
+  return (
+    <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
+      <div className="flex justify-between items-center px-4">
+        {/* Left section: Menu icon and logo */}
+        <div className="flex items-center gap-4">
+          <SideBarSliderIcon
+            onClick={() => onSideBarOpened((prev) => !prev)}
+            className="text-gray-600"
+          />
+          <div className="flex items-center gap-2">
+            <PropManagerLogoIcon variant="light" />
+            <PropManagerLogoText />
+          </div>
+        </div>
+
+        {/* Right-aligned actions */}
+        <div className="flex items-center gap-4">
+          <div className="ml-2">
+            <BellIcon
+              hasNotifications={true}
+              className="text-gray-600"
+              onClick={() => console.log("Notification clicked")}
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <div
+              className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-400 cursor-pointer transition-colors duration-200"
+              onClick={() => console.log("Profile clicked")}
+            >
+              {name
+                .split(" ")
+                .map((part) => part.charAt(0))
+                .join("")}
             </div>
           </div>
         </div>
