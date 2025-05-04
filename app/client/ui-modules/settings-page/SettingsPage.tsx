@@ -14,7 +14,7 @@ import { Checkbox } from "./components/FormCheckbox";
 import { SettingsNotificationPreferences } from "./components/SettingsNotificationPreferences";
 import { useDispatch, useSelector } from "react-redux";
 import { SettingsSecurityPreferences } from "./components/SettingsSecurityPreferences";
-
+import { SettingsAccountPreferences } from "./components/SettingsAccountPreferences";
 
 export function SettingsPage(): React.JSX.Element {
   const dispatch = useDispatch();
@@ -56,7 +56,7 @@ function SettingsPageBase({
         onClose={() => onSideBarOpened(false)}
         navLinks={agentLinks}
       />
-
+      <SettingsAccountPreferences />
       <SettingsNotificationPreferences />
       <SettingsSecurityPreferences />
     </div>
