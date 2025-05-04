@@ -10,35 +10,25 @@ export interface NavLinkItem {
 }
 
 export const agentDashboardLinks = [
-    { to: "/agent-dashboard",
-      label: "Overview"
-    },
-    { to: "/agent-properties",
-      label: "Properties"
-    },
-    { to: "/agent-calendar",
-      label: "Calendar"
-    },
-    { to: "/agent-tasks",
-      label: "Tasks"
-    },
-    { to: "/agent-messages",
-      label: "Messages"
-    },
-    { to: "/agent-analytics",
-      label: "Analytics"
-    },
-  ];
+  { to: "/agent-dashboard", label: "Overview" },
+  { to: "/agent-properties", label: "Properties" },
+  { to: "/agent-calendar", label: "Calendar" },
+  { to: "/agent-tasks", label: "Tasks" },
+  { to: "/agent-messages", label: "Messages" },
+  { to: "/agent-analytics", label: "Analytics" },
+];
+
+export const landlordDashboardLinks = [
+  { to: "/landlord-dashboard", label: "Overview" },
+  { to: "/landlord-properties", label: "Properties" },
+  { to: "/landlord-calendar", label: "Calendar" },
+  { to: "/landlord-tasks", label: "Tasks" },
+];
 
 export const settingLinks: NavLinkItem[] = [
-    { to: "/profile",
-      label: "Profile"
-    },
-    { to: "/settings",
-      label: "Settings"
-    },
-  ];
-
+  { to: "/profile", label: "Profile" },
+  { to: "/settings", label: "Settings" },
+];
 
 export const agentLinks: NavLinkItem[] = [
   { to: "/", label: "Overview" },
@@ -58,8 +48,6 @@ export const agentLinks: NavLinkItem[] = [
     icon: <CalendarIcon />,
   },
 ];
-
-
 
 export const landlordLinks: NavLinkItem[] = [
   { to: "/", label: "Overview" },
