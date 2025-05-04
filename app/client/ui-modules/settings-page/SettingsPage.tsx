@@ -15,6 +15,7 @@ import { SettingsNotificationPreferences } from "./components/SettingsNotificati
 import { useDispatch, useSelector } from "react-redux";
 import { SettingsSecurityPreferences } from "./components/SettingsSecurityPreferences";
 import { SettingsAccountPreferences } from "./components/SettingsAccountPreferences";
+import { SettingsAccountDeactivation } from "./components/SettingsAccountDeactivation";
 
 export function SettingsPage(): React.JSX.Element {
   const dispatch = useDispatch();
@@ -59,6 +60,7 @@ function SettingsPageBase({
       <SettingsAccountPreferences />
       <SettingsNotificationPreferences />
       <SettingsSecurityPreferences />
+      <SettingsAccountDeactivation/>
     </div>
   );
 }
