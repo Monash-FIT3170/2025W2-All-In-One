@@ -1,18 +1,25 @@
-import { createSlice } from "@reduxjs/toolkit";
 import { SettingsPageUiState } from "../SettingsPageUiState";
 import { RootState } from "/app/client/store";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: SettingsPageUiState = {
   isLoading: false,
+  textNotificationsEnabled: false,
 };
 
-export const SettingsPageSlice = createSlice({
+export const settingsPageSlice = createSlice({
   name: "SettingsPage",
-  initialState: initialState,
-  reducers: {},
+  initialState,
+  reducers: {
+    setTextNotificationsEnabled(state, action: PayloadAction<boolean>) {
+      state.textNotificationsEnabled = action.payload;
+    },
+  },
 });
-
 export const selectSettingsPageUiState = (state: RootState) =>
-  state.SettingsPage;
+  state.settingsPage;
 
-export default SettingsPageSlice.reducer;
+export default settingsPageSlice.reducer;
+export const {
+  setTextNotificationsEnabled
+} = settingsPageSlice.actions;
