@@ -11,9 +11,12 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.20.7",
+    "@radix-ui/react-checkbox": "^1.2.3",
     "@radix-ui/react-progress": "^1.1.4",
     "@reduxjs/toolkit": "^2.6.1",
     "@tailwindcss/postcss": "^4.0.17",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.507.0",
     "meteor-node-stubs": "^1.2.5",
     "patch-package": "^8.0.0",
     "postcss": "^8.5.3",
