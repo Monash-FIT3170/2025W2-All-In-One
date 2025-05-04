@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Input } from "./Input";
-import { cn } from "/app/client/lib/utils";
 import {
   Dispatch,
   SetStateAction,
@@ -232,11 +231,7 @@ export const FileUploader = forwardRef<
           ref={ref}
           tabIndex={0}
           onKeyDownCapture={handleKeyDown}
-          className={cn(
-            "grid w-full focus:outline-none overflow-hidden",
-            className,
-            value && value.length > 0 ? "gap-2" : ""
-          )}
+          className={`grid w-full focus:outline-none overflow-hidden ${value && value.length > 0 ? "gap-2" : ""} ${className ?? ""}`}
           dir={dir}
           {...props}
         >
@@ -258,18 +253,17 @@ export const FileUploaderContent = forwardRef<
 
   return (
     <div
-      className={cn("w-full px-1")}
+    className={`w-full px-1 ${className ?? ""}`}
       ref={containerRef}
       aria-description="content file holder"
     >
       <div
         {...props}
         ref={ref}
-        className={cn(
-          "flex rounded-xl gap-1",
-          orientation === "horizontal" ? "flex-raw flex-wrap" : "flex-col",
-          className
-        )}
+        className={`flex rounded-xl gap-1 ${
+          orientation === "horizontal" ? "flex-row flex-wrap" : "flex-col"
+        } ${className ?? ""}`}
+        
       >
         {children}
       </div>
@@ -288,12 +282,9 @@ export const FileUploaderItem = forwardRef<
   return (
     <div
       ref={ref}
-      className={cn(
-        buttonVariants({ variant: "ghost" }),
-        "h-6 p-1 justify-between cursor-pointer relative",
-        className,
+      className={`${buttonVariants({ variant: "ghost" })} h-6 p-1 justify-between cursor-pointer relative ${
         isSelected ? "bg-muted" : ""
-      )}
+      } ${className ?? ""}`}      
       {...props}
     >
       <div className="font-medium leading-none tracking-tight flex items-center gap-1.5 h-full w-full">
@@ -301,10 +292,7 @@ export const FileUploaderItem = forwardRef<
       </div>
       <button
         type="button"
-        className={cn(
-          "absolute",
-          direction === "rtl" ? "top-1 left-1" : "top-1 right-1"
-        )}
+        className={`absolute ${direction === "rtl" ? "top-1 left-1" : "top-1 right-1"}`}
         onClick={() => removeFileFromSet(index)}
       >
         <span className="sr-only">remove item {index}</span>
@@ -331,17 +319,13 @@ export const FileInput = forwardRef<
       }`}
     >
       <div
-        className={cn(
-          `w-full rounded-lg duration-300 ease-in-out
-         ${
-           dropzoneState.isDragAccept
-             ? "border-green-500"
-             : dropzoneState.isDragReject || isFileTooBig
-             ? "border-red-500"
-             : "border-gray-300"
-         }`,
-          className
-        )}
+className={`w-full rounded-lg duration-300 ease-in-out ${
+  dropzoneState.isDragAccept
+    ? "border-green-500"
+    : dropzoneState.isDragReject || isFileTooBig
+    ? "border-red-500"
+    : "border-gray-300"
+} ${className ?? ""}`}
         {...rootProps}
       >
         {children}

@@ -1,13 +1,5 @@
 "use client";
 
-/**
- *
- * missing props. Should contain onSubmit here, with the form object passed in. I assume the form object contains the values entered in the form (correct me if im wrong).
- * Any events tied to business data that will need to be read or manipulated should passed upwards. Also i dont see a form page component anywhere. The page and the form itself should be seperate components
- * pass up into props (onSubmit onClick)
- * use map() function for FormBasicInformation
- * delete cn function and use tailwindMerge
- */
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import * as z from "zod";
