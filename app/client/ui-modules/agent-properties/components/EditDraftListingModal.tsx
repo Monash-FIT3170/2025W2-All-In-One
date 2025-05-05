@@ -24,21 +24,19 @@ export default function EditDraftListingModal() {
     </>
   )
 
-  const listingContent = (
-    <div>
-      <h1>A beach house</h1>
-      <p>A nice beach house.</p>
-      <div style={{ height: "1000px" }}/>
-    </div>
+  return (
+    <>
+      <ThemedButton variant={ThemedButtonVariant.PRIMARY} onClick={toggle}>
+        Open this
+      </ThemedButton>
+      <Modal isOpen={isOpen} toggle={toggle} footer={modalFooter}>
+        <div>
+          <h1>A beach house</h1>
+          <p>A nice beach house.</p>
+          <div style={{ height: "1000px" }}/>
+        </div>
+      </Modal>
+    </>
   );
 
-  return {
-    isOpen,
-    toggle,
-    ModalUI: (
-      <Modal isOpen={isOpen} toggle={toggle} footer={modalFooter}>
-        {listingContent}
-      </Modal>
-    ),
-  };
 }
