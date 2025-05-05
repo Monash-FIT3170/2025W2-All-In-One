@@ -14,8 +14,6 @@ import {
   FormItem,
   FormLabel,
 } from "/app/client/ui-modules/settings-page/components/Form";
-import { Switch } from "/app/client/ui-modules/settings-page/components/Switch";
-
 const FormSchema = z.object({
   marketing_emails: z.boolean().default(false).optional(),
   security_emails: z.boolean(),
@@ -46,15 +44,16 @@ export function SettingsAccountDeactivation() {
               control={form.control}
               name="marketing_emails"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border border-red-500 bg-red-50 p-3 shadow-sm">
                   <div className="space-y-0.5">
                     <FormLabel>Deactivate Account</FormLabel>
                     <FormDescription>
-                      Temporarily disable your account. You can reactivate it at any time.
+                      Temporarily disable your account. You can reactivate it at
+                      any time.
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Button>Deactivate Account</Button>
+                    <Button variant="destructive">Deactivate Account</Button>
                   </FormControl>
                 </FormItem>
               )}

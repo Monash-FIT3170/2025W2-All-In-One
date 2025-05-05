@@ -14,8 +14,6 @@ import {
   FormItem,
   FormLabel,
 } from "/app/client/ui-modules/settings-page/components/Form";
-import { Switch } from "/app/client/ui-modules/settings-page/components/Switch";
-
 const FormSchema = z.object({
   marketing_emails: z.boolean().default(false).optional(),
   security_emails: z.boolean(),
