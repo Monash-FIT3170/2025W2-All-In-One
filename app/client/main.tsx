@@ -12,6 +12,10 @@ import { AgentCalendar } from "./ui-modules/role-dashboard/agent-dashboard/pages
 import { AgentMessage } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentMessage";
 import { AgentTask } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentTask";
 import { AgentProperty } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentProperty";
+import { LandlordDashboard } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordDashboard";
+import { LandlordCalendar } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordCalendar";
+import { LandlordTask } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordTask";
+import { LandlordProperty } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordProperty";
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottonNavbar";
 import { PropertyListingPage } from "/app/client/ui-modules/property-listing-page/PropertyListingPage";
 import { AgentProperties } from "./ui-modules/agent-properties/AgentProperties";
@@ -38,6 +42,10 @@ function AppRoot(): React.JSX.Element {
               <Route path="/agent-calendar" element={<AgentCalendar />} />
               <Route path="/agent-messages" element={<AgentMessage />} />
               <Route path="/agent-tasks" element={<AgentTask />} />
+              <Route path="/landlord-dashboard" element={<LandlordDashboard />} />
+              <Route path="/landlord-properties" element={<LandlordProperty />} />
+              <Route path="/landlord-calendar" element={<LandlordCalendar />} />
+              <Route path="/landlord-tasks" element={<LandlordTask />} />
               <Route path="/test" element={<PropertyListingPage />} />
               <Route path="/home-example" element={<ExampleHomePage />} />
               <Route path="/agent-properties" element={<AgentProperties />} />
