@@ -5,6 +5,9 @@ import {
   landlordDashboardLinks,
   settingLinks,
 } from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+
 export function LandlordCalendar(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
   return (
@@ -20,6 +23,7 @@ export function LandlordCalendar(): React.JSX.Element {
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-bold mb-6">Landlord Calendar</h1>
         </div>
+        <Calendar></Calendar>
       </div>
     </div>
   );
