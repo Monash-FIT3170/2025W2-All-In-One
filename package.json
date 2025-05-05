@@ -12,8 +12,10 @@
   "dependencies": {
     "@babel/runtime": "^7.20.7",
     "@radix-ui/react-progress": "^1.1.4",
+    "@radix-ui/react-tabs": "^1.1.9",
     "@reduxjs/toolkit": "^2.6.1",
     "@tailwindcss/postcss": "^4.0.17",
+    "bcrypt": "^5.1.1",
     "meteor-node-stubs": "^1.2.5",
     "patch-package": "^8.0.0",
     "postcss": "^8.5.3",

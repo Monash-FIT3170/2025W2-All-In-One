@@ -1,23 +1,15 @@
 import { Meteor } from "meteor/meteor";
-import { TasksCollection } from "./database/example-tasks/TasksCollection";
-import "./methods/example-tasks/task-methods";
+import { Accounts } from "meteor/accounts-base";
 
-Meteor.startup(tempSeedFunction);
+// todo: initial set up to then be changed later
+const SEED_USERNAME = 'meteorite';
+const SEED_PASSWORD = 'password';
 
-// TODO: This code and below is temporary and will be removed in the future.
-async function tempSeedFunction(): Promise<void> {
-  if ((await TasksCollection.find().countAsync()) === 0) {
-    [
-      "First Task",
-      "Second Task",
-      "Third Task",
-      "Fourth Task",
-      "Fifth Task",
-      "Sixth Task",
-      "Seventh Task",
-    ].forEach(insertTask);
+Meteor.startup(async () => {
+  if (!(await Accounts.findUserByUsername(SEED_USERNAME))) {
+    await Accounts.createUser({
+      username: SEED_USERNAME,
+      password: SEED_PASSWORD,
+    });
   }
-}
-
-const insertTask = (taskText: string) =>
-  TasksCollection.insertAsync({ text: taskText });
+});
