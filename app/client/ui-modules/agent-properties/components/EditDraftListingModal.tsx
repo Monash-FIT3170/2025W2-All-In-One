@@ -1,24 +1,23 @@
-import { useState } from "react";
 import { ThemedButton, ThemedButtonVariant } from "../../theming/components/ThemedButton";
 import React from "react";
 import Modal from "./Modal";
 
-export default function EditDraftListingModal() {
-  const [isOpen, setisOpen] = useState(false);
+interface EditDraftListingModalProps {
+  toggle: () => void;
+  isOpen: boolean;
+  children: React.ReactNode;
+}
 
-  const toggle = () => {
-    setisOpen(!isOpen);
-  };
-
+export default function EditDraftListingModal(props: EditDraftListingModalProps) {
   const modalFooter = (
     <>
-      <ThemedButton variant={ThemedButtonVariant.SECONDARY} onClick={toggle}>
+      <ThemedButton variant={ThemedButtonVariant.SECONDARY} onClick={props.toggle}>
         Cancel
       </ThemedButton>
-      <ThemedButton variant={ThemedButtonVariant.TERTIARY} onClick={toggle}>
+      <ThemedButton variant={ThemedButtonVariant.TERTIARY} onClick={props.toggle}>
         Save Changes
       </ThemedButton>
-      <ThemedButton variant={ThemedButtonVariant.PRIMARY} onClick={toggle}>
+      <ThemedButton variant={ThemedButtonVariant.PRIMARY} onClick={props.toggle}>
         Publish listing
       </ThemedButton>
     </>
@@ -26,15 +25,8 @@ export default function EditDraftListingModal() {
 
   return (
     <>
-      <ThemedButton variant={ThemedButtonVariant.PRIMARY} onClick={toggle}>
-        Open this
-      </ThemedButton>
-      <Modal isOpen={isOpen} toggle={toggle} footer={modalFooter}>
-        <div>
-          <h1>A beach house</h1>
-          <p>A nice beach house.</p>
-          <div style={{ height: "1000px" }}/>
-        </div>
+      <Modal isOpen={props.isOpen} toggle={props.toggle} footer={modalFooter}>
+        {props.children}
       </Modal>
     </>
   );

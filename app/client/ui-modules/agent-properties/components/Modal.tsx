@@ -1,8 +1,8 @@
 import React, { ReactNode } from "react";
 
 interface ModalType {
-  children?: ReactNode;
-  footer?: ReactNode;
+  children?: React.ReactNode;
+  footer?: React.ReactNode;
   isOpen: boolean;
   toggle: () => void;
 }

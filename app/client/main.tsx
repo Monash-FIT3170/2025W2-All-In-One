@@ -48,7 +48,7 @@ function AppRoot(): React.JSX.Element {
               <Route path="/landlord-tasks" element={<LandlordTask />} />
               <Route path="/test" element={<PropertyListingPage />} />
               <Route path="/home-example" element={<ExampleHomePage />} />
-              <Route path="/agent-properties" element={<AgentProperties />} />
+              <Route path="/agent-properties-draft" element={<AgentProperties />} />
             </Routes>
             <BottomNavbar />
           </BrowserRouter>
