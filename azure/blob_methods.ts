@@ -1,15 +1,22 @@
 import { Meteor } from 'meteor/meteor';
-import { getContainerClient, uploadFile, uploadFiles, UploadResults } from '../app/server/azure/blobStorageService';
+import { getContainerClient, uploadFile,  } from '../app/server/azure/blobStorageService';
 console.log("✅ blobs.list method file loaded");
 
 
 Meteor.methods({
   // Method to upload blob
-  async 'blobs.uploadFile'(blob: Blob,blobName: string) {
+  async 'blobs.uploadFile'(
+    blobData: number[],
+    blobName: string,
+    blobContentType: string,
+    containerClientName: string) {
     try {
       console.log("Uploading...")
-      const containerClient = await getContainerClient();
-      const uploadResult = await uploadFile(containerClient, blobName, blob);
+      const blob = Buffer.from(blobData);
+
+
+      const containerClient = await getContainerClient(containerClientName);
+      const uploadResult = await uploadFile(containerClient, blobName, blob,blobContentType);
         return uploadResult; 
     } catch (error) {
         if (error instanceof Error) {
@@ -20,11 +27,25 @@ Meteor.methods({
       }
     },
 
-  async 'blobs.uploadFiles'(blobs: Blob[], blobNamePrefix: string) {
-    try{
-      const containerClient = await getContainerClient();
-      const uploadResults: UploadResults = await uploadFiles(containerClient, blobs, blobNamePrefix);
-      return uploadResults
+  async 'blobs.uploadFiles'(
+    blobData: { data: Uint8Array; name: string; type: string }[],
+    blobNamePrefix: string,
+    containerClientName: string) {
+      try {
+        const containerClient = await getContainerClient(containerClientName);
+  
+        const uploadResults = await Promise.all(
+          blobData.map(async (blob, index) => {
+            const buffer = Buffer.from(blob.data);
+            const blobName = `${blobNamePrefix}-${Date.now()}-${index}-${blob.name}`;
+            return await uploadFile(containerClient, blobName, buffer, blob.type);
+          })
+        );
+  
+        return {
+          success: uploadResults.filter(uploadResult => uploadResult.success),
+          failed: uploadResults.filter(uploadResult => !uploadResult.success),
+        };
     } catch (error) {
         if (error instanceof Error) {
           throw new Meteor.Error('blob-upload-failed', error.message);
