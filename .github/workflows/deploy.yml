@@ -29,6 +29,7 @@ jobs:
         env:
           GALAXY_USERNAME: ${{ secrets.GALAXY_USERNAME }}
           GALAXY_PASSWORD: ${{ secrets.GALAXY_PASSWORD }}
+          AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
         run: |
           export PATH="/home/runner/.meteor:$PATH"
           chmod +x ./galaxy-login.sh
