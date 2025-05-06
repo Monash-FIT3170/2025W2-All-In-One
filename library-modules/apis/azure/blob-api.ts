@@ -13,7 +13,6 @@ export async function viewBlobs(): Promise<string[]> {
 
 export async function uploadFileHandler(blob: Blob, blobName: string, containerClientName: string = "property-media-dev") {
     console.log("Calling blobs.uploadFile");
-    console.log(`blob: ${blob} ${await blob.text()}`)
     const uint8Array = await blobToUint8Array(blob)
 
     const uploadResult: UploadResult = await Meteor.callAsync("blobs.uploadFile", uint8Array, blobName,blob.type,containerClientName)
