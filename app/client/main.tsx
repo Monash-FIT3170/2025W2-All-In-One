@@ -18,7 +18,7 @@ import { LandlordTask } from "./ui-modules/role-dashboard/landlord-dashboard/pag
 import { LandlordProperty } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordProperty";
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottonNavbar";
 import { PropertyListingPage } from "/app/client/ui-modules/property-listing-page/PropertyListingPage";
-import {LoginForm} from "/app/client/ui-modules/user-authentication/LoginForm";
+import { AuthTabs } from "./ui-modules/user-authentication/AuthTabs";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -48,7 +48,8 @@ function AppRoot(): React.JSX.Element {
               <Route path="/landlord-tasks" element={<LandlordTask />} />
               <Route path="/test" element={<PropertyListingPage />} />
               <Route path="/home-example" element={<ExampleHomePage />} />
-              <Route path="/login" element={<LoginForm />} />
+              <Route path="/login" element={<AuthTabs />} />
+              <Route path="/signup" element={<AuthTabs />} />
             </Routes>
             <BottomNavbar />
           </BrowserRouter>
