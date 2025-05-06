@@ -31,6 +31,7 @@ Meteor.methods({
       firstName: data.firstName,
       lastName: data.lastName,
       role: data.accountType,
+      createdAt: new Date(),
     };
 
     // Agent-specific validation and profile field
