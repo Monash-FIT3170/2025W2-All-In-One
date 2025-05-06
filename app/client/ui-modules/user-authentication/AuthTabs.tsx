@@ -5,12 +5,10 @@ import { LoginForm } from "./LoginForm";
 import { SignupForm } from "./SignupForm";
 
 // Styles
-const cardClass =
-  "w-full max-w-lg rounded-xl border bg-white shadow-lg p-8";
-const tabsListClass =
-  "inline-flex items-center justify-center rounded-md bg-muted p-1 text-muted-foreground w-full mb-6";
-const tabTriggerClass =
-  "w-full inline-flex items-center justify-center whitespace-nowrap rounded-sm px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow";
+const cardClass = "w-full max-w-lg rounded-xl border bg-white shadow-lg p-8";
+const tabsListClass = "inline-flex items-center justify-center w-full rounded-full bg-gray-100 p-1 mb-6";
+const tabTriggerClass = "w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all text-gray-500 data-[state=active]:bg-white data-[state=active]:text-black";
+
 
 export const AuthTabs = () => {
   const location = useLocation();
@@ -32,7 +30,11 @@ export const AuthTabs = () => {
   return (
     <div className="h-screen overflow-hidden flex items-center justify-center bg-gray-50 px-4">
       <div className={cardClass}>
-        <Tabs.Root value={tab} onValueChange={handleTabChange} className="w-full">
+        <Tabs.Root
+          value={tab}
+          onValueChange={handleTabChange}
+          className="w-full"
+        >
           <Tabs.List className={tabsListClass}>
             <Tabs.Trigger value="login" className={tabTriggerClass}>
               Login

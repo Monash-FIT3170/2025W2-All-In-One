@@ -16,6 +16,7 @@
     "@reduxjs/toolkit": "^2.6.1",
     "@tailwindcss/postcss": "^4.0.17",
     "bcrypt": "^5.1.1",
+    "lucide-react": "^0.507.0",
     "meteor-node-stubs": "^1.2.5",
     "patch-package": "^8.0.0",
     "postcss": "^8.5.3",

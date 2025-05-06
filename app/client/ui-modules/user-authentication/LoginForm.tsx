@@ -62,8 +62,11 @@ export const LoginForm = () => {
         />
       </div>
 
-      <button type="submit" className={buttonClass}>
-        Log In
+      <button
+        type="submit"
+        className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-black/90"
+      >
+        Sign up
       </button>
 
       {message && (
