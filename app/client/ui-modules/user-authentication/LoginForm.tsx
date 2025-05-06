@@ -22,6 +22,7 @@ export const LoginForm = () => {
         setMessage("An unknown error occurred.");
       } else {
         setMessage("Login successful!");
+        // TODO: REDIRECT TO THE DASHBOARD BASED ON THE ROLE 
         setemail("");
         setPassword("");
       }
