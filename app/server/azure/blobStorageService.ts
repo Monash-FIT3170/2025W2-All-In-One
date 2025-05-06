@@ -1,8 +1,8 @@
 // Azure authentication dependency
-import { BlobServiceClient, ContainerClient, ContainerCreateResponse, StoragePipelineOptions, StorageRetryPolicyType } from '@azure/storage-blob';
+import { BlobServiceClient, BlobUploadCommonResponse, ContainerClient, ContainerCreateResponse, StoragePipelineOptions, StorageRetryPolicyType,ContainerCreateOptions } from '@azure/storage-blob';
 const connStr = process.env.AZURE_CONNECTION_STRING;
 const defaultContainerName = "property-media-dev";
-export let blobServiceClient: BlobServiceClient;
+
 export const options: StoragePipelineOptions = {
   retryOptions: {
     maxTries: 4,
@@ -17,23 +17,30 @@ export type UploadResult = {
   success: boolean;
   url?: string;
   error?: string;
+  response?: BlobUploadCommonResponse;
 }
 export type UploadResults = {
   success: UploadResult[];
   failed: UploadResult[];
 }
 
-try {
-  if (!connStr) {
-    throw new Error("Azure connection string is undefined");
+export function getBlobServiceClient(): BlobServiceClient {
+  console.log("Getting Blob Service Client");
+  try {
+    if (!connStr) {
+      throw new Error("Azure connection string is undefined");
+    }
+    const blobServiceClient: BlobServiceClient = BlobServiceClient.fromConnectionString(connStr, options);
+    console.log("Fetched Blob Service Client");
+    return blobServiceClient;
+  } catch (e) {
+    console.error("Failed to get Blob Service Client:", e);
+    throw new Error("Could not retrieve Blob Service Client.");
   }
-  blobServiceClient = BlobServiceClient.fromConnectionString(connStr, options);
-} catch (e) {
-  console.error("Failed to create BlobServiceClient:", e);
-  throw new Error("Could not initialize BlobServiceClient.");
 }
 
 export async function getContainerClient(containerName: string = defaultContainerName): Promise<ContainerClient> {
+  const blobServiceClient: BlobServiceClient = getBlobServiceClient();
   console.log("Getting Container Client");
   try {
     const client: ContainerClient = await blobServiceClient.getContainerClient(containerName);
@@ -45,25 +52,34 @@ export async function getContainerClient(containerName: string = defaultContaine
     throw new Error("Could not retrieve container client.");
   }
 }
-export async function createContainer(blobServiceClient: BlobServiceClient,containerName: string): Promise<ContainerClient> {
-  
+export async function createContainer(containerName: string): Promise<ContainerClient> {
+  const options: ContainerCreateOptions = {
+    access: "container"
+  }
+  const blobServiceClient: BlobServiceClient = getBlobServiceClient();
   const {containerClient,containerCreateResponse} : 
   {containerClient: ContainerClient; containerCreateResponse: ContainerCreateResponse; }
-  = await blobServiceClient.createContainer(containerName);
+  = await blobServiceClient.createContainer(containerName,options);
 
-  if (containerCreateResponse.errorCode)
-    throw Error(`Failed to create container, error code: ${containerCreateResponse.errorCode}`);
-  
+  if(containerCreateResponse.errorCode){
+    switch(containerCreateResponse.errorCode){
+      case "409":
+        console.log(`Container "${containerName}" already exists`); 
+        return await getContainerClient(containerName)
+    }
+    throw new Error(`Failed to create container "${containerName}": ${containerCreateResponse.errorCode}`); 
+  }
   console.log(`Created container "${containerName}" successfully`); 
-  return containerClient;
+    return containerClient;
+
 }
 
-export async function uploadFile(containerClient: ContainerClient, blobName: string, blob: Blob): Promise<UploadResult>{
+export async function uploadFile(containerClient: ContainerClient, blobName: string, blob: Buffer,blobContentType: string): Promise<UploadResult>{
   const blobBlockClient = containerClient.getBlockBlobClient(blobName);
   try {
-      await blobBlockClient.uploadData(blob, {
+      const response = await blobBlockClient.uploadData(blob, {
         blobHTTPHeaders: {
-          blobContentType:  blob.type, 
+          blobContentType: blobContentType,
         }
       });
       console.log(`Uploaded blob "${blobName}" successfully, URL: ${blobBlockClient.url}`);
@@ -71,30 +87,26 @@ export async function uploadFile(containerClient: ContainerClient, blobName: str
         blobName,
         success: true,
         url: blobBlockClient.url,
-      };
-  } catch(e) {
-      console.log(`Failed to upload blob "${blobName}":`, e);
-      return {
-        blobName,
-        success: false,
-        error: (e as Error).message ?? "Unknown error",
-      };
+        response: response
+        };
+  } 
+  catch(e) {
+    if (e instanceof Error)
+      { console.log(`Failed to upload blob "${blobName}":`, e.message);
+        return {
+          blobName,
+          success: false,
+          error: e.message ?? "Unknown error",
+        };
+      }
+      else {
+        console.log(`Failed to upload blob "${blobName}":`, e);
+        return {
+          blobName,
+          success: false,
+          error: "Unknown error",
+        };
+      }
   }
 }
-export async function uploadFiles(containerClient: ContainerClient, blobs: Blob[],blobNamePrefix: string = 'blob'  ): Promise<UploadResults>{
 
-  // Collect uploadFile promises in array
-  const uploadPromises = blobs.map((blob, index) => {
-    const blobName = `${blobNamePrefix}-${Date.now()}-${index}`;
-    return uploadFile(containerClient, blobName, blob);
-  });
-
-  // Execute all Promises
-  const uploadResults = await Promise.all(uploadPromises);
-  return {
-    success: uploadResults.filter(result => result.success),
-    failed: uploadResults.filter(result => !result.success)
-  }
-  
-
-}
