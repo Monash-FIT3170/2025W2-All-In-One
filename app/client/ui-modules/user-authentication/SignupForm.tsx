@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { EyeIcon } from "lucide-react";
+import { Meteor } from "meteor/meteor";
 
 const inputClass =
   "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200 text-sm";
@@ -9,9 +10,41 @@ const labelClass = "block mb-1 text-sm font-medium text-gray-700";
 export const SignupForm = () => {
   const [accountType, setAccountType] = useState("tenant");
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [agentCode, setAgentCode] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const formData = {
+      email,
+      password,
+      firstName,
+      lastName,
+      accountType,
+      agentCode: accountType === "agent" ? agentCode : undefined,
+    };
+
+    Meteor.call("user.register", formData, (err: { reason: string } | undefined) => {
+      if (err) {
+        setMessage(err.reason || "Registration failed.");
+      } else {
+        setMessage("Account created successfully!");
+        setFirstName("");
+        setLastName("");
+        setEmail("");
+        setPassword("");
+        setAgentCode("");
+      }
+    });
+  };
 
   return (
-    <div className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold">Account Type</h2>
         <Tabs.Root
@@ -29,10 +62,10 @@ export const SignupForm = () => {
                 key={type}
                 value={type}
                 className={`
-    flex items-center justify-center gap-2 rounded-md border px-4 py-3 text-sm font-medium transition-all
-    border border-gray-300 text-gray-700 bg-white
-    data-[state=active]:border-black data-[state=active]:shadow-sm
-  `}
+                  flex items-center justify-center gap-2 rounded-md border px-4 py-3 text-sm font-medium transition-all
+                  border border-gray-300 text-gray-700 bg-white
+                  data-[state=active]:border-black data-[state=active]:shadow-sm
+                `}
               >
                 <span className="text-lg">{icon}</span>
                 <span>{label}</span>
@@ -44,50 +77,54 @@ export const SignupForm = () => {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="firstName" className={labelClass}>
-            First Name
-          </label>
+          <label htmlFor="firstName" className={labelClass}>First Name</label>
           <input
             type="text"
             id="firstName"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
             placeholder="John"
             className={inputClass}
+            required
           />
         </div>
         <div>
-          <label htmlFor="lastName" className={labelClass}>
-            Last Name
-          </label>
+          <label htmlFor="lastName" className={labelClass}>Last Name</label>
           <input
             type="text"
             id="lastName"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
             placeholder="Doe"
             className={inputClass}
+            required
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="email" className={labelClass}>
-          Email
-        </label>
+        <label htmlFor="email" className={labelClass}>Email</label>
         <input
           type="email"
           id="email"
-          placeholder="your@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="example@email.com"
           className={inputClass}
+          required
         />
       </div>
 
       <div className="relative">
-        <label htmlFor="password" className={labelClass}>
-          Password
-        </label>
+        <label htmlFor="password" className={labelClass}>Password</label>
         <input
           type={passwordVisible ? "text" : "password"}
           id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
           className={inputClass}
+          required
         />
         <button
           type="button"
@@ -103,13 +140,14 @@ export const SignupForm = () => {
 
       {accountType === "agent" && (
         <div>
-          <label htmlFor="agentCode" className={labelClass}>
-            Agent Verification Code
-          </label>
+          <label htmlFor="agentCode" className={labelClass}>Agent Verification Code</label>
           <input
             type="text"
             id="agentCode"
+            value={agentCode}
+            onChange={(e) => setAgentCode(e.target.value)}
             className={inputClass}
+            required
           />
           <p className="text-xs text-gray-500 mt-1">
             This code is provided by your agency administrator
@@ -121,14 +159,18 @@ export const SignupForm = () => {
         type="submit"
         className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-black/90"
       >
-        Sign up
+        Create Account
       </button>
+
+      {message && (
+        <p className="text-center text-sm text-gray-700">{message}</p>
+      )}
 
       <p className="text-xs text-center text-gray-500">
         By continuing, you agree to our{" "}
         <span className="underline cursor-pointer">Terms of Service</span> and{" "}
         <span className="underline cursor-pointer">Privacy Policy</span>
       </p>
-    </div>
+    </form>
   );
 };

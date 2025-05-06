@@ -8,21 +8,21 @@ const buttonClass =
   "w-full bg-black text-yellow-400 py-2 px-4 rounded-md hover:bg-black/90 text-sm";
 
 export const LoginForm = () => {
-  const [username, setUsername] = useState("");
+  const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    Meteor.loginWithPassword(username, password, (error) => {
+    Meteor.loginWithPassword(email, password, (error) => {
       if (error instanceof Meteor.Error) {
         setMessage(`Login failed: ${error.reason}`);
       } else if (error) {
         setMessage("An unknown error occurred.");
       } else {
         setMessage("Login successful!");
-        setUsername("");
+        setemail("");
         setPassword("");
       }
     });
@@ -31,18 +31,18 @@ export const LoginForm = () => {
   return (
     <form onSubmit={submit} className="space-y-5">
       <div>
-        <label htmlFor="username" className={labelClass}>
-          Username
+        <label htmlFor="email" className={labelClass}>
+          email
         </label>
         <input
-          id="username"
-          name="username"
+          id="email"
+          name="email"
           type="text"
-          placeholder="Username"
+          placeholder="example@email.com"
           required
           className={inputClass}
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={email}
+          onChange={(e) => setemail(e.target.value)}
         />
       </div>
 
@@ -66,7 +66,7 @@ export const LoginForm = () => {
         type="submit"
         className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-black/90"
       >
-        Sign up
+        Login
       </button>
 
       {message && (

@@ -1,5 +1,6 @@
 import { Meteor } from "meteor/meteor";
 import { Accounts } from "meteor/accounts-base";
+import "./methods/accounts/user.register";
 
 // todo: initial set up to then be changed later
 const SEED_USERNAME = 'meteorite';
@@ -10,6 +11,7 @@ Meteor.startup(async () => {
     await Accounts.createUser({
       username: SEED_USERNAME,
       password: SEED_PASSWORD,
+      email: "example.email.com"
     });
   }
 });
