@@ -9,7 +9,6 @@ let parseIgnoreGlobList = [
   "**/.meteor/**/*",
   "**/.git/**/*",
   "**/.vscode/**/*",
-  "**/*.d.ts",
 ];
 
 let globalConfigList = [globalIgnores(parseIgnoreGlobList)];
