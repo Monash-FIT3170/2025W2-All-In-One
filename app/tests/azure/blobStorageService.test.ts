@@ -1,8 +1,8 @@
-import { expect, jest } from "@jest/globals";
-import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
-import { uploadFile } from "../../../library-modules/apis/azure/blobStorageService";
-import { blobToUint8Array } from "../../../library-modules/apis/azure/blob-api";
 process.env.AZURE_CONNECTION_STRING = 'mocked-connection-string';
+import { expect, jest } from "@jest/globals";
+import { BlobServiceClient, ContainerClient, ContainerCreateResponse } from "@azure/storage-blob";
+import { createContainer, uploadFile } from "../../../library-modules/apis/azure/blobStorageService";
+import { blobToUint8Array } from "../../../library-modules/apis/azure/blob-api";
 
 const mockUpload = jest.fn().mockImplementation(() => Promise.resolve({status:200}))
 const mockedBlockBlobClient = {
@@ -15,17 +15,23 @@ const mockedBlockBlobClient = {
 const mockedContainerClient = {
     getBlockBlobClient: jest.fn( () => mockedBlockBlobClient),
 } as unknown as ContainerClient;
+let mockedContainerCreateResponse: { errorCode?: string } = {};
 
 jest.mock("@azure/storage-blob",() => ({
-    BlockServiceClient: {
+    BlobServiceClient: {
         fromConnectionString: jest.fn(() => ({
-            getContainerClient: mockedContainerClient
+            getContainerClient: mockedContainerClient,
+            createContainer: jest.fn().mockImplementation(() => Promise.resolve({
+                containerClient: mockedContainerClient,
+                containerCreateResponse: mockedContainerCreateResponse
+            })),
         }))
     } as unknown as BlobServiceClient,
     StorageRetryPolicyType: {
         EXPONENTIAL: 'EXPONENTIAL'
-      }
+      },
 }));
+
 
 describe('uploadFile', () => {
     beforeEach(() => {
@@ -77,3 +83,25 @@ describe('uploadFile', () => {
         });
     });
 });
+
+describe('createContainer', () => {
+    beforeEach(() => {
+        process.env.AZURE_CONNECTION_STRING = 'mocked-connection-string';
+        mockedContainerCreateResponse = {};
+        jest.clearAllMocks();
+      });
+    it('should make and return a container client', async () => {
+        const containerName = "test";
+        const container = await createContainer(containerName)
+        expect(container).toBe(mockedContainerClient);
+
+    }) 
+    it('should throw an error from the errorCode', async () => {
+        const containerName = "test"
+        mockedContainerCreateResponse = { errorCode: '404' };
+        await expect(createContainer(containerName)).rejects.toThrowError(`Failed to create container \"${containerName}\":`)
+    })
+
+})
+
+

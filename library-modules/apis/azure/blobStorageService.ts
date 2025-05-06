@@ -1,6 +1,5 @@
 // Azure authentication dependency
 import { BlobServiceClient, BlobUploadCommonResponse, ContainerClient, ContainerCreateResponse, StoragePipelineOptions, StorageRetryPolicyType,ContainerCreateOptions } from '@azure/storage-blob';
-const connStr = process.env.AZURE_CONNECTION_STRING;
 const defaultContainerName = "property-media-dev";
 
 export const options: StoragePipelineOptions = {
@@ -25,6 +24,7 @@ export type UploadResults = {
 }
 
 export function getBlobServiceClient(): BlobServiceClient {
+  const connStr = process.env.AZURE_CONNECTION_STRING
   console.log("Getting Blob Service Client");
   try {
     if (!connStr) {
@@ -44,7 +44,7 @@ export async function getContainerClient(containerName: string = defaultContaine
   console.log("Getting Container Client");
   try {
     const client: ContainerClient = await blobServiceClient.getContainerClient(containerName);
-    console.log(`Fetched container client: ${client.containerName}`);
+    console.log(`Fetched Container Client: ${client.containerName}`);
     return client;
 
   } catch (e) {
@@ -54,7 +54,7 @@ export async function getContainerClient(containerName: string = defaultContaine
 }
 export async function createContainer(containerName: string): Promise<ContainerClient> {
   const options: ContainerCreateOptions = {
-    access: "container"
+    access: "blob"
   }
   const blobServiceClient: BlobServiceClient = getBlobServiceClient();
   const {containerClient,containerCreateResponse} : 
