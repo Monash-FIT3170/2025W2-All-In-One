@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { getContainerClient, uploadFile,  } from '../app/server/azure/blobStorageService';
+import { getContainerClient, uploadFile,  } from './blobStorageService';
 console.log("✅ blobs.list method file loaded");
 
 
