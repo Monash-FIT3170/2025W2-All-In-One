@@ -51,7 +51,6 @@ function AppRoot(): React.JSX.Element {
               <Route path="/home-example" element={<ExampleHomePage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/" element={<ExampleHomePage />} />
-              <Route path="/test" element={<DraftListingPage />} />
               <Route path="/propertyform" element={<PropertyFormPage />} />
             </Routes>
             <BottomNavbar />
