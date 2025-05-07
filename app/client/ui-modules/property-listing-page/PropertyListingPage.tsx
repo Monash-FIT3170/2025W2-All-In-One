@@ -23,6 +23,7 @@ import { BackLink } from "../theming/components/BackLink";
 import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonIcon";
 import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
+import EditDraftListingModal from "./components/EditDraftListingModal";
 
 // TODO: The state here is temporary. During server data integration, this should be moved to a redux slice.
 export function PropertyListingPage({
@@ -30,7 +31,11 @@ export function PropertyListingPage({
 }: {
   className?: string;
 }): React.JSX.Element {
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
+
   return (
+    <>
     <ListingPageContent
       streetNumber="86"
       street="Fury Lane"
@@ -93,6 +98,17 @@ export function PropertyListingPage({
       onSubmitDraftListing={() => console.log("draft submitted!")}
       className={twMerge("p-5", className)}
     />
+    <div>
+      <button onClick={toggleModal}>Click this to edit this property.</button>
+      <EditDraftListingModal isOpen={isModalOpen} toggle={toggleModal}>
+        <div>
+          <h1>A beach house</h1>
+          <p>A nice beach house.</p>
+          <div style={{ height: "1000px" }}/>
+        </div>
+      </EditDraftListingModal>
+    </div>
+    </>
   );
 }
 

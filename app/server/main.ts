@@ -1,7 +1,6 @@
 import { Meteor } from "meteor/meteor";
 import { TasksCollection } from "./database/example-tasks/TasksCollection";
 import "./methods/example-tasks/task-methods";
-import { ListingCollection } from "./database/listing/ListingCollection";
 
 Meteor.startup(tempSeedFunction);
 
@@ -22,12 +21,3 @@ async function tempSeedFunction(): Promise<void> {
 
 const insertTask = (taskText: string) =>
   TasksCollection.insertAsync({ text: taskText });
-
-const insertListing = (listingTitle: string, listingDesc: string) => {
-  return ListingCollection.insertAsync({
-    title: listingTitle,
-    description: listingDesc,
-  })
-}
-
-insertListing("Beach House", "A house next to the beach so you can swim.");

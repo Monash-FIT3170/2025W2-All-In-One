@@ -1,11 +1,16 @@
 import React from "react";
 import { Link } from "react-router";
-import { SidebarContainer } from "./components/SidebarContainer";
-import { SidebarHeader } from "./components/SidebarContainer";
-import { SidebarContent } from "./components/SidebarContainer";
+import {
+  SidebarContainer,
+  SidebarHeader,
+  SidebarContent,
+  SidebarFooter
+} from "./components/SidebarContainer";
 
 import { NavLinkItem } from "./components/NavBarLink";
 import { NavBarLinks } from "./components/NavBarLink";
+import { NavGroup } from "./components/NavGroup";
+import { ProfileFooter } from "./components/ProfileFooter";
 
 interface SideNavBarProps {
   isOpen: boolean;
@@ -35,11 +40,63 @@ export function SideNavBar({ isOpen, onClose, navLinks }: SideNavBarProps) {
           nav={<NavBarLinks links={navLinks} />}
           bottom={
             <>
-              {commonLinks.profile}
-              {commonLinks.settings}
+            {commonLinks.profile}
+            {commonLinks.settings}
             </>
           }
         />
+      </SidebarContainer>
+
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black z-40"
+          onClick={onClose}
+          style={{
+            backdropFilter: "blur(5px)",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          }}
+        />
+      )}
+    </>
+  );
+}
+
+
+interface RoleSideNavBarProps {
+  isOpen: boolean;
+  onClose: () => void;
+  dashboardLinks: NavLinkItem[];
+  settingsLinks: NavLinkItem[];
+}
+
+export function RoleSideNavBar({
+  isOpen,
+  onClose,
+  dashboardLinks = [],
+  settingsLinks = []
+}: RoleSideNavBarProps) {
+  return (
+    <>
+      <SidebarContainer isOpen={isOpen}>
+        <SidebarHeader onClose={onClose} />
+        <SidebarContent
+          nav={
+            <>
+              <NavGroup title="Dashboard">
+                <NavBarLinks links={dashboardLinks} />
+              </NavGroup>
+              <NavGroup title="Settings">
+                <NavBarLinks links={settingsLinks} />
+              </NavGroup>
+            </>
+          }
+        />
+        <SidebarFooter>
+          <ProfileFooter
+            name="Bob Builder"
+            title="Agent"
+          />
+        </SidebarFooter>
       </SidebarContainer>
 
       {isOpen && (
