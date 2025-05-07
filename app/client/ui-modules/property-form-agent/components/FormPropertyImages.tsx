@@ -39,7 +39,7 @@ export default function FormPropertyImages({
   };
 
   return (
-    <div className="border border-(--divider-color) w-full p-7 rounded-md">
+    <div className="border border-(--divider-color) w-full p-7 rounded-md mb-3">
       <FormHeading
         title="Property Images"
         subtitle="Upload high-quality images of the property"
