@@ -1,7 +1,7 @@
 import { Meteor } from "meteor/meteor";
 import { TasksCollection } from "./database/example-tasks/TasksCollection";
 import "./methods/example-tasks/task-methods";
-import "/library-modules/apis/azure/blob_methods";
+import "./methods/azure/blob_methods";
 import "./settings-to-env";
 Meteor.startup(tempSeedFunction);
 

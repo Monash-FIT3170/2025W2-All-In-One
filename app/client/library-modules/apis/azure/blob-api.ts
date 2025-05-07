@@ -1,4 +1,4 @@
-import { UploadResult, UploadResults } from "./blobStorageService";
+import { UploadResult, UploadResults } from "../../../app/server/methods/azure/blobStorageService";
 
 type fileInfo = {
     data: Promise<Uint8Array<ArrayBufferLike>>,

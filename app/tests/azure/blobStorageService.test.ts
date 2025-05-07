@@ -1,7 +1,7 @@
 process.env.AZURE_CONNECTION_STRING = 'mocked-connection-string';
 import { expect, jest } from "@jest/globals";
 import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
-import { createContainer, uploadFile } from "../../../library-modules/apis/azure/blobStorageService";
+import { createContainer, uploadFile } from "../../server/methods/azure/blobStorageService";
 import { blobToUint8Array } from "../../../library-modules/apis/azure/blob-api";
 
 const mockUpload = jest.fn().mockImplementation(() => Promise.resolve({status:200}))
