@@ -57,9 +57,6 @@ function GuestLandingPageBase({
               </Link>
             </div>
           </div>
-          <Link to="/tenant-dashboard">
-            <Button>Tenant Page</Button>
-          </Link>
         </div>
       </div>
     );
