@@ -98,6 +98,8 @@ export function PropertyListingPage({
       onSubmitDraftListing={() => console.log("draft submitted!")}
       className={twMerge("p-5", className)}
     />
+
+    {/* To be moved somewhere else later once confirmed */}
     <div>
       <button onClick={toggleModal}>Click this to edit this property.</button>
       <EditDraftListingModal isOpen={isModalOpen} toggle={toggleModal}>
