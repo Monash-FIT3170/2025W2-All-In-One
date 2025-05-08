@@ -5,15 +5,14 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from "../../theming/components/shadcn/Form";
+} from "../../theming-shadcn/Form";
 import { CloudUpload, Paperclip } from "lucide-react";
-import * as z from "zod";
 import {
   FileUploader,
   FileUploaderContent,
   FileUploaderItem,
   FileInput,
-} from "../../theming/components/shadcn/FileUpload";
+} from "../../theming-shadcn/FileUpload";
 import { FormSchemaType } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";

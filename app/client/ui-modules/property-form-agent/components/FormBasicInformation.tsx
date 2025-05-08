@@ -1,21 +1,20 @@
 "use client";
 import React from "react";
-import { z } from "zod";
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../theming/components/shadcn/Form";
+} from "../../theming-shadcn/Form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../theming/components/shadcn/Select";
-import { Input } from "../../theming/components/shadcn/Input";
+} from "../../theming-shadcn/Select";
+import { Input } from "../../theming-shadcn/Input";
 import { UseFormReturn } from "react-hook-form";
 import { FormSchemaType } from "./FormSchema";
 import { FormHeading } from "./FormHeading";

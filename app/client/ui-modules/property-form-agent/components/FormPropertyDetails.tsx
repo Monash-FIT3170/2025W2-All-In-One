@@ -7,9 +7,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../theming/components/shadcn/Form";
-import { Input } from "../../theming/components/shadcn/Input";
-import { Textarea } from "../../theming/components/shadcn/Textarea";
+} from "../../theming-shadcn/Form";
+import { Input } from "../../theming-shadcn/Input";
+import { Textarea } from "../../theming-shadcn/Textarea";
 import { FormSchemaType } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";

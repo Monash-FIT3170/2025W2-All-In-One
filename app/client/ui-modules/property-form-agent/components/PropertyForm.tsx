@@ -3,13 +3,13 @@
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import * as z from "zod";
-import { Form } from "../../theming/components/shadcn/Form";
+import { Form } from "../../theming-shadcn/Form";
 import FormBasicInformation from "./FormBasicInformation";
 import FormPropertyDetails from "./FormPropertyDetails";
 import FormPropertyImages from "./FormPropertyImages";
 import FormListingOptions from "./FormListingOptions";
 import { formSchema, FormSchemaType } from "./FormSchema";
-import { Button } from "../../theming/components/shadcn/Button";
+import { Button } from "../../theming-shadcn/Button";
 
 export function PropertyForm({
   form,
@@ -26,7 +26,7 @@ export function PropertyForm({
         <FormPropertyImages form={form} />
         <FormListingOptions form={form} />
         <div className="flex justify-end mt-5">
-        <Button variant="black" type="submit">Create Listing</Button>
+        <Button type="submit">Create Listing</Button>
         </div>
       </form>
     </Form>

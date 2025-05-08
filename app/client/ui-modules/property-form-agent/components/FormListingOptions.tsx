@@ -6,21 +6,21 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../theming/components/shadcn/Form";
+} from "../../theming-shadcn/Form";
 import { format } from "date-fns";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../../theming/components/shadcn/Popover";
-import { Calendar } from "../../theming/components/shadcn/Calendar";
+} from "../../theming-shadcn/Popover";
+import { Calendar } from "../../theming-shadcn/Calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
 import {
   RadioGroup,
   RadioGroupItem,
-} from "../../theming/components/shadcn/RadioGroup";
-import { Switch } from "../../theming/components/shadcn/Switch";
-import { Button } from "../../theming/components/shadcn/Button";
+} from "../../theming-shadcn/RadioGroup";
+import { Switch } from "../../theming-shadcn/Switch";
+import { Button } from "../../theming-shadcn/Button";
 import { FormSchemaType } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
@@ -32,7 +32,7 @@ export default function FormListingOptions({
 }) {
 
   return (
-    <div className="border border-(--divider-color) w-full p-7 rounded-md">
+    <div className="border border-(--divider-color) w-full p-7 rounded-md mb-3">
       <FormHeading
         title="Listing Options"
         subtitle="Configure additional listing settings"

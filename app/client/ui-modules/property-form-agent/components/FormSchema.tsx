@@ -1,4 +1,3 @@
-import React from "react";
 import * as z from "zod";
 
 export const formSchema = z.object({
