@@ -1,13 +1,13 @@
 import { Meteor } from "meteor/meteor";
 import { Mongo } from "meteor/mongo";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { TaskDocument } from "/app/server/database/example-tasks/models/TaskDocument";
+import { Task } from "../../database/example-tasks/models/Task";
 import { TasksCollection } from "/app/server/database/example-tasks/TasksCollection";
 import { TaskDTO } from "./models/TaskDTO";
 
 const taskInsertMethod = {
   [MeteorMethodIdentifier.TASK_INSERT]: async (text: string): Promise<string> => {
-    const newTask: Mongo.OptionalId<TaskDocument> = {
+    const newTask: Mongo.OptionalId<Task> = {
       text: text
     }
     return await TasksCollection.insertAsync(newTask);
@@ -23,7 +23,7 @@ const taskGetAllMethod = {
   }
 }
 
-function mapTaskDocumentToTaskDTO(task: TaskDocument): TaskDTO {
+function mapTaskDocumentToTaskDTO(task: Task): TaskDTO {
   return {
     taskId: task._id,
     text: task.text

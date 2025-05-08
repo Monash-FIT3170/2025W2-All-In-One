@@ -1,4 +1,4 @@
 import { Mongo } from "meteor/mongo";
-import { TaskDocument } from "./models/TaskDocument";
+import { Task } from "./models/Task";
 
-export const TasksCollection: Mongo.Collection<TaskDocument> = new Mongo.Collection("tasks");
+export const TasksCollection: Mongo.Collection<Task> = new Mongo.Collection("tasks");
