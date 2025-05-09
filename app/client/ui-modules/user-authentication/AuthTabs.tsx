@@ -1,41 +1,30 @@
 import React, { useEffect, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { LoginForm } from "./LoginForm";
 import { SignupForm } from "./SignupForm";
 
-// Styles
-const cardClass = "w-full max-w-lg rounded-xl border bg-white shadow-lg p-8";
-const tabsListClass = "inline-flex items-center justify-center w-full rounded-full bg-gray-100 p-1 mb-6";
-const tabTriggerClass = "w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all text-gray-500 data-[state=active]:bg-white data-[state=active]:text-black";
+const tabTriggerClass =
+  "w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all text-gray-500 data-[state=active]:bg-white data-[state=active]:text-black";
 
+type AuthTabsProps = {
+  initialTab: "login" | "signup";
+};
 
-export const AuthTabs = () => {
-  const location = useLocation();
+export const AuthTabs = ({ initialTab }: AuthTabsProps) => {
   const navigate = useNavigate();
-  const initialTab = location.pathname === "/signup" ? "signup" : "login";
-
-  const [tab, setTab] = useState(initialTab);
-
-  // Sync tab change with route
-  useEffect(() => {
-    setTab(initialTab);
-  }, [location.pathname]);
+  const [tab, setTab] = useState<"login" | "signup">(initialTab);
 
   const handleTabChange = (value: string) => {
-    setTab(value);
+    setTab(value as "login" | "signup");
     navigate(value === "signup" ? "/signup" : "/login");
   };
 
   return (
     <div className="h-screen overflow-hidden flex items-center justify-center bg-gray-50 px-4">
-      <div className={cardClass}>
-        <Tabs.Root
-          value={tab}
-          onValueChange={handleTabChange}
-          className="w-full"
-        >
-          <Tabs.List className={tabsListClass}>
+      <div className="w-full max-w-lg rounded-xl border bg-white shadow-lg p-8">
+        <Tabs.Root value={tab} onValueChange={handleTabChange} className="w-full">
+          <Tabs.List className="inline-flex items-center justify-center w-full rounded-full bg-gray-100 p-1 mb-6">
             <Tabs.Trigger value="login" className={tabTriggerClass}>
               Login
             </Tabs.Trigger>

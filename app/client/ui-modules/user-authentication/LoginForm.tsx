@@ -33,7 +33,7 @@ export const LoginForm = () => {
     <form onSubmit={submit} className="space-y-5">
       <div>
         <label htmlFor="email" className={labelClass}>
-          email
+          Email
         </label>
         <input
           id="email"

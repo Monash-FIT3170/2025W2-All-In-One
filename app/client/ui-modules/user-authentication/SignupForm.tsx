@@ -8,39 +8,55 @@ const inputClass =
 const labelClass = "block mb-1 text-sm font-medium text-gray-700";
 
 export const SignupForm = () => {
-  const [accountType, setAccountType] = useState("tenant");
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [agentCode, setAgentCode] = useState("");
+  const [formData, setFormData] = useState({
+    accountType: "tenant",
+    passwordVisible: false,
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    agentCode: "",
+  });
+
   const [message, setMessage] = useState("");
+
+  const updateField = (field: string, value: string | boolean) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formData = {
-      email,
-      password,
-      firstName,
-      lastName,
-      accountType,
-      agentCode: accountType === "agent" ? agentCode : undefined,
+    const payload = {
+      email: formData.email,
+      password: formData.password,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      accountType: formData.accountType,
+      agentCode:
+        formData.accountType === "agent" ? formData.agentCode : undefined,
     };
 
-    Meteor.call("user.register", formData, (err: { reason: string } | undefined) => {
-      if (err) {
-        setMessage(err.reason || "Registration failed.");
-      } else {
-        setMessage("Account created successfully!");
-        setFirstName("");
-        setLastName("");
-        setEmail("");
-        setPassword("");
-        setAgentCode("");
+    Meteor.call(
+      "user.register",
+      payload,
+      (err: { reason: string } | undefined) => {
+        if (err) {
+          setMessage(err.reason || "Registration failed.");
+        } else {
+          setMessage("Account created successfully!");
+          setFormData({
+            accountType: "tenant",
+            passwordVisible: false,
+            firstName: "",
+            lastName: "",
+            email: "",
+            password: "",
+            agentCode: "",
+          });
+        }
       }
-    });
+    );
   };
 
   return (
@@ -48,8 +64,8 @@ export const SignupForm = () => {
       <div>
         <h2 className="text-lg font-semibold">Account Type</h2>
         <Tabs.Root
-          value={accountType}
-          onValueChange={setAccountType}
+          value={formData.accountType}
+          onValueChange={(val) => updateField("accountType", val)}
           className="w-full"
         >
           <Tabs.List className="grid grid-cols-3 gap-2 mt-2">
@@ -77,24 +93,32 @@ export const SignupForm = () => {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="firstName" className={labelClass}>First Name</label>
+          <label htmlFor="firstName" className={labelClass}>
+            First Name
+          </label>
           <input
             type="text"
             id="firstName"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            value={formData.firstName}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              updateField("firstName", e.target.value)
+            }
             placeholder="John"
             className={inputClass}
             required
           />
         </div>
         <div>
-          <label htmlFor="lastName" className={labelClass}>Last Name</label>
+          <label htmlFor="lastName" className={labelClass}>
+            Last Name
+          </label>
           <input
             type="text"
             id="lastName"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
+            value={formData.lastName}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              updateField("lastName", e.target.value)
+            }
             placeholder="Doe"
             className={inputClass}
             required
@@ -103,12 +127,16 @@ export const SignupForm = () => {
       </div>
 
       <div>
-        <label htmlFor="email" className={labelClass}>Email</label>
+        <label htmlFor="email" className={labelClass}>
+          Email
+        </label>
         <input
           type="email"
           id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={formData.email}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            updateField("email", e.target.value)
+          }
           placeholder="example@email.com"
           className={inputClass}
           required
@@ -116,12 +144,16 @@ export const SignupForm = () => {
       </div>
 
       <div className="relative">
-        <label htmlFor="password" className={labelClass}>Password</label>
+        <label htmlFor="password" className={labelClass}>
+          Password
+        </label>
         <input
-          type={passwordVisible ? "text" : "password"}
+          type={formData.passwordVisible ? "text" : "password"}
           id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={formData.password}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            updateField("password", e.target.value)
+          }
           placeholder="••••••••"
           className={inputClass}
           required
@@ -129,7 +161,9 @@ export const SignupForm = () => {
         <button
           type="button"
           className="absolute top-9 right-3 text-gray-500"
-          onClick={() => setPasswordVisible(!passwordVisible)}
+          onClick={() =>
+            updateField("passwordVisible", !formData.passwordVisible)
+          }
         >
           <EyeIcon className="w-5 h-5" />
         </button>
@@ -138,14 +172,18 @@ export const SignupForm = () => {
         </p>
       </div>
 
-      {accountType === "agent" && (
+      {formData.accountType === "agent" && (
         <div>
-          <label htmlFor="agentCode" className={labelClass}>Agent Verification Code</label>
+          <label htmlFor="agentCode" className={labelClass}>
+            Agent Verification Code
+          </label>
           <input
             type="text"
             id="agentCode"
-            value={agentCode}
-            onChange={(e) => setAgentCode(e.target.value)}
+            value={formData.agentCode}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              updateField("agentCode", e.target.value)
+            }
             className={inputClass}
             required
           />

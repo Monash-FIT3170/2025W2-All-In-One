@@ -53,8 +53,8 @@ function AppRoot(): React.JSX.Element {
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/" element={<ExampleHomePage />} />
               <Route path="/propertyform" element={<PropertyFormPage />} />
-              <Route path="/login" element={<AuthTabs />} />
-              <Route path="/signup" element={<AuthTabs />} />
+              <Route path="/login" element={<AuthTabs initialTab="login" />} />
+              <Route path="/signup" element={<AuthTabs initialTab="signup" />} />
             </Routes>
             <BottomNavbar />
           </BrowserRouter>
