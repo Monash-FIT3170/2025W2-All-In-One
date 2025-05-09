@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Meteor } from "meteor/meteor";
 import { SignupFormUIState } from "../SignupFormUIState";
 import { RootState } from "/app/client/store";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 const initialState: SignupFormUIState = {
   accountType: "tenant",
@@ -66,7 +67,7 @@ export const registerUser = createAsyncThunk(
 
     return new Promise<void>((resolve, reject) => {
       Meteor.call(
-        "user.register",
+        MeteorMethodIdentifier.USER_REGISTER,
         payload,
         (err: { reason: string } | undefined) => {
           if (err) {
