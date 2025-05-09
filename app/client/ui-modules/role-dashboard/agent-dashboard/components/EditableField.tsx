@@ -1,20 +1,30 @@
 import React from "react";
+import { Input } from "../../../theming-shadcn/Input";
 
-export function EditableField({label, text}: {label: string, text: string}):  React.JSX.Element {
+interface EditableFieldProps {
+  label: string;
+  value: string;
+  editing: boolean;
+  onChange: (value: string) => void;
+}
 
-
-
-    return (
-
-        // this is the section that will display when on the default profile (not edit mode)
-        <div className="grid w-full max-w-sm items-start gap-1.5">
-            
-        <div className="text-base geist-bold text-gray-700">{label}</div>
-        <div className="border rounded px-3 py-2 bg-muted border-gray-300  text-muted-foreground geist-regular">
-            {text}
-            </div>
-
+export function EditableField({ label, value, editing, onChange }: EditableFieldProps) {
+  return (
+    <div className="grid w-full max-w-sm items-start gap-1.5">
+      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+        {label}
+      </label>
+      {editing ? (
+        <Input 
+          value={value} 
+          onChange={(e) => onChange(e.target.value)} 
+          className="bg-white"
+        />
+      ) : (
+        <div className="border rounded px-3 py-2 text-muted-foreground bg-muted border-gray-300">
+          {value}
         </div>
-       
-    );
+      )}
+    </div>
+  );
 }
