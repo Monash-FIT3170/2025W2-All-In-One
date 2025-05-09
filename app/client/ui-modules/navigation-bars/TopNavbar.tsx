@@ -119,13 +119,16 @@ export function TopNavbar({
   return (
     <header className="sticky top-0 z-50 bg-white text-black py-4 shadow">
       <div className="flex justify-between items-center px-6">
-        {/* Left-aligned logo */}
-        <div
-          onClick={() => onSideBarOpened(true)} // Open the sidebar when the logo is clicked
-          className="flex items-center gap-2 cursor-pointer"
-        >
-          <PropManagerLogoIcon variant="light" />
-          <PropManagerLogoText />
+        {/* Left-aligned sidebar slider icon */}
+        <div className="flex items-center gap-4">
+          <SideBarSliderIcon
+            onClick={() => onSideBarOpened((prev) => !prev)}
+            className="text-gray-600"
+          />
+          <div className="flex items-center gap-2">
+            <PropManagerLogoIcon variant="light" />
+            <PropManagerLogoText />
+          </div>
         </div>
 
         {/* Right-aligned buttons */}
