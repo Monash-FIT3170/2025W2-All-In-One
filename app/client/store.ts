@@ -4,6 +4,8 @@ import { agentDashboardSlice } from "./ui-modules/role-dashboard/agent-dashboard
 import { landlordDashboardSlice } from "./ui-modules/role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
 import { guestLandingPageSlice } from "./ui-modules/guest-landing-page/state/reducers/guest-landing-page-slice";
 import { settingsPageSlice } from "./ui-modules/settings-page/state/reducers/settings-page-slice";
+import { loginFormSlice } from "./ui-modules/user-authentication/state/reducers/login-form-slice";
+import { signupFormSlice } from "./ui-modules/user-authentication/state/reducers/signup-form-slice";
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +13,9 @@ export const store = configureStore({
     agentDashboard: agentDashboardSlice.reducer,
     guestLandingPage: guestLandingPageSlice.reducer,
     settingsPage: settingsPageSlice.reducer,
-    landlordDashboard: landlordDashboardSlice.reducer
+    landlordDashboard: landlordDashboardSlice.reducer,
+    loginFormSlice: loginFormSlice.reducer,
+    signupFormSlice: signupFormSlice.reducer
   },
 });
 
