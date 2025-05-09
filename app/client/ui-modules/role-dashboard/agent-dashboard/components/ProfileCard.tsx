@@ -1,65 +1,123 @@
 import React from "react";
 import { CardWidget } from "../../components/CardWidget";
 import { EditableField } from "./EditableField";
-
+import { Button } from "../../../theming-shadcn/Button";
+import { useAppDispatch, useAppSelector } from "../../../../store";
+import { 
+  selectProfileData, 
+  selectIsEditing, 
+  setEditing, 
+  updateField 
+} from "../state/profile-slice";
 
 export function ProfileCard() {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-        <CardWidget
-          title="Personal Information"
-          value=""
-          subtitle="your basic personal information"
-        >
+  const dispatch = useAppDispatch();
+  const profile = useAppSelector(selectProfileData);
+  const isEditing = useAppSelector(selectIsEditing);
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <EditableField label="First Name" text="Tom"></EditableField>
-                <EditableField label="Last Name" text="Macauley"></EditableField>
+  const handleFieldChange = (field: keyof typeof profile) => (value: string) => {
+    dispatch(updateField({ field, value }));
+  };
 
-            </div>
+  const handleEditToggle = () => {
+    dispatch(setEditing(!isEditing));
+  };
 
-            <EditableField label="Date of Birth" text="25/09/2003"></EditableField>
-            <EditableField label="Occupation" text="Student"></EditableField>
-        
-        </CardWidget>
-        
-        <CardWidget
-          title="Contact Information"
-          value=""
-          subtitle="How we can reach you"
-        >
-            
-            
-            <EditableField label="Email Address" text="thomas123mac@gmail.com"></EditableField>
-            <EditableField label="Phone Number" text="0437 559 777"></EditableField>
-            <EditableField label="Emergency Contact" text="Thomas Higgins (Bestest Friend) - (000)"></EditableField> 
-            
-        
-        </CardWidget>
-
-        <CardWidget
-          title="Employment Information"
-          value=""
-          subtitle="Your current employment details"
-        >
-
-            
-            <EditableField label="Current Employer" text="Fit 3170"></EditableField>
-            <EditableField label="Working Address" text="Learning Jungle"></EditableField>
-            <EditableField label="Work Phone" text="0437 559 777"></EditableField>
-
-        
-        </CardWidget>
-
-        <CardWidget
-          title="Vehicle Information"
-          value=""
-          subtitle="Registered vehicles for parking"
-        >
-
-        
-        </CardWidget>
-       
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+      <div className="col-span-full flex justify-end">
+        <Button onClick={handleEditToggle}>
+          {isEditing ? "Save Profile" : "Edit Profile"}
+        </Button>
       </div>
-    );
-  }
+      
+      <CardWidget title="Personal Information" value="" subtitle="your basic personal information">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <EditableField 
+            label="First Name" 
+            value={profile.firstName}
+            editing={isEditing}
+            onChange={handleFieldChange('firstName')}
+          />
+          <EditableField 
+            label="Last Name" 
+            value={profile.lastName}
+            editing={isEditing}
+            onChange={handleFieldChange('lastName')}
+          />
+        </div>
+        <EditableField 
+          label="Date of Birth" 
+          value={profile.dob}
+          editing={isEditing}
+          onChange={handleFieldChange('dob')}
+        />
+        <EditableField 
+          label="Occupation" 
+          value={profile.occupation}
+          editing={isEditing}
+          onChange={handleFieldChange('occupation')}
+        />
+      </CardWidget>
+    
+      
+      <CardWidget
+        title="Contact Information"
+        value=""
+        subtitle="How we can reach you"
+      >
+        <EditableField 
+          label="Email Address" 
+          value={profile.email}
+          editing={isEditing}
+          onChange={handleFieldChange('email')}
+        />
+        <EditableField 
+          label="Phone Number" 
+          value={profile.phone}
+          editing={isEditing}
+          onChange={handleFieldChange('phone')}
+        />
+        <EditableField 
+          label="Emergency Contact" 
+          value={profile.emergencyContact}
+          editing={isEditing}
+          onChange={handleFieldChange('emergencyContact')}
+        /> 
+      </CardWidget>
+
+      <CardWidget
+        title="Employment Information"
+        value=""
+        subtitle="Your current employment details"
+      >
+        <EditableField 
+          label="Current Employer" 
+          value={profile.employer}
+          editing={isEditing}
+          onChange={handleFieldChange('employer')}
+        />
+        <EditableField 
+          label="Working Address" 
+          value={profile.workAddress}
+          editing={isEditing}
+          onChange={handleFieldChange('workAddress')}
+        />
+        <EditableField 
+          label="Work Phone" 
+          value={profile.workPhone}
+          editing={isEditing}
+          onChange={handleFieldChange('workPhone')}
+        />
+      </CardWidget>
+
+      <CardWidget
+        title="Vehicle Information"
+        value=""
+        subtitle="Registered vehicles for parking"
+      >
+        {/* Add vehicle fields here when needed */}
+      </CardWidget>
+    </div>
+  );
+}
