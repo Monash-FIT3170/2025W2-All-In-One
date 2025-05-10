@@ -15,7 +15,7 @@ export function EditableField({
   onChange,
 }: EditableFieldProps) {
   return (
-    <div className="grid w-full max-w-sm items-start gap-1.5">
+    <div className="grid w-full items-start gap-0.5">
       <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
         {label}
       </label>

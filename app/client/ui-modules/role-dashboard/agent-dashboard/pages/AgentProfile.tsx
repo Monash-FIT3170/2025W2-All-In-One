@@ -41,8 +41,8 @@ export function AgentProfile(): React.JSX.Element {
           settingsLinks={settingLinks}
         />
 
-        <div className="max-w-screen-lg mx-auto px-6">
-          <div className="flex justify-between items-center mb-6">
+        <div className="max-w-screen-xl mx-auto px-6 sm:px-8">
+          <div className="flex justify-between items-center">
             <div className="flex items-start gap-4">
               <EditableAvatar
                 editing={isEditing}
