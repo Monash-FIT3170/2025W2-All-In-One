@@ -12,6 +12,7 @@ interface ProfileData {
   employer: string;
   workAddress: string;
   workPhone: string;
+  profileImage: string
 }
 
 interface ProfileState {
@@ -35,7 +36,8 @@ const initialState: ProfileState = {
     emergencyContact: "Thomas Higgins (Bestest Friend) - (000)",
     employer: "Fit 3170",
     workAddress: "Learning Jungle",
-    workPhone: "0437 559 777"
+    workPhone: "0437 559 777",
+    profileImage: "/need-to-add.png"
   }
 };
 
