@@ -8,20 +8,25 @@ interface EditableFieldProps {
   onChange: (value: string) => void;
 }
 
-export function EditableField({ label, value, editing, onChange }: EditableFieldProps) {
+export function EditableField({
+  label,
+  value,
+  editing,
+  onChange,
+}: EditableFieldProps) {
   return (
     <div className="grid w-full max-w-sm items-start gap-1.5">
       <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
         {label}
       </label>
       {editing ? (
-        <Input 
-          value={value} 
-          onChange={(e) => onChange(e.target.value)} 
-          className="bg-white"
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-auto text-sm px-3 py-2 focus:ring-0 focus-visible:ring-0 shadow-none"
         />
       ) : (
-        <div className="border rounded px-3 py-2 text-muted-foreground bg-muted border-gray-300">
+        <div className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 bg-muted text-muted-foreground">
           {value}
         </div>
       )}

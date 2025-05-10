@@ -3,11 +3,11 @@ import { CardWidget } from "../../components/CardWidget";
 import { EditableField } from "./EditableField";
 import { Button } from "../../../theming-shadcn/Button";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { 
-  selectProfileData, 
-  selectIsEditing, 
-  setEditing, 
-  updateField 
+import {
+  selectProfileData,
+  selectIsEditing,
+  setEditing,
+  updateField,
 } from "../state/profile-slice";
 
 export function ProfileCard() {
@@ -15,9 +15,10 @@ export function ProfileCard() {
   const profile = useAppSelector(selectProfileData);
   const isEditing = useAppSelector(selectIsEditing);
 
-  const handleFieldChange = (field: keyof typeof profile) => (value: string) => {
-    dispatch(updateField({ field, value }));
-  };
+  const handleFieldChange =
+    (field: keyof typeof profile) => (value: string) => {
+      dispatch(updateField({ field, value }));
+    };
 
   const handleEditToggle = () => {
     dispatch(setEditing(!isEditing));
@@ -25,65 +26,64 @@ export function ProfileCard() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-      <div className="col-span-full flex justify-end">
-        <Button onClick={handleEditToggle}>
-          {isEditing ? "Save Profile" : "Edit Profile"}
-        </Button>
-      </div>
-      
-      <CardWidget title="Personal Information" value="" subtitle="your basic personal information">
+      <div className="col-span-full flex justify-end"></div>
+
+      <CardWidget
+        title="Personal Information"
+        value=""
+        subtitle="your basic personal information"
+      >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <EditableField 
-            label="First Name" 
+          <EditableField
+            label="First Name"
             value={profile.firstName}
             editing={isEditing}
-            onChange={handleFieldChange('firstName')}
+            onChange={handleFieldChange("firstName")}
           />
-          <EditableField 
-            label="Last Name" 
+          <EditableField
+            label="Last Name"
             value={profile.lastName}
             editing={isEditing}
-            onChange={handleFieldChange('lastName')}
+            onChange={handleFieldChange("lastName")}
           />
         </div>
-        <EditableField 
-          label="Date of Birth" 
+        <EditableField
+          label="Date of Birth"
           value={profile.dob}
           editing={isEditing}
-          onChange={handleFieldChange('dob')}
+          onChange={handleFieldChange("dob")}
         />
-        <EditableField 
-          label="Occupation" 
+        <EditableField
+          label="Occupation"
           value={profile.occupation}
           editing={isEditing}
-          onChange={handleFieldChange('occupation')}
+          onChange={handleFieldChange("occupation")}
         />
       </CardWidget>
-    
-      
+
       <CardWidget
         title="Contact Information"
         value=""
         subtitle="How we can reach you"
       >
-        <EditableField 
-          label="Email Address" 
+        <EditableField
+          label="Email Address"
           value={profile.email}
           editing={isEditing}
-          onChange={handleFieldChange('email')}
+          onChange={handleFieldChange("email")}
         />
-        <EditableField 
-          label="Phone Number" 
+        <EditableField
+          label="Phone Number"
           value={profile.phone}
           editing={isEditing}
-          onChange={handleFieldChange('phone')}
+          onChange={handleFieldChange("phone")}
         />
-        <EditableField 
-          label="Emergency Contact" 
+        <EditableField
+          label="Emergency Contact"
           value={profile.emergencyContact}
           editing={isEditing}
-          onChange={handleFieldChange('emergencyContact')}
-        /> 
+          onChange={handleFieldChange("emergencyContact")}
+        />
       </CardWidget>
 
       <CardWidget
@@ -91,23 +91,23 @@ export function ProfileCard() {
         value=""
         subtitle="Your current employment details"
       >
-        <EditableField 
-          label="Current Employer" 
+        <EditableField
+          label="Current Employer"
           value={profile.employer}
           editing={isEditing}
-          onChange={handleFieldChange('employer')}
+          onChange={handleFieldChange("employer")}
         />
-        <EditableField 
-          label="Working Address" 
+        <EditableField
+          label="Working Address"
           value={profile.workAddress}
           editing={isEditing}
-          onChange={handleFieldChange('workAddress')}
+          onChange={handleFieldChange("workAddress")}
         />
-        <EditableField 
-          label="Work Phone" 
+        <EditableField
+          label="Work Phone"
           value={profile.workPhone}
           editing={isEditing}
-          onChange={handleFieldChange('workPhone')}
+          onChange={handleFieldChange("workPhone")}
         />
       </CardWidget>
 

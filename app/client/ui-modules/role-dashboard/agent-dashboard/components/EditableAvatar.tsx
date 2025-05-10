@@ -56,13 +56,13 @@ export function EditableAvatar({imageUrl, editing, onImageChange}: EditableAvata
             >
 
 
-        <Avatar className="w-12 h-12  border border-gray-300"> 
-            <AvatarImage src={imageUrl} alt="Profile Picture" />
+        <Avatar> 
+            <AvatarImage src={imageUrl} alt="Profile Picture" className="w-24 h-24 object-cover rounded-full"/>
             <AvatarFallback>
                 <img 
                 src="/images/test-image.png"
                 alt="Fallback Image"
-                className="w-full h-full object-cover rounded-full"
+                className="w-24 h-24 object-cover rounded-full"
                 />
             </AvatarFallback>
         </Avatar>
