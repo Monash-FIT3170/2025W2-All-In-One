@@ -1,16 +1,16 @@
 
-export type Property = {
-  _id: string;
+export type PropertyDTO = {
+  propertyId: string;
   streetnumber: string;
   streetname: string;
   suburb: string;
   province: string;
   postcode: string;
-  property_status_id: string;
+  propertyStatus: string;
   description: string;
   bathrooms: number;
   bedrooms: number;
-  property_feature_ids: string[];
+  features: string[];
   type: string;
   area?: number;
 }
