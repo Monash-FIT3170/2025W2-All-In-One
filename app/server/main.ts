@@ -1,6 +1,7 @@
 import { Meteor } from "meteor/meteor";
 import "./methods/example-tasks/task-methods";
 import { PropertyCollection, PropertyFeatureCollection, PropertyPriceCollection, PropertyStatusCollection } from "./database/property/property-collections";
+import { InspectionCollection, ListingCollection } from "/app/server/database/property-listing/listing-collections";
 
 Meteor.startup(tempSeedPropertyData);
 
@@ -10,6 +11,7 @@ async function tempSeedPropertyData(): Promise<void> {
       _id: "1",
       name: "Vacant"
     })
+
     PropertyFeatureCollection.insertAsync({
       _id: "1",
       name: "Pool"
@@ -18,11 +20,13 @@ async function tempSeedPropertyData(): Promise<void> {
       _id: "2",
       name: "Lots of space"
     })
+
     PropertyPriceCollection.insertAsync({
       property_id: "1",
       price_per_month: 1500,
       date_set: new Date(),
     });
+
     PropertyCollection.insertAsync({
       _id: "1",
       streetnumber: "123",
@@ -38,5 +42,26 @@ async function tempSeedPropertyData(): Promise<void> {
       property_feature_ids: ["1", "2"],
       type: "House",
     });
+
+    InspectionCollection.insertAsync({
+      _id: "1",
+      starttime: new Date("2025-04-12T10:00:00Z"),
+      endtime: new Date("2025-04-13T11:00:00Z"),
+    });
+    InspectionCollection.insertAsync({
+      _id: "2",
+      starttime: new Date("2025-04-14T10:00:00Z"),
+      endtime: new Date("2025-04-15T11:00:00Z"),
+    });
+
+    ListingCollection.insertAsync({
+      property_id: "1",
+      image_urls: [
+        "https://cdn.pixabay.com/photo/2018/08/04/11/30/draw-3583548_1280.png",
+        "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
+        "https://cdn.pixabay.com/photo/2024/05/26/10/15/bird-8788491_1280.jpg",
+      ],
+      inspection_ids: ["1", "2"],
+    })
   }
 }
