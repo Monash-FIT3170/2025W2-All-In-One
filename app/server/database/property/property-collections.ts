@@ -1,14 +1,14 @@
 import { Mongo } from "meteor/mongo";
-import { Property } from "/app/server/database/property/models/Property";
-import { PropertyFeature } from "/app/server/database/property/models/PropertyFeature";
-import { PropertyPrice } from "/app/server/database/property/models/PropertyPrice";
-import { PropertyStatus } from "/app/server/database/property/models/PropertyStatus";
+import { PropertyDocument } from "./models/PropertyDocument";
+import { PropertyFeatureDocument } from "./models/PropertyFeatureDocument";
+import { PropertyPriceDocument } from "./models/PropertyPriceDocument";
+import { PropertyStatusDocument } from "./models/PropertyStatusDocument";
 
-export const PropertyCollection: Mongo.Collection<Property> =
+export const PropertyCollection: Mongo.Collection<PropertyDocument> =
   new Mongo.Collection("properties");
-export const PropertyFeatureCollection: Mongo.Collection<PropertyFeature> =
+export const PropertyFeatureCollection: Mongo.Collection<PropertyFeatureDocument> =
   new Mongo.Collection("property_features");
-export const PropertyPriceCollection: Mongo.Collection<PropertyPrice> =
+export const PropertyPriceCollection: Mongo.Collection<PropertyPriceDocument> =
   new Mongo.Collection("property_prices");
-export const PropertyStatusCollection: Mongo.Collection<PropertyStatus> =
+export const PropertyStatusCollection: Mongo.Collection<PropertyStatusDocument> =
   new Mongo.Collection("property_statuses");

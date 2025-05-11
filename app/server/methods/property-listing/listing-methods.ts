@@ -2,9 +2,9 @@ import {
   InspectionCollection,
   ListingCollection,
 } from "../../database/property-listing/listing-collections";
-import { Listing } from "../../database/property-listing/models/Listing";
+import { ListingDocument } from "../../database/property-listing/models/ListingDocument";
 import { ListingDTO } from "./models/ListingDTO";
-import { Inspection } from "/app/server/database/property-listing/models/Inspection";
+import { InspectionDocument } from "../../database/property-listing/models/InspectionDocument";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 const getListingForProperty = {
@@ -28,8 +28,8 @@ const getListingForProperty = {
   },
 };
 
-async function mapListingToListingDTO(listing: Listing): Promise<ListingDTO> {
-  let inspections: Inspection[] = [];
+async function mapListingToListingDTO(listing: ListingDocument): Promise<ListingDTO> {
+  let inspections: InspectionDocument[] = [];
 
   if (listing.inspection_ids.length > 0) {
     inspections = await InspectionCollection.find({

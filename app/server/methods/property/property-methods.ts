@@ -1,4 +1,4 @@
-import { Property } from "/app/server/database/property/models/Property";
+import { PropertyDocument } from "../../database/property/models/PropertyDocument";
 import {
   PropertyCollection,
   PropertyFeatureCollection,
@@ -30,7 +30,7 @@ const propertyGetMethod = {
 };
 
 async function mapPropertyDocumentToPropertyDTO(
-  property: Property
+  property: PropertyDocument
 ): Promise<PropertyDTO> {
   const propertyStatusDocument = await PropertyStatusCollection.findOneAsync(
     property.property_status_id
