@@ -8,6 +8,7 @@ import {
   registerUser,
   selectSignupFormUIState,
 } from "./state/reducers/signup-form-slice";
+import { SignupFormUIState } from "./state/SignupFormUIState";
 
 const inputClass =
   "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200 text-sm";
@@ -27,7 +28,7 @@ export const SignupForm = () => {
   };
 
   const handleChange =
-    (field: keyof typeof formState) =>
+    (field: keyof SignupFormUIState) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       dispatch(updateField({ field, value: e.target.value }));
     };
