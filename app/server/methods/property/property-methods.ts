@@ -15,13 +15,13 @@ const propertyGetMethod = {
     const fetchedPropertyDocument = await PropertyCollection.findOneAsync(id);
 
     if (!fetchedPropertyDocument) {
-      throw new Meteor.Error("not-found", `Property with ${id} not found`);
+      throw new Meteor.Error("NotFound", `Property with ${id} not found`);
     }
 
     const propertyDTO = mapPropertyDocumentToPropertyDTO(
       fetchedPropertyDocument
     ).catch((error) => {
-      throw new Meteor.Error("invalid-data", error.message);
+      throw new Meteor.Error(error.name, error.message);
     });
 
     return propertyDTO;
@@ -58,11 +58,11 @@ async function mapPropertyDocumentToPropertyDTO(
     suburb: property.suburb,
     province: property.province,
     postcode: property.postcode,
-    propertyStatus: propertyStatusDocument.name, // will need to obtain status from the collection
+    propertyStatus: propertyStatusDocument.name,
     description: property.description,
     bathrooms: property.bathrooms,
     bedrooms: property.bedrooms,
-    features: propertyFeaturesDocuments.map((doc) => doc.name), // will need to obtain fetures from the collection
+    features: propertyFeaturesDocuments.map((doc) => doc.name),
     type: property.type,
     area: property.area,
   };
