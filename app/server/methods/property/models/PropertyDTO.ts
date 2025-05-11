@@ -6,10 +6,12 @@ export type PropertyDTO = {
   suburb: string;
   province: string;
   postcode: string;
+  pricePerMonth: number;
   propertyStatus: string;
   description: string;
   bathrooms: number;
   bedrooms: number;
+  parking: number;
   features: string[];
   type: string;
   area?: number;

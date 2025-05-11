@@ -2,6 +2,7 @@ import { Property } from "/app/server/database/property/models/Property";
 import {
   PropertyCollection,
   PropertyFeatureCollection,
+  PropertyPriceCollection,
   PropertyStatusCollection,
 } from "/app/server/database/property/PropertyCollections";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
@@ -37,10 +38,19 @@ async function mapPropertyDocumentToPropertyDTO(
   const propertyFeaturesDocuments = await PropertyFeatureCollection.find({
     _id: { $in: property.property_feature_ids },
   }).fetchAsync();
+  const propertyPriceDocument = await PropertyPriceCollection.findOneAsync(
+    { property_id: property._id },
+    { sort: { date_set: -1 } }
+  );
 
   if (!propertyStatusDocument) {
     throw new InvalidDataError(
       `Property status for Property id ${property._id} not found.`
+    );
+  }
+  if (!propertyPriceDocument) {
+    throw new InvalidDataError(
+      `Property price for Property id ${property._id} not found.`
     );
   }
   if (
@@ -58,10 +68,12 @@ async function mapPropertyDocumentToPropertyDTO(
     suburb: property.suburb,
     province: property.province,
     postcode: property.postcode,
+    pricePerMonth: propertyPriceDocument.price_per_month,
     propertyStatus: propertyStatusDocument.name,
     description: property.description,
     bathrooms: property.bathrooms,
     bedrooms: property.bedrooms,
+    parking: property.parking,
     features: propertyFeaturesDocuments.map((doc) => doc.name),
     type: property.type,
     area: property.area,

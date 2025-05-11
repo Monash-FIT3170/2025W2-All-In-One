@@ -10,6 +10,7 @@ export type Property = {
   description: string;
   bathrooms: number;
   bedrooms: number;
+  parking: number;
   property_feature_ids: string[];
   type: string;
   area?: number;

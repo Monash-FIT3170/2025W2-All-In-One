@@ -1,6 +1,6 @@
 import { Meteor } from "meteor/meteor";
 import "./methods/example-tasks/task-methods";
-import { PropertyCollection, PropertyFeatureCollection, PropertyStatusCollection } from "/app/server/database/property/PropertyCollections";
+import { PropertyCollection, PropertyFeatureCollection, PropertyPriceCollection, PropertyStatusCollection } from "/app/server/database/property/PropertyCollections";
 
 Meteor.startup(tempSeedPropertyData);
 
@@ -18,6 +18,11 @@ async function tempSeedPropertyData(): Promise<void> {
       _id: "2",
       name: "Lots of space"
     })
+    PropertyPriceCollection.insertAsync({
+      property_id: "1",
+      price_per_month: 1500,
+      date_set: new Date(),
+    });
     PropertyCollection.insertAsync({
       _id: "1",
       streetnumber: "123",
@@ -29,6 +34,7 @@ async function tempSeedPropertyData(): Promise<void> {
       description: "A lovely home with a pool.",
       bathrooms: 2,
       bedrooms: 3,
+      parking: 2,
       property_feature_ids: ["1", "2"],
       type: "House",
     });
