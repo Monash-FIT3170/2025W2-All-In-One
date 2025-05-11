@@ -1,6 +1,6 @@
 import { Meteor } from "meteor/meteor";
 import "./methods/example-tasks/task-methods";
-import { PropertyCollection, PropertyFeatureCollection, PropertyPriceCollection, PropertyStatusCollection } from "/app/server/database/property/PropertyCollections";
+import { PropertyCollection, PropertyFeatureCollection, PropertyPriceCollection, PropertyStatusCollection } from "./database/property/property-collections";
 
 Meteor.startup(tempSeedPropertyData);
 

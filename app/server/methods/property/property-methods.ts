@@ -4,7 +4,7 @@ import {
   PropertyFeatureCollection,
   PropertyPriceCollection,
   PropertyStatusCollection,
-} from "/app/server/database/property/PropertyCollections";
+} from "../../database/property/property-collections";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { PropertyDTO } from "/app/server/methods/property/models/PropertyDTO";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
