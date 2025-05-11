@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ListingStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingStatusPill";
 import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingSummary";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
@@ -36,3 +36,10 @@ export const propertyListingSlice = createSlice({
   extraReducers: (builder) => {
   }
 })
+
+// TEMP: Id used for property will be 1. To be changed to a dynamic id given how listing is structured in the future
+export const loadProperty = createAsyncThunk(
+  "propertyListing/loadProperty",
+  async (propertyId: string) => {
+  }
+)
