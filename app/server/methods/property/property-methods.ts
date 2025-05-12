@@ -1,3 +1,4 @@
+import { get } from "react-hook-form";
 import { PropertyDocument } from "../../database/property/models/PropertyDocument";
 import {
   PropertyCollection,
@@ -5,22 +6,26 @@ import {
   PropertyPriceCollection,
   PropertyStatusCollection,
 } from "../../database/property/property-collections";
+import { PropertyFeatureDocument } from "/app/server/database/property/models/PropertyFeatureDocument";
+import { PropertyPriceDocument } from "/app/server/database/property/models/PropertyPriceDocument";
+import { PropertyStatusDocument } from "/app/server/database/property/models/PropertyStatusDocument";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { PropertyDTO } from "/app/server/methods/property/models/PropertyDTO";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 
 const propertyGetMethod = {
   [MeteorMethodIdentifier.PROPERTY_GET]: async (
     id: string
   ): Promise<PropertyDTO> => {
-    const fetchedPropertyDocument = await PropertyCollection.findOneAsync(id);
+    const propertyDocument = await getPropertyDocumentById(id);
 
-    if (!fetchedPropertyDocument) {
-      throw new Meteor.Error("NotFound", `Property with ${id} not found`);
+    if (!propertyDocument) {
+      throw meteorWrappedInvalidDataError(new InvalidDataError(`Property with ${id} not found`));
     }
 
-    const propertyDTO = mapPropertyDocumentToPropertyDTO(
-      fetchedPropertyDocument
+    const propertyDTO = await mapPropertyDocumentToPropertyDTO(
+      propertyDocument
     ).catch((error) => {
       throw new Meteor.Error(error.name, error.message);
     });
@@ -32,16 +37,14 @@ const propertyGetMethod = {
 async function mapPropertyDocumentToPropertyDTO(
   property: PropertyDocument
 ): Promise<PropertyDTO> {
-  const propertyStatusDocument = await PropertyStatusCollection.findOneAsync(
+  const propertyStatusDocument = await getPropertyStatusDocumentById(
     property.property_status_id
   );
-  const propertyFeaturesDocuments = await PropertyFeatureCollection.find({
-    _id: { $in: property.property_feature_ids },
-  }).fetchAsync();
-  const propertyPriceDocument = await PropertyPriceCollection.findOneAsync(
-    { property_id: property._id },
-    { sort: { date_set: -1 } }
+  const propertyPriceDocument = await getLatestPropertyPriceDocumentForProperty(
+    property._id
   );
+  const propertyFeaturesDocuments =
+    await getPropertyFeatureDocumentsMatchingIds(property.property_feature_ids);
 
   if (!propertyStatusDocument) {
     throw new InvalidDataError(
@@ -79,6 +82,33 @@ async function mapPropertyDocumentToPropertyDTO(
     type: property.type,
     area: property.area,
   };
+}
+
+async function getPropertyDocumentById(id: string): Promise<PropertyDocument | undefined> {
+  return await PropertyCollection.findOneAsync(id);
+}
+
+async function getPropertyStatusDocumentById(
+  id: string
+): Promise<PropertyStatusDocument | undefined> {
+  return await PropertyStatusCollection.findOneAsync(id);
+}
+
+async function getPropertyFeatureDocumentsMatchingIds(
+  ids: string[]
+): Promise<PropertyFeatureDocument[]> {
+  return await PropertyFeatureCollection.find({
+    _id: { $in: ids },
+  }).fetchAsync();
+}
+
+async function getLatestPropertyPriceDocumentForProperty(
+  propertyId: string
+): Promise<PropertyPriceDocument | undefined> {
+  return await PropertyPriceCollection.findOneAsync(
+    { property_id: propertyId },
+    { sort: { date_set: -1 } }
+  );
 }
 
 Meteor.methods({

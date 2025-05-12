@@ -8,23 +8,26 @@ import { ListingDTO } from "./models/ListingDTO";
 import { InspectionDocument } from "../../database/property-listing/models/InspectionDocument";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
+import { ListingStatusDocument } from "/app/server/database/property-listing/models/ListingStatusDocument";
+import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 
 const getListingForProperty = {
   [MeteorMethodIdentifier.LISTING_GET_FOR_PROPERTY]: async (
     propertyId: string
   ): Promise<ListingDTO> => {
-    const listing = await ListingCollection.findOneAsync({
-      property_id: propertyId,
-    });
+    const listing = await getListingDocumentAssociatedWithProperty(propertyId);
 
     if (!listing) {
-      throw new Meteor.Error(
-        "notFound",
-        `No listing entry found for property ID: ${propertyId}`
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(
+          `No listing found for property with Id ${propertyId}`
+        )
       );
     }
 
-    const listingDTO = await mapListingToListingDTO(listing);
+    const listingDTO = await mapListingToListingDTO(listing).catch((error) => {
+      throw new Meteor.Error(error.name, error.message);
+    });
 
     return listingDTO;
   },
@@ -36,12 +39,12 @@ async function mapListingToListingDTO(
   let inspections: InspectionDocument[] = [];
 
   if (listing.inspection_ids.length > 0) {
-    inspections = await InspectionCollection.find({
-      _id: { $in: listing.inspection_ids },
-    }).fetchAsync();
+    inspections = await getInspectionDocumentsMatchingIds(
+      listing.inspection_ids
+    );
   }
 
-  const listingStatusDocument = await ListingStatusCollection.findOneAsync(
+  const listingStatusDocument = await getListingStatusDocumentById(
     listing.listing_status_id
   );
 
@@ -60,6 +63,28 @@ async function mapListingToListingDTO(
       end_time: inspection.endtime,
     })),
   };
+}
+
+async function getListingDocumentAssociatedWithProperty(
+  propertyId: string
+): Promise<ListingDocument | undefined> {
+  return await ListingCollection.findOneAsync({
+    property_id: propertyId,
+  });
+}
+
+async function getInspectionDocumentsMatchingIds(
+  ids: string[]
+): Promise<InspectionDocument[]> {
+  return await InspectionCollection.find({
+    _id: { $in: ids },
+  }).fetchAsync();
+}
+
+async function getListingStatusDocumentById(
+  id: string
+): Promise<ListingStatusDocument | undefined> {
+  return await ListingStatusCollection.findOneAsync(id);
 }
 
 Meteor.methods({
