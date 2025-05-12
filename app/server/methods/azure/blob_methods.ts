@@ -54,22 +54,4 @@ Meteor.methods({
       }
 
   },
-
-  // Method to list blobs
-  async 'blobs.list'() {
-    try {
-      const containerClient = await getContainerClient();
-      const blobs = [];
-      for await (const blob of containerClient.listBlobsFlat()) {
-        blobs.push(blob.name);
-      }
-      return blobs;
-    } catch (error) {
-        if (error instanceof Error) {
-          throw new Meteor.Error('blob-upload-failed', error.message);
-        } else {
-          throw new Meteor.Error('blob-upload-failed', 'Unknown error occurred');
-        }
-      }      
-  },
 });

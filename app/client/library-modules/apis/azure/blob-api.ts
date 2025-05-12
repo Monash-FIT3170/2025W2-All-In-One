@@ -1,12 +1,6 @@
 import { UploadResult, UploadResults, fileInfo } from "/app/client/library-modules/apis/azure/blob-model"
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
-
-export async function viewBlobs(): Promise<string[]> {
-    const blobs: string[] = await Meteor.callAsync("blobs.list", null)
-    return blobs;
-}
-
 export async function uploadFileHandler(blob: Blob, blobName: string, containerClientName: string = "property-media-dev") {
     const uint8Array = await blobToUint8Array(blob)
 
