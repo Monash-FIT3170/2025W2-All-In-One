@@ -7,7 +7,6 @@ import { ListingDocument } from "../../database/property-listing/models/ListingD
 import { ListingDTO } from "./models/ListingDTO";
 import { InspectionDocument } from "../../database/property-listing/models/InspectionDocument";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { ListingStatusDocument } from "/app/server/database/property-listing/models/ListingStatusDocument";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 
 const getListingForProperty = {
