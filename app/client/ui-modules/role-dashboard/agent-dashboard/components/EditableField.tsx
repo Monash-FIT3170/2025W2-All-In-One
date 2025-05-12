@@ -20,7 +20,7 @@ export function EditableField({
         {label}
       </label>
 
-      <input
+      <Input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         readOnly={!editing}
