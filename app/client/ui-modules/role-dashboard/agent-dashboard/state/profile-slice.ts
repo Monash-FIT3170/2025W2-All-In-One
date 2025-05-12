@@ -12,7 +12,7 @@ interface ProfileData {
   employer: string;
   workAddress: string;
   workPhone: string;
-  profileImage: string
+  profileImage: string;
 }
 
 interface ProfileState {
@@ -33,12 +33,12 @@ const initialState: ProfileState = {
     occupation: "Student",
     email: "thomas123mac@gmail.com",
     phone: "0437 559 777",
-    emergencyContact: "Thomas Higgins (Bestest Friend) - (000)",
+    emergencyContact: "Miachel Jordan",
     employer: "Fit 3170",
     workAddress: "Learning Jungle",
     workPhone: "0437 559 777",
-    profileImage: "/need-to-add.png"
-  }
+    profileImage: "/need-to-add.png",
+  },
 };
 
 export const profileSlice = createSlice({
@@ -48,7 +48,10 @@ export const profileSlice = createSlice({
     setEditing: (state, action: PayloadAction<boolean>) => {
       state.isEditing = action.payload;
     },
-    updateField: (state, action: PayloadAction<{ field: keyof ProfileData; value: string }>) => {
+    updateField: (
+      state,
+      action: PayloadAction<{ field: keyof ProfileData; value: string }>
+    ) => {
       state.data[action.payload.field] = action.payload.value;
     },
     saveProfile: (state) => {
@@ -65,20 +68,21 @@ export const profileSlice = createSlice({
     },
     resetProfile: (state) => {
       // You might want to reset to initial state or fetch fresh data
+      state.data = initialState.data;
       state.isEditing = false;
       state.error = null;
-    }
-  }
+    },
+  },
 });
 
 // Action creators
-export const { 
-  setEditing, 
-  updateField, 
-  saveProfile, 
-  saveProfileSuccess, 
+export const {
+  setEditing,
+  updateField,
+  saveProfile,
+  saveProfileSuccess,
   saveProfileFailure,
-  resetProfile 
+  resetProfile,
 } = profileSlice.actions;
 
 // Selectors

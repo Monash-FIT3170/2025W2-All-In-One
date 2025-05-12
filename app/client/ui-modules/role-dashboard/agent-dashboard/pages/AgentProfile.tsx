@@ -8,6 +8,7 @@ import {
 import { ProfileCard } from "../components/ProfileCard";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import {
+  resetProfile,
   selectIsEditing,
   selectProfileData,
   setEditing,
@@ -66,13 +67,22 @@ export function AgentProfile(): React.JSX.Element {
                 </div>
               </div>
             </div>
-
-            <Button
-              onClick={handleEditToggle}
-              className="mt-1 hover:bg-gray-300 cursor-pointer transition"
-            >
-              {isEditing ? "Save Profile" : "Edit Profile"}
-            </Button>
+            <div className="flex gap-2 mt-1">
+              {isEditing && (
+                <Button
+                  onClick={() => dispatch(resetProfile())}
+                  className="w-32 mt-1 hover:bg-gray-300 cursor-pointer transition"
+                >
+                  Cancel Edit
+                </Button>
+              )}
+              <Button
+                onClick={handleEditToggle}
+                className="w-32 mt-1 hover:bg-gray-300 cursor-pointer transition"
+              >
+                {isEditing ? "Save Profile" : "Edit Profile"}
+              </Button>
+            </div>
           </div>
 
           <ProfileCard />

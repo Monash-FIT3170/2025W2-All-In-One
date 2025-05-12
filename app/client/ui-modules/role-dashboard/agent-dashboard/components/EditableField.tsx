@@ -15,21 +15,17 @@ export function EditableField({
   onChange,
 }: EditableFieldProps) {
   return (
-    <div className="grid w-full items-start gap-0.5">
+    <div className="grid w-full items-start gap-0.5 min-w-0">
       <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
         {label}
       </label>
-      {editing ? (
-        <Input
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="h-auto text-sm px-3 py-2 focus:ring-0 focus-visible:ring-0 shadow-none"
-        />
-      ) : (
-        <div className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 bg-muted text-muted-foreground">
-          {value}
-        </div>
-      )}
+
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        readOnly={!editing}
+        className="w-full h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
     </div>
   );
 }
