@@ -12,6 +12,7 @@ export function mapApiPropertyToProperty(property: ApiProperty): Property {
     pricePerMonth: property.pricePerMonth,
     propertyStatus: property.propertyStatus,
     description: property.description,
+    summaryDescription: property.summaryDescription,
     bathrooms: property.bathrooms,
     bedrooms: property.bedrooms,
     parking: property.parking,

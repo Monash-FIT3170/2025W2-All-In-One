@@ -9,8 +9,6 @@ import {
 } from "/app/client/library-modules/utils/date-utils";
 import { RootState } from "/app/client/store";
 
-// TODO: Missing DB fields
-
 const initialState: PropertyListingPageUiState = {
   streetNumber: "",
   street: "",
@@ -19,7 +17,7 @@ const initialState: PropertyListingPageUiState = {
   postcode: "",
   summaryDescription: "",
   propertyStatusText: "",
-  propertyStatusPillVariant: PropertyStatusPillVariant.VACANT, // Assuming VACANT is a valid default
+  propertyStatusPillVariant: PropertyStatusPillVariant.VACANT,
   propertyDescription: "",
   propertyFeatures: [],
   propertyType: "",
@@ -47,12 +45,11 @@ export const propertyListingSlice = createSlice({
       state.suburb = action.payload.suburb;
       state.province = action.payload.province;
       state.postcode = action.payload.postcode;
-      state.summaryDescription = "WIP, currently missing from property API"; // Needs a field in the DB
+      state.summaryDescription = action.payload.summaryDescription;
       state.propertyStatusText = action.payload.propertyStatus;
-      state.propertyStatusPillVariant =
-        action.payload.propertyStatus.toLowerCase() === "vacant"
-          ? PropertyStatusPillVariant.VACANT
-          : PropertyStatusPillVariant.VACANT;
+      state.propertyStatusPillVariant = getPropertyStatusPillVariant(
+        action.payload.propertyStatus
+      );
       state.propertyDescription = action.payload.description;
       state.propertyFeatures = action.payload.features;
       state.propertyType = action.payload.type;
@@ -73,8 +70,12 @@ export const propertyListingSlice = createSlice({
         })
       );
       state.listingImageUrls = action.payload.image_urls;
-      state.listingStatusText = "DRAFT LISTING"; // Needs a field in the DB, Listing collection
-      state.listingStatusPillVariant = ListingStatusPillVariant.DRAFT; // Needs to depend on a field in DB, Listing collection
+      state.listingStatusText = getListingStatusDisplayString(
+        action.payload.listing_status
+      );
+      state.listingStatusPillVariant = getListingStatusPillVariant(
+        action.payload.listing_status
+      );
     });
   },
 });
@@ -87,6 +88,37 @@ function getPropertyPriceDisplayString(price: number): string {
   return `$${price.toString()}/month`;
 }
 
+function getListingStatusDisplayString(status: string): string {
+  switch (status.toLowerCase()) {
+    case "draft":
+      return "DRAFT LISTING";
+    default:
+      return "Unknown Status";
+  }
+}
+
+function getPropertyStatusPillVariant(
+  status: string
+): PropertyStatusPillVariant {
+  switch (status.toLowerCase()) {
+    case "vacant":
+      return PropertyStatusPillVariant.VACANT;
+    default:
+      return PropertyStatusPillVariant.VACANT; // Default to VACANT if unknown
+  }
+}
+
+function getListingStatusPillVariant(status: string): ListingStatusPillVariant {
+  switch (status.toLowerCase()) {
+    case "draft":
+      return ListingStatusPillVariant.DRAFT;
+    case "current":
+      return ListingStatusPillVariant.CURRENT;
+    default:
+      return ListingStatusPillVariant.DRAFT; // Default to DRAFT if unknown
+  }
+}
+
 export const load = createAsyncThunk(
   "propertyListing/load",
   async (propertyId: string) => {
@@ -97,4 +129,5 @@ export const load = createAsyncThunk(
   }
 );
 
-export const selectPropertyListingUiState = (state: RootState) => state.propertyListing;
+export const selectPropertyListingUiState = (state: RootState) =>
+  state.propertyListing;

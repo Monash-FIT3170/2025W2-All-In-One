@@ -9,6 +9,7 @@ export type PropertyDTO = {
   pricePerMonth: number;
   propertyStatus: string;
   description: string;
+  summaryDescription: string;
   bathrooms: number;
   bedrooms: number;
   parking: number;

@@ -9,6 +9,7 @@ export type PropertyWithListingData = {
   pricePerMonth: number;
   propertyStatus: string;
   description: string;
+  summaryDescription: string;
   bathrooms: number;
   bedrooms: number;
   parking: number;
@@ -16,6 +17,7 @@ export type PropertyWithListingData = {
   type: string;
   area?: number;
   image_urls: string[];
+  listing_status: string;
   inspections: {
     start_time: Date;
     end_time: Date;

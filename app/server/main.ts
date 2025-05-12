@@ -9,6 +9,7 @@ import {
 import {
   InspectionCollection,
   ListingCollection,
+  ListingStatusCollection,
 } from "/app/server/database/property-listing/listing-collections";
 
 Meteor.startup(tempSeedPropertyData);
@@ -45,6 +46,7 @@ async function tempSeedPropertyData(): Promise<void> {
       property_status_id: "1",
       description:
         "Modern apartment with spacious living areas and a beautiful garden. Recently renovated with new appliances and fixtures throughout. The property features an open-plan kitchen and dining area that flows onto a private balcony with city views. The master bedroom includes an ensuite bathroom and built-in wardrobes, while the second bedroom is generously sized and located near the main bathroom.",
+      summary_description: "Modern apartment with spacious living areas and a beautiful garden.",
       bathrooms: 2,
       bedrooms: 3,
       parking: 2,
@@ -65,12 +67,18 @@ async function tempSeedPropertyData(): Promise<void> {
 
     ListingCollection.insertAsync({
       property_id: "1",
+      listing_status_id: "1",
       image_urls: [
         "https://cdn.pixabay.com/photo/2018/08/04/11/30/draw-3583548_1280.png",
         "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
         "https://cdn.pixabay.com/photo/2024/05/26/10/15/bird-8788491_1280.jpg",
       ],
       inspection_ids: ["1", "2"],
+    });
+
+    ListingStatusCollection.insertAsync({
+      _id: "1",
+      name: "Draft",
     });
   }
 }

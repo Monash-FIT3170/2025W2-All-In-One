@@ -71,6 +71,7 @@ async function mapPropertyDocumentToPropertyDTO(
     pricePerMonth: propertyPriceDocument.price_per_month,
     propertyStatus: propertyStatusDocument.name,
     description: property.description,
+    summaryDescription: property.summary_description,
     bathrooms: property.bathrooms,
     bedrooms: property.bedrooms,
     parking: property.parking,

@@ -1,11 +1,14 @@
 import {
   InspectionCollection,
   ListingCollection,
+  ListingStatusCollection,
 } from "../../database/property-listing/listing-collections";
 import { ListingDocument } from "../../database/property-listing/models/ListingDocument";
 import { ListingDTO } from "./models/ListingDTO";
 import { InspectionDocument } from "../../database/property-listing/models/InspectionDocument";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { ListingStatusDocument } from "/app/server/database/property-listing/models/ListingStatusDocument";
+import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 
 const getListingForProperty = {
   [MeteorMethodIdentifier.LISTING_GET_FOR_PROPERTY]: async (
@@ -28,7 +31,9 @@ const getListingForProperty = {
   },
 };
 
-async function mapListingToListingDTO(listing: ListingDocument): Promise<ListingDTO> {
+async function mapListingToListingDTO(
+  listing: ListingDocument
+): Promise<ListingDTO> {
   let inspections: InspectionDocument[] = [];
 
   if (listing.inspection_ids.length > 0) {
@@ -37,9 +42,20 @@ async function mapListingToListingDTO(listing: ListingDocument): Promise<Listing
     }).fetchAsync();
   }
 
+  const listingStatusDocument = await ListingStatusCollection.findOneAsync(
+    listing.listing_status_id
+  );
+
+  if (!listingStatusDocument) {
+    throw new InvalidDataError(
+      `Invalid listing status entry for listing id ${listing._id}, property id ${listing.property_id}`
+    );
+  }
+
   return {
     property_id: listing.property_id,
     image_urls: listing.image_urls,
+    listing_status: listingStatusDocument.name,
     inspections: inspections.map((inspection) => ({
       start_time: inspection.starttime,
       end_time: inspection.endtime,
@@ -48,5 +64,5 @@ async function mapListingToListingDTO(listing: ListingDocument): Promise<Listing
 }
 
 Meteor.methods({
-  ...getListingForProperty
-})
+  ...getListingForProperty,
+});

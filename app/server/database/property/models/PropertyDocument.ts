@@ -8,6 +8,7 @@ export type PropertyDocument = {
   postcode: string;
   property_status_id: string;
   description: string;
+  summary_description: string;
   bathrooms: number;
   bedrooms: number;
   parking: number;
