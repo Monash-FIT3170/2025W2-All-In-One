@@ -1,8 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { getContainerClient, uploadFile,  } from './blobStorageService';
 import { fileInfo, UploadResult, UploadResults } from './blobDTO';
-console.log("✅ blobs.list method file loaded");
-
 
 Meteor.methods({
   // Method to upload blob

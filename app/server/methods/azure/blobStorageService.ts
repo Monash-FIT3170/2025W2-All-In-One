@@ -1,8 +1,9 @@
 // Azure authentication dependency
 import { BlobServiceClient, ContainerClient, ContainerCreateResponse, StoragePipelineOptions, StorageRetryPolicyType,ContainerCreateOptions } from '@azure/storage-blob';
 import { UploadResult } from './blobDTO';
+import dotenv from "dotenv"
 const defaultContainerName = "property-media-dev";
-
+dotenv.config({path: `${process.env.PWD}/.env`})
 export const options: StoragePipelineOptions = {
   retryOptions: {
     maxTries: 4,

@@ -1,22 +1,20 @@
 import { UploadResult, UploadResults, fileInfo } from "/app/client/library-modules/apis/azure/blob-model"
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 
 export async function viewBlobs(): Promise<string[]> {
-    console.log("Calling blobs.list");
     const blobs: string[] = await Meteor.callAsync("blobs.list", null)
     return blobs;
 }
 
 export async function uploadFileHandler(blob: Blob, blobName: string, containerClientName: string = "property-media-dev") {
-    console.log("Calling blobs.uploadFile");
     const uint8Array = await blobToUint8Array(blob)
 
-    const uploadResult: UploadResult = await Meteor.callAsync("blobs.uploadFile", uint8Array, blobName,blob.type,containerClientName)
+    const uploadResult: UploadResult = await Meteor.callAsync(MeteorMethodIdentifier.BLOB_UPLOAD_FILE, uint8Array, blobName,blob.type,containerClientName)
     return uploadResult;
 }
 
 export async function uploadFilesHandler(blobs: File[], blobNamePrefix: string, containerClientName: string = "property-media-dev"){
-    console.log("Calling blobs.uploadFiles");
     const files: fileInfo[] = await Promise.all(
         blobs.map(async (file) => {
           const uint8Array = blobToUint8Array(file);
@@ -27,7 +25,7 @@ export async function uploadFilesHandler(blobs: File[], blobNamePrefix: string, 
           };
         })
       );
-      const uploadResults: UploadResults = await Meteor.callAsync("blobs.uploadFiles", files, blobNamePrefix, containerClientName)
+      const uploadResults: UploadResults = await Meteor.callAsync(MeteorMethodIdentifier.BLOB_UPLOAD_FILES, files, blobNamePrefix, containerClientName)
     
 
     return uploadResults
