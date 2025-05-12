@@ -11,7 +11,7 @@ export async function uploadFileHandler(blob: Blob, blobName: string, containerC
 export async function uploadFilesHandler(blobs: File[], blobNamePrefix: string, containerClientName: string = "property-media-dev"){
     const files: fileInfo[] = await Promise.all(
         blobs.map(async (file) => {
-          const uint8Array = blobToUint8Array(file);
+          const uint8Array = await blobToUint8Array(file);
           return {
             data: uint8Array,
             name: file.name, 
@@ -19,6 +19,7 @@ export async function uploadFilesHandler(blobs: File[], blobNamePrefix: string, 
           };
         })
       );
+      console.log(files)
       const uploadResults: UploadResults = await Meteor.callAsync(MeteorMethodIdentifier.BLOB_UPLOAD_FILES, files, blobNamePrefix, containerClientName)
     
 

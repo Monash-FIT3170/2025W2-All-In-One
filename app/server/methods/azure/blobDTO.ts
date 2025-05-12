@@ -12,7 +12,7 @@ export type UploadResult = {
     failed: UploadResult[];
   }
   export type fileInfo = {
-    data: Promise<Uint8Array<ArrayBufferLike>>,
+    data: Uint8Array<ArrayBufferLike>,
     name: string,
     type: string
 }

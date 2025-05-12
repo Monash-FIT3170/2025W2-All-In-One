@@ -5,7 +5,7 @@ import { fileInfo, UploadResult, UploadResults } from './blobDTO';
 Meteor.methods({
   // Method to upload blob
   async 'blobs.uploadFile'(
-    blobData: number[],
+    blobData: Uint8Array<ArrayBufferLike>,
     blobName: string,
     blobContentType: string,
     containerClientName: string): Promise<UploadResult> {
@@ -35,7 +35,8 @@ Meteor.methods({
   
         const uploadResults = await Promise.all(
           blobData.map(async (blob, index) => {
-            const buffer = Buffer.from(await blob.data);
+            const buffer = Buffer.from(blob.data);
+            console.log(await buffer.buffer)
             const blobName = `${blobNamePrefix}-${Date.now()}-${index}-${blob.name}`;
             return await uploadFile(containerClient, blobName, buffer, blob.type);
           })
