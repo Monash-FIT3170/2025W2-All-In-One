@@ -13,14 +13,14 @@ const getListingForProperty = {
   [MeteorMethodIdentifier.LISTING_GET_FOR_PROPERTY]: async (
     propertyId: string
   ): Promise<ListingDTO> => {
-    const listing = await ListingCollection.findOne({
+    const listing = await ListingCollection.findOneAsync({
       property_id: propertyId,
     });
 
     if (!listing) {
       throw new Meteor.Error(
         "notFound",
-        `No listing found for property ID: ${propertyId}`
+        `No listing entry found for property ID: ${propertyId}`
       );
     }
 

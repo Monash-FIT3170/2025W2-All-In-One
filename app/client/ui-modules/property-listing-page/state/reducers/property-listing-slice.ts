@@ -81,7 +81,7 @@ export const propertyListingSlice = createSlice({
 });
 
 function getPropertyAreaDisplayString(area: number): string {
-  return `${area} m²`;
+  return `${area}m²`;
 }
 
 function getPropertyPriceDisplayString(price: number): string {

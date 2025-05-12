@@ -1,5 +1,7 @@
 import { Meteor } from "meteor/meteor";
 import "./methods/example-tasks/task-methods";
+import "./methods/property/property-methods";
+import "./methods/property-listing/listing-methods"
 import {
   PropertyCollection,
   PropertyFeatureCollection,
@@ -39,7 +41,7 @@ async function tempSeedPropertyData(): Promise<void> {
     PropertyCollection.insertAsync({
       _id: "1",
       streetnumber: "123",
-      streetname: "Sample st",
+      streetname: "Sample St",
       suburb: "Springfield",
       province: "IL",
       postcode: "62704",
@@ -52,6 +54,7 @@ async function tempSeedPropertyData(): Promise<void> {
       parking: 2,
       property_feature_ids: ["1", "2"],
       type: "House",
+      area: 500
     });
 
     InspectionCollection.insertAsync({
