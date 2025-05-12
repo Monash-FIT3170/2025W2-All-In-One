@@ -1,7 +1,15 @@
 import { Meteor } from "meteor/meteor";
 import "./methods/example-tasks/task-methods";
-import { PropertyCollection, PropertyFeatureCollection, PropertyPriceCollection, PropertyStatusCollection } from "./database/property/property-collections";
-import { InspectionCollection, ListingCollection } from "/app/server/database/property-listing/listing-collections";
+import {
+  PropertyCollection,
+  PropertyFeatureCollection,
+  PropertyPriceCollection,
+  PropertyStatusCollection,
+} from "./database/property/property-collections";
+import {
+  InspectionCollection,
+  ListingCollection,
+} from "/app/server/database/property-listing/listing-collections";
 
 Meteor.startup(tempSeedPropertyData);
 
@@ -9,17 +17,17 @@ async function tempSeedPropertyData(): Promise<void> {
   if ((await PropertyCollection.find().countAsync()) === 0) {
     PropertyStatusCollection.insertAsync({
       _id: "1",
-      name: "Vacant"
-    })
+      name: "Vacant",
+    });
 
     PropertyFeatureCollection.insertAsync({
       _id: "1",
-      name: "Pool"
-    })
+      name: "Pool",
+    });
     PropertyFeatureCollection.insertAsync({
       _id: "2",
-      name: "Lots of space"
-    })
+      name: "Lots of space",
+    });
 
     PropertyPriceCollection.insertAsync({
       property_id: "1",
@@ -35,7 +43,8 @@ async function tempSeedPropertyData(): Promise<void> {
       province: "IL",
       postcode: "62704",
       property_status_id: "1",
-      description: "A lovely home with a pool.",
+      description:
+        "Modern apartment with spacious living areas and a beautiful garden. Recently renovated with new appliances and fixtures throughout. The property features an open-plan kitchen and dining area that flows onto a private balcony with city views. The master bedroom includes an ensuite bathroom and built-in wardrobes, while the second bedroom is generously sized and located near the main bathroom.",
       bathrooms: 2,
       bedrooms: 3,
       parking: 2,
@@ -62,6 +71,6 @@ async function tempSeedPropertyData(): Promise<void> {
         "https://cdn.pixabay.com/photo/2024/05/26/10/15/bird-8788491_1280.jpg",
       ],
       inspection_ids: ["1", "2"],
-    })
+    });
   }
 }

@@ -7,6 +7,7 @@ import {
   getFormattedDateStringFromDate,
   getFormattedTimeStringFromDate,
 } from "/app/client/library-modules/utils/date-utils";
+import { RootState } from "/app/client/store";
 
 // TODO: Missing DB fields
 
@@ -40,7 +41,7 @@ export const propertyListingSlice = createSlice({
   initialState: initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(loadProperty.fulfilled, (state, action) => {
+    builder.addCase(load.fulfilled, (state, action) => {
       state.streetNumber = action.payload.streetnumber;
       state.street = action.payload.streetname;
       state.suburb = action.payload.suburb;
@@ -72,7 +73,7 @@ export const propertyListingSlice = createSlice({
         })
       );
       state.listingImageUrls = action.payload.image_urls;
-      state.listingStatusText = "DRAFT"; // Needs a field in the DB, Listing collection
+      state.listingStatusText = "DRAFT LISTING"; // Needs a field in the DB, Listing collection
       state.listingStatusPillVariant = ListingStatusPillVariant.DRAFT; // Needs to depend on a field in DB, Listing collection
     });
   },
@@ -86,8 +87,8 @@ function getPropertyPriceDisplayString(price: number): string {
   return `$${price.toString()}/month`;
 }
 
-export const loadProperty = createAsyncThunk(
-  "propertyListing/loadProperty",
+export const load = createAsyncThunk(
+  "propertyListing/load",
   async (propertyId: string) => {
     const propertyWithListingData = await getPropertyWithListingDataUseCase(
       propertyId
@@ -95,3 +96,5 @@ export const loadProperty = createAsyncThunk(
     return propertyWithListingData;
   }
 );
+
+export const selectPropertyListingUiState = (state: RootState) => state.propertyListing;
