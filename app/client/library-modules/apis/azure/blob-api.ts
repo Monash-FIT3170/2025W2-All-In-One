@@ -1,10 +1,6 @@
-import { UploadResult, UploadResults } from "../../../app/server/methods/azure/blobStorageService";
+import { UploadResult, UploadResults, fileInfo } from "/app/client/library-modules/apis/azure/blob-model"
 
-type fileInfo = {
-    data: Promise<Uint8Array<ArrayBufferLike>>,
-    name: string,
-    type: string
-}
+
 export async function viewBlobs(): Promise<string[]> {
     console.log("Calling blobs.list");
     const blobs: string[] = await Meteor.callAsync("blobs.list", null)

@@ -3,6 +3,7 @@ import { expect, jest } from "@jest/globals";
 import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
 import { createContainer, uploadFile } from "../../server/methods/azure/blobStorageService";
 import { blobToUint8Array } from "/app/client/library-modules/apis/azure/blob-api";
+import { testBlob } from "./testBlob";
 const mockUpload = jest.fn().mockImplementation(() => Promise.resolve({status:200}))
 const mockedBlockBlobClient = {
     uploadData: mockUpload,
@@ -40,7 +41,7 @@ describe('uploadFile', () => {
       
     it('should upload the file and return success result', async () => {
         const blobName = 'test';
-        const blob = new Blob(['Hello world'], { type: 'text/plain' });
+        const blob = testBlob;
         const uint8Array = await blobToUint8Array(blob);
         const buffer: Buffer = Buffer.from(uint8Array) ;
         const uploadResult = await uploadFile(mockedContainerClient, blobName,buffer ,blob.type);
@@ -61,7 +62,7 @@ describe('uploadFile', () => {
     });
     it('should handle upload failure and return failure result', async () => {
         const blobName = 'test';
-        const blob = new Blob(['Hello world'], { type: 'text/plain' });
+        const blob = testBlob;
         const uint8Array = await blobToUint8Array(blob);
         const buffer: Buffer = Buffer.from(uint8Array);
         mockUpload.mockImplementationOnce(() => Promise.reject(new Error('Upload failed')));

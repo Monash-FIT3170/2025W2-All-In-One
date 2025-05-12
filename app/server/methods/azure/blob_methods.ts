@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { getContainerClient, uploadFile,  } from './blobStorageService';
+import { fileInfo, UploadResult, UploadResults } from './blobDTO';
 console.log("✅ blobs.list method file loaded");
 
 
@@ -9,14 +10,14 @@ Meteor.methods({
     blobData: number[],
     blobName: string,
     blobContentType: string,
-    containerClientName: string) {
+    containerClientName: string): Promise<UploadResult> {
     try {
       console.log("Uploading...")
       const blob = Buffer.from(blobData);
 
 
       const containerClient = await getContainerClient(containerClientName);
-      const uploadResult = await uploadFile(containerClient, blobName, blob,blobContentType);
+      const uploadResult: UploadResult = await uploadFile(containerClient, blobName, blob,blobContentType);
         return uploadResult; 
     } catch (error) {
         if (error instanceof Error) {
@@ -28,15 +29,15 @@ Meteor.methods({
     },
 
   async 'blobs.uploadFiles'(
-    blobData: { data: Uint8Array; name: string; type: string }[],
+    blobData: fileInfo[],
     blobNamePrefix: string,
-    containerClientName: string) {
+    containerClientName: string): Promise<UploadResults> {
       try {
         const containerClient = await getContainerClient(containerClientName);
   
         const uploadResults = await Promise.all(
           blobData.map(async (blob, index) => {
-            const buffer = Buffer.from(blob.data);
+            const buffer = Buffer.from(await blob.data);
             const blobName = `${blobNamePrefix}-${Date.now()}-${index}-${blob.name}`;
             return await uploadFile(containerClient, blobName, buffer, blob.type);
           })

@@ -1,5 +1,6 @@
 // Azure authentication dependency
-import { BlobServiceClient, BlobUploadCommonResponse, ContainerClient, ContainerCreateResponse, StoragePipelineOptions, StorageRetryPolicyType,ContainerCreateOptions } from '@azure/storage-blob';
+import { BlobServiceClient, ContainerClient, ContainerCreateResponse, StoragePipelineOptions, StorageRetryPolicyType,ContainerCreateOptions } from '@azure/storage-blob';
+import { UploadResult } from './blobDTO';
 const defaultContainerName = "property-media-dev";
 
 export const options: StoragePipelineOptions = {
@@ -11,17 +12,6 @@ export const options: StoragePipelineOptions = {
   },
 };
 
-export type UploadResult = {
-  blobName: string; 
-  success: boolean;
-  url?: string;
-  error?: string;
-  response?: BlobUploadCommonResponse;
-}
-export type UploadResults = {
-  success: UploadResult[];
-  failed: UploadResult[];
-}
 
 export function getBlobServiceClient(): BlobServiceClient {
   const connStr = process.env.AZURE_CONNECTION_STRING
