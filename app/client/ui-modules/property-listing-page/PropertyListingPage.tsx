@@ -25,8 +25,12 @@ import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
 import { useAppDispatch } from "/app/client/store";
 import { useSelector } from "react-redux";
-import { load, selectPropertyListingUiState } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
+import {
+  load,
+  selectPropertyListingUiState,
+} from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
+import { AgentTopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
 
 // TODO: To re-add edit draft listing modal
 export function PropertyListingPage({
@@ -35,50 +39,64 @@ export function PropertyListingPage({
   className?: string;
 }): React.JSX.Element {
   const dispatch = useAppDispatch();
-  const state: PropertyListingPageUiState = useSelector(selectPropertyListingUiState)
+  const state: PropertyListingPageUiState = useSelector(
+    selectPropertyListingUiState
+  );
 
   useEffect(() => {
     dispatch(load("1"));
   }, []);
-  
-  return (
-    <ListingPageContent
-      streetNumber={state.streetNumber}
-      street={state.street}
-      suburb={state.suburb}
-      province={state.province}
-      postcode={state.postcode}
-      summaryDescription={state.summaryDescription}
-      propertyStatusText={state.propertyStatusText}
-      propertyStatusPillVariant={state.propertyStatusPillVariant}
-      propertyDescription={state.propertyDescription}
-      propertyFeatures={state.propertyFeatures}
-      propertyType={state.propertyType}
-      propertyLandArea={state.propertyLandArea}
-      propertyBathrooms={state.propertyBathrooms}
-      propertyParkingSpaces={state.propertyParkingSpaces}
-      propertyBedrooms={state.propertyBedrooms}
-      propertyPrice={state.propertyPrice}
-      inspectionBookingUiStateList={state.inspectionBookingUiStateList}
-      listingImageUrls={state.listingImageUrls}
-      listingStatusText={state.listingStatusText}
-      listingStatusPillVariant={state.listingStatusPillVariant}
-      shouldDisplayListingStatus={state.shouldDisplayListingStatus}
-      shouldDisplaySubmitDraftButton={state.shouldDisplaySubmitDraftButton}
-      onBack={() => {
-        console.log("back button pressed");
-      }}
-      onBook={(index: number) => {
-        console.log(`booking button ${index} pressed`);
-      }}
-      onApply={() => {
-        console.log("applied!");
-      }}
-      onContactAgent={() => console.log("contacting agent!")}
-      onSubmitDraftListing={() => console.log("draft submitted!")}
-      className={twMerge("p-5", className)}
-    />
-  );
+
+  if (state.shouldShowLoadingState) {
+    return (
+      <>
+        <AgentTopNavbar onSideBarOpened={() => {}} />
+        <ListingPageContentLoadingSkeleton className={twMerge("p-5", className)} />
+      </>
+    );
+  } else {
+    return (
+      <>
+        <AgentTopNavbar onSideBarOpened={() => {}} />
+        <ListingPageContent
+          streetNumber={state.streetNumber}
+          street={state.street}
+          suburb={state.suburb}
+          province={state.province}
+          postcode={state.postcode}
+          summaryDescription={state.summaryDescription}
+          propertyStatusText={state.propertyStatusText}
+          propertyStatusPillVariant={state.propertyStatusPillVariant}
+          propertyDescription={state.propertyDescription}
+          propertyFeatures={state.propertyFeatures}
+          propertyType={state.propertyType}
+          propertyLandArea={state.propertyLandArea}
+          propertyBathrooms={state.propertyBathrooms}
+          propertyParkingSpaces={state.propertyParkingSpaces}
+          propertyBedrooms={state.propertyBedrooms}
+          propertyPrice={state.propertyPrice}
+          inspectionBookingUiStateList={state.inspectionBookingUiStateList}
+          listingImageUrls={state.listingImageUrls}
+          listingStatusText={state.listingStatusText}
+          listingStatusPillVariant={state.listingStatusPillVariant}
+          shouldDisplayListingStatus={state.shouldDisplayListingStatus}
+          shouldDisplaySubmitDraftButton={state.shouldDisplaySubmitDraftButton}
+          onBack={() => {
+            console.log("back button pressed");
+          }}
+          onBook={(index: number) => {
+            console.log(`booking button ${index} pressed`);
+          }}
+          onApply={() => {
+            console.log("applied!");
+          }}
+          onContactAgent={() => console.log("contacting agent!")}
+          onSubmitDraftListing={() => console.log("draft submitted!")}
+          className={twMerge("p-5", className)}
+        />
+      </>
+    );
+  }
 }
 
 function ListingPageContent({
@@ -182,6 +200,14 @@ function ListingPageContent({
       />
     </div>
   );
+}
+
+function ListingPageContentLoadingSkeleton({
+  className = "",
+}: {
+  className?: string;
+}): React.JSX.Element {
+  return <p className={className}>Loading...</p>;
 }
 
 function TopBar({
@@ -306,7 +332,7 @@ function ListingDetails({
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={twMerge("flex gap-6", className)}>
+    <div className={twMerge("flex gap-7", className)}>
       <div className="flex-1 flex flex-col">
         <ListingDescription
           description={propertyDescription}
@@ -315,6 +341,7 @@ function ListingDetails({
         <PropertyInspections
           bookingUiStateList={inspectionBookingUiStateList}
           onBook={onBook}
+          className="w-full"
         />
       </div>
 

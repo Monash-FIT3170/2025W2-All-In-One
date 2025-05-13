@@ -32,6 +32,7 @@ const initialState: PropertyListingPageUiState = {
   listingStatusPillVariant: ListingStatusPillVariant.DRAFT, // Assuming DRAFT is a valid default
   shouldDisplayListingStatus: true,
   shouldDisplaySubmitDraftButton: true,
+  shouldShowLoadingState: true,
 };
 
 export const propertyListingSlice = createSlice({
@@ -76,6 +77,7 @@ export const propertyListingSlice = createSlice({
       state.listingStatusPillVariant = getListingStatusPillVariant(
         action.payload.listing_status
       );
+      state.shouldShowLoadingState = false;
     });
   },
 });
