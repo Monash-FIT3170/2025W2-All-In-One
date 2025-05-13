@@ -25,7 +25,7 @@ const getListingForProperty = {
       );
     }
 
-    const listingDTO = await mapListingToListingDTO(listing).catch((error) => {
+    const listingDTO = await mapListingDocumentToListingDTO(listing).catch((error) => {
       throw new Meteor.Error(error.name, error.message);
     });
 
@@ -33,7 +33,7 @@ const getListingForProperty = {
   },
 };
 
-async function mapListingToListingDTO(
+async function mapListingDocumentToListingDTO(
   listing: ListingDocument
 ): Promise<ListingDTO> {
   let inspections: InspectionDocument[] = [];

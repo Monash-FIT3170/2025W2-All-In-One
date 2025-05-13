@@ -29,7 +29,7 @@ const initialState: PropertyListingPageUiState = {
   inspectionBookingUiStateList: [],
   listingImageUrls: [],
   listingStatusText: "",
-  listingStatusPillVariant: ListingStatusPillVariant.DRAFT, // Assuming DRAFT is a valid default
+  listingStatusPillVariant: ListingStatusPillVariant.DRAFT,
   shouldDisplayListingStatus: true,
   shouldDisplaySubmitDraftButton: true,
   shouldShowLoadingState: true,
@@ -106,7 +106,7 @@ function getPropertyStatusPillVariant(
     case "vacant":
       return PropertyStatusPillVariant.VACANT;
     default:
-      return PropertyStatusPillVariant.VACANT; // Default to VACANT if unknown
+      return PropertyStatusPillVariant.VACANT;
   }
 }
 
@@ -117,7 +117,7 @@ function getListingStatusPillVariant(status: string): ListingStatusPillVariant {
     case "current":
       return ListingStatusPillVariant.CURRENT;
     default:
-      return ListingStatusPillVariant.DRAFT; // Default to DRAFT if unknown
+      return ListingStatusPillVariant.DRAFT;
   }
 }
 
