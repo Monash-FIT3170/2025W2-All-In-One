@@ -25,9 +25,11 @@ const getListingForProperty = {
       );
     }
 
-    const listingDTO = await mapListingDocumentToListingDTO(listing).catch((error) => {
-      throw new Meteor.Error(error.name, error.message);
-    });
+    const listingDTO = await mapListingDocumentToListingDTO(listing).catch(
+      (error) => {
+        throw meteorWrappedInvalidDataError(error);
+      }
+    );
 
     return listingDTO;
   },

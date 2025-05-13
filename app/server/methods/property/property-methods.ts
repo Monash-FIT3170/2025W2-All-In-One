@@ -21,13 +21,15 @@ const propertyGetMethod = {
     const propertyDocument = await getPropertyDocumentById(id);
 
     if (!propertyDocument) {
-      throw meteorWrappedInvalidDataError(new InvalidDataError(`Property with ${id} not found`));
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Property with ${id} not found`)
+      );
     }
 
     const propertyDTO = await mapPropertyDocumentToPropertyDTO(
       propertyDocument
     ).catch((error) => {
-      throw new Meteor.Error(error.name, error.message);
+      throw meteorWrappedInvalidDataError(error);
     });
 
     return propertyDTO;
@@ -84,7 +86,9 @@ async function mapPropertyDocumentToPropertyDTO(
   };
 }
 
-async function getPropertyDocumentById(id: string): Promise<PropertyDocument | undefined> {
+async function getPropertyDocumentById(
+  id: string
+): Promise<PropertyDocument | undefined> {
   return await PropertyCollection.findOneAsync(id);
 }
 
