@@ -8,16 +8,18 @@ import {
 import { EditableField } from "./EditableField";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 
-export function EmploymentInfoCard() {
-  const dispatch = useAppDispatch();
-  const profile = useAppSelector(selectProfileData);
-  const isEditing = useAppSelector(selectIsEditing);
+interface Props {
+  profile: {
+    employer: string;
+    workAddress: string;
+    workPhone: string;
+  };
 
-  const handleFieldChange =
-    (field: keyof typeof profile) => (value: string) => {
-      dispatch(updateField({ field, value }));
-    };
+  isEditing: boolean;
+  onChange: (field: keyof Props["profile"], value: string) => void;
+}
 
+export function EmploymentInfoCard({ profile, isEditing, onChange }: Props) {
   return (
     <CardWidget
       title="Employment Information"
@@ -28,19 +30,19 @@ export function EmploymentInfoCard() {
         label="Current Employer"
         value={profile.employer}
         editing={isEditing}
-        onChange={handleFieldChange("employer")}
+        onChange={(val) => onChange("employer", val)}
       />
       <EditableField
         label="Working Address"
         value={profile.workAddress}
         editing={isEditing}
-        onChange={handleFieldChange("workAddress")}
+        onChange={(val) => onChange("workAddress", val)}
       />
       <EditableField
         label="Work Phone"
         value={profile.workPhone}
         editing={isEditing}
-        onChange={handleFieldChange("workPhone")}
+        onChange={(val) => onChange("workPhone", val)}
       />
     </CardWidget>
   );

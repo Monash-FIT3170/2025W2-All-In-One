@@ -5,6 +5,7 @@ import {
   selectIsEditing,
   selectProfileData,
   setEditing,
+  updateField,
 } from "./agent-dashboard/state/profile-slice";
 import { AgentTopNavbar } from "../navigation-bars/TopNavbar";
 import { RoleSideNavBar } from "../navigation-bars/side-nav-bars/SideNavbar";
@@ -15,6 +16,10 @@ import {
 import { EditableAvatar } from "./components/EditableAvatar";
 import { Button } from "../theming-shadcn/Button";
 import { ProfileCard } from "./components/ProfileCard";
+import { PersonalInfoCard } from "./components/PersonalInfoCard";
+import { ContactInfoCard } from "./components/ContactInfoCard";
+import { EmploymentInfoCard } from "./components/EmploymentInfoCard";
+import { CardWidget } from "./components/CardWidget";
 
 export function ProfilePage(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
@@ -27,11 +32,22 @@ export function ProfilePage(): React.JSX.Element {
     null
   );
 
-  const handleEditToggle = () => {
-    dispatch(setEditing(!isEditing));
-  };
-
+  const [localProfile, setLocalProfile] = React.useState(profile);
   // NEED TO MAKE A "Local profile" so that u can make multiple changes without saving until the btn is pressed
+  React.useEffect(() => {
+    if (isEditing) {
+      setLocalProfile(profile); // clone the latest profile when edit mode begins
+    }
+  }, [isEditing, profile]);
+
+  const handleSave = () => {
+    Object.entries(localProfile).forEach(([field, value]) =>
+      dispatch(
+        updateField({ field: field as keyof typeof localProfile, value })
+      )
+    );
+    dispatch(setEditing(false));
+  };
 
   return (
     <div className="min-h-screen">
@@ -71,24 +87,64 @@ export function ProfilePage(): React.JSX.Element {
               </div>
             </div>
             <div className="flex gap-2 mt-1">
-              {isEditing && (
+              {isEditing ? (
+                <>
+                  <Button
+                    onClick={() => dispatch(setEditing(false))}
+                    className="w-32 mt-1 hover:bg-gray-300 cursor-pointer transition"
+                  >
+                    Cancel Edit
+                  </Button>
+                  <Button
+                    onClick={handleSave}
+                    className="w-32 mt-1 hover:bg-gray-300 cursor-pointer transition"
+                  >
+                    Save Profile
+                  </Button>
+                </>
+              ) : (
                 <Button
-                  onClick={() => dispatch(resetProfile())}
+                  onClick={() => dispatch(setEditing(true))}
                   className="w-32 mt-1 hover:bg-gray-300 cursor-pointer transition"
                 >
-                  Cancel Edit
+                  Edit Profile
                 </Button>
               )}
-              <Button
-                onClick={handleEditToggle}
-                className="w-32 mt-1 hover:bg-gray-300 cursor-pointer transition"
-              >
-                {isEditing ? "Save Profile" : "Edit Profile"}
-              </Button>
             </div>
           </div>
 
-          <ProfileCard />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+            <div className="col-span-full flex justify-end"></div>
+            <PersonalInfoCard
+              profile={isEditing ? localProfile : profile}
+              isEditing={isEditing}
+              onChange={(field, value) =>
+                setLocalProfile((prev) => ({ ...prev, [field]: value }))
+              }
+            />
+            {/*TODO: add switch statements to change information based on users role i.e agent  */}
+            <ContactInfoCard
+              profile={isEditing ? localProfile : profile}
+              isEditing={isEditing}
+              onChange={(field, value) =>
+                setLocalProfile((prev) => ({ ...prev, [field]: value }))
+              }
+            />
+            <EmploymentInfoCard
+              profile={isEditing ? localProfile : profile}
+              isEditing={isEditing}
+              onChange={(field, value) =>
+                setLocalProfile((prev) => ({ ...prev, [field]: value }))
+              }
+            />
+            <CardWidget
+              title="Vehicle Information"
+              value=""
+              subtitle="Registered vehicles for parking"
+            >
+              {/*TODO: decide and implement table for vehicle registration */}
+            </CardWidget>
+          </div>
         </div>
       </div>
     </div>

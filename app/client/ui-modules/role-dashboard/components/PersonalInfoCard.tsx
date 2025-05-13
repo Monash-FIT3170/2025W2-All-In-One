@@ -8,16 +8,19 @@ import {
 import { EditableField } from "./EditableField";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 
-export function PersonalInfoCard() {
-  const dispatch = useAppDispatch();
-  const profile = useAppSelector(selectProfileData);
-  const isEditing = useAppSelector(selectIsEditing);
+interface Props {
+  profile: {
+    firstName: string;
+    lastName: string;
+    dob: string;
+    occupation: string;
+  };
 
-  const handleFieldChange =
-    (field: keyof typeof profile) => (value: string) => {
-      dispatch(updateField({ field, value }));
-    };
+  isEditing: boolean;
+  onChange: (field: keyof Props["profile"], value: string) => void;
+}
 
+export function PersonalInfoCard({ profile, isEditing, onChange }: Props) {
   return (
     <CardWidget
       title="Personal Information"
@@ -29,26 +32,26 @@ export function PersonalInfoCard() {
           label="First Name"
           value={profile.firstName}
           editing={isEditing}
-          onChange={handleFieldChange("firstName")}
+          onChange={(val) => onChange("firstName", val)}
         />
         <EditableField
           label="Last Name"
           value={profile.lastName}
           editing={isEditing}
-          onChange={handleFieldChange("lastName")}
+          onChange={(val) => onChange("lastName", val)}
         />
       </div>
       <EditableField
         label="Date of Birth"
         value={profile.dob}
         editing={isEditing}
-        onChange={handleFieldChange("dob")}
+        onChange={(val) => onChange("dob", val)}
       />
       <EditableField
         label="Occupation"
         value={profile.occupation}
         editing={isEditing}
-        onChange={handleFieldChange("occupation")}
+        onChange={(val) => onChange("occupation", val)}
       />
     </CardWidget>
   );

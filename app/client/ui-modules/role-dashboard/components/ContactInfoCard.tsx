@@ -8,16 +8,18 @@ import {
 import { EditableField } from "./EditableField";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 
-export function ContactInfoCard() {
-  const dispatch = useAppDispatch();
-  const profile = useAppSelector(selectProfileData);
-  const isEditing = useAppSelector(selectIsEditing);
+interface Props {
+  profile: {
+    email: string;
+    phone: string;
+    emergencyContact: string;
+  };
 
-  const handleFieldChange =
-    (field: keyof typeof profile) => (value: string) => {
-      dispatch(updateField({ field, value }));
-    };
+  isEditing: boolean;
+  onChange: (field: keyof Props["profile"], value: string) => void;
+}
 
+export function ContactInfoCard({ profile, isEditing, onChange }: Props) {
   return (
     <CardWidget
       title="Contact Information"
@@ -28,19 +30,19 @@ export function ContactInfoCard() {
         label="Email Address"
         value={profile.email}
         editing={isEditing}
-        onChange={handleFieldChange("email")}
+        onChange={(val) => onChange("email", val)}
       />
       <EditableField
         label="Phone Number"
         value={profile.phone}
         editing={isEditing}
-        onChange={handleFieldChange("phone")}
+        onChange={(val) => onChange("phone", val)}
       />
       <EditableField
         label="Emergency Contact"
         value={profile.emergencyContact}
         editing={isEditing}
-        onChange={handleFieldChange("emergencyContact")}
+        onChange={(val) => onChange("emergencyContact", val)}
       />
     </CardWidget>
   );
