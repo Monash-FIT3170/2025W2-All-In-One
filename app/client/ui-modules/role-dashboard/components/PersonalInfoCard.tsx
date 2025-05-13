@@ -21,6 +21,10 @@ interface Props {
 }
 
 export function PersonalInfoCard({ profile, isEditing, onChange }: Props) {
+  function formatDate(date: Date): string {
+    return date.toISOString().split("T")[0]; // "YYYY-MM-DD"
+  }
+
   return (
     <CardWidget
       title="Personal Information"
@@ -46,6 +50,7 @@ export function PersonalInfoCard({ profile, isEditing, onChange }: Props) {
         value={profile.dob}
         editing={isEditing}
         onChange={(val) => onChange("dob", val)}
+        type="date"
       />
       <EditableField
         label="Occupation"

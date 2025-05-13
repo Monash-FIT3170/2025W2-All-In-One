@@ -6,6 +6,7 @@ interface EditableFieldProps {
   value: string;
   editing: boolean;
   onChange: (value: string) => void;
+  type?: string;
 }
 
 export function EditableField({
@@ -13,6 +14,7 @@ export function EditableField({
   value,
   editing,
   onChange,
+  type = "text",
 }: EditableFieldProps) {
   return (
     <div className="grid w-full items-start gap-0.5 min-w-0">
@@ -22,6 +24,7 @@ export function EditableField({
 
       <Input
         value={value}
+        type={type}
         onChange={(e) => onChange(e.target.value)}
         readOnly={!editing}
         className="w-full h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
