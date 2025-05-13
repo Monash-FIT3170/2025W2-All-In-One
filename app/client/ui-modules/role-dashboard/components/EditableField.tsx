@@ -1,5 +1,5 @@
 import React from "react";
-import { Input } from "../../../theming-shadcn/Input";
+import { Input } from "../../theming-shadcn/Input";
 
 interface EditableFieldProps {
   label: string;

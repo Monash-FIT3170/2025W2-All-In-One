@@ -19,9 +19,9 @@ import { LandlordProperty } from "./ui-modules/role-dashboard/landlord-dashboard
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottonNavbar";
 import { PropertyListingPage } from "/app/client/ui-modules/property-listing-page/PropertyListingPage";
 import { SettingsPage } from "./ui-modules/settings-page/SettingsPage";
-import { AgentProfile } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentProfile";
 import { PropertyFormPage } from "./ui-modules/property-form-agent/PropertyFormPage";
 import { AuthTabs } from "./ui-modules/user-authentication/AuthTabs";
+import { ProfilePage } from "./ui-modules/role-dashboard/ProfilePage";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -44,10 +44,16 @@ function AppRoot(): React.JSX.Element {
               <Route path="/agent-properties" element={<AgentProperty />} />
               <Route path="/agent-calendar" element={<AgentCalendar />} />
               <Route path="/agent-messages" element={<AgentMessage />} />
-              <Route path="/agent-profile" element={<AgentProfile />} />
+              <Route path="/agent-profile" element={<ProfilePage />} />
               <Route path="/agent-tasks" element={<AgentTask />} />
-              <Route path="/landlord-dashboard" element={<LandlordDashboard />} />
-              <Route path="/landlord-properties" element={<LandlordProperty />} />
+              <Route
+                path="/landlord-dashboard"
+                element={<LandlordDashboard />}
+              />
+              <Route
+                path="/landlord-properties"
+                element={<LandlordProperty />}
+              />
               <Route path="/landlord-calendar" element={<LandlordCalendar />} />
               <Route path="/landlord-tasks" element={<LandlordTask />} />
               <Route path="/test" element={<PropertyListingPage />} />
@@ -56,12 +62,14 @@ function AppRoot(): React.JSX.Element {
               <Route path="/" element={<ExampleHomePage />} />
               <Route path="/propertyform" element={<PropertyFormPage />} />
               <Route path="/login" element={<AuthTabs initialTab="login" />} />
-              <Route path="/signup" element={<AuthTabs initialTab="signup" />} />
+              <Route
+                path="/signup"
+                element={<AuthTabs initialTab="signup" />}
+              />
             </Routes>
             <BottomNavbar />
           </BrowserRouter>
         </DefaultTheme>
-
       </Provider>
     </React.StrictMode>
   );

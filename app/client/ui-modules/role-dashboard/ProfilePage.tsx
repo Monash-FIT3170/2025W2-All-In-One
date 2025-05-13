@@ -1,22 +1,22 @@
 import React from "react";
-import { AgentTopNavbar } from "../../../navigation-bars/TopNavbar";
-import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
-import {
-  agentDashboardLinks,
-  settingLinks,
-} from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
-import { ProfileCard } from "../components/ProfileCard";
-import { useAppDispatch, useAppSelector } from "/app/client/store";
+import { useAppDispatch, useAppSelector } from "../../store";
 import {
   resetProfile,
   selectIsEditing,
   selectProfileData,
   setEditing,
-} from "../state/profile-slice";
-import { EditableAvatar } from "../components/EditableAvatar";
-import { Button } from "../../../theming-shadcn/Button";
+} from "./agent-dashboard/state/profile-slice";
+import { AgentTopNavbar } from "../navigation-bars/TopNavbar";
+import { RoleSideNavBar } from "../navigation-bars/side-nav-bars/SideNavbar";
+import {
+  agentDashboardLinks,
+  settingLinks,
+} from "../navigation-bars/side-nav-bars/side-nav-link-definitions";
+import { EditableAvatar } from "./components/EditableAvatar";
+import { Button } from "../theming-shadcn/Button";
+import { ProfileCard } from "./components/ProfileCard";
 
-export function AgentProfile(): React.JSX.Element {
+export function ProfilePage(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
 
   const dispatch = useAppDispatch();
@@ -31,9 +31,12 @@ export function AgentProfile(): React.JSX.Element {
     dispatch(setEditing(!isEditing));
   };
 
+  // NEED TO MAKE A "Local profile" so that u can make multiple changes without saving until the btn is pressed
+
   return (
     <div className="min-h-screen">
-      <AgentTopNavbar onSideBarOpened={onSideBarOpened} />
+      <AgentTopNavbar onSideBarOpened={onSideBarOpened} />{" "}
+      {/*TODO: add switch statements to change nav bars based on users role i.e agent  */}
       <div className="flex">
         <RoleSideNavBar
           isOpen={isSidebarOpen}
@@ -62,7 +65,7 @@ export function AgentProfile(): React.JSX.Element {
                 <div className="flex gap-2 flex-wrap">
                   <span className="text-xs bg-white text-black px-2 py-1 rounded-full border border-gray-400">
                     Verified Agent{" "}
-                    {/* Verify check or something maybe idk lol */}
+                    {/*TODO: add switch statements to change nav bars based on users role i.e agent  */}
                   </span>
                 </div>
               </div>
