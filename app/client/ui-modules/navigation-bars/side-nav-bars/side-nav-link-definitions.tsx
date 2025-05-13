@@ -28,6 +28,13 @@ export const tenantDashboardLinks = [
   { to: "/tenant-search-properties", label: "Search Properties" },
 ];
 
+export const landlordDashboardLinks = [
+  { to: "/landlord-dashboard", label: "Overview" },
+  { to: "/landlord-properties", label: "Properties" },
+  { to: "/landlord-calendar", label: "Calendar" },
+  { to: "/landlord-tasks", label: "Tasks" },
+];
+
 export const settingLinks: NavLinkItem[] = [
   { to: "/profile", label: "Profile" },
   { to: "/settings", label: "Settings" },
