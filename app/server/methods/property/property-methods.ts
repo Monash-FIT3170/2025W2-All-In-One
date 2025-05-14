@@ -10,14 +10,14 @@ import { PropertyFeatureDocument } from "/app/server/database/property/models/Pr
 import { PropertyPriceDocument } from "/app/server/database/property/models/PropertyPriceDocument";
 import { PropertyStatusDocument } from "/app/server/database/property/models/PropertyStatusDocument";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
-import { PropertyDTO } from "/app/server/methods/property/models/PropertyDTO";
+import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 
 const propertyGetMethod = {
   [MeteorMethodIdentifier.PROPERTY_GET]: async (
     id: string
-  ): Promise<PropertyDTO> => {
+  ): Promise<ApiProperty> => {
     const propertyDocument = await getPropertyDocumentById(id);
 
     if (!propertyDocument) {
@@ -38,7 +38,7 @@ const propertyGetMethod = {
 
 async function mapPropertyDocumentToPropertyDTO(
   property: PropertyDocument
-): Promise<PropertyDTO> {
+): Promise<ApiProperty> {
   const propertyStatusDocument = await getPropertyStatusDocumentById(
     property.property_status_id
   );

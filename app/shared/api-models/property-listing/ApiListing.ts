@@ -7,4 +7,4 @@ export type ApiListing = {
     start_time: Date;
     end_time: Date;
   }[];
-}
+};

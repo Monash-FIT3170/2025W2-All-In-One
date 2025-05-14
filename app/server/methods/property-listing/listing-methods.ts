@@ -4,17 +4,17 @@ import {
   ListingStatusCollection,
 } from "../../database/property-listing/listing-collections";
 import { ListingDocument } from "../../database/property-listing/models/ListingDocument";
-import { ListingDTO } from "./models/ListingDTO";
 import { InspectionDocument } from "../../database/property-listing/models/InspectionDocument";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ListingStatusDocument } from "/app/server/database/property-listing/models/ListingStatusDocument";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
+import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
 
 const getListingForProperty = {
   [MeteorMethodIdentifier.LISTING_GET_FOR_PROPERTY]: async (
     propertyId: string
-  ): Promise<ListingDTO> => {
+  ): Promise<ApiListing> => {
     const listing = await getListingDocumentAssociatedWithProperty(propertyId);
 
     if (!listing) {
@@ -37,7 +37,7 @@ const getListingForProperty = {
 
 async function mapListingDocumentToListingDTO(
   listing: ListingDocument
-): Promise<ListingDTO> {
+): Promise<ApiListing> {
   let inspections: InspectionDocument[] = [];
 
   if (listing.inspection_ids.length > 0) {
