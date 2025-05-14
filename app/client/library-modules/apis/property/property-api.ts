@@ -1,4 +1,4 @@
-import { ApiProperty } from "/app/client/library-modules/apis/property/models/ApiProperty";
+import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 export async function apiGetPropertyById(id: string): Promise<ApiProperty> {
