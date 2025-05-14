@@ -11,6 +11,7 @@ export const store = configureStore({
   reducer: {
     exampleHomePage: homePageSlice.reducer,
     agentDashboard: agentDashboardSlice.reducer,
+    tenantDashboard: tenantDashboardSlice.reducer,
     guestLandingPage: guestLandingPageSlice.reducer,
     settingsPage: settingsPageSlice.reducer,
     landlordDashboard: landlordDashboardSlice.reducer,
@@ -27,6 +28,7 @@ export type AppThunk<ThunkReturnType = void> = ThunkAction<ThunkReturnType, Root
 
 // Add type-safe hooks
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 

@@ -3,10 +3,18 @@ import { UpcomingTasks } from "../../components/UpcomingTask";
 import { PropertyOverview } from "../components/PropertyOverview";
 import { DashboardCards } from "../components/DashboardCard";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { selectProperties, selectTasks, setProperties, setTasks } from "../state/agent-dashboard-slice";
+import {
+  selectProperties,
+  selectTasks,
+  setProperties,
+  setTasks,
+} from "../state/agent-dashboard-slice";
 import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
-import { AgentTopNavbar} from "../../../navigation-bars/TopNavbar";
-import { agentDashboardLinks, settingLinks } from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
+import { AgentTopNavbar } from "../../../navigation-bars/TopNavbar";
+import {
+  agentDashboardLinks,
+  settingLinks,
+} from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
 
 export function AgentDashboard(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
@@ -16,43 +24,47 @@ export function AgentDashboard(): React.JSX.Element {
 
   useEffect(() => {
     // Dummy data to be replaced with API calls
-    dispatch(setProperties([
-      {
-        address: "123 Main St",
-        status: "Closed",
-        rent: 1500,
-      },
-      {
-        address: "456 Oak Ave",
-        status: "Draft",
-        rent: 2200,
-      },
-      {
-        address: "789 Pine Rd",
-        status: "Closed",
-        rent: 1800,
-      },
-      {
-        address: "101 Cedar Ln",
-        status: "Maintenance",
-        rent: 1950,
-      },
-    ]));
+    dispatch(
+      setProperties([
+        {
+          address: "123 Main St",
+          status: "Closed",
+          rent: 1500,
+        },
+        {
+          address: "456 Oak Ave",
+          status: "Draft",
+          rent: 2200,
+        },
+        {
+          address: "789 Pine Rd",
+          status: "Closed",
+          rent: 1800,
+        },
+        {
+          address: "101 Cedar Ln",
+          status: "Maintenance",
+          rent: 1950,
+        },
+      ])
+    );
 
-    dispatch(setTasks([
-      {
-        title: "Property Inspection",
-        address: "123 Main St, Apt 4B",
-        datetime: "May 1, 2024",
-        status: "Due Soon" as const,
-      },
-      {
-        title: "Tenant Meeting",
-        address: "123 Main St, Apt 4B",
-        datetime: "April 25, 2024",
-        status: "Upcoming" as const,
-      },
-    ]));
+    dispatch(
+      setTasks([
+        {
+          title: "Property Inspection",
+          address: "123 Main St, Apt 4B",
+          datetime: "May 1, 2024",
+          status: "Due Soon" as const,
+        },
+        {
+          title: "Tenant Meeting",
+          address: "123 Main St, Apt 4B",
+          datetime: "April 25, 2024",
+          status: "Upcoming" as const,
+        },
+      ])
+    );
   }, [dispatch]);
 
   return (
