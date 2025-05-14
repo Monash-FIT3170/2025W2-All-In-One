@@ -14,20 +14,19 @@ export default function EditDraftListingModal(props: EditDraftListingModalProps)
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70">
           <div 
             onClick={(e) => e.stopPropagation()}
-            className="flex h-[85vh] w-[70%] flex-col overflow-hidden rounded-xl bg-white p-4">
-            <div className="flex-1 overflow-y-auto pr-4">
-              {props.children}
+            className="flex h-[85vh] w-[50%] flex-col overflow-hidden rounded-xl bg-white p-4">
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              <div className="w-full max-w-3xl mx-auto">
+                {props.children}
+              </div>
             </div>
 
             <div className="sticky bottom-0 flex justify-end gap-4 border-t border-gray-300 bg-white pt-4 pb-4">
               <ThemedButton variant={ThemedButtonVariant.SECONDARY} onClick={props.toggle}>
                 Cancel
               </ThemedButton>
-              <ThemedButton variant={ThemedButtonVariant.TERTIARY} onClick={props.toggle}>
-                Save Changes
-              </ThemedButton>
               <ThemedButton variant={ThemedButtonVariant.PRIMARY} onClick={props.toggle}>
-                Publish listing
+                Save Changes
               </ThemedButton>
             </div>
           </div>

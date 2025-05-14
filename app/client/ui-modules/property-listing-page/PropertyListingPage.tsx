@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { PropertyFeatures } from "./components/PropertyFeatures";
 import { ListingPropertyDetails } from "./components/ListingPropertyDetails";
 import {
@@ -24,6 +24,10 @@ import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonI
 import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
 import EditDraftListingModal from "./components/EditDraftListingModal";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { PropertyForm } from "../property-form-agent/components/PropertyForm";
+import { formSchema, FormSchemaType } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
 
 // TODO: The state here is temporary. During server data integration, this should be moved to a redux slice.
 export function PropertyListingPage({
@@ -34,6 +38,36 @@ export function PropertyListingPage({
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
+    const dummyDraftListing: FormSchemaType = {
+    landlord: "Dylan Hoang",
+    property_type: "house",
+    address: "123 Main Street",
+    city: "Melbourne",
+    state: "VIC",
+    postal_code: "3000",
+    apartment_number: "Apt 4B",
+    monthly_rent: 2500,
+    bond: 2500,
+    bedroom_number: 3,
+    bathroom_number: 2,
+    space: 150,
+    description: "A spacious and sunny 3-bedroom house.",
+    amenities: "Air conditioning, Garage, Garden",
+    images: [],
+    available_dates: new Date("2025-06-01"),
+    lease_term: "12_months",
+    show_contact_boolean: true,
+  };
+
+  const form = useForm<FormSchemaType>({
+    resolver: zodResolver(formSchema),
+    defaultValues: dummyDraftListing,
+  });
+
+  const handleSubmit = (values: FormSchemaType) => {
+    console.log("Updated listing submitted!", values);
+  };
+  
   return (
     <>
     <ListingPageContent
@@ -101,11 +135,7 @@ export function PropertyListingPage({
     <div>
       <button onClick={toggleModal}>Click this to edit this property.</button>
       <EditDraftListingModal isOpen={isModalOpen} toggle={toggleModal}>
-        <div>
-          <h1>A beach house</h1>
-          <p>A nice beach house.</p>
-          <div style={{ height: "1000px" }}/>
-        </div>
+        <PropertyForm form={form} onSubmit={handleSubmit} />
       </EditDraftListingModal>
     </div>
     </>

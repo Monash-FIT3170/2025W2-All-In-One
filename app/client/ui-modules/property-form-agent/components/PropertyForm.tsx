@@ -25,9 +25,6 @@ export function PropertyForm({
         <FormPropertyDetails form={form} />
         <FormPropertyImages form={form} />
         <FormListingOptions form={form} />
-        <div className="flex justify-end mt-5">
-        <Button type="submit">Create Listing</Button>
-        </div>
       </form>
     </Form>
   );
