@@ -13,6 +13,12 @@ interface ProfileData {
   workAddress: string;
   workPhone: string;
   profileImage: string;
+  carMake: string;
+  carModel: string;
+  carYear: string;
+  carPlate: string;
+  
+
 }
 
 interface ProfileState {
@@ -38,6 +44,11 @@ const initialState: ProfileState = {
     workAddress: "Learning Jungle",
     workPhone: "0437 559 777",
     profileImage: "/need-to-add.png",
+    carMake: "Crown",
+    carModel: "Toyota",
+    carYear: "2000",
+    carPlate: "AWSOME",
+
   },
 };
 
