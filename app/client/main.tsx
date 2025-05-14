@@ -21,6 +21,13 @@ import { PropertyListingPage } from "/app/client/ui-modules/property-listing-pag
 import { SettingsPage } from "./ui-modules/settings-page/SettingsPage";
 import { PropertyFormPage } from "./ui-modules/property-form-agent/PropertyFormPage";
 import { AuthTabs } from "./ui-modules/user-authentication/AuthTabs";
+import TenantDashboard from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDashboard";
+import TenantProperty from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantProperty";
+import TenantCalender from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantCalender";
+import TenantMaintenance from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMaintenance";
+import TenantMessages from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMessages";
+import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDocument";
+import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -44,8 +51,14 @@ function AppRoot(): React.JSX.Element {
               <Route path="/agent-calendar" element={<AgentCalendar />} />
               <Route path="/agent-messages" element={<AgentMessage />} />
               <Route path="/agent-tasks" element={<AgentTask />} />
-              <Route path="/landlord-dashboard" element={<LandlordDashboard />} />
-              <Route path="/landlord-properties" element={<LandlordProperty />} />
+              <Route
+                path="/landlord-dashboard"
+                element={<LandlordDashboard />}
+              />
+              <Route
+                path="/landlord-properties"
+                element={<LandlordProperty />}
+              />
               <Route path="/landlord-calendar" element={<LandlordCalendar />} />
               <Route path="/landlord-tasks" element={<LandlordTask />} />
               <Route path="/test" element={<PropertyListingPage />} />
@@ -54,12 +67,27 @@ function AppRoot(): React.JSX.Element {
               <Route path="/" element={<ExampleHomePage />} />
               <Route path="/propertyform" element={<PropertyFormPage />} />
               <Route path="/login" element={<AuthTabs initialTab="login" />} />
-              <Route path="/signup" element={<AuthTabs initialTab="signup" />} />
+              <Route
+                path="/signup"
+                element={<AuthTabs initialTab="signup" />}
+              />
+              <Route path="/tenant-dashboard" element={<TenantDashboard />} />
+              <Route path="/tenant-property" element={<TenantProperty />} />
+              <Route path="/tenant-calender" element={<TenantCalender />} />
+              <Route
+                path="/tenant-maintenance"
+                element={<TenantMaintenance />}
+              />
+              <Route path="/tenant-messages" element={<TenantMessages />} />
+              <Route path="/tenant-documents" element={<TenantDocument />} />
+              <Route
+                path="/tenant-search-properties"
+                element={<TenantSearchProperties />}
+              />
             </Routes>
             <BottomNavbar />
           </BrowserRouter>
         </DefaultTheme>
-
       </Provider>
     </React.StrictMode>
   );
