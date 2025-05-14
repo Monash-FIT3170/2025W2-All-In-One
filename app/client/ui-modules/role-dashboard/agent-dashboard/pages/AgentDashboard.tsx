@@ -9,13 +9,14 @@ import { AgentTopNavbar} from "../../../navigation-bars/TopNavbar";
 import { agentDashboardLinks, settingLinks } from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
 
 export function AgentDashboard(): React.JSX.Element {
-  const [isSidebarOpen, onSideBarOpened] = React.useState(false);
-  const dispatch = useAppDispatch();
-  const properties = useAppSelector(selectProperties);
-  const tasks = useAppSelector(selectTasks);
+  const [isSidebarOpen, onSideBarOpened] = React.useState(false);// is used to manage the state of the sidebar (open or closed).
+  const dispatch = useAppDispatch(); // is used to dispatch actions to the Redux store.
+  const properties = useAppSelector(selectProperties); // is used to retrieve data from the Redux store.
+  const tasks = useAppSelector(selectTasks); // is used to retrieve data from the Redux store.
 
   useEffect(() => {
     // Dummy data to be replaced with API calls
+    // This useEffect hook is used to set the initial state of properties and tasks when the component mounts.
     dispatch(setProperties([
       {
         address: "123 Main St",
@@ -69,7 +70,7 @@ export function AgentDashboard(): React.JSX.Element {
           <h1 className="text-2xl font-bold mb-6">Agent Dashboard</h1>
           <DashboardCards />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <UpcomingTasks tasks={tasks} />
+            <UpcomingTasks tasks={tasks} /> {/* Display a list of upcoming tasks using tasks data from the redux store. */}
             <PropertyOverview properties={properties} />
           </div>
         </div>
