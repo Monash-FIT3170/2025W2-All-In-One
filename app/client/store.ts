@@ -15,7 +15,7 @@ export const store = configureStore({
     guestLandingPage: guestLandingPageSlice.reducer,
     settingsPage: settingsPageSlice.reducer,
     landlordDashboard: landlordDashboardSlice.reducer,
-    profile: profileSlice.reducer
+    profile: profileSlice.reducer,
     loginFormSlice: loginFormSlice.reducer,
     signupFormSlice: signupFormSlice.reducer
   },
