@@ -14,7 +14,10 @@ interface UpcomingTasksProps {
   className?: string;
 }
 
-export function UpcomingTasks({ tasks, className = "" }: UpcomingTasksProps): React.JSX.Element {
+export function UpcomingTasks({
+  tasks,
+  className = "",
+}: UpcomingTasksProps): React.JSX.Element {
   return (
     <CardWidget
       title="Upcoming Tasks"
@@ -58,7 +61,11 @@ function TaskItem({ task }: { task: Task }): React.JSX.Element {
           <p className="text-gray-600 text-sm">{task.address}</p>
           <p className="text-gray-500 text-sm mt-1">{task.datetime}</p>
         </div>
-        <span className={`px-3 py-1 rounded-full text-sm ${getStatusStyle(task.status)}`}>
+        <span
+          className={`px-3 py-1 rounded-full text-sm ${getStatusStyle(
+            task.status
+          )}`}
+        >
           {task.status}
         </span>
       </div>

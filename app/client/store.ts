@@ -8,11 +8,13 @@ import { loginFormSlice } from "./ui-modules/user-authentication/state/reducers/
 import { signupFormSlice } from "./ui-modules/user-authentication/state/reducers/signup-form-slice";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { propertyListingSlice } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
+import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
 
 export const store = configureStore({
   reducer: {
     exampleHomePage: homePageSlice.reducer,
     agentDashboard: agentDashboardSlice.reducer,
+    tenantDashboard: tenantDashboardSlice.reducer,
     guestLandingPage: guestLandingPageSlice.reducer,
     settingsPage: settingsPageSlice.reducer,
     landlordDashboard: landlordDashboardSlice.reducer,
