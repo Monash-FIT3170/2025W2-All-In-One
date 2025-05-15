@@ -8,7 +8,7 @@ import {
   settingLinks,
 } from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
 import { Calendar } from "../../../theming/components/Calendar";
-
+import { Button } from "../../../theming-shadcn/Button";
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const tasks = useAppSelector(selectTasks); // Retrieve tasks from Redux store
@@ -94,9 +94,8 @@ export function AgentCalendar(): React.JSX.Element {
                       <p className="text-sm text-blue-500">{task.status}</p>
                     </li>
                   ))}
-                <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                  Add Event
-                </button>
+                  <br />
+                  <Button>Add Task</Button>
               </div>
             </div>
 
