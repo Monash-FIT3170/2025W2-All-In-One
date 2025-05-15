@@ -1,6 +1,7 @@
 // Azure authentication dependency
 import { BlobServiceClient, ContainerClient, ContainerCreateResponse, StoragePipelineOptions, StorageRetryPolicyType,ContainerCreateOptions } from '@azure/storage-blob';
 import { UploadResult } from '/app/shared/azure/blob-models'
+import { Meteor } from 'meteor/meteor';
 import dotenv from "dotenv"
 const defaultContainerName = "property-media-dev";
 dotenv.config({path: `${process.env.PWD}/.env`})

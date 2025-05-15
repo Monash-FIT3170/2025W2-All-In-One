@@ -1,4 +1,3 @@
-process.env.AZURE_CONNECTION_STRING = 'mocked-connection-string';
 import { expect, jest } from "@jest/globals";
 import { BlobServiceClient, ContainerClient } from "@azure/storage-blob";
 import { createContainer, uploadFile } from "../../server/methods/azure/blob-storage-service";
@@ -17,6 +16,15 @@ const mockedContainerClient = {
 } as unknown as ContainerClient;
 let mockedContainerCreateResponse: { errorCode?: string } = {};
 
+jest.mock('meteor/meteor', () => ({
+  Meteor: {
+    settings: {
+      private: {
+        AZURE_CONNECTION_STRING: 'test'
+      }
+    }
+  }
+}));
 jest.mock("@azure/storage-blob",() => ({
     BlobServiceClient: {
         fromConnectionString: jest.fn(() => ({
@@ -31,6 +39,7 @@ jest.mock("@azure/storage-blob",() => ({
         EXPONENTIAL: 'EXPONENTIAL'
       },
 }));
+
 
 
 describe('uploadFile', () => {
@@ -86,7 +95,6 @@ describe('uploadFile', () => {
 
 describe('createContainer', () => {
     beforeEach(() => {
-        process.env.AZURE_CONNECTION_STRING = 'mocked-connection-string';
         mockedContainerCreateResponse = {};
         jest.clearAllMocks();
       });
