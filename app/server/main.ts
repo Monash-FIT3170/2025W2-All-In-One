@@ -1,5 +1,5 @@
 import { Meteor } from "meteor/meteor";
-import "./methods/example-tasks/task-methods";
+import "./methods/tasks/task-methods";
 import "./methods/property/property-methods";
 import "./methods/property-listing/listing-methods"
 import {
@@ -13,9 +13,11 @@ import {
   ListingCollection,
   ListingStatusCollection,
 } from "/app/server/database/property-listing/listing-collections";
-
+import { TaskCollection } from "/app/server/database/task/task-collections";
 Meteor.startup(tempSeedPropertyData);
+Meteor.startup(tempSeedTaskData);
 
+// This function is used to seed the database with initial property data
 async function tempSeedPropertyData(): Promise<void> {
   if ((await PropertyCollection.find().countAsync()) === 0) {
     PropertyStatusCollection.insertAsync({
@@ -82,6 +84,31 @@ async function tempSeedPropertyData(): Promise<void> {
     ListingStatusCollection.insertAsync({
       _id: "1",
       name: "Draft",
+    });
+  }
+}
+
+async function tempSeedTaskData(): Promise<void> {
+  if ((await TaskCollection.find().countAsync()) === 0) {
+    TaskCollection.insertAsync({
+      _id: "1",
+      name: "Initial listing meeting",
+      status: "Not started",
+      createdDate: new Date("2025-04-12T10:00:00Z"),
+      dueDate: new Date("2025-04-19T10:00:00Z"),
+      description: "Meet with the client to discuss the property listing process and gather necessary information.",
+      priority: "High",
+      user_id: "1"
+    });
+    TaskCollection.insertAsync({
+      _id: "2",
+      name: "Follow-up with client",
+      status: "Not started",
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-04-27T10:00:00Z"),
+      description: "Check in with the client to provide updates and address any questions.",
+      priority: "Medium",
+      user_id: "1"
     });
   }
 }
