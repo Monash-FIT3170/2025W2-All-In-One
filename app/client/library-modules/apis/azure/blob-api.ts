@@ -1,14 +1,14 @@
-import { UploadResult, UploadResults, FileInfo,isValidBlobContentType } from '/app/shared/azure/blob-models'
+import { UploadResult, UploadResults, FileInfo,isValidBlobContentType, BlobNamePrefix } from '/app/shared/azure/blob-models'
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
-export async function uploadImageHandler(blob: Blob, blobName: string): Promise<UploadResult>{
+export async function uploadFileHandler(blob: Blob, blobName: string): Promise<UploadResult>{
     const uint8Array = await blobToUint8Array(blob)
 
     const uploadResult: UploadResult = await Meteor.callAsync(MeteorMethodIdentifier.BLOB_UPLOAD_FILE, uint8Array, blobName,blob.type)
     return uploadResult;
 }
 
-export async function uploadImagesHandler(blobs: File[], blobNamePrefix: string): Promise<UploadResults>{
+export async function uploadFilesHandler(blobs: File[], blobNamePrefix: BlobNamePrefix): Promise<UploadResults>{
     const files: FileInfo[] = await Promise.all(
         blobs.map(async (file) => {
           const uint8Array = await blobToUint8Array(file);

@@ -28,3 +28,5 @@ export type BlobContentType = typeof AllowedBlobContentType[number]
 export function isValidBlobContentType(type: string): type is BlobContentType {
   return (AllowedBlobContentType as readonly string[]).includes(type);
 }
+
+export type BlobNamePrefix = 'property/' | 'document/';

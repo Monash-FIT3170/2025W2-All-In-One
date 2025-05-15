@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { getContainerClient, uploadFile,  } from './blob-storage-service';
-import { BlobContentType, FileInfo, UploadResult, UploadResults } from '/app/shared/azure/blob-models'
+import { BlobContentType, BlobNamePrefix, FileInfo, UploadResult, UploadResults } from '/app/shared/azure/blob-models'
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 
 const blobUploadFileMethod = {
@@ -29,7 +29,7 @@ const blobUploadFileMethod = {
 const blobUploadFilesMethod = {
   [MeteorMethodIdentifier.BLOB_UPLOAD_FILES]: async (
     blobData: FileInfo[],
-    blobNamePrefix: string,): Promise<UploadResults> => {
+    blobNamePrefix: BlobNamePrefix,): Promise<UploadResults> => {
       try {
         const containerClient = await getContainerClient();
   
