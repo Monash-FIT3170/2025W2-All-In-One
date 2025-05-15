@@ -34,13 +34,14 @@ jobs:
           export PATH="/home/runner/.meteor:$PATH"
           chmod +x ./galaxy-login.sh
           ./galaxy-login.sh "$GALAXY_USERNAME" "$GALAXY_PASSWORD"
-      - name: Inject AZURE_CONNECTION_STRING:
+
+      - name: Inject AZURE_CONNECTION_STRING
         run: |
-          echo '{
-            "private": {
-              "AZURE_CONNECTION_STRING": "${{ secrets.AZURE_CONNECTION_STRING }}"
+          echo "{
+            \"private\": {
+              \"AZURE_CONNECTION_STRING\": \"${{ secrets.AZURE_CONNECTION_STRING }}\"
               }
-            }' > settings.json 
+            }" > settings.json 
 
       - name: Deploy
         run: |
