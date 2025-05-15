@@ -1,4 +1,4 @@
-import { ApiProperty } from "/app/client/library-modules/apis/property/models/ApiProperty";
+import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
 
 export function mapApiPropertyToProperty(property: ApiProperty): Property {
