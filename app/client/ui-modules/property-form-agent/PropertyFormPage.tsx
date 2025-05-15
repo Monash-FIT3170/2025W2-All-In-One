@@ -7,7 +7,6 @@ import { ArrowLeftIcon } from "lucide-react";
 import { PropertyForm } from "./components/PropertyForm";
 import { formSchema, FormSchemaType } from "./components/FormSchema";
 import { formDefaultValues } from "./components/PropertyForm";
-import { uploadFilesHandler } from "../../library-modules/apis/azure/blob-api";
 
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
@@ -20,7 +19,6 @@ export function PropertyFormPage() {
   };
 
   const handleSubmit = (values: FormSchemaType) => {
-    uploadFilesHandler(values.images,"today")
     console.log("Form submitted!", values);
   };
 

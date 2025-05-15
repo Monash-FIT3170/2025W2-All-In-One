@@ -7,14 +7,13 @@ const blobUploadFileMethod = {
   [MeteorMethodIdentifier.BLOB_UPLOAD_FILE] : async (
     blobData: Uint8Array<ArrayBufferLike>,
     blobName: string,
-    blobContentType: BlobContentType,
-    containerClientName: string): Promise<UploadResult> => {
+    blobContentType: BlobContentType): Promise<UploadResult> => {
     try {
       console.log("Uploading...")
       const blob = Buffer.from(blobData);
       
 
-      const containerClient = await getContainerClient(containerClientName);
+      const containerClient = await getContainerClient();
       const uploadResult: UploadResult = await uploadFile(containerClient, blobName, blob,blobContentType);
         return uploadResult; 
     } catch (error) {
@@ -30,10 +29,9 @@ const blobUploadFileMethod = {
 const blobUploadFilesMethod = {
   [MeteorMethodIdentifier.BLOB_UPLOAD_FILES]: async (
     blobData: FileInfo[],
-    blobNamePrefix: string,
-    containerClientName: string): Promise<UploadResults> => {
+    blobNamePrefix: string,): Promise<UploadResults> => {
       try {
-        const containerClient = await getContainerClient(containerClientName);
+        const containerClient = await getContainerClient();
   
         const uploadResults = await Promise.all(
           blobData.map(async (blob, index) => {
