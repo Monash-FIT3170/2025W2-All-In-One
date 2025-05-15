@@ -1,5 +1,5 @@
 
-export type TaskDocument = {
+export type Task = {
   _id: string;
   text: string;
 };

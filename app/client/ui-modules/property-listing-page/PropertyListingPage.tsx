@@ -1,4 +1,4 @@
-import React from "react";
+import React, { use, useEffect } from "react";
 import { PropertyFeatures } from "./components/PropertyFeatures";
 import { ListingPropertyDetails } from "./components/ListingPropertyDetails";
 import {
@@ -23,93 +23,80 @@ import { BackLink } from "../theming/components/BackLink";
 import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonIcon";
 import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
-import EditDraftListingModal from "./components/EditDraftListingModal";
+import { useAppDispatch } from "/app/client/store";
+import { useSelector } from "react-redux";
+import {
+  load,
+  selectPropertyListingUiState,
+} from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
+import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
+import { AgentTopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
 
-// TODO: The state here is temporary. During server data integration, this should be moved to a redux slice.
+// TODO: To re-add edit draft listing modal
 export function PropertyListingPage({
   className = "",
 }: {
   className?: string;
 }): React.JSX.Element {
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const toggleModal = () => setIsModalOpen(!isModalOpen);
-
-  return (
-    <>
-    <ListingPageContent
-      streetNumber="86"
-      street="Fury Lane"
-      suburb="Toorak"
-      province="VIC"
-      postcode="3166"
-      summaryDescription="The house of your dreams, yadda yadda yes this house is very lorem ipsum."
-      propertyStatusText="Vacant"
-      propertyStatusPillVariant={PropertyStatusPillVariant.VACANT}
-      propertyDescription="Modern apartment with spacious living areas and a beautiful garden. Recently renovated with new
-        appliances and fixtures throughout. The property features an open-plan kitchen and dining area that flows
-        onto a private balcony with city views. The master bedroom includes an ensuite bathroom and built-in
-        wardrobes, while the second bedroom is generously sized and located near the main bathroom."
-      propertyFeatures={[
-        "Pool",
-        "Gym",
-        "Garage",
-        "Pet friendly",
-        "Washing machine",
-        "Shed",
-        "Lots of grass",
-      ]}
-      propertyType="Apartment"
-      propertyLandArea="500m²"
-      propertyBathrooms="2"
-      propertyParkingSpaces="2"
-      propertyBedrooms="4"
-      propertyPrice="$1500/mth"
-      inspectionBookingUiStateList={[
-        {
-          date: "21st Jan 2025",
-          startingTime: "11:25pm",
-          endingTime: "11:55pm",
-        },
-        {
-          date: "22nd Jan 2025",
-          startingTime: "1:20pm",
-          endingTime: "1:50pm",
-        },
-      ]}
-      listingImageUrls={[
-        "https://cdn.pixabay.com/photo/2018/08/04/11/30/draw-3583548_1280.png",
-        "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
-        "https://cdn.pixabay.com/photo/2024/05/26/10/15/bird-8788491_1280.jpg",
-      ]}
-      listingStatusText="DRAFT LISTING"
-      listingStatusPillVariant={ListingStatusPillVariant.DRAFT}
-      shouldDisplayListingStatus={true}
-      shouldDisplaySubmitDraftButton={true}
-      onBack={() => {
-        console.log("back button pressed");
-      }}
-      onBook={(index: number) => {
-        console.log(`booking button ${index} pressed`);
-      }}
-      onApply={() => {
-        console.log("applied!");
-      }}
-      onContactAgent={() => console.log("contacting agent!")}
-      onSubmitDraftListing={() => console.log("draft submitted!")}
-      className={twMerge("p-5", className)}
-    />
-    <div>
-      <button onClick={toggleModal}>Click this to edit this property.</button>
-      <EditDraftListingModal isOpen={isModalOpen} toggle={toggleModal}>
-        <div>
-          <h1>A beach house</h1>
-          <p>A nice beach house.</p>
-          <div style={{ height: "1000px" }}/>
-        </div>
-      </EditDraftListingModal>
-    </div>
-    </>
+  const dispatch = useAppDispatch();
+  const state: PropertyListingPageUiState = useSelector(
+    selectPropertyListingUiState
   );
+
+  useEffect(() => {
+    dispatch(load("1"));
+  }, []);
+
+  if (state.shouldShowLoadingState) {
+    return (
+      <>
+        <AgentTopNavbar onSideBarOpened={() => {}} />
+        <ListingPageContentLoadingSkeleton className={twMerge("p-5", className)} />
+      </>
+    );
+  } else {
+    return (
+      <>
+        <AgentTopNavbar onSideBarOpened={() => {}} />
+        <ListingPageContent
+          streetNumber={state.streetNumber}
+          street={state.street}
+          suburb={state.suburb}
+          province={state.province}
+          postcode={state.postcode}
+          summaryDescription={state.summaryDescription}
+          propertyStatusText={state.propertyStatusText}
+          propertyStatusPillVariant={state.propertyStatusPillVariant}
+          propertyDescription={state.propertyDescription}
+          propertyFeatures={state.propertyFeatures}
+          propertyType={state.propertyType}
+          propertyLandArea={state.propertyLandArea}
+          propertyBathrooms={state.propertyBathrooms}
+          propertyParkingSpaces={state.propertyParkingSpaces}
+          propertyBedrooms={state.propertyBedrooms}
+          propertyPrice={state.propertyPrice}
+          inspectionBookingUiStateList={state.inspectionBookingUiStateList}
+          listingImageUrls={state.listingImageUrls}
+          listingStatusText={state.listingStatusText}
+          listingStatusPillVariant={state.listingStatusPillVariant}
+          shouldDisplayListingStatus={state.shouldDisplayListingStatus}
+          shouldDisplaySubmitDraftButton={state.shouldDisplaySubmitDraftButton}
+          onBack={() => {
+            console.log("back button pressed");
+          }}
+          onBook={(index: number) => {
+            console.log(`booking button ${index} pressed`);
+          }}
+          onApply={() => {
+            console.log("applied!");
+          }}
+          onContactAgent={() => console.log("contacting agent!")}
+          onSubmitDraftListing={() => console.log("draft submitted!")}
+          className={twMerge("p-5", className)}
+        />
+      </>
+    );
+  }
 }
 
 function ListingPageContent({
@@ -213,6 +200,14 @@ function ListingPageContent({
       />
     </div>
   );
+}
+
+function ListingPageContentLoadingSkeleton({
+  className = "",
+}: {
+  className?: string;
+}): React.JSX.Element {
+  return <p className={className}>Loading...</p>;
 }
 
 function TopBar({
@@ -337,7 +332,7 @@ function ListingDetails({
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={twMerge("flex gap-6", className)}>
+    <div className={twMerge("flex gap-7", className)}>
       <div className="flex-1 flex flex-col">
         <ListingDescription
           description={propertyDescription}
@@ -346,6 +341,7 @@ function ListingDetails({
         <PropertyInspections
           bookingUiStateList={inspectionBookingUiStateList}
           onBook={onBook}
+          className="w-full"
         />
       </div>
 
