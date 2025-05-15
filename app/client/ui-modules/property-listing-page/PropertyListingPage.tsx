@@ -31,6 +31,9 @@ import {
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import { AgentTopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
+import EditDraftListingModal from "./components/EditDraftListingModal";
+import { EditDraftListingButton } from "./components/EditDraftListingButton";
+import { PropertyForm } from "../property-form-agent/components/PropertyForm";
 
 // TODO: To re-add edit draft listing modal
 export function PropertyListingPage({
@@ -362,7 +365,8 @@ function BottomBar({
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={twMerge("flex", className)}>
+    <div className={twMerge("flex items-center gap-2", className)}>
+      <EditListing/>
       {shouldDisplaySubmitDraftButton && (
         <SubmitDraftListingButton
           onClick={onSubmitDraftListing}
@@ -370,5 +374,24 @@ function BottomBar({
         />
       )}
     </div>
+  );
+}
+
+function EditListing({
+  className = "",
+}: {
+  className?: string;
+}): React.JSX.Element {
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
+
+  return (
+    <>
+      <EditDraftListingButton onClick={toggleModal}/>
+        <EditDraftListingModal isOpen={isModalOpen} toggle={toggleModal}>
+          {/* <PropertyForm form={form} onSubmit={handleSubmit} /> */}
+          <h1>hey there buddy</h1>
+        </EditDraftListingModal>
+    </>
   );
 }
