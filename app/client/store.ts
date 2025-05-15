@@ -6,6 +6,9 @@ import { guestLandingPageSlice } from "./ui-modules/guest-landing-page/state/red
 import { settingsPageSlice } from "./ui-modules/settings-page/state/reducers/settings-page-slice";
 import { loginFormSlice } from "./ui-modules/user-authentication/state/reducers/login-form-slice";
 import { signupFormSlice } from "./ui-modules/user-authentication/state/reducers/signup-form-slice";
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import { propertyListingSlice } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
+import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
 
 export const store = configureStore({
   reducer: {
@@ -16,19 +19,20 @@ export const store = configureStore({
     settingsPage: settingsPageSlice.reducer,
     landlordDashboard: landlordDashboardSlice.reducer,
     loginFormSlice: loginFormSlice.reducer,
-    signupFormSlice: signupFormSlice.reducer
+    propertyListing: propertyListingSlice.reducer,
+    signupFormSlice: signupFormSlice.reducer,
   },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-export type AppThunk<ThunkReturnType = void> = ThunkAction<ThunkReturnType, RootState, unknown, Action>;
-
-
+export type AppThunk<ThunkReturnType = void> = ThunkAction<
+  ThunkReturnType,
+  RootState,
+  unknown,
+  Action
+>;
 
 // Add type-safe hooks
-import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
-
