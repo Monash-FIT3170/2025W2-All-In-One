@@ -48,24 +48,26 @@ in the `Extensions` tab of vscode
       },
       {
           "type": "node",
-          "request": "launch",
-          "name": "Meteor: Node",
-          "runtimeExecutable": "npm",
-          "runtimeArgs": ["start"],
-          "outputCapture": "std",
+          "request": "attach",
+          "name": "Attach to Meteor: Node",
+          "port": 9229
       }
   ],
   "compounds": [
       {
           "name": "Meteor: All",
-          "configurations": ["Meteor: Node", "Meteor: Chrome"]
+          "configurations": ["Attach to Meteor: Node", "Meteor: Chrome"]
       }
   ]
 }
 ```
-4. Debugging is now configured. Everytime you want to debug, ensure the app is running 
-(aka `meteor run` has been run) before beginning a debugging session. To run a debugging
-session, set a breakpoint and select `Run` in the navbar and click `Start Debugging`.
+4. Debugging is now configured. 
+
+#### How to debug
+1. Ensure the app is running in debug mode (aka `meteor run --inspect` has been run)
+2. Ensure `Meteor: All` debug mode is set by going to the 'Run & Debug tab' and selecting 
+`Meteor: All` next to the green play button
+3. Set a breakpoint in the code and select `Run` in the navbar and click `Start Debugging`.
 
 ### Step 5: Testing your configuration
 1. Open up a terminal at the root of the project and run `meteor run`

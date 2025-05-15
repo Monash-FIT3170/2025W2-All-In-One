@@ -24,7 +24,7 @@ export function PropertyInspections({
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={twMerge("flex flex-col", className)}>
+    <div className={twMerge("flex flex-col w-[520px]", className)}>
       <SubHeading text="Upcoming Inspections" className="mb-2" />
       <InspectionBookingList
         bookingUiStateList={bookingUiStateList}
@@ -46,7 +46,7 @@ function InspectionBookingList({
   return (
     <div
       className={twMerge(
-        "flex flex-col w-[520px] border-[1.5px] border-(--divider-color) rounded-lg py-3 px-4",
+        "flex flex-col border-[1.5px] border-(--divider-color) rounded-lg py-3 px-4",
         className
       )}
     >

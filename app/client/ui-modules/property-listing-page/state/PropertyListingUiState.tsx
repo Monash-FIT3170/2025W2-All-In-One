@@ -25,4 +25,5 @@ export type PropertyListingPageUiState = {
   listingStatusPillVariant: ListingStatusPillVariant;
   shouldDisplayListingStatus: boolean;
   shouldDisplaySubmitDraftButton: boolean;
+  shouldShowLoadingState: boolean;
 };
