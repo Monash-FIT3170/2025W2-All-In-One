@@ -15,7 +15,7 @@ export const options: StoragePipelineOptions = {
 
 
 export function getBlobServiceClient(): BlobServiceClient {
-  const connStr = process.env.AZURE_CONNECTION_STRING
+  const connStr = Meteor.settings.private.AZURE_CONNECTION_STRING
   console.log("Getting Blob Service Client");
   try {
     if (!connStr) {
