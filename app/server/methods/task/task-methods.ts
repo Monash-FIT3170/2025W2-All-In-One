@@ -1,127 +1,68 @@
 import { get } from "react-hook-form";
 import { TaskDocument } from "../../database/task/models/TaskDocument";
 import { TaskCollection } from "../../database/task/task-collections";
-import { PropertyFeatureDocument } from "/app/server/database/property/models/PropertyFeatureDocument";
-import { PropertyPriceDocument } from "/app/server/database/property/models/PropertyPriceDocument";
-import { PropertyStatusDocument } from "/app/server/database/property/models/PropertyStatusDocument";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
-import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
+import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 
-// This method is used to get a property by its ID
-// It returns a promise that resolves to an ApiProperty object
-// If the property is not found, it throws an InvalidDataError
-// If there is an error while mapping the property document to DTO, it throws an InvalidDataError
+// This method is used to get a task by its ID
+// It returns a promise that resolves to an Apitask object
+// If the task is not found, it throws an InvalidDataError
+// If there is an error while mapping the task document to DTO, it throws an InvalidDataError
 // The method is wrapped in a Meteor method so it can be called from the client
-const propertyGetMethod = {
-  [MeteorMethodIdentifier.PROPERTY_GET]: async (
+const taskGetMethod = {
+  [MeteorMethodIdentifier.TASK_GET]: async (
     id: string
-  ): Promise<ApiProperty> => {
-    const propertyDocument = await getPropertyDocumentById(id);
+  ): Promise<ApiTask> => {
+    const taskDocument = await getTaskDocumentById(id);
 
-    if (!propertyDocument) {
+    if (!taskDocument) {
       throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Property with ${id} not found`)
+        new InvalidDataError(`task with ${id} not found`)
       );
     }
 
-    const propertyDTO = await mapPropertyDocumentToPropertyDTO(
-      propertyDocument
+    const taskDTO = await mapTaskDocumentTotaskDTO(
+      taskDocument
     ).catch((error) => {
       throw meteorWrappedInvalidDataError(error);
     });
 
-    return propertyDTO;
+    return taskDTO;
   },
 };
-// This method is used to map a property document to an ApiProperty DTO.
-// This function transforms a PropertyDocument (raw database document) into an ApiProperty (structured DTO) for client use. It performs the following steps:
-// 1. Fetches the property status document by its ID
-// 2. Fetches the latest property price document for the property
-// 3. Fetches the property features documents matching the IDs in the property document
-// It takes a PropertyDocument as input and returns a promise that resolves to an ApiProperty object
-// It fetches the property status, latest property price, and property features documents
+// This method is used to map a task document to an Apitask DTO.
+// This function transforms a TaskDocument (raw database document) into an Apitask (structured DTO) for client use. It performs the following steps:
+// 1. Fetches the task status document by its ID
+// 2. Fetches the latest task price document for the task
+// 3. Fetches the task features documents matching the IDs in the task document
+// It takes a TaskDocument as input and returns a promise that resolves to an Apitask object
+// It fetches the task status, latest task price, and task features documents
 
-async function mapPropertyDocumentToPropertyDTO(
-  property: PropertyDocument
-): Promise<ApiProperty> {
-  const propertyStatusDocument = await getPropertyStatusDocumentById(
-    property.property_status_id
-  );
-  const propertyPriceDocument = await getLatestPropertyPriceDocumentForProperty(
-    property._id
-  );
-  const propertyFeaturesDocuments =
-    await getPropertyFeatureDocumentsMatchingIds(property.property_feature_ids);
-
-  if (!propertyStatusDocument) {
-    throw new InvalidDataError(
-      `Property status for Property id ${property._id} not found.`
-    );
-  }
-  if (!propertyPriceDocument) {
-    throw new InvalidDataError(
-      `Property price for Property id ${property._id} not found.`
-    );
-  }
-  if (
-    propertyFeaturesDocuments.length !== property.property_feature_ids.length
-  ) {
-    throw new InvalidDataError(
-      `Missing property features for Property id ${property._id}.`
-    );
-  }
+async function mapTaskDocumentTotaskDTO(
+  task: TaskDocument
+): Promise<ApiTask> {
 
   return {
-    propertyId: property._id,
-    streetnumber: property.streetnumber,
-    streetname: property.streetname,
-    suburb: property.suburb,
-    province: property.province,
-    postcode: property.postcode,
-    pricePerMonth: propertyPriceDocument.price_per_month,
-    propertyStatus: propertyStatusDocument.name,
-    description: property.description,
-    summaryDescription: property.summary_description,
-    bathrooms: property.bathrooms,
-    bedrooms: property.bedrooms,
-    parking: property.parking,
-    features: propertyFeaturesDocuments.map((doc) => doc.name),
-    type: property.type,
-    area: property.area,
+    taskId: task._id,
+    name: task.name,
+    status: task.status,
+    createdDate: task.createdDate,
+    dueDate: task.dueDate,
+    description: task.description,
+    priority: task.priority,
+    userId: task.user_id,
   };
 }
 
-async function getPropertyDocumentById(
+async function getTaskDocumentById(
   id: string
-): Promise<PropertyDocument | undefined> {
-  return await PropertyCollection.findOneAsync(id);
+): Promise<TaskDocument | undefined> {
+  return await TaskCollection.findOneAsync(id);
 }
 
-async function getPropertyStatusDocumentById(
-  id: string
-): Promise<PropertyStatusDocument | undefined> {
-  return await PropertyStatusCollection.findOneAsync(id);
-}
-
-async function getPropertyFeatureDocumentsMatchingIds(
-  ids: string[]
-): Promise<PropertyFeatureDocument[]> {
-  return await PropertyFeatureCollection.find({
-    _id: { $in: ids },
-  }).fetchAsync();
-}
-
-async function getLatestPropertyPriceDocumentForProperty(
-  propertyId: string
-): Promise<PropertyPriceDocument | undefined> {
-  return await PropertyPriceCollection.findOneAsync(
-    { property_id: propertyId },
-    { sort: { date_set: -1 } }
-  );
-}
 
 Meteor.methods({
-  ...propertyGetMethod,
+  ...taskGetMethod,
 });
