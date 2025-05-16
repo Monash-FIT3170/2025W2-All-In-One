@@ -2,7 +2,6 @@ import { Meteor } from "meteor/meteor";
 import { check, Match } from "meteor/check";
 import { Accounts } from "meteor/accounts-base";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { UserProfileCollection } from "../../database/user/user-collections";
 
 type RegisterPayload = {
   email: string;
@@ -55,13 +54,12 @@ async function registerUser(data: RegisterPayload): Promise<{ userId: string }> 
     });
 
     // Create UserProfile linked by userId from meteor.users()
-    UserProfileCollection.insertAsync({
-      _id: userId,
+    await Meteor.callAsync(MeteorMethodIdentifier.USER_INSERT, {
+      userId,
       firstName: data.firstName,
       lastName: data.lastName,
       role: data.accountType,
       agentCode: data.accountType === "agent" ? data.agentCode : undefined,
-      createdAt: new Date(),
     });
 
     return { userId };
