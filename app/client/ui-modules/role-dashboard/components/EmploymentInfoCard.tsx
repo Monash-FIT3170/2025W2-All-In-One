@@ -20,30 +20,32 @@ interface Props {
 }
 
 export function EmploymentInfoCard({ profile, isEditing, onChange }: Props) {
+  const fields: {
+    label: string;
+    key: keyof Props["profile"];
+    type?: string;
+  }[] = [
+    { label: "Current Employer", key: "employer", type: "string" },
+    { label: "Working Address", key: "workAddress", type: "string" },
+    { label: "Work Phone", key: "workPhone", type: "string" },
+  ];
   return (
     <CardWidget
       title="Employment Information"
       value=""
       subtitle="Your current employment details"
     >
-      <EditableField
-        label="Current Employer"
-        value={profile.employer}
-        editing={isEditing}
-        onChange={(val) => onChange("employer", val)}
-      />
-      <EditableField
-        label="Working Address"
-        value={profile.workAddress}
-        editing={isEditing}
-        onChange={(val) => onChange("workAddress", val)}
-      />
-      <EditableField
-        label="Work Phone"
-        value={profile.workPhone}
-        editing={isEditing}
-        onChange={(val) => onChange("workPhone", val)}
-      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {fields.map(({ label, key, type }) => (
+          <EditableField
+            label={label}
+            value={profile[key]}
+            editing={isEditing}
+            onChange={(val) => onChange(key, val)}
+            type={type}
+          />
+        ))}
+      </div>
     </CardWidget>
   );
 }

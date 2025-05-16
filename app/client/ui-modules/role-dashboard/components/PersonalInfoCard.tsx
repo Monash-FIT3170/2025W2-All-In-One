@@ -21,9 +21,16 @@ interface Props {
 }
 
 export function PersonalInfoCard({ profile, isEditing, onChange }: Props) {
-  function formatDate(date: Date): string {
-    return date.toISOString().split("T")[0]; // "YYYY-MM-DD"
-  }
+  const fields: {
+    label: string;
+    key: keyof Props["profile"];
+    type?: string;
+  }[] = [
+    { label: "First Name", key: "firstName", type: "string" },
+    { label: "Last Name", key: "lastName", type: "string" },
+    { label: "Date of Birth", key: "dob", type: "date" },
+    { label: "Occupation", key: "occupation", type: "string" },
+  ];
 
   return (
     <CardWidget
@@ -32,32 +39,16 @@ export function PersonalInfoCard({ profile, isEditing, onChange }: Props) {
       subtitle="your basic personal information"
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <EditableField
-          label="First Name"
-          value={profile.firstName}
-          editing={isEditing}
-          onChange={(val) => onChange("firstName", val)}
-        />
-        <EditableField
-          label="Last Name"
-          value={profile.lastName}
-          editing={isEditing}
-          onChange={(val) => onChange("lastName", val)}
-        />
+        {fields.map(({ label, key, type }) => (
+          <EditableField
+            label={label}
+            value={profile[key]}
+            editing={isEditing}
+            onChange={(val) => onChange(key, val)}
+            type={type}
+          />
+        ))}
       </div>
-      <EditableField
-        label="Date of Birth"
-        value={profile.dob}
-        editing={isEditing}
-        onChange={(val) => onChange("dob", val)}
-        type="date"
-      />
-      <EditableField
-        label="Occupation"
-        value={profile.occupation}
-        editing={isEditing}
-        onChange={(val) => onChange("occupation", val)}
-      />
     </CardWidget>
   );
 }

@@ -53,18 +53,12 @@ function AppRoot(): React.JSX.Element {
               <Route path="/agent-messages" element={<AgentMessage />} />
               <Route path="/agent-tasks" element={<AgentTask />} />
               <Route
-               
                 path="/landlord-dashboard"
-               
                 element={<LandlordDashboard />}
-             
               />
               <Route
-               
                 path="/landlord-properties"
-               
                 element={<LandlordProperty />}
-             
               />
               <Route path="/landlord-calendar" element={<LandlordCalendar />} />
               <Route path="/landlord-tasks" element={<LandlordTask />} />
@@ -74,13 +68,10 @@ function AppRoot(): React.JSX.Element {
               <Route path="/example" element={<ExampleHomePage />} />
               <Route path="/propertyform" element={<PropertyFormPage />} />
               <Route path="/login" element={<AuthTabs initialTab="login" />} />
-              <Route
-                path="/profile" element={<ProfilePage />} />
+              <Route path="/profile" element={<ProfilePage />} />
               <Route
                 path="/signup"
-               
                 element={<AuthTabs initialTab="signup" />}
-             
               />
               <Route path="/tenant-dashboard" element={<TenantDashboard />} />
               <Route path="/tenant-property" element={<TenantProperty />} />

@@ -20,30 +20,33 @@ interface Props {
 }
 
 export function ContactInfoCard({ profile, isEditing, onChange }: Props) {
+  const fields: {
+    label: string;
+    key: keyof Props["profile"];
+    type?: string;
+  }[] = [
+    { label: "Email Address", key: "email", type: "string" },
+    { label: "Phone Number", key: "phone", type: "string" },
+    { label: "Emergency Contact", key: "emergencyContact", type: "string" },
+  ];
+
   return (
     <CardWidget
       title="Contact Information"
       value=""
       subtitle="How we can reach you"
     >
-      <EditableField
-        label="Email Address"
-        value={profile.email}
-        editing={isEditing}
-        onChange={(val) => onChange("email", val)}
-      />
-      <EditableField
-        label="Phone Number"
-        value={profile.phone}
-        editing={isEditing}
-        onChange={(val) => onChange("phone", val)}
-      />
-      <EditableField
-        label="Emergency Contact"
-        value={profile.emergencyContact}
-        editing={isEditing}
-        onChange={(val) => onChange("emergencyContact", val)}
-      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {fields.map(({ label, key, type }) => (
+          <EditableField
+            label={label}
+            value={profile[key]}
+            editing={isEditing}
+            onChange={(val) => onChange(key, val)}
+            type={type}
+          />
+        ))}
+      </div>
     </CardWidget>
   );
 }
