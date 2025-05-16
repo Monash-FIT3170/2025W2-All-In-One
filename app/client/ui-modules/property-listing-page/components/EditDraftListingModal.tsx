@@ -39,6 +39,18 @@ export default function EditDraftListingModal(props: EditDraftListingModalProps)
                 <PropertyForm onSubmit={handleSaveChanges} form={listingInfo} mode={"edit"}/>
               </div>
             </div>
+
+            <div className="sticky bottom-0 flex justify-end gap-4 border-t border-gray-300 bg-white pt-4 pb-4">
+              <ThemedButton 
+              variant={ThemedButtonVariant.SECONDARY} 
+              onClick={() => {
+                listingInfo.reset();
+                props.toggle();
+              }}
+              >
+                Cancel
+              </ThemedButton>
+            </div>
           </div>
         </div>
       )}
