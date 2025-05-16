@@ -1,5 +1,5 @@
 
-export type TaskDTO = {
+export type ApiTask = {
   taskId: string,
   text: string
 }
