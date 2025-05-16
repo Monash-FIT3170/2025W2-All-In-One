@@ -14,9 +14,11 @@ import { Button } from "../../theming-shadcn/Button";
 export function PropertyForm({
   form,
   onSubmit,
+  mode = "create"
 }: {
   form: UseFormReturn<FormSchemaType>;
   onSubmit: (values: FormSchemaType) => void;
+  mode?: "create" | "edit";
 }) {
   return (
     <Form {...form}>
@@ -25,6 +27,11 @@ export function PropertyForm({
         <FormPropertyDetails form={form} />
         <FormPropertyImages form={form} />
         <FormListingOptions form={form} />
+        <div className="flex justify-end mt-5">
+          <Button type="submit">
+            {mode === "create" ? "Create Listing" : "Save Changes"}
+          </Button>
+        </div>
       </form>
     </Form>
   );

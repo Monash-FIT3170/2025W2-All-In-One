@@ -1,13 +1,32 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { FormSchemaType, formSchema } from "../../property-form-agent/components/FormSchema";
+import { formDefaultValues, PropertyForm } from "../../property-form-agent/components/PropertyForm";
 import { ThemedButton, ThemedButtonVariant } from "../../theming/components/ThemedButton";
 import React from "react";
 
 interface EditDraftListingModalProps {
   toggle: () => void;
   isOpen: boolean;
-  children: React.ReactNode;
+  propertyForm: FormSchemaType;
 }
 
 export default function EditDraftListingModal(props: EditDraftListingModalProps) {
+  const listingInfo = useForm<FormSchemaType>({
+    resolver: zodResolver(formSchema),
+    defaultValues: props.propertyForm,
+  });
+
+  const handleSaveChanges = async (values: FormSchemaType) => {
+    try {
+      console.log("Saved successfully", values);
+      console.log("Closing modal")
+      props.toggle();
+    } catch (error) {
+      console.error("Failed to save:", error);
+    }
+  };
+
   return (
     <>
       {props.isOpen && (
@@ -17,17 +36,8 @@ export default function EditDraftListingModal(props: EditDraftListingModalProps)
             className="flex h-[85vh] w-[50%] flex-col overflow-hidden rounded-xl bg-white p-4">
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <div className="w-full max-w-3xl mx-auto">
-                {props.children}
+                <PropertyForm onSubmit={handleSaveChanges} form={listingInfo} mode={"edit"}/>
               </div>
-            </div>
-
-            <div className="sticky bottom-0 flex justify-end gap-4 border-t border-gray-300 bg-white pt-4 pb-4">
-              <ThemedButton variant={ThemedButtonVariant.SECONDARY} onClick={props.toggle}>
-                Cancel
-              </ThemedButton>
-              <ThemedButton variant={ThemedButtonVariant.PRIMARY} onClick={props.toggle}>
-                Save Changes
-              </ThemedButton>
             </div>
           </div>
         </div>

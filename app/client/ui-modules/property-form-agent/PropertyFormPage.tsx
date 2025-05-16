@@ -7,8 +7,6 @@ import { ArrowLeftIcon } from "lucide-react";
 import { PropertyForm } from "./components/PropertyForm";
 import { formSchema, FormSchemaType } from "./components/FormSchema";
 import { formDefaultValues } from "./components/PropertyForm";
-import { ThemedButton, ThemedButtonVariant } from "../theming/components/ThemedButton";
-
 
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
@@ -44,11 +42,6 @@ export function PropertyFormPage() {
 
       <div className="max-w-3xl mx-auto px-6 py-10 rounded-md space-y-10">
           <PropertyForm onSubmit={handleSubmit} form={form} />
-          <div className="flex justify-end mt-5">
-            <ThemedButton variant={ThemedButtonVariant.PRIMARY} onClick={form.handleSubmit(handleSubmit)}>
-              Create Listing
-            </ThemedButton>
-          </div>
       </div>
     </div>
   );

@@ -34,6 +34,9 @@ import { AgentTopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar
 import EditDraftListingModal from "./components/EditDraftListingModal";
 import { EditDraftListingButton } from "./components/EditDraftListingButton";
 import { PropertyForm } from "../property-form-agent/components/PropertyForm";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { formSchema, FormSchemaType } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
 
 // TODO: To re-add edit draft listing modal
 export function PropertyListingPage({
@@ -384,14 +387,34 @@ function EditListing({
 }): React.JSX.Element {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const toggleModal = () => setIsModalOpen(!isModalOpen);
+  const state: PropertyListingPageUiState = useSelector(
+    selectPropertyListingUiState
+  );
+  const listingInfo: FormSchemaType = {
+    landlord: "Dylan Hoang",
+    property_type: state.propertyType,
+    address: `${state.streetNumber} ${state.street}`,
+    city: state.suburb,
+    state: state.province,
+    postal_code: state.postcode,
+    apartment_number: "",
+    monthly_rent: Number(state.propertyPrice),
+    bond: 2500, // Not actually displyed on property listing page
+    bedroom_number: Number(state.propertyBedrooms),
+    bathroom_number: Number(state.propertyBathrooms),
+    space: Number(state.propertyLandArea),
+    description: state.propertyDescription,
+    amenities: state.propertyFeatures.join(", "),
+    images: [],
+    available_dates: new Date(),
+    lease_term: "12_months", // Not actually displyed on property listing page
+    show_contact_boolean: true,
+    };
 
   return (
     <>
       <EditDraftListingButton onClick={toggleModal}/>
-        <EditDraftListingModal isOpen={isModalOpen} toggle={toggleModal}>
-          {/* <PropertyForm form={form} onSubmit={handleSubmit} /> */}
-          <h1>hey there buddy</h1>
-        </EditDraftListingModal>
+        <EditDraftListingModal isOpen={isModalOpen} toggle={toggleModal} propertyForm={listingInfo}/>
     </>
   );
 }
