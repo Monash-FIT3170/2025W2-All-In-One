@@ -29,7 +29,7 @@ export const LoginForm = () => {
         <input
           id="email"
           name="email"
-          type="text"
+          type="email"
           placeholder="example@email.com"
           required
           className={inputClass}
