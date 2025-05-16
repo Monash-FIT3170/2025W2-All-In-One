@@ -23,7 +23,7 @@ import { PropertyFormPage } from "./ui-modules/property-form-agent/PropertyFormP
 import { AuthTabs } from "./ui-modules/user-authentication/AuthTabs";
 import TenantDashboard from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDashboard";
 import TenantProperty from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantProperty";
-import TenantCalender from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantCalender";
+import { TenantCalendar } from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantCalender";
 import TenantMaintenance from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMaintenance";
 import TenantMessages from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMessages";
 import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDocument";
@@ -73,7 +73,7 @@ function AppRoot(): React.JSX.Element {
               />
               <Route path="/tenant-dashboard" element={<TenantDashboard />} />
               <Route path="/tenant-property" element={<TenantProperty />} />
-              <Route path="/tenant-calender" element={<TenantCalender />} />
+              <Route path="/tenant-calendar" element={<TenantCalendar />} />
               <Route
                 path="/tenant-maintenance"
                 element={<TenantMaintenance />}
