@@ -1,10 +1,10 @@
 import React from "react";
-import { CardWidget } from "./CardWidget";
+import { CardWidget } from "../../role-dashboard/components/CardWidget";
 import {
   selectIsEditing,
   selectProfileData,
   updateField,
-} from "../agent-dashboard/state/profile-slice";
+} from "../state/profile-slice";
 import { EditableField } from "./EditableField";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 

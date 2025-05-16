@@ -1,5 +1,5 @@
 import React from "react";
-import { CardWidget } from "./CardWidget";
+import { CardWidget } from "../../role-dashboard/components/CardWidget";
 import { EditableField } from "./EditableField";
 interface Props {
   profile: {

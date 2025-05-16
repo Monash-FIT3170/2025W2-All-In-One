@@ -28,7 +28,7 @@ import TenantMaintenance from "./ui-modules/role-dashboard/tenant-dashboard/page
 import TenantMessages from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMessages";
 import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDocument";
 import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
-import { ProfilePage } from "./ui-modules/role-dashboard/ProfilePage";
+import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
 
 Meteor.startup(initialiseReactRoot);
 

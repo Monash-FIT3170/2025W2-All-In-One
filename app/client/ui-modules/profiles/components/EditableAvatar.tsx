@@ -5,7 +5,7 @@ import {
   selectProfileData,
   setEditing,
   updateField,
-} from "../agent-dashboard/state/profile-slice";
+} from "../state/profile-slice";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 

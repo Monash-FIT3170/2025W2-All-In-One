@@ -6,7 +6,7 @@ import {
   selectProfileData,
   setEditing,
   updateField,
-} from "./agent-dashboard/state/profile-slice";
+} from "./state/profile-slice";
 import { AgentTopNavbar } from "../navigation-bars/TopNavbar";
 import { RoleSideNavBar } from "../navigation-bars/side-nav-bars/SideNavbar";
 import {
@@ -18,7 +18,6 @@ import { Button } from "../theming-shadcn/Button";
 import { PersonalInfoCard } from "./components/PersonalInfoCard";
 import { ContactInfoCard } from "./components/ContactInfoCard";
 import { EmploymentInfoCard } from "./components/EmploymentInfoCard";
-import { CardWidget } from "./components/CardWidget";
 import { VehicleInfoCard } from "./components/VehicleInfoCard";
 
 export function ProfilePage(): React.JSX.Element {
