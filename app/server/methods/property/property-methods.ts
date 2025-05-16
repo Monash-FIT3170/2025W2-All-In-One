@@ -13,6 +13,7 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
+import { Property } from "/app/client/library-modules/domain-models/property/Property";
 
 const propertyGetMethod = {
   [MeteorMethodIdentifier.PROPERTY_GET]: async (
@@ -115,6 +116,31 @@ async function getLatestPropertyPriceDocumentForProperty(
   );
 }
 
+async function updateProperty(property: ApiProperty): Promise<void> {
+  await PropertyCollection.updateAsync(property.propertyId, {
+    $set: {
+      streetnumber: property.streetnumber,
+      streetname: property.streetname,
+      suburb: property.suburb,
+      province: property.province,
+      postcode: property.postcode,
+      description: property.description,
+      summaryDescription: property.summaryDescription,
+      bathrooms: property.bathrooms,
+      bedrooms: property.bedrooms,
+      parking: property.parking,
+      type: property.type,
+      area: property.area,
+    },
+  });
+}
+
+Meteor.methods({
+  [MeteorMethodIdentifier.PROPERTY_UPDATE]: updateProperty,
+});
+
+
 Meteor.methods({
   ...propertyGetMethod,
+  ...updateProperty,
 });

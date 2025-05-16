@@ -7,4 +7,5 @@ export enum MeteorMethodIdentifier {
   BLOB_UPLOAD_FILES = 'blobs.uploadFiles',
   PROPERTY_GET = 'properties.getOne',
   LISTING_GET_FOR_PROPERTY = 'listings.getForProperty',
+  PROPERTY_UPDATE = 'properties.update',
 }
