@@ -2,6 +2,7 @@ import { Meteor } from "meteor/meteor";
 import { check, Match } from "meteor/check";
 import { Accounts } from "meteor/accounts-base";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { UserProfileCollection } from "../../database/user/user-collections";
 
 type RegisterPayload = {
   email: string;
@@ -45,31 +46,22 @@ function validateRegisterPayload(data: RegisterPayload) {
   }
 }
 
-function buildUserProfile(data: RegisterPayload): Record<string, any> {
-  const profileData: Record<string, any> = {
-    firstName: data.firstName,
-    lastName: data.lastName,
-    role: data.accountType,
-    createdAt: new Date(),
-  };
-
-  if (data.accountType === "agent") {
-    profileData.agentCode = data.agentCode;
-  }
-
-  return profileData;
-}
-
-async function registerUser(
-  data: RegisterPayload
-): Promise<{ userId: string }> {
-  const profile = buildUserProfile(data);
-
+async function registerUser(data: RegisterPayload): Promise<{ userId: string }> {
   try {
+    // Create Meteor user for authentication purposes
     const userId = await Accounts.createUserAsync({
       email: data.email,
       password: data.password,
-      profile,
+    });
+
+    // Create UserProfile linked by userId from meteor.users()
+    UserProfileCollection.insertAsync({
+      _id: userId,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      role: data.accountType,
+      agentCode: data.accountType === "agent" ? data.agentCode : undefined,
+      createdAt: new Date(),
     });
 
     return { userId };
