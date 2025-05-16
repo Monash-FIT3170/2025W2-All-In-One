@@ -15,7 +15,6 @@ import {
 } from "../navigation-bars/side-nav-bars/side-nav-link-definitions";
 import { EditableAvatar } from "./components/EditableAvatar";
 import { Button } from "../theming-shadcn/Button";
-import { ProfileCard } from "./components/ProfileCard";
 import { PersonalInfoCard } from "./components/PersonalInfoCard";
 import { ContactInfoCard } from "./components/ContactInfoCard";
 import { EmploymentInfoCard } from "./components/EmploymentInfoCard";

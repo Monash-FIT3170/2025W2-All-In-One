@@ -52,14 +52,8 @@ function AppRoot(): React.JSX.Element {
               <Route path="/agent-calendar" element={<AgentCalendar />} />
               <Route path="/agent-messages" element={<AgentMessage />} />
               <Route path="/agent-tasks" element={<AgentTask />} />
-              <Route
-                path="/landlord-dashboard"
-                element={<LandlordDashboard />}
-              />
-              <Route
-                path="/landlord-properties"
-                element={<LandlordProperty />}
-              />
+              <Route path="/landlord-dashboard" element={<LandlordDashboard />} />
+              <Route path="/landlord-properties" element={<LandlordProperty />} />
               <Route path="/landlord-calendar" element={<LandlordCalendar />} />
               <Route path="/landlord-tasks" element={<LandlordTask />} />
               <Route path="/test" element={<PropertyListingPage />} />
@@ -69,23 +63,14 @@ function AppRoot(): React.JSX.Element {
               <Route path="/propertyform" element={<PropertyFormPage />} />
               <Route path="/login" element={<AuthTabs initialTab="login" />} />
               <Route path="/profile" element={<ProfilePage />} />
-              <Route
-                path="/signup"
-                element={<AuthTabs initialTab="signup" />}
-              />
+              <Route path="/signup" element={<AuthTabs initialTab="signup" />} />
               <Route path="/tenant-dashboard" element={<TenantDashboard />} />
               <Route path="/tenant-property" element={<TenantProperty />} />
               <Route path="/tenant-calender" element={<TenantCalender />} />
-              <Route
-                path="/tenant-maintenance"
-                element={<TenantMaintenance />}
-              />
+              <Route path="/tenant-maintenance"element={<TenantMaintenance />} />
               <Route path="/tenant-messages" element={<TenantMessages />} />
               <Route path="/tenant-documents" element={<TenantDocument />} />
-              <Route
-                path="/tenant-search-properties"
-                element={<TenantSearchProperties />}
-              />
+              <Route path="/tenant-search-properties" element={<TenantSearchProperties />} />
             </Routes>
             <BottomNavbar />
           </BrowserRouter>
