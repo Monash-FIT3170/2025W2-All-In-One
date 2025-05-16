@@ -4,6 +4,7 @@ import { FormSchemaType, formSchema } from "../../property-form-agent/components
 import { formDefaultValues, PropertyForm } from "../../property-form-agent/components/PropertyForm";
 import { ThemedButton, ThemedButtonVariant } from "../../theming/components/ThemedButton";
 import React from "react";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 interface EditDraftListingModalProps {
   toggle: () => void;
@@ -18,13 +19,32 @@ export default function EditDraftListingModal(props: EditDraftListingModalProps)
   });
 
   const handleSaveChanges = async (values: FormSchemaType) => {
-    try {
-      console.log("Saved successfully", values);
-      console.log("Closing modal")
-      props.toggle();
-    } catch (error) {
-      console.error("Failed to save:", error);
+    // Update property details
+    console.log("Updating listing details:", values);
+    const updatedProperty = {
+      propertyId: "1",
+      streetnumber: "22",
+      streetname: "Police Road",
+      suburb: "Clayton",
+      province: values.state,
+      postcode: values.postal_code,
+      pricePerMonth: values.monthly_rent,
+      propertyStatus: "1",
+      description: values.description,
+      summaryDescription: "I updated this summary description.",
+      bathrooms: values.bathroom_number,
+      bedrooms: values.bedroom_number,
+      parking: 100,
+      features: ["1", "2"],
+      type: values.property_type,
+      area: values.space,
     }
+
+    await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_UPDATE, updatedProperty);
+
+    // Close modal
+    console.log("Finished updating listing, closing modal")
+    props.toggle();
   };
 
   return (
