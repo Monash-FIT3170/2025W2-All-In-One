@@ -29,13 +29,22 @@ jobs:
         env:
           GALAXY_USERNAME: ${{ secrets.GALAXY_USERNAME }}
           GALAXY_PASSWORD: ${{ secrets.GALAXY_PASSWORD }}
+          AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
         run: |
           export PATH="/home/runner/.meteor:$PATH"
           chmod +x ./galaxy-login.sh
           ./galaxy-login.sh "$GALAXY_USERNAME" "$GALAXY_PASSWORD"
 
+      - name: Inject AZURE_CONNECTION_STRING
+        run: |
+          echo "{
+            \"private\": {
+              \"AZURE_CONNECTION_STRING\": \"${{ secrets.AZURE_CONNECTION_STRING }}\"
+              }
+            }" > settings.json 
+
       - name: Deploy
         run: |
           export PATH="/home/runner/.meteor:$PATH"
           export DEPLOY_HOSTNAME=ap-southeast-2.galaxy.meteor.com
-          meteor deploy 20251pm-allinone.au.meteorapp.com --free --mongo
+          meteor deploy 20251pm-allinone.au.meteorapp.com --settings settings.json --free --mongo
