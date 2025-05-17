@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { LoginFormUIState } from "../LoginFormUIState";
 import { RootState } from "/app/client/store";
 import { ApiUserAccount } from "../../../../../shared/api-models/user/ApiUserAccount";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { getUserAccountById } from "/app/client/library-modules/domain-models/user/repositories/user-account-repository";
 
 const initialState: LoginFormUIState = {
   email: "",
@@ -70,10 +70,7 @@ export const loginUser = createAsyncThunk<
         if (!userId) throw new Error("User ID not found after login.");
 
         // retrieve the user profile by userId
-        const user: ApiUserAccount = await Meteor.callAsync(
-          MeteorMethodIdentifier.USER_ACCOUNT_GET,
-          userId
-        );
+       const user: ApiUserAccount = await getUserAccountById(userId);
 
         if (!user?.role) {
           throw new Error("User role not found.");
