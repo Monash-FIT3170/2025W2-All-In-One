@@ -5,5 +5,6 @@ export enum MeteorMethodIdentifier {
   PROPERTY_GET = 'properties.getOne',
   LISTING_GET_FOR_PROPERTY = 'listings.getForProperty',
   USER_REGISTER = 'user.register',
-  USER_INSERT = 'users.insert'
+  USER_INSERT = 'users.insert',
+  USER_GET = 'users.getOne',
 }
