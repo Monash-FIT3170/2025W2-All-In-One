@@ -1,5 +1,4 @@
 import { Meteor } from "meteor/meteor";
-import "./methods/accounts/user.register";
 import "./methods/azure/blob-methods";
 import "./methods/example-tasks/task-methods";
 import "./methods/property/property-methods";
@@ -15,6 +14,11 @@ import {
   ListingCollection,
   ListingStatusCollection,
 } from "/app/server/database/property-listing/listing-collections";
+import "./methods/user/user.register";
+import "./methods/user/user-account-methods";
+import "./methods/user/role-methods/agent-methods";
+import "./methods/user/role-methods/tenant-methods";
+import "./methods/user/role-methods/landlord-methods";
 
 Meteor.startup(tempSeedPropertyData);
 
