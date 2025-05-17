@@ -87,7 +87,7 @@ async function tempSeedPropertyData(): Promise<void> {
     });
   }
 }
-
+// This function is used to seed the database with initial task data
 async function tempSeedTaskData(): Promise<void> {
   if ((await TaskCollection.find().countAsync()) === 0) {
     TaskCollection.insertAsync({
