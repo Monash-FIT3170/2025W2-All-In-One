@@ -10,6 +10,7 @@ import {
 } from "./state/reducers/signup-form-slice";
 import { SignupFormUIState } from "./state/SignupFormUIState";
 import { useRedirectToDashboard } from "./redirectToDashboardHook";
+import { Role } from "/app/shared/user-role-identifier";
 
 const inputClass =
   "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200 text-sm";
@@ -52,9 +53,9 @@ export const SignupForm = () => {
         >
           <Tabs.List className="grid grid-cols-3 gap-2 mt-2">
             {[
-              { type: "tenant", label: "Tenant", icon: "👤" },
-              { type: "landlord", label: "Landlord", icon: "🏢" },
-              { type: "agent", label: "Agent", icon: "💼" },
+              { type: Role.TENANT, label: "Tenant", icon: "👤" },
+              { type: Role.LANDLORD, label: "Landlord", icon: "🏢" },
+              { type: Role.AGENT, label: "Agent", icon: "💼" },
             ].map(({ type, label, icon }) => (
               <Tabs.Trigger
                 key={type}

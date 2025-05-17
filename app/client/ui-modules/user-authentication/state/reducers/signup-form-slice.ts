@@ -3,9 +3,10 @@ import { Meteor } from "meteor/meteor";
 import { SignupFormUIState } from "../SignupFormUIState";
 import { RootState } from "/app/client/store";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { Role } from "/app/shared/user-role-identifier";
 
 const initialState: SignupFormUIState = {
-  accountType: "tenant",
+  accountType: Role.TENANT,
   passwordVisible: false,
   firstName: "",
   lastName: "",
@@ -64,7 +65,7 @@ export const registerUser = createAsyncThunk<
     firstName: state.firstName,
     lastName: state.lastName,
     accountType: state.accountType,
-    agentCode: state.accountType === "agent" ? state.agentCode : undefined,
+    agentCode: state.accountType === Role.AGENT ? state.agentCode : undefined,
   };
 
   try {
