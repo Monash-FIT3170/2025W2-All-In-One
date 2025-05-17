@@ -61,7 +61,7 @@ export const SignupForm = () => {
                 key={type}
                 value={type}
                 className={`
-                  flex items-center justify-center gap-2 rounded-md border px-4 py-3 text-sm font-medium transition-all
+                  flex items-center justify-center gap-2 rounded-md px-4 py-3 text-sm font-medium transition-all
                   border border-gray-300 text-gray-700 bg-white
                   data-[state=active]:border-black data-[state=active]:shadow-sm
                 `}
