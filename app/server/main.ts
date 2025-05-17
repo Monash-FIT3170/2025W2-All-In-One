@@ -1,4 +1,6 @@
 import { Meteor } from "meteor/meteor";
+import "./methods/accounts/user.register";
+import "./methods/azure/blob-methods";
 import "./methods/example-tasks/task-methods";
 import "./methods/user/user.register";
 import "./methods/user/user-methods";
