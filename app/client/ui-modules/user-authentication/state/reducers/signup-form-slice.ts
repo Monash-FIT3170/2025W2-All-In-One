@@ -53,7 +53,7 @@ export const signupFormSlice = createSlice({
 });
 
 export const registerUser = createAsyncThunk<
-  string, // return role
+  void,
   void,
   { state: RootState; rejectValue: string }
 >("signup/registerUser", async (_, { getState, rejectWithValue }) => {
@@ -73,15 +73,8 @@ export const registerUser = createAsyncThunk<
 
     const userId = Meteor.userId();
     if (!userId) throw new Error("User not logged in after registration.");
-
-    const user: ApiUserProfile = await Meteor.callAsync(
-      MeteorMethodIdentifier.USER_GET,
-      userId
-    );
-
-    if (!user?.role) throw new Error("User role missing after registration.");
-
-    return user.role;
+    
+    return;
   } catch (err: any) {
     console.error("Signup error:", err);
     return rejectWithValue(err.reason || err.message || "Registration failed.");
