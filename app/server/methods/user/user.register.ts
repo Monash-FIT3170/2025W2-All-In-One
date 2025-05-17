@@ -53,7 +53,7 @@ async function registerUser(data: RegisterPayload): Promise<{ userId: string }> 
     });
 
     // 2. Create UserAccount record
-    await Meteor.callAsync(MeteorMethodIdentifier.USER_INSERT, {
+    await Meteor.callAsync(MeteorMethodIdentifier.USER_ACCOUNT_INSERT, {
       _id: userId,
       role: data.accountType,
     });

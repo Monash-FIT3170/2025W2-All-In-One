@@ -9,12 +9,11 @@ import { InvalidDataError } from "../../errors/InvalidDataError";
 
 // -- INSERT USER --
 const userInsertMethod = {
-  [MeteorMethodIdentifier.USER_INSERT]: async (
-    data: Omit<UserAccountDocument, "createdAt"> // only omitting created at, and id we want it to be linked to the meteor.users accounts
+  [MeteorMethodIdentifier.USER_ACCOUNT_INSERT]: async (
+    data: UserAccountDocument
   ): Promise<string> => {
     const newUserAccount: UserAccountDocument = {
       ...data,
-      createdAt: new Date(),
     };
 
     return await UserAccountCollection.insertAsync(newUserAccount);
@@ -23,7 +22,7 @@ const userInsertMethod = {
 
 // -- GET USER BY ID FUNCTION --
 const userGetMethod = {
-  [MeteorMethodIdentifier.USER_GET]: async (
+  [MeteorMethodIdentifier.USER_ACCOUNT_GET]: async (
     userId: string
   ): Promise<ApiUserAccount> => {
     const userDocument = await getUserDocumentById(userId);
@@ -51,11 +50,7 @@ async function mapUserDocumentToDTO(
 ): Promise<ApiUserAccount> {
   return {
     userId: user._id,
-    firstName: user.firstName,
-    lastName: user.lastName,
     role: user.role,
-    agentCode: user.agentCode,
-    createdAt: user.createdAt,
   };
 }
 

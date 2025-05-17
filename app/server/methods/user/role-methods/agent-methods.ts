@@ -3,6 +3,9 @@ import { Mongo } from "meteor/mongo";
 import { AgentDocument } from "/app/server/database/user/models/AgentDocument";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { AgentCollection } from "/app/server/database/user/user-collections";
+import { ApiAgent } from "/app/shared/api-models/user/ApiAgent";
+import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
+import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 
 // -- INSERT AGENT --
 const agentInsertMethod = {
@@ -18,7 +21,37 @@ const agentInsertMethod = {
   },
 }
 
+// -- GET AGENT --
+const agentGetMethod = {
+  [MeteorMethodIdentifier.AGENT_GET]: async (
+    userId: string
+  ): Promise<ApiAgent> => {
+    const agentDoc = await AgentCollection.findOneAsync({ userId });
+
+    if (!agentDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Agent with user ID ${userId} not found.`)
+      );
+    }
+
+    return mapAgentDocumentToDTO(agentDoc);
+  },
+};
+
+function mapAgentDocumentToDTO(agent: AgentDocument): ApiAgent {
+  return {
+    agentId: agent._id!,
+    userId: agent.userId,
+    firstName: agent.firstName,
+    lastName: agent.lastName,
+    email: agent.email,
+    agentCode: agent.agentCode,
+    createdAt: agent.createdAt,
+  };
+}
+
 
 Meteor.methods({
   ...agentInsertMethod,
+  ...agentGetMethod,
 });

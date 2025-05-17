@@ -71,7 +71,7 @@ export const loginUser = createAsyncThunk<
 
         // retrieve the user profile by userId
         const user: ApiUserAccount = await Meteor.callAsync(
-          MeteorMethodIdentifier.USER_GET,
+          MeteorMethodIdentifier.USER_ACCOUNT_GET,
           userId
         );
 

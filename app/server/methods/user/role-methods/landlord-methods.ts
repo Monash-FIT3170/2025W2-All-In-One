@@ -3,6 +3,9 @@ import { Mongo } from "meteor/mongo";
 import { LandlordDocument } from "/app/server/database/user/models/LandlordDocument";
 import { LandlordCollection } from "/app/server/database/user/user-collections";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
+import { InvalidDataError } from "/app/server/errors/InvalidDataError";
+import { ApiLandlord } from "/app/shared/api-models/user/ApiLandlord";
 
 // -- INSERT LANDLORD --
 const landlordInsertMethod = {
@@ -19,6 +22,34 @@ const landlordInsertMethod = {
 }
 
 
+const landlordGetMethod = {
+  [MeteorMethodIdentifier.LANDLORD_GET]: async (
+    userId: string
+  ): Promise<ApiLandlord> => {
+    const landlordDoc = await LandlordCollection.findOneAsync({ userId });
+
+    if (!landlordDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Landlord with user ID ${userId} not found.`)
+      );
+    }
+
+    return mapLandlordDocumentToDTO(landlordDoc);
+  },
+};
+
+function mapLandlordDocumentToDTO(landlord: LandlordDocument): ApiLandlord {
+  return {
+    landlordId: landlord._id!,
+    userId: landlord.userId,
+    firstName: landlord.firstName,
+    lastName: landlord.lastName,
+    email: landlord.email,
+    createdAt: landlord.createdAt,
+  };
+}
+
 Meteor.methods({
   ...landlordInsertMethod,
+  ...landlordGetMethod
 });

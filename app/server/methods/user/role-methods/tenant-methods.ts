@@ -3,6 +3,9 @@ import { Mongo } from "meteor/mongo";
 import { TenantDocument } from "/app/server/database/user/models/TenantDocument";
 import { TenantCollection } from "/app/server/database/user/user-collections";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { ApiTenant } from "/app/shared/api-models/user/ApiTenant";
+import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
+import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 
 // -- INSERT TENANT --
 const tenantInsertMethod = {
@@ -18,7 +21,34 @@ const tenantInsertMethod = {
   },
 }
 
+const tenantGetMethod = {
+  [MeteorMethodIdentifier.TENANT_GET]: async (
+    userId: string
+  ): Promise<ApiTenant> => {
+    const tenantDoc = await TenantCollection.findOneAsync({ userId });
+
+    if (!tenantDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Tenant with user ID ${userId} not found.`)
+      );
+    }
+
+    return mapTenantDocumentToDTO(tenantDoc);
+  },
+};
+
+function mapTenantDocumentToDTO(tenant: TenantDocument): ApiTenant {
+  return {
+    tenantId: tenant._id!,
+    userId: tenant.userId,
+    firstName: tenant.firstName,
+    lastName: tenant.lastName,
+    email: tenant.email,
+    createdAt: tenant.createdAt,
+  };
+}
 
 Meteor.methods({
   ...tenantInsertMethod,
+  ...tenantGetMethod
 });
