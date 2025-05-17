@@ -3,7 +3,6 @@ import { Meteor } from "meteor/meteor";
 import { SignupFormUIState } from "../SignupFormUIState";
 import { RootState } from "/app/client/store";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { ApiUserProfile } from "/app/shared/api-models/user/ApiUserProfile";
 
 const initialState: SignupFormUIState = {
   accountType: "tenant",
