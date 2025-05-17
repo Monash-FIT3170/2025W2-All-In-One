@@ -10,10 +10,9 @@ import { InvalidDataError } from "../../errors/InvalidDataError";
 // -- INSERT USER --
 const userInsertMethod = {
   [MeteorMethodIdentifier.USER_INSERT]: async (
-    // omitting id since we dont want the db to generate one but Accounts library already creates one to link to auth stuff
-    data: Omit<UserProfileDocument, "_id" | "createdAt">
+    data: Omit<UserProfileDocument, "createdAt"> // only omitting created at, and id we want it to be linked to the meteor.users accounts
   ): Promise<string> => {
-    const newUserProfile: Mongo.OptionalId<UserProfileDocument> = {
+    const newUserProfile: UserProfileDocument = {
       ...data,
       createdAt: new Date(),
     };
