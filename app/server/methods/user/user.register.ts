@@ -13,7 +13,26 @@ type RegisterPayload = {
   agentCode?: string;
 };
 
-function validateRegisterPayload(data: RegisterPayload) {
+
+export const userRegisterMethod = {
+  [MeteorMethodIdentifier.USER_REGISTER]: async (data: RegisterPayload) => {
+    validatePayload(data);
+
+    // creating meteor users based on meteor account library
+    const userId = await createAuthUser(data.email, data.password);
+    // create a user account record
+    await createUserAccount(userId, data.accountType);
+    // creating the role specifci record whether a tenant/agent/landlord account
+    await createRoleSpecificRecord(userId, data);
+
+    return { userId };
+  },
+};
+
+
+// -- Helper Methods --
+
+function validatePayload(data: RegisterPayload) {
   check(data, {
     email: String,
     password: String,
@@ -24,69 +43,26 @@ function validateRegisterPayload(data: RegisterPayload) {
   });
 
   if (data.password.length < 8) {
-    throw new Meteor.Error(
-      "weak-password",
-      "Password must be at least 8 characters long."
-    );
+    throw new Meteor.Error("weak-password", "Password must be at least 8 characters long.");
   }
 
   if (data.accountType === Role.AGENT) {
     if (!data.agentCode?.trim()) {
       throw new Meteor.Error("missing-code", "Agent verification code is required.");
     }
-    //TODO: ADD CORRECT AGENT CODE VERIFICATION FOR FUTURE!!
     if (data.agentCode !== "AGENT123") {
-      throw new Meteor.Error(
-        "invalid-code",
-        "Invalid agent verification code."
-      );
+      throw new Meteor.Error("invalid-code", "Invalid agent verification code.");
     }
   }
 }
 
-async function registerUser(data: RegisterPayload): Promise<{ userId: string }> {
+async function createAuthUser(email: string, password: string): Promise<string> {
   try {
-    // 1. Create Meteor user (auth)
-    const userId = await Accounts.createUserAsync({
-      email: data.email,
-      password: data.password,
-    });
-
-    // 2. Create UserAccount record
-    await Meteor.callAsync(MeteorMethodIdentifier.USER_ACCOUNT_INSERT, {
-      _id: userId,
-      role: data.accountType,
-    });
-
-    // 3. Create role-specific record
-    const common = {
-      userId,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      createdAt: new Date(),
-    };
-
-    switch (data.accountType) {
-      case Role.AGENT:
-        await Meteor.callAsync(MeteorMethodIdentifier.AGENT_INSERT, {
-          ...common,
-          agentCode: data.agentCode || "",
-        });
-        break;
-      case Role.TENANT:
-        await Meteor.callAsync(MeteorMethodIdentifier.TENANT_INSERT, common);
-        break;
-      case Role.LANDLORD:
-        await Meteor.callAsync(MeteorMethodIdentifier.LANDLORD_INSERT, common);
-        break;
-    }
-
-    return { userId };
+    return await Accounts.createUserAsync({ email, password });
   } catch (e: any) {
     if (
       e instanceof Meteor.Error &&
-      e.message?.includes("Something went wrong. Please check your credentials.")
+      e.message?.includes("check your credentials")
     ) {
       throw new Meteor.Error(403, "An account with this email already exists.");
     }
@@ -95,12 +71,37 @@ async function registerUser(data: RegisterPayload): Promise<{ userId: string }> 
   }
 }
 
-export const userRegisterMethod = {
-  [MeteorMethodIdentifier.USER_REGISTER]: async (data: RegisterPayload) => {
-    validateRegisterPayload(data);
-    return await registerUser(data);
-  },
-};
+async function createUserAccount(userId: string, role: Role): Promise<void> {
+  await Meteor.callAsync(MeteorMethodIdentifier.USER_ACCOUNT_INSERT, {
+    _id: userId,
+    role,
+  });
+}
+
+async function createRoleSpecificRecord(userId: string, data: RegisterPayload): Promise<void> {
+  const common = {
+    userId,
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    createdAt: new Date(),
+  };
+
+  switch (data.accountType) {
+    case Role.AGENT:
+      await Meteor.callAsync(MeteorMethodIdentifier.AGENT_INSERT, {
+        ...common,
+        agentCode: data.agentCode || "",
+      });
+      break;
+    case Role.TENANT:
+      await Meteor.callAsync(MeteorMethodIdentifier.TENANT_INSERT, common);
+      break;
+    case Role.LANDLORD:
+      await Meteor.callAsync(MeteorMethodIdentifier.LANDLORD_INSERT, common);
+      break;
+  }
+}
 
 Meteor.methods({
   ...userRegisterMethod,
