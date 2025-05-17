@@ -24,7 +24,6 @@ export const LoginForm = () => {
     if (loginUser.fulfilled.match(result)) {
       redirectToDashboard(result.payload);
     }
-    
   };
 
   return (
