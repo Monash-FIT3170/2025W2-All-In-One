@@ -1,9 +1,10 @@
 import { Meteor } from "meteor/meteor";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { LoginFormUIState } from "../LoginFormUIState";
-import { RootState } from "/app/client/store";
-import { ApiUserAccount } from "../../../../../shared/api-models/user/ApiUserAccount";
+import { AppDispatch, RootState } from "/app/client/store";
+import { UserAccount } from "/app/client/library-modules/domain-models/user/UserAccount";
 import { getUserAccountById } from "/app/client/library-modules/domain-models/user/repositories/user-account-repository";
+import { loadCurrentUser } from "./current-user-slice";
 
 const initialState: LoginFormUIState = {
   email: "",
@@ -54,40 +55,45 @@ export const loginFormSlice = createSlice({
 });
 
 export const loginUser = createAsyncThunk<
-  string, // return user role for the componenet to do the navigation
+  string, // Return role for redirect
   void,
-  { state: RootState; rejectValue: string }>
-  ("login/loginUser", async (_, { getState, rejectWithValue }) => {
-  const { email, password } = getState().loginFormSlice;
+  { state: RootState; dispatch: AppDispatch; rejectValue: string }
+>("login/loginUser", async (_, { getState, rejectWithValue, dispatch }) => {
+  const { email, password } = getState().loginForm;
 
-  return await new Promise<string>((resolve, reject) => {
-    Meteor.loginWithPassword(email, password, async (error) => {
-      if (error) {
-        return reject(rejectWithValue("Login failed."));
-      }
-      try {
-        const userId = Meteor.userId();
-        if (!userId) throw new Error("User ID not found after login.");
-
-        // retrieve the user profile by userId
-       const user: ApiUserAccount = await getUserAccountById(userId);
-
-        if (!user?.role) {
-          throw new Error("User role not found.");
+  try {
+    // Wrap Meteor login in a Promise to await
+    await new Promise<void>((resolve, reject) => {
+      Meteor.loginWithPassword(email, password, (error) => {
+        if (error) {
+          return reject(
+            new Error("Login failed. Please check your credentials.")
+          );
         }
-
-        resolve(user.role); // Return role for redirect
-      } catch (err: any) {
-        reject(rejectWithValue(err.message || "Failed to fetch user profile."));
-      }
+        resolve();
+      });
     });
-  });
+
+    const userId = Meteor.userId();
+    if (!userId) throw new Error("User ID not found after login.");
+
+    // Load user account and role-specific profile into Redux
+    await dispatch(loadCurrentUser(userId));
+
+    // Retrieve account to return the role for redirect
+    const user: UserAccount = await getUserAccountById(userId);
+    if (!user?.role) throw new Error("User role not found.");
+    
+    return user.role;
+  } catch (err: any) {
+    console.error("Login error:", err);
+    return rejectWithValue(err.message || "Unexpected login error.");
+  }
 });
 
 export const { setEmail, setPassword, setMessage, setLoading, clearForm } =
   loginFormSlice.actions;
 
-export const selectLoginFormUIState = (state: RootState) =>
-  state.loginFormSlice;
+export const selectLoginFormUIState = (state: RootState) => state.loginForm;
 
 export default loginFormSlice.reducer;

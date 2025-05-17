@@ -9,7 +9,7 @@ import {
   selectSignupFormUIState,
 } from "./state/reducers/signup-form-slice";
 import { SignupFormUIState } from "./state/SignupFormUIState";
-import { useRedirectToDashboard } from "./redirectToDashboardHook";
+import { useRedirectToDashboard } from "./utils/redirectToDashboardHook";
 import { Role } from "/app/shared/user-role-identifier";
 
 const inputClass =

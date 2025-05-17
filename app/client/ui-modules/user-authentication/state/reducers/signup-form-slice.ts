@@ -57,7 +57,7 @@ export const registerUser = createAsyncThunk<
   void,
   { state: RootState; rejectValue: string }
 >("signup/registerUser", async (_, { getState, rejectWithValue }) => {
-  const state = (getState() as RootState).signupFormSlice;
+  const state = (getState() as RootState).signupForm;
 
   const payload = {
     email: state.email,
@@ -83,5 +83,5 @@ export const registerUser = createAsyncThunk<
 
 export const { updateField, clearForm } = signupFormSlice.actions;
 export const selectSignupFormUIState = (state: RootState) =>
-  state.signupFormSlice;
+  state.signupForm;
 export default signupFormSlice.reducer;

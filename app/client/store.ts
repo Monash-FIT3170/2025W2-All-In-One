@@ -10,6 +10,7 @@ import { signupFormSlice } from "./ui-modules/user-authentication/state/reducers
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { propertyListingSlice } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
+import { currentUserSlice } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
 
 export const store = configureStore({
   reducer: {
@@ -20,9 +21,10 @@ export const store = configureStore({
     settingsPage: settingsPageSlice.reducer,
     landlordDashboard: landlordDashboardSlice.reducer,
     profile: profileSlice.reducer,
-    loginFormSlice: loginFormSlice.reducer,
+    loginForm: loginFormSlice.reducer,
     propertyListing: propertyListingSlice.reducer,
-    signupFormSlice: signupFormSlice.reducer,
+    signupForm: signupFormSlice.reducer,
+    currentUser: currentUserSlice.reducer
   },
 });
 
