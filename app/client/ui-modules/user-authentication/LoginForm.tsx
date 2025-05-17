@@ -6,6 +6,7 @@ import {
   setPassword,
   loginUser,
 } from "./state/reducers/login-form-slice";
+import { useNavigate } from "react-router";
 
 const inputClass =
   "w-full px-4 py-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-200 text-sm";
@@ -14,10 +15,18 @@ const labelClass = "block mb-1 text-sm font-medium text-gray-700";
 export const LoginForm = () => {
   const dispatch = useAppDispatch();
   const loginState = useAppSelector(selectLoginFormUIState);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(loginUser());
+    const result = await dispatch(loginUser());
+
+    if (loginUser.fulfilled.match(result)) {
+      const role = result.payload;
+      if (role === "tenant") navigate("/tenant-dashboard");
+      else if (role === "landlord") navigate("/landlord-dashboard");
+      else if (role === "agent") navigate("/agent-dashboard");
+    }
   };
 
   return (

@@ -2,6 +2,8 @@ import { Meteor } from "meteor/meteor";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { LoginFormUIState } from "../LoginFormUIState";
 import { RootState } from "/app/client/store";
+import { ApiUserProfile } from "/app/shared/api-models/user/ApiUserProfile";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 const initialState: LoginFormUIState = {
   email: "",
@@ -51,25 +53,39 @@ export const loginFormSlice = createSlice({
   },
 });
 
-export const loginUser = createAsyncThunk(
-  "login/loginUser",
-  async (_, { getState, rejectWithValue }) => {
-    const { email, password } = (getState() as RootState).loginFormSlice;
+export const loginUser = createAsyncThunk<
+  string, // return user role for the componenet to do the navigation
+  void,
+  { state: RootState; rejectValue: string }>
+  ("login/loginUser", async (_, { getState, rejectWithValue }) => {
+  const { email, password } = getState().loginFormSlice;
 
-    return await new Promise<void>((resolve, reject) => {
-      Meteor.loginWithPassword(email, password, (error) => {
-        if (error instanceof Meteor.Error) {
-          return reject(rejectWithValue(`Login failed: ${error.reason}`));
-        } else if (error) {
-          return reject(rejectWithValue("An unknown error occurred."));
-        } else {
-          return resolve();
+  return await new Promise<string>((resolve, reject) => {
+    Meteor.loginWithPassword(email, password, async (error) => {
+      if (error) {
+        return reject(rejectWithValue("Login failed."));
+      }
+      try {
+        const userId = Meteor.userId();
+        if (!userId) throw new Error("User ID not found after login.");
+
+        // retrieve the user profile by userId
+        const user: ApiUserProfile = await Meteor.callAsync(
+          MeteorMethodIdentifier.USER_GET,
+          userId
+        );
+
+        if (!user?.role) {
+          throw new Error("User role not found.");
         }
-      });
-    });
-  }
-);
 
+        resolve(user.role); // Return role for redirect
+      } catch (err: any) {
+        reject(rejectWithValue(err.message || "Failed to fetch user profile."));
+      }
+    });
+  });
+});
 
 export const { setEmail, setPassword, setMessage, setLoading, clearForm } =
   loginFormSlice.actions;
