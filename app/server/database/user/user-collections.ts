@@ -1,5 +1,5 @@
 import { Mongo } from "meteor/mongo";
-import { UserProfileDocument } from "./models/UserProfileDocument";
+import { UserAccountDocument } from "./models/UserAccountDocument";
 
-export const UserProfileCollection: Mongo.Collection<UserProfileDocument> =
-  new Mongo.Collection("user_profiles");
+export const UserAccountCollection: Mongo.Collection<UserAccountDocument> =
+  new Mongo.Collection("user_accounts");

@@ -53,7 +53,7 @@ async function registerUser(data: RegisterPayload): Promise<{ userId: string }> 
       password: data.password,
     });
 
-    // Create UserProfile linked by userId from meteor.users()
+    // Create UseAccount linked by userId from meteor.users()
     await Meteor.callAsync(MeteorMethodIdentifier.USER_INSERT, {
       _id: userId, // passing the primary key to avoid db from generating it.
       firstName: data.firstName,

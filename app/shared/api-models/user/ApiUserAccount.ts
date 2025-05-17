@@ -1,5 +1,5 @@
-export type UserProfileDocument = {
-  _id: string;
+export type ApiUserAccount = {
+  userId: string;
   firstName: string;
   lastName: string;
   role: "agent" | "tenant" | "landlord";

@@ -71,7 +71,7 @@ export const registerUser = createAsyncThunk<
     await Meteor.callAsync(MeteorMethodIdentifier.USER_REGISTER, payload);
 
     const userId = Meteor.userId();
-    if (!userId) throw new Error("User not logged in after registration.");
+    if (!userId) throw new Error("Registration successful! Please log in.");
     
     return;
   } catch (err: any) {

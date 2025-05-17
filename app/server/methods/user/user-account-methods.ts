@@ -1,23 +1,23 @@
 import { Meteor } from "meteor/meteor";
 import { Mongo } from "meteor/mongo";
-import { UserProfileCollection } from "../../database/user/user-collections";
+import { UserAccountCollection } from "../../database/user/user-collections";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { UserProfileDocument } from "../../database/user/models/UserProfileDocument";
-import { ApiUserProfile } from "/app/shared/api-models/user/ApiUserProfile";
+import { UserAccountDocument } from "../../database/user/models/UserAccountDocument";
+import { ApiUserAccount } from "../../../shared/api-models/user/ApiUserAccount";
 import { meteorWrappedInvalidDataError } from "../../utils/error-utils";
 import { InvalidDataError } from "../../errors/InvalidDataError";
 
 // -- INSERT USER --
 const userInsertMethod = {
   [MeteorMethodIdentifier.USER_INSERT]: async (
-    data: Omit<UserProfileDocument, "createdAt"> // only omitting created at, and id we want it to be linked to the meteor.users accounts
+    data: Omit<UserAccountDocument, "createdAt"> // only omitting created at, and id we want it to be linked to the meteor.users accounts
   ): Promise<string> => {
-    const newUserProfile: UserProfileDocument = {
+    const newUserAccount: UserAccountDocument = {
       ...data,
       createdAt: new Date(),
     };
 
-    return await UserProfileCollection.insertAsync(newUserProfile);
+    return await UserAccountCollection.insertAsync(newUserAccount);
   },
 };
 
@@ -25,7 +25,7 @@ const userInsertMethod = {
 const userGetMethod = {
   [MeteorMethodIdentifier.USER_GET]: async (
     userId: string
-  ): Promise<ApiUserProfile> => {
+  ): Promise<ApiUserAccount> => {
     const userDocument = await getUserDocumentById(userId);
 
     if (!userDocument) {
@@ -47,8 +47,8 @@ const userGetMethod = {
 
 // -- MAPPING FUNCTION --
 async function mapUserDocumentToDTO(
-  user: UserProfileDocument
-): Promise<ApiUserProfile> {
+  user: UserAccountDocument
+): Promise<ApiUserAccount> {
   return {
     userId: user._id,
     firstName: user.firstName,
@@ -62,8 +62,8 @@ async function mapUserDocumentToDTO(
 // -- DATA ACCESS FUNCTION --
 async function getUserDocumentById(
   id: string
-): Promise<UserProfileDocument | undefined> {
-  return await UserProfileCollection.findOneAsync({ _id: id });
+): Promise<UserAccountDocument | undefined> {
+  return await UserAccountCollection.findOneAsync({ _id: id });
 }
 
 Meteor.methods({
