@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { use, useEffect } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { EyeIcon } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
@@ -9,6 +9,7 @@ import {
   selectSignupFormUIState,
 } from "./state/reducers/signup-form-slice";
 import { SignupFormUIState } from "./state/SignupFormUIState";
+import { useRedirectToDashboard } from "./redirectToDashboardHook";
 
 const inputClass =
   "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200 text-sm";
@@ -17,14 +18,19 @@ const labelClass = "block mb-1 text-sm font-medium text-gray-700";
 export const SignupForm = () => {
   const dispatch = useAppDispatch();
   const formState = useAppSelector(selectSignupFormUIState);
+  const redirectToDashboard = useRedirectToDashboard();
 
   useEffect(() => {
     dispatch(clearForm());
   }, [dispatch]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(registerUser());
+    const result = await dispatch(registerUser());
+
+    if (registerUser.fulfilled.match(result)) {
+      redirectToDashboard(formState.accountType);
+    }
   };
 
   const handleChange =

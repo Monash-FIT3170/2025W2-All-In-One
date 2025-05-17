@@ -3,6 +3,7 @@ import { Meteor } from "meteor/meteor";
 import { SignupFormUIState } from "../SignupFormUIState";
 import { RootState } from "/app/client/store";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { ApiUserProfile } from "/app/shared/api-models/user/ApiUserProfile";
 
 const initialState: SignupFormUIState = {
   accountType: "tenant",
@@ -51,37 +52,41 @@ export const signupFormSlice = createSlice({
   },
 });
 
-export const registerUser = createAsyncThunk(
-  "signup/registerUser",
-  async (_, { getState, rejectWithValue }) => {
-    const state = (getState() as RootState).signupFormSlice;
+export const registerUser = createAsyncThunk<
+  string, // return role
+  void,
+  { state: RootState; rejectValue: string }
+>("signup/registerUser", async (_, { getState, rejectWithValue }) => {
+  const state = (getState() as RootState).signupFormSlice;
 
-    const payload = {
-      email: state.email,
-      password: state.password,
-      firstName: state.firstName,
-      lastName: state.lastName,
-      accountType: state.accountType,
-      agentCode: state.accountType === "agent" ? state.agentCode : undefined,
-    };
+  const payload = {
+    email: state.email,
+    password: state.password,
+    firstName: state.firstName,
+    lastName: state.lastName,
+    accountType: state.accountType,
+    agentCode: state.accountType === "agent" ? state.agentCode : undefined,
+  };
 
-    return new Promise<void>((resolve, reject) => {
-      Meteor.call(
-        MeteorMethodIdentifier.USER_REGISTER,
-        payload,
-        (err: { reason: string } | undefined) => {
-          if (err) {
-            return reject(
-              rejectWithValue(err.reason || "Registration failed.")
-            );
-          }
-          return resolve();
-          // TODO: FIX TO DIRECT TO THE CORRECT PAGE
-        }
-      );
-    });
+  try {
+    await Meteor.callAsync(MeteorMethodIdentifier.USER_REGISTER, payload);
+
+    const userId = Meteor.userId();
+    if (!userId) throw new Error("User not logged in after registration.");
+
+    const user: ApiUserProfile = await Meteor.callAsync(
+      MeteorMethodIdentifier.USER_GET,
+      userId
+    );
+
+    if (!user?.role) throw new Error("User role missing after registration.");
+
+    return user.role;
+  } catch (err: any) {
+    console.error("Signup error:", err);
+    return rejectWithValue(err.reason || err.message || "Registration failed.");
   }
-);
+});
 
 export const { updateField, clearForm } = signupFormSlice.actions;
 export const selectSignupFormUIState = (state: RootState) =>
