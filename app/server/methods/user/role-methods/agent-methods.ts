@@ -1,9 +1,9 @@
 import { Meteor } from "meteor/meteor";
 import { Mongo } from "meteor/mongo";
-import { AgentDocument } from "/app/server/database/user/models/AgentDocument";
+import { AgentDocument } from "../../../database/user/models/role-models/AgentDocument";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { AgentCollection } from "/app/server/database/user/user-collections";
-import { ApiAgent } from "/app/shared/api-models/user/ApiAgent";
+import { ApiAgent } from "../../../../shared/api-models/user/api-roles/ApiAgent";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 

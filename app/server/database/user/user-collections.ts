@@ -1,8 +1,8 @@
 import { Mongo } from "meteor/mongo";
 import { UserAccountDocument } from "./models/UserAccountDocument";
-import { AgentDocument } from "./models/AgentDocument";
-import { TenantDocument } from "./models/TenantDocument";
-import { LandlordDocument } from "./models/LandlordDocument";
+import { AgentDocument } from "./models/role-models/AgentDocument";
+import { TenantDocument } from "./models/role-models/TenantDocument";
+import { LandlordDocument } from "./models/role-models/LandlordDocument";
 
 export const UserAccountCollection: Mongo.Collection<UserAccountDocument> =
   new Mongo.Collection("user_accounts");

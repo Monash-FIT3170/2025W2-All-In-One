@@ -1,9 +1,9 @@
 import { Meteor } from "meteor/meteor";
 import { Mongo } from "meteor/mongo";
-import { TenantDocument } from "/app/server/database/user/models/TenantDocument";
+import { TenantDocument } from "../../../database/user/models/role-models/TenantDocument";
 import { TenantCollection } from "/app/server/database/user/user-collections";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { ApiTenant } from "/app/shared/api-models/user/ApiTenant";
+import { ApiTenant } from "../../../../shared/api-models/user/api-roles/ApiTenant";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 

@@ -1,11 +1,11 @@
 import { Meteor } from "meteor/meteor";
 import { Mongo } from "meteor/mongo";
-import { LandlordDocument } from "/app/server/database/user/models/LandlordDocument";
+import { LandlordDocument } from "../../../database/user/models/role-models/LandlordDocument";
 import { LandlordCollection } from "/app/server/database/user/user-collections";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
-import { ApiLandlord } from "/app/shared/api-models/user/ApiLandlord";
+import { ApiLandlord } from "../../../../shared/api-models/user/api-roles/ApiLandlord";
 
 // -- INSERT LANDLORD --
 const landlordInsertMethod = {
