@@ -1,7 +1,5 @@
 import { get } from "react-hook-form";
 import { TaskDocument } from "../../database/task/models/TaskDocument";
-import { TaskStatusDocument } from "../../database/task/models/TaskStatusDocument";
-import { TaskStatusCollection } from "../../database/task/task-collections";
 import { TaskCollection } from "../../database/task/task-collections";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiTask } from "/app/shared/api-models/task/ApiTask";
@@ -14,9 +12,7 @@ import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 // If there is an error while mapping the task document to DTO, it throws an InvalidDataError
 // The method is wrapped in a Meteor method so it can be called from the client
 const taskGetMethod = {
-  [MeteorMethodIdentifier.TASK_GET]: async (
-    id: string
-  ): Promise<ApiTask> => {
+  [MeteorMethodIdentifier.TASK_GET]: async (id: string): Promise<ApiTask> => {
     const taskDocument = await getTaskDocumentById(id);
 
     if (!taskDocument) {
@@ -25,11 +21,11 @@ const taskGetMethod = {
       );
     }
 
-    const taskDTO = await mapTaskDocumentTotaskDTO(
-      taskDocument
-    ).catch((error) => {
-      throw meteorWrappedInvalidDataError(error);
-    });
+    const taskDTO = await mapTaskDocumentTotaskDTO(taskDocument).catch(
+      (error) => {
+        throw meteorWrappedInvalidDataError(error);
+      }
+    );
 
     return taskDTO;
   },
@@ -42,26 +38,15 @@ const taskGetMethod = {
 // It takes a TaskDocument as input and returns a promise that resolves to an Apitask object
 // It fetches the task status, latest task price, and task features documents
 
-async function mapTaskDocumentTotaskDTO(
-  task: TaskDocument
-): Promise<ApiTask> {
-  const taskStatusDocument = await getTaskStatusDocumentById(
-    task.task_status_id
-  );
-  if (!taskStatusDocument) {
-    throw new InvalidDataError(
-      `task status for Task id ${task._id} not found.`
-    );
-  }
-  
+async function mapTaskDocumentTotaskDTO(task: TaskDocument): Promise<ApiTask> {
   return {
     taskId: task._id,
     name: task.name,
-    status: taskStatusDocument.name,
+    status: task.taskStatus,
     createdDate: task.createdDate,
     dueDate: task.dueDate,
     description: task.description,
-    priority: task.priority
+    priority: task.priority,
   };
 }
 
@@ -69,12 +54,6 @@ async function getTaskDocumentById(
   id: string
 ): Promise<TaskDocument | undefined> {
   return await TaskCollection.findOneAsync(id);
-}
-
-async function getTaskStatusDocumentById(
-  id: string
-): Promise<TaskStatusDocument | undefined> {
-  return await TaskStatusCollection.findOneAsync(id);
 }
 
 Meteor.methods({

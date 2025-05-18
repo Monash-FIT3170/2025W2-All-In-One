@@ -8,7 +8,7 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiLandlord } from "../../../../shared/api-models/user/api-roles/ApiLandlord";
 import { TaskDocument } from "/app/server/database/task/models/TaskDocument";
 import { TaskCollection } from "/app/server/database/task/task-collections";
-  
+
 // -- INSERT LANDLORD --
 const landlordInsertMethod = {
   [MeteorMethodIdentifier.LANDLORD_INSERT]: async (
@@ -21,7 +21,7 @@ const landlordInsertMethod = {
 
     return await LandlordCollection.insertAsync(newLandlord);
   },
-}
+};
 
 //GET LANDLORD
 // This method is used to get a landlord by its userId
@@ -42,22 +42,18 @@ const landlordGetMethod = {
   },
 };
 
-async function mapLandlordDocumentToDTO(landlord: LandlordDocument): Promise<ApiLandlord> {
-  const taskDocuments =
-  await getTaskDocumentsMatchingIds(landlord.task_ids);
+async function mapLandlordDocumentToDTO(
+  landlord: LandlordDocument
+): Promise<ApiLandlord> {
+  const taskIds = landlord.task_ids ?? [];
 
-  if (
-    taskDocuments.length !== landlord.task_ids.length
-  ) {
-    throw new InvalidDataError(
-      `Missing task documents for Agent id ${landlord._id}.`
-    );
-  }
+  const taskDocuments =
+    taskIds.length > 0 ? await getTaskDocumentsMatchingIds(taskIds) : [];
 
   return {
     landlordId: landlord._id!,
     userAccountId: landlord.userId,
-    tasks: taskDocuments.map((doc) => doc.name),
+    tasks: taskDocuments.map((doc) => doc.name), // will be empty if no tasks
     firstName: landlord.firstName,
     lastName: landlord.lastName,
     email: landlord.email,
@@ -75,5 +71,5 @@ async function getTaskDocumentsMatchingIds(
 
 Meteor.methods({
   ...landlordInsertMethod,
-  ...landlordGetMethod
+  ...landlordGetMethod,
 });

@@ -21,7 +21,7 @@ const tenantInsertMethod = {
 
     return await TenantCollection.insertAsync(newTenant);
   },
-}
+};
 
 const tenantGetMethod = {
   [MeteorMethodIdentifier.TENANT_GET]: async (
@@ -39,18 +39,13 @@ const tenantGetMethod = {
   },
 };
 
-async function mapTenantDocumentToDTO(tenant: TenantDocument): Promise<ApiTenant> {
+async function mapTenantDocumentToDTO(
+  tenant: TenantDocument
+): Promise<ApiTenant> {
+  const taskIds = tenant.task_ids ?? [];
 
-    const taskDocuments =
-    await getTaskDocumentsMatchingIds(tenant.task_ids);
-  
-    if (
-      taskDocuments.length !== tenant.task_ids.length
-    ) {
-      throw new InvalidDataError(
-        `Missing task documents for Tenant id ${tenant._id}.`
-      );
-    }
+  const taskDocuments =
+    taskIds.length > 0 ? await getTaskDocumentsMatchingIds(taskIds) : [];
 
   return {
     tenantId: tenant._id!,
@@ -73,5 +68,5 @@ async function getTaskDocumentsMatchingIds(
 
 Meteor.methods({
   ...tenantInsertMethod,
-  ...tenantGetMethod
+  ...tenantGetMethod,
 });

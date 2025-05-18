@@ -1,6 +1,6 @@
 import { Meteor } from "meteor/meteor";
 import "./methods/azure/blob-methods";
-import "./methods/tasks/task-methods";
+import "./methods/task/task-methods";
 import "./methods/property/property-methods";
 import "./methods/property-listing/listing-methods";
 import {
@@ -36,9 +36,9 @@ Meteor.startup(tempSeedPropertyData);
 Meteor.startup(tempSeedTaskData);
 Meteor.startup(tempSeedUserAndRoleData);
 
-
 // This function is used to seed the database with initial property data
 async function tempSeedPropertyData(): Promise<void> {
+  console.log("Seeding property data...");
   if ((await PropertyCollection.find().countAsync()) === 0) {
     PropertyStatusCollection.insertAsync({
       _id: "1",

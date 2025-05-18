@@ -66,30 +66,28 @@ async function mapPropertyDocumentToPropertyDTO(
   const propertyFeaturesDocuments =
     await getPropertyFeatureDocumentsMatchingIds(property.property_feature_ids);
 
-  const AgentDocument = await getAgentDocumentById(property.agent_id);
-  const LandlordDocument = await getLandlordDocumentById(
-    property.landlord_id
-  );
-  const TenantDocument = property.tenant_id
-  ? await getTenantDocumentById(property.tenant_id)
-  : null; // Handle missing tenant_id gracefully
+  const AgentDocument = property.agent_id
+    ? await getAgentDocumentById(property.agent_id)
+    : null; // Handle missing agent_id gracefully
 
-  if (!AgentDocument) {
-    throw new InvalidDataError(
-      `Agent for Property id ${property._id} not found.`
-    );
-  }
-  if (!LandlordDocument) {
-    throw new InvalidDataError(
-      `Landlord for Property id ${property._id} not found.`
-    );
-  }
+  const LandlordDocument = property.landlord_id
+    ? await getLandlordDocumentById(property.landlord_id)
+    : null; // Handle missing landlord_id gracefully
+
+  const TenantDocument = property.tenant_id
+    ? await getTenantDocumentById(property.tenant_id)
+    : null; // Handle missing tenant_id gracefully
+
+    if (!AgentDocument) {
+      console.warn(`Agent for Property id ${property._id} not found.`);
+    }
+    if (!LandlordDocument) {
+      console.warn(`Landlord for Property id ${property._id} not found.`);
+    }
 
   //Check if I need this, as I we don't necessarily need a tenant for a property
   if (!TenantDocument) {
-    throw new InvalidDataError(
-      `Tenant for Property id ${property._id} not found.`
-    );
+    console.warn(`Tenant for Property id ${property._id} not found.`);
   }
 
   if (!propertyStatusDocument) {
@@ -127,9 +125,9 @@ async function mapPropertyDocumentToPropertyDTO(
     features: propertyFeaturesDocuments.map((doc) => doc.name),
     type: property.type,
     area: property.area,
-    agentId: AgentDocument._id,
-    landlordId: LandlordDocument._id,
-    tenantId: TenantDocument._id
+    agentId: AgentDocument ? AgentDocument._id : '', // Always string
+    landlordId: LandlordDocument ? LandlordDocument._id : '', // Always string
+    tenantId: TenantDocument ? TenantDocument._id : '', // Always string
   };
 }
 

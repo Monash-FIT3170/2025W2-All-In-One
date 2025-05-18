@@ -23,7 +23,7 @@ const agentInsertMethod = {
 
     return await AgentCollection.insertAsync(newAgent);
   },
-}
+};
 
 // -- GET AGENT --
 const agentGetMethod = {
@@ -37,26 +37,19 @@ const agentGetMethod = {
         new InvalidDataError(`Agent with user ID ${userId} not found.`)
       );
     }
-    const agentDTO = await mapAgentDocumentToDTO(
-      agentDoc
-    ).catch((error) => {
+    const agentDTO = await mapAgentDocumentToDTO(agentDoc).catch((error) => {
       throw meteorWrappedInvalidDataError(error);
     });
     return agentDTO;
   },
 };
 
-async function mapAgentDocumentToDTO(agent: AgentDocument): Promise<ApiAgent> {  
-  const taskDocuments =
-  await getTaskDocumentsMatchingIds(agent.task_ids);
+async function mapAgentDocumentToDTO(agent: AgentDocument): Promise<ApiAgent> {
+  const taskIds = agent.task_ids ?? [];
 
-  if (
-    taskDocuments.length !== agent.task_ids.length
-  ) {
-    throw new InvalidDataError(
-      `Missing task documents for Agent id ${agent._id}.`
-    );
-  }
+  const taskDocuments =
+    taskIds.length > 0 ? await getTaskDocumentsMatchingIds(taskIds) : [];
+
   return {
     agentId: agent._id!,
     userAccountId: agent.userId,
