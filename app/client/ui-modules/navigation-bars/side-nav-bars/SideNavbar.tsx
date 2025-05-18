@@ -11,6 +11,7 @@ import { NavLinkItem } from "./components/NavBarLink";
 import { NavBarLinks } from "./components/NavBarLink";
 import { NavGroup } from "./components/NavGroup";
 import { ProfileFooter } from "./components/ProfileFooter";
+import { useAppSelector } from "/app/client/store";
 
 interface SideNavBarProps {
   isOpen: boolean;
@@ -75,6 +76,9 @@ export function RoleSideNavBar({
   dashboardLinks = [],
   settingsLinks = []
 }: RoleSideNavBarProps) {
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const name = currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : "Unknown User";
+  const initials = currentUser ? `${currentUser.firstName?.charAt(0) ?? ''}${currentUser.lastName?.charAt(0) ?? ''}` : "?";
   return (
     <>
       <SidebarContainer isOpen={isOpen}>
@@ -93,7 +97,7 @@ export function RoleSideNavBar({
         />
         <SidebarFooter>
           <ProfileFooter
-            name="Bob Builder"
+            name= {name}
             title="Agent"
           />
         </SidebarFooter>
