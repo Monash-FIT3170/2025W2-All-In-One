@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocation, useNavigate } from "react-router";
 import { PropertyFeatures } from "./components/PropertyFeatures";
 import { ListingPropertyDetails } from "./components/ListingPropertyDetails";
 import {
@@ -25,81 +26,105 @@ import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
 import { ReviewTenantButton } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantButton";
 
+// Define interface for property data (matching what PropertyListingPage sends)
+interface PropertyData {
+  streetNumber: string;
+  street: string;
+  suburb: string;
+  province: string;
+  postcode: string;
+  summaryDescription: string;
+  propertyStatusText: string;
+  propertyStatusPillVariant: PropertyStatusPillVariant;
+  propertyDescription: string;
+  propertyFeatures: string[];
+  propertyType: string;
+  propertyLandArea: string;
+  propertyBathrooms: string;
+  propertyParkingSpaces: string;
+  propertyBedrooms: string;
+  propertyPrice: string;
+  inspectionBookingUiStateList: InspectionBookingListUiState[];
+  listingImageUrls: string[];
+}
+
 // TODO: The state here is temporary. During server data integration, this should be moved to a redux slice.
 export function PropertyListedPage({
   className = "",
 }: {
   className?: string;
 }): React.JSX.Element {
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const toggleModal = () => setIsModalOpen(!isModalOpen);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Extract property data from navigation state
+  const propertyData: PropertyData | null = location.state?.propertyData || null;
+
+  // If no property data, show error state and redirect
+  if (!propertyData) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">
+            No Property Data Found
+          </h1>
+          <p className="text-gray-600 mb-6">
+            This page requires property data from the draft submission process.
+          </p>
+          <button
+            onClick={() => navigate('/property-listing')}
+            className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          >
+            Go to Property Listing
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
-    <ListingPageContent
-      streetNumber="86"
-      street="Fury Lane"
-      suburb="Toorak"
-      province="VIC"
-      postcode="3166"
-      summaryDescription="The house of your dreams, yadda yadda yes this house is very lorem ipsum."
-      propertyStatusText="Vacant"
-      propertyStatusPillVariant={PropertyStatusPillVariant.VACANT}
-      propertyDescription="Modern apartment with spacious living areas and a beautiful garden. Recently renovated with new
-        appliances and fixtures throughout. The property features an open-plan kitchen and dining area that flows
-        onto a private balcony with city views. The master bedroom includes an ensuite bathroom and built-in
-        wardrobes, while the second bedroom is generously sized and located near the main bathroom."
-      propertyFeatures={[
-        "Pool",
-        "Gym",
-        "Garage",
-        "Pet friendly",
-        "Washing machine",
-        "Shed",
-        "Lots of grass",
-      ]}
-      propertyType="Apartment"
-      propertyLandArea="500m²"
-      propertyBathrooms="2"
-      propertyParkingSpaces="2"
-      propertyBedrooms="4"
-      propertyPrice="$1500/mth"
-      inspectionBookingUiStateList={[
-        {
-          date: "21st Jan 2025",
-          startingTime: "11:25pm",
-          endingTime: "11:55pm",
-        },
-        {
-          date: "22nd Jan 2025",
-          startingTime: "1:20pm",
-          endingTime: "1:50pm",
-        },
-      ]}
-      listingImageUrls={[
-        "https://cdn.pixabay.com/photo/2018/08/04/11/30/draw-3583548_1280.png",
-        "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
-        "https://cdn.pixabay.com/photo/2024/05/26/10/15/bird-8788491_1280.jpg",
-      ]}
-      listingStatusText="CURRENTLY LISTED"
-      listingStatusPillVariant={ListingStatusPillVariant.CURRENT}
-      shouldDisplayListingStatus={true}
-      shouldDisplaySubmitDraftButton={false}
-      shouldDisplayReviewTenantButton={true}
-      onBack={() => {
-        console.log("back button pressed");
-      }}
-      onBook={(index: number) => {
-        console.log(`booking button ${index} pressed`);
-      }}
-      onApply={() => {
-        console.log("applied!");
-      }}
-      onContactAgent={() => console.log("contacting agent!")}
-      onSubmitDraftListing={() => console.log("draft submitted!")}
-      onReviewTenantApplications={() => console.log("reviewing tenant applications!")}
-      className={twMerge("p-5", className)}
-    />
+      <ListingPageContent
+        // Use data from PropertyListingPage (via navigation state)
+        streetNumber={propertyData.streetNumber}
+        street={propertyData.street}
+        suburb={propertyData.suburb}
+        province={propertyData.province}
+        postcode={propertyData.postcode}
+        summaryDescription={propertyData.summaryDescription}
+        // Override status to show it's now listed (not draft)
+        propertyStatusText="Listed"
+        propertyStatusPillVariant={PropertyStatusPillVariant.VACANT}
+        propertyDescription={propertyData.propertyDescription}
+        propertyFeatures={propertyData.propertyFeatures}
+        propertyType={propertyData.propertyType}
+        propertyLandArea={propertyData.propertyLandArea}
+        propertyBathrooms={propertyData.propertyBathrooms}
+        propertyParkingSpaces={propertyData.propertyParkingSpaces}
+        propertyBedrooms={propertyData.propertyBedrooms}
+        propertyPrice={propertyData.propertyPrice}
+        inspectionBookingUiStateList={propertyData.inspectionBookingUiStateList}
+        listingImageUrls={propertyData.listingImageUrls}
+        listingStatusText="CURRENTLY LISTED"
+        listingStatusPillVariant={ListingStatusPillVariant.CURRENT}
+        shouldDisplayListingStatus={true}
+        shouldDisplaySubmitDraftButton={false}
+        shouldDisplayReviewTenantButton={true}
+        onBack={() => {
+          console.log("back button pressed");
+          //TODO: Navigate to the previous page
+        }}
+        onBook={(index: number) => {
+          console.log(`booking button ${index} pressed`);
+        }}
+        onApply={() => {
+          console.log("applied!");
+        }}
+        onContactAgent={() => console.log("contacting agent!")}
+        onSubmitDraftListing={() => console.log("draft submitted!")}
+        onReviewTenantApplications={() => console.log("reviewing tenant applications!")}
+        className={twMerge("p-5", className)}
+      />
     </>
   );
 }
