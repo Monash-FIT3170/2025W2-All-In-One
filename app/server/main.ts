@@ -30,6 +30,7 @@ import {
   LandlordCollection,
 } from "./database/user/user-collections";
 import { Role } from "../shared/user-role-identifier";
+import { TaskStatus } from "../shared/task-status-identifier";
 
 Meteor.startup(tempSeedPropertyData);
 Meteor.startup(tempSeedTaskData);
@@ -131,7 +132,7 @@ async function tempSeedTaskData(): Promise<void> {
     TaskCollection.insertAsync({
       _id: "1",
       name: "Initial listing meeting",
-      task_status_id: "1",
+      taskStatus: TaskStatus.NOTSTARTED,
       createdDate: new Date("2025-04-12T10:00:00Z"),
       dueDate: new Date("2025-04-19T10:00:00Z"),
       description:
@@ -141,7 +142,7 @@ async function tempSeedTaskData(): Promise<void> {
     TaskCollection.insertAsync({
       _id: "2",
       name: "Follow-up with client",
-      task_status_id: "2",
+      taskStatus: TaskStatus.INPROGRESS,
       createdDate: new Date("2025-04-20T10:00:00Z"),
       dueDate: new Date("2025-04-27T10:00:00Z"),
       description:

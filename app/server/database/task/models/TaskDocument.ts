@@ -1,7 +1,8 @@
+import { TaskStatus } from "/app/shared/task-status-identifier";
 export type TaskDocument = {
   _id: string;
   name: string;
-  task_status_id: string;
+  taskStatus: TaskStatus;
   createdDate: Date;
   dueDate: Date;
   description: string;
