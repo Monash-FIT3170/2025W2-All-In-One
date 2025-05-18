@@ -77,8 +77,9 @@ export function RoleSideNavBar({
   settingsLinks = []
 }: RoleSideNavBarProps) {
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-  const name = currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : "Unknown User";
-  const initials = currentUser ? `${currentUser.firstName?.charAt(0) ?? ''}${currentUser.lastName?.charAt(0) ?? ''}` : "?";
+  const firstName = currentUser?.firstName || "Unknown";
+  const lastName = currentUser?.lastName || "User";
+  const title = "Agent";
   return (
     <>
       <SidebarContainer isOpen={isOpen}>
@@ -96,10 +97,7 @@ export function RoleSideNavBar({
           }
         />
         <SidebarFooter>
-          <ProfileFooter
-            name= {name}
-            title="Agent"
-          />
+          <ProfileFooter firstName={firstName} lastName={lastName} title={title} />
         </SidebarFooter>
       </SidebarContainer>
 
