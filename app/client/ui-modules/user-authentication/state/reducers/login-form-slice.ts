@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { LoginFormUIState } from "../LoginFormUIState";
 import { AppDispatch, RootState } from "/app/client/store";
 import { UserAccount } from "/app/client/library-modules/domain-models/user/UserAccount";
-import { getUserAccountById } from "/app/client/library-modules/domain-models/user/repositories/user-account-repository";
+import { getUserAccountById } from "../../../../library-modules/domain-models/user/user-account-repositories/user-account-repository";
 import { loadCurrentUser } from "./current-user-slice";
 
 const initialState: LoginFormUIState = {

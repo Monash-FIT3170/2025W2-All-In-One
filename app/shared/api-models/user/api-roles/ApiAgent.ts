@@ -1,6 +1,6 @@
 export type ApiAgent = {
   agentId: string; // pk
-  userId: string; // id for the user account - used for auth/admin purposes only
+  userAccountId: string; // id for the user account - used for auth/admin purposes only
   firstName: string;
   lastName: string;
   email: string;

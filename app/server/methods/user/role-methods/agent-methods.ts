@@ -41,7 +41,7 @@ const agentGetMethod = {
 function mapAgentDocumentToDTO(agent: AgentDocument): ApiAgent {
   return {
     agentId: agent._id!,
-    userId: agent.userId,
+    userAccountId: agent.userId,
     firstName: agent.firstName,
     lastName: agent.lastName,
     email: agent.email,

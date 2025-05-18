@@ -41,7 +41,7 @@ const landlordGetMethod = {
 function mapLandlordDocumentToDTO(landlord: LandlordDocument): ApiLandlord {
   return {
     landlordId: landlord._id!,
-    userId: landlord.userId,
+    userAccountId: landlord.userId,
     firstName: landlord.firstName,
     lastName: landlord.lastName,
     email: landlord.email,

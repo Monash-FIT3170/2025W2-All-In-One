@@ -6,7 +6,7 @@ import {
   setPassword,
   loginUser,
 } from "./state/reducers/login-form-slice";
-import { useRedirectToDashboard } from "./utils/redirectToDashboardHook";
+import { useRedirectToDashboard } from "../hooks/redirectToDashboardHook";
 
 const inputClass =
   "w-full px-4 py-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-200 text-sm";

@@ -1,6 +1,6 @@
 export type Agent = {
   agentId: string; 
-  userId: string; 
+  userAccountId: string; 
   firstName: string;
   lastName: string;
   email: string;

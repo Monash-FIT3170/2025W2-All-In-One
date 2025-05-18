@@ -40,7 +40,7 @@ const tenantGetMethod = {
 function mapTenantDocumentToDTO(tenant: TenantDocument): ApiTenant {
   return {
     tenantId: tenant._id!,
-    userId: tenant.userId,
+    userAccountId: tenant.userId,
     firstName: tenant.firstName,
     lastName: tenant.lastName,
     email: tenant.email,

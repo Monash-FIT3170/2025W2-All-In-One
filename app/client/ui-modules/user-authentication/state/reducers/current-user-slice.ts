@@ -4,10 +4,10 @@ import { UserAccount } from "/app/client/library-modules/domain-models/user/User
 import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
 import { Tenant } from "/app/client/library-modules/domain-models/user/Tenant";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
-import { getUserAccountById } from "/app/client/library-modules/domain-models/user/repositories/user-account-repository";
-import { getAgentById } from "/app/client/library-modules/domain-models/user/repositories/role-repositories/agent-repository";
-import { getTenantById } from "/app/client/library-modules/domain-models/user/repositories/role-repositories/tenant-repository";
-import { getLandlordById } from "/app/client/library-modules/domain-models/user/repositories/role-repositories/landlord-repository";
+import { getUserAccountById } from "../../../../library-modules/domain-models/user/user-account-repositories/user-account-repository";
+import { getAgentById } from "../../../../library-modules/domain-models/user/role-repositories/agent-repository";
+import { getTenantById } from "../../../../library-modules/domain-models/user/role-repositories/tenant-repository";
+import { getLandlordById } from "../../../../library-modules/domain-models/user/role-repositories/landlord-repository";
 import { Role } from "/app/shared/user-role-identifier";
 import { AppDispatch, RootState } from "/app/client/store";
 
