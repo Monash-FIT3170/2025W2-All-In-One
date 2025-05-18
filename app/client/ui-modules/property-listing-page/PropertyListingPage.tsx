@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router";
 import { PropertyFeatures } from "./components/PropertyFeatures";
 import { ListingPropertyDetails } from "./components/ListingPropertyDetails";
 import {
@@ -32,7 +33,67 @@ export function PropertyListingPage({
   className?: string;
 }): React.JSX.Element {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const navigate = useNavigate();
+  
   const toggleModal = () => setIsModalOpen(!isModalOpen);
+
+  // Handler for submit draft listing
+  const handleSubmitDraftListing = () => {
+    console.log("draft submitted!");
+    
+    // Collect all the property data
+    const propertyData = {
+      streetNumber: "86",
+      street: "Fury Lane",
+      suburb: "Toorak",
+      province: "VIC",
+      postcode: "3166",
+      summaryDescription: "The house of your dreams, yadda yadda yes this house is very lorem ipsum.",
+      propertyStatusText: "Vacant",
+      propertyStatusPillVariant: PropertyStatusPillVariant.VACANT,
+      propertyDescription: "Modern apartment with spacious living areas and a beautiful garden. Recently renovated with new appliances and fixtures throughout. The property features an open-plan kitchen and dining area that flows onto a private balcony with city views. The master bedroom includes an ensuite bathroom and built-in wardrobes, while the second bedroom is generously sized and located near the main bathroom.",
+      propertyFeatures: [
+        "Pool",
+        "Gym",
+        "Garage",
+        "Pet friendly",
+        "Washing machine",
+        "Shed",
+        "Lots of grass",
+      ],
+      propertyType: "Apartment",
+      propertyLandArea: "500m²",
+      propertyBathrooms: "2",
+      propertyParkingSpaces: "2",
+      propertyBedrooms: "4",
+      propertyPrice: "$1500/mth",
+      inspectionBookingUiStateList: [
+        {
+          date: "21st Jan 2025",
+          startingTime: "11:25pm",
+          endingTime: "11:55pm",
+        },
+        {
+          date: "22nd Jan 2025",
+          startingTime: "1:20pm",
+          endingTime: "1:50pm",
+        },
+      ],
+      listingImageUrls: [
+        "https://cdn.pixabay.com/photo/2018/08/04/11/30/draw-3583548_1280.png",
+        "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
+        "https://cdn.pixabay.com/photo/2024/05/26/10/15/bird-8788491_1280.jpg",
+      ],
+    };
+    
+    // Navigate to PropertyListedPage with data
+    navigate('/property-listed', { 
+      state: { 
+        propertyData,
+        message: 'Draft submitted successfully!' 
+      }
+    });
+  };
 
   return (
     <>
@@ -87,6 +148,7 @@ export function PropertyListingPage({
       shouldDisplaySubmitDraftButton={true}
       onBack={() => {
         console.log("back button pressed");
+        // TODO : Navigate back to the previous page
       }}
       onBook={(index: number) => {
         console.log(`booking button ${index} pressed`);
@@ -95,7 +157,7 @@ export function PropertyListingPage({
         console.log("applied!");
       }}
       onContactAgent={() => console.log("contacting agent!")}
-      onSubmitDraftListing={() => console.log("draft submitted!")}
+      onSubmitDraftListing={handleSubmitDraftListing}
       className={twMerge("p-5", className)}
     />
     <div>
