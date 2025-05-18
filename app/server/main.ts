@@ -19,7 +19,7 @@ import "./methods/user/user-account-methods";
 import "./methods/user/role-methods/agent-methods";
 import "./methods/user/role-methods/tenant-methods";
 import "./methods/user/role-methods/landlord-methods";
-import { TaskCollection } from "/app/server/database/task/task-collections";
+import { TaskCollection, TaskStatusCollection } from "/app/server/database/task/task-collections";
 Meteor.startup(tempSeedPropertyData);
 Meteor.startup(tempSeedTaskData);
 
@@ -62,7 +62,10 @@ async function tempSeedPropertyData(): Promise<void> {
       parking: 2,
       property_feature_ids: ["1", "2"],
       type: "House",
-      area: 500
+      area: 500,
+      agent_id: "1",
+      landlord_id: "1",
+      tenant_id: "1"
     });
 
     InspectionCollection.insertAsync({
@@ -96,25 +99,38 @@ async function tempSeedPropertyData(): Promise<void> {
 // This function is used to seed the database with initial task data
 async function tempSeedTaskData(): Promise<void> {
   if ((await TaskCollection.find().countAsync()) === 0) {
+    TaskStatusCollection.insertAsync({
+      _id: "1",
+      name: "Not Started",
+    });
+
+    TaskStatusCollection.insertAsync({
+      _id: "2",
+      name: "In Progress",
+    });
+    
+    TaskStatusCollection.insertAsync({
+      _id: "3",
+      name: "Completed",
+    });
+
     TaskCollection.insertAsync({
       _id: "1",
       name: "Initial listing meeting",
-      status: "Not started",
+      task_status_id: "1",
       createdDate: new Date("2025-04-12T10:00:00Z"),
       dueDate: new Date("2025-04-19T10:00:00Z"),
       description: "Meet with the client to discuss the property listing process and gather necessary information.",
-      priority: "High",
-      user_id: "1"
+      priority: "High"
     });
     TaskCollection.insertAsync({
       _id: "2",
       name: "Follow-up with client",
-      status: "Not started",
+      task_status_id: "2",
       createdDate: new Date("2025-04-20T10:00:00Z"),
       dueDate: new Date("2025-04-27T10:00:00Z"),
       description: "Check in with the client to provide updates and address any questions.",
-      priority: "Medium",
-      user_id: "1"
+      priority: "Medium"
     });
   }
 }

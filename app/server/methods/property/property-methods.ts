@@ -13,6 +13,12 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
+import { AgentDocument } from "../../database/user/models/role-models/AgentDocument";
+import { LandlordDocument } from "../../database/user/models/role-models/LandlordDocument";
+import { TenantDocument } from "../../database/user/models/role-models/TenantDocument";
+import { AgentCollection } from "../../database/user/user-collections";
+import { LandlordCollection } from "../../database/user/user-collections";
+import { TenantCollection } from "../../database/user/user-collections";
 
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
@@ -60,6 +66,32 @@ async function mapPropertyDocumentToPropertyDTO(
   const propertyFeaturesDocuments =
     await getPropertyFeatureDocumentsMatchingIds(property.property_feature_ids);
 
+  const AgentDocument = await getAgentDocumentById(property.agent_id);
+  const LandlordDocument = await getLandlordDocumentById(
+    property.landlord_id
+  );
+  const TenantDocument = property.tenant_id
+  ? await getTenantDocumentById(property.tenant_id)
+  : null; // Handle missing tenant_id gracefully
+
+  if (!AgentDocument) {
+    throw new InvalidDataError(
+      `Agent for Property id ${property._id} not found.`
+    );
+  }
+  if (!LandlordDocument) {
+    throw new InvalidDataError(
+      `Landlord for Property id ${property._id} not found.`
+    );
+  }
+
+  //Check if I need this, as I we don't necessarily need a tenant for a property
+  if (!TenantDocument) {
+    throw new InvalidDataError(
+      `Tenant for Property id ${property._id} not found.`
+    );
+  }
+
   if (!propertyStatusDocument) {
     throw new InvalidDataError(
       `Property status for Property id ${property._id} not found.`
@@ -95,6 +127,9 @@ async function mapPropertyDocumentToPropertyDTO(
     features: propertyFeaturesDocuments.map((doc) => doc.name),
     type: property.type,
     area: property.area,
+    agentId: AgentDocument._id,
+    landlordId: LandlordDocument._id,
+    tenantId: TenantDocument._id
   };
 }
 
@@ -125,6 +160,22 @@ async function getLatestPropertyPriceDocumentForProperty(
     { property_id: propertyId },
     { sort: { date_set: -1 } }
   );
+}
+
+async function getAgentDocumentById(
+  id: string
+): Promise<AgentDocument | undefined> {
+  return await AgentCollection.findOneAsync(id);
+}
+async function getLandlordDocumentById(
+  id: string
+): Promise<LandlordDocument | undefined> {
+  return await LandlordCollection.findOneAsync(id);
+}
+async function getTenantDocumentById(
+  id: string
+): Promise<TenantDocument | undefined> {
+  return await TenantCollection.findOneAsync(id);
 }
 
 Meteor.methods({

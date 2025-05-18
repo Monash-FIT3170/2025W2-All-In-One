@@ -16,4 +16,7 @@ export type ApiProperty = {
   features: string[];
   type: string;
   area?: number;
+  agentId: string;
+  landlordId: string;
+  tenantId: string;
 }

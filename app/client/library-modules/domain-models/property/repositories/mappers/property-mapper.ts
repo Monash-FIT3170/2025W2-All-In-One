@@ -18,6 +18,9 @@ export function mapApiPropertyToProperty(property: ApiProperty): Property {
     parking: property.parking,
     features: property.features,
     type: property.type,
-    area: property.area
+    area: property.area,
+    agentId: property.agentId,
+    landlordId: property.landlordId,
+    tenantId: property.tenantId
   }
 }
