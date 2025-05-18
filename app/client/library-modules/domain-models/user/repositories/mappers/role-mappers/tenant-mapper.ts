@@ -8,6 +8,6 @@ export function mapApiTenantToTenant(tenant: ApiTenant): Tenant {
     firstName: tenant.firstName,
     lastName: tenant.lastName,
     email: tenant.email,
-    createdAt: tenant.createdAt,
+    createdAt: tenant.createdAt.toISOString(),
   };
 }

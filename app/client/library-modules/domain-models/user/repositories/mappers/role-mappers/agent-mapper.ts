@@ -9,6 +9,6 @@ export function mapApiAgentToAgent(agent: ApiAgent): Agent {
     lastName: agent.lastName,
     email: agent.email,
     agentCode: agent.agentCode,
-    createdAt: agent.createdAt,
+    createdAt: agent.createdAt.toISOString(),
   };
 }

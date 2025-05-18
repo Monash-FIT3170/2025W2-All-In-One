@@ -5,5 +5,5 @@ export type Agent = {
   lastName: string;
   email: string;
   agentCode: string;
-  createdAt: Date;
+  createdAt: string; // FIX FOR REDUX ERRORS NOT ACCEPTING DATE BUT ONLY STRING
 }

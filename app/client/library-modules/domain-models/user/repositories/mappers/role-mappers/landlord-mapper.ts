@@ -8,6 +8,6 @@ export function mapLandlordToLandlord(landlord: ApiLandlord): Landlord {
     firstName: landlord.firstName,
     lastName: landlord.lastName,
     email: landlord.email,
-    createdAt: landlord.createdAt,
+    createdAt: landlord.createdAt.toISOString(),
   };
 }

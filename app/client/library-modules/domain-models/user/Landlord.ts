@@ -4,5 +4,5 @@ export type Landlord = {
   firstName: string;
   lastName: string;
   email: string;
-  createdAt: Date;
+  createdAt: string;
 }

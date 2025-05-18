@@ -1,9 +1,10 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Meteor } from "meteor/meteor";
 import { SignupFormUIState } from "../SignupFormUIState";
-import { RootState } from "/app/client/store";
+import { AppDispatch, RootState } from "/app/client/store";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { Role } from "/app/shared/user-role-identifier";
+import { loadCurrentUser } from "./current-user-slice";
 
 const initialState: SignupFormUIState = {
   accountType: Role.TENANT,
@@ -55,9 +56,9 @@ export const signupFormSlice = createSlice({
 export const registerUser = createAsyncThunk<
   void,
   void,
-  { state: RootState; rejectValue: string }
->("signup/registerUser", async (_, { getState, rejectWithValue }) => {
-  const state = (getState() as RootState).signupForm;
+  { state: RootState; dispatch: AppDispatch; rejectValue: string }
+>("signup/registerUser", async (_, { getState, dispatch, rejectWithValue }) => {
+  const state = getState().signupForm;
 
   const payload = {
     email: state.email,
@@ -69,11 +70,32 @@ export const registerUser = createAsyncThunk<
   };
 
   try {
+    // 1. Register the user
     await Meteor.callAsync(MeteorMethodIdentifier.USER_REGISTER, payload);
 
-    const userId = Meteor.userId();
-    if (!userId) throw new Error("Registration successful! Please log in.");
-    
+    // 2. Get current user
+    const currentUser = Meteor.user();
+
+    // 3. If not logged in OR logged in user email doesn't match the new one, log in manually
+    const loggedInEmail = currentUser?.emails?.[0]?.address;
+    const userNeedsLogin = !currentUser || loggedInEmail !== payload.email;
+
+    if (userNeedsLogin) {
+      await new Promise<void>((resolve, reject) => {
+        Meteor.loginWithPassword(payload.email, payload.password, (error) => {
+          if (error)
+            return reject(new Error("Auto-login failed after registration."));
+          resolve();
+        });
+      });
+    }
+
+    // 4. Load the correct current user
+    const finalUserId = Meteor.userId();
+    if (!finalUserId) throw new Error("Unable to establish login session.");
+
+    await dispatch(loadCurrentUser(finalUserId));
+
     return;
   } catch (err: any) {
     console.error("Signup error:", err);
@@ -82,6 +104,5 @@ export const registerUser = createAsyncThunk<
 });
 
 export const { updateField, clearForm } = signupFormSlice.actions;
-export const selectSignupFormUIState = (state: RootState) =>
-  state.signupForm;
+export const selectSignupFormUIState = (state: RootState) => state.signupForm;
 export default signupFormSlice.reducer;
