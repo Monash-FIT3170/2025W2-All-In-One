@@ -6,6 +6,8 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { ApiTenant } from "../../../../shared/api-models/user/api-roles/ApiTenant";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
+import { TaskDocument } from "/app/server/database/task/models/TaskDocument";
+import { TaskCollection } from "/app/server/database/task/task-collections";
 
 // -- INSERT TENANT --
 const tenantInsertMethod = {
@@ -37,15 +39,36 @@ const tenantGetMethod = {
   },
 };
 
-function mapTenantDocumentToDTO(tenant: TenantDocument): ApiTenant {
+async function mapTenantDocumentToDTO(tenant: TenantDocument): Promise<ApiTenant> {
+
+    const taskDocuments =
+    await getTaskDocumentsMatchingIds(tenant.task_ids);
+  
+    if (
+      taskDocuments.length !== tenant.task_ids.length
+    ) {
+      throw new InvalidDataError(
+        `Missing task documents for Tenant id ${tenant._id}.`
+      );
+    }
+
   return {
     tenantId: tenant._id!,
     userAccountId: tenant.userId,
+    tasks: taskDocuments.map((doc) => doc.name),
     firstName: tenant.firstName,
     lastName: tenant.lastName,
     email: tenant.email,
     createdAt: tenant.createdAt,
   };
+}
+
+async function getTaskDocumentsMatchingIds(
+  ids: string[]
+): Promise<TaskDocument[]> {
+  return await TaskCollection.find({
+    _id: { $in: ids },
+  }).fetchAsync();
 }
 
 Meteor.methods({

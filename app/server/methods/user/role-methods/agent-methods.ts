@@ -46,9 +46,7 @@ const agentGetMethod = {
   },
 };
 
-async function mapAgentDocumentToDTO(agent: AgentDocument): Promise<ApiAgent> {
-
-  
+async function mapAgentDocumentToDTO(agent: AgentDocument): Promise<ApiAgent> {  
   const taskDocuments =
   await getTaskDocumentsMatchingIds(agent.task_ids);
 
