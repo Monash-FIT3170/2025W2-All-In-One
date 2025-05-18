@@ -45,8 +45,8 @@ export function AgentTopNavbar({
             className="text-gray-600"
           />
           <div className="flex items-center gap-2">
-            <PropManagerLogoIcon variant="light" />
-            <PropManagerLogoText />
+            <PropManagerLogoIcon variant="light" className="w-10 h-10" />
+            <PropManagerLogoText className="text-2xl font-bold" />
           </div>
         </div>
 
@@ -83,8 +83,8 @@ export function LandlordTopNavbar({
             className="text-gray-600"
           />
           <div className="flex items-center gap-2">
-            <PropManagerLogoIcon variant="light" />
-            <PropManagerLogoText />
+            <PropManagerLogoIcon variant="light" className="w-10 h-10" />
+            <PropManagerLogoText className="text-2xl font-bold" />
           </div>
         </div>
 
@@ -121,8 +121,8 @@ export function TenantTopNavbar({
             className="text-gray-600"
           />
           <div className="flex items-center gap-2">
-            <PropManagerLogoIcon variant="light" />
-            <PropManagerLogoText />
+            <PropManagerLogoIcon variant="light" className="w-10 h-10" />
+            <PropManagerLogoText className="text-2xl font-bold" />
           </div>
         </div>
 
@@ -153,8 +153,8 @@ export function TopNavbar({
           onClick={() => onSideBarOpened(true)} // Open the sidebar when the logo is clicked
           className="flex items-center gap-2 cursor-pointer"
         >
-          <PropManagerLogoIcon variant="light" />
-          <PropManagerLogoText />
+          <PropManagerLogoIcon variant="light" className="w-10 h-10" />
+          <PropManagerLogoText className="text-2xl font-bold" />
         </div>
 
         {/* Right-aligned buttons */}

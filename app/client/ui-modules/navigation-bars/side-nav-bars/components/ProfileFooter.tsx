@@ -10,8 +10,9 @@ export function ProfileFooter({ firstName, lastName, title }: ProfileFooterProps
   const initials = `${firstName?.charAt(0) ?? ''}${lastName?.charAt(0) ?? ''}`;
   const name = `${firstName} ${lastName}`;
   return (
-    <div className="flex items-center gap-4 px-4 py-4">
-      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-2xl font-bold">
+    <div className="flex items-center gap-3 px-4 py-3">
+      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-xl">
+
         {initials}
       </div>
       <div>
