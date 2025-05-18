@@ -1,5 +1,7 @@
+import { Role } from "/app/shared/user-role-identifier";
+
 export type SignupFormUIState = {
-  accountType: "tenant" | "landlord" | "agent";
+  accountType: Role;
   passwordVisible: boolean;
   firstName: string;
   lastName: string;
