@@ -1,5 +1,7 @@
 import { get } from "react-hook-form";
 import { TaskDocument } from "../../database/task/models/TaskDocument";
+import { TaskStatusDocument } from "../../database/task/models/TaskStatusDocument";
+import { TaskStatusCollection } from "../../database/task/task-collections";
 import { TaskCollection } from "../../database/task/task-collections";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiTask } from "/app/shared/api-models/task/ApiTask";
@@ -43,16 +45,23 @@ const taskGetMethod = {
 async function mapTaskDocumentTotaskDTO(
   task: TaskDocument
 ): Promise<ApiTask> {
-
+  const taskStatusDocument = await getTaskStatusDocumentById(
+    task.task_status_id
+  );
+  if (!taskStatusDocument) {
+    throw new InvalidDataError(
+      `task status for Task id ${task._id} not found.`
+    );
+  }
+  
   return {
     taskId: task._id,
     name: task.name,
-    status: task.status,
+    status: taskStatusDocument.name,
     createdDate: task.createdDate,
     dueDate: task.dueDate,
     description: task.description,
-    priority: task.priority,
-    userId: task.user_id,
+    priority: task.priority
   };
 }
 
@@ -62,6 +71,11 @@ async function getTaskDocumentById(
   return await TaskCollection.findOneAsync(id);
 }
 
+async function getTaskStatusDocumentById(
+  id: string
+): Promise<TaskStatusDocument | undefined> {
+  return await TaskStatusCollection.findOneAsync(id);
+}
 
 Meteor.methods({
   ...taskGetMethod,

@@ -1,6 +1,7 @@
 export type Agent = {
   agentId: string; 
   userAccountId: string; 
+  tasks: string[]; 
   firstName: string;
   lastName: string;
   email: string;

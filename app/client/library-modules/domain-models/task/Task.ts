@@ -6,5 +6,4 @@ export type Task = {
   dueDate: Date;
   description: string;
   priority: string;
-  userId: string;
 };

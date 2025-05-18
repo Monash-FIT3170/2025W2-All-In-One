@@ -6,5 +6,4 @@ export type ApiTask = {
   dueDate: Date;
   description: string;
   priority: string;
-  userId: string;
 }

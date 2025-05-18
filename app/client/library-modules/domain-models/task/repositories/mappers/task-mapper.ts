@@ -9,8 +9,7 @@ export function mapApiTasktoTask(task: ApiTask): Task {
     createdDate: task.createdDate,
     dueDate: task.dueDate,
     description: task.description,
-    priority: task.priority,
-    userId: task.userId
+    priority: task.priority
   }
 }
 
