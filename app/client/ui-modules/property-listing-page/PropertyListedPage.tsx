@@ -23,6 +23,7 @@ import { BackLink } from "../theming/components/BackLink";
 import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonIcon";
 import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
+import { ReviewTenantButton } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantButton";
 
 // TODO: The state here is temporary. During server data integration, this should be moved to a redux slice.
 export function PropertyListedPage({
@@ -84,6 +85,7 @@ export function PropertyListedPage({
       listingStatusPillVariant={ListingStatusPillVariant.CURRENT}
       shouldDisplayListingStatus={true}
       shouldDisplaySubmitDraftButton={false}
+      shouldDisplayReviewTenantButton={true}
       onBack={() => {
         console.log("back button pressed");
       }}
@@ -95,6 +97,7 @@ export function PropertyListedPage({
       }}
       onContactAgent={() => console.log("contacting agent!")}
       onSubmitDraftListing={() => console.log("draft submitted!")}
+      onReviewTenantApplications={() => console.log("reviewing tenant applications!")}
       className={twMerge("p-5", className)}
     />
     </>
@@ -124,11 +127,13 @@ function ListingPageContent({
   listingStatusPillVariant,
   shouldDisplayListingStatus,
   shouldDisplaySubmitDraftButton,
+  shouldDisplayReviewTenantButton,
   onBack,
   onBook,
   onApply,
   onContactAgent,
   onSubmitDraftListing,
+  onReviewTenantApplications,
   className = "",
 }: {
   streetNumber: string;
@@ -153,11 +158,13 @@ function ListingPageContent({
   listingStatusPillVariant: ListingStatusPillVariant;
   shouldDisplayListingStatus: boolean;
   shouldDisplaySubmitDraftButton: boolean;
+  shouldDisplayReviewTenantButton: boolean;
   onBack: () => void;
   onBook: (index: number) => void;
   onApply: () => void;
   onContactAgent: () => void;
   onSubmitDraftListing: () => void;
+  onReviewTenantApplications: () => void;
   className?: string;
 }): React.JSX.Element {
   return (
@@ -198,7 +205,9 @@ function ListingPageContent({
       />
       <BottomBar
         shouldDisplaySubmitDraftButton={shouldDisplaySubmitDraftButton}
+        shouldDisplayReviewTenantButton={shouldDisplayReviewTenantButton}
         onSubmitDraftListing={onSubmitDraftListing}
+        onReviewTenantApplications={onReviewTenantApplications}
       />
     </div>
   );
@@ -347,19 +356,28 @@ function ListingDetails({
 
 function BottomBar({
   shouldDisplaySubmitDraftButton,
+  shouldDisplayReviewTenantButton,
   onSubmitDraftListing,
+  onReviewTenantApplications,
   className = "",
 }: {
   shouldDisplaySubmitDraftButton: boolean;
+  shouldDisplayReviewTenantButton: boolean;
   onSubmitDraftListing: () => void;
+  onReviewTenantApplications: () => void;
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={twMerge("flex", className)}>
+    <div className={twMerge("flex items-center justify-between", className)}>
+      {shouldDisplayReviewTenantButton && (
+        <ReviewTenantButton
+          onClick={onReviewTenantApplications}
+        />
+      )}
       {shouldDisplaySubmitDraftButton && (
         <SubmitDraftListingButton
           onClick={onSubmitDraftListing}
-          className="ml-auto"
+          className="flex-1"
         />
       )}
     </div>
