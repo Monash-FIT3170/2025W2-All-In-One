@@ -5,6 +5,8 @@ import { PropManagerLogoText } from "../theming/components/logo/PropManagerLogoT
 import { Button } from "../theming-shadcn/Button";
 import { BellIcon } from "../theming/icons/BellIcon";
 import { SideBarSliderIcon } from "../theming/icons/SideBarSlider";
+import { useAppSelector } from "/app/client/store";
+import { useSelector } from "react-redux";
 interface TopNavbarProps {
   onSideBarOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -23,9 +25,13 @@ interface LandlordTopNavbarProps {
 
 export function AgentTopNavbar({
   onSideBarOpened,
-  name = "Bob Builder",
-  title = "Agent",
+  // name = "Bob Builder",
+  // title = "Agent",
 }: AgentTopNavbarProps): React.JSX.Element {
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const name = currentUser?.firstName + " " + currentUser?.lastName || "Guest";
+  console.log("Current User:", currentUser);
+
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
       <div className="flex justify-between items-center px-4">
