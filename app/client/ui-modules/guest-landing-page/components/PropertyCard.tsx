@@ -1,4 +1,5 @@
 import React from "react";
+import { CardWidget } from "../../role-dashboard/components/CardWidget";
 
 interface PropertyCardProps {
   imageUrl: string;
@@ -18,15 +19,18 @@ export function PropertyCard({
   pricePerWeek,
 }: PropertyCardProps) {
   return (
-    <div className="rounded-xl overflow-hidden shadow-md bg-white w-full max-w-sm">
-      <img src={imageUrl} alt={address} className="h-48 w-full object-cover" />
-      <div className="p-4">
-        <h3 className="font-semibold text-md">{address}</h3>
-        <p className="text-sm text-gray-600">
-          {beds} bed • {baths} bath • {availability}
-        </p>
-        <p className="text-base font-medium mt-2">{pricePerWeek} per week</p>
-      </div>
-    </div>
+    <CardWidget
+      title={address}
+      value={pricePerWeek + " per week"}
+      className="w-full max-w-sm overflow-hidden"
+      children={
+        <>
+          <img src={imageUrl} alt={address} className="h-48 w-full object-cover rounded-t-lg" />
+          <p className="text-sm text-gray-600 mt-2">
+            {beds} bed • {baths} bath • {availability}
+          </p>
+        </>
+      }
+    />
   );
 }
