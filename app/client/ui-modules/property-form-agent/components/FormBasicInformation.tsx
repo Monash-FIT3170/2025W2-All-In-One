@@ -18,12 +18,16 @@ import { Input } from "../../theming-shadcn/Input";
 import { UseFormReturn } from "react-hook-form";
 import { FormSchemaType } from "./FormSchema";
 import { FormHeading } from "./FormHeading";
+import { ApiLandlord } from "/app/shared/api-models/user/api-roles/ApiLandlord";
 
 export default function FormBasicInformation({
   form,
+  landlords,
 }: {
   form: UseFormReturn<FormSchemaType>;
+  landlords: ApiLandlord[];
 }) {
+
   return (
     <div className="border border-(--divider-color) w-full p-7 rounded-md mb-3">
       <FormHeading
@@ -43,11 +47,11 @@ export default function FormBasicInformation({
                 </SelectTrigger>
               </FormControl>
               <SelectContent className="bg-white">
-                <SelectItem value="Dylan Hoang">Dylan Hoang</SelectItem>
-                <SelectItem value="Marcus Bontempelli">
-                  Marcus Bontempelli
-                </SelectItem>
-                <SelectItem value="Nick Daicos">Nick Daicos</SelectItem>
+                {landlords.map((landlord) => (
+                  <SelectItem key={landlord.landlordId} value={landlord.landlordId}>
+                    {landlord.firstName} {landlord.lastName}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <FormMessage />
