@@ -1,4 +1,4 @@
-import { ApiProperty } from "/app/client/library-modules/apis/property/models/ApiProperty";
+import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
 
 export function mapApiPropertyToProperty(property: ApiProperty): Property {
@@ -18,6 +18,9 @@ export function mapApiPropertyToProperty(property: ApiProperty): Property {
     parking: property.parking,
     features: property.features,
     type: property.type,
-    area: property.area
+    area: property.area,
+    agentId: property.agentId,
+    landlordId: property.landlordId,
+    tenantId: property.tenantId
   }
 }
