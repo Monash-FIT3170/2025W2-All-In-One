@@ -13,6 +13,8 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
+import { ListingStatusCollection } from "/app/server/database/property-listing/listing-collections";
+import { ListingCollection } from "/app/server/database/property-listing/listing-collections";
 import { AgentDocument } from "../../database/user/models/role-models/AgentDocument";
 import { LandlordDocument } from "../../database/user/models/role-models/LandlordDocument";
 import { TenantDocument } from "../../database/user/models/role-models/TenantDocument";
@@ -60,6 +62,33 @@ const propertyGetAllMethod = {
     const propertyDTOs = await Promise.all(
       propertyDocuments.map((property) => mapPropertyDocumentToPropertyDTO(property))
     );
+    return propertyDTOs;
+  },
+};
+
+const getAllListedProperties = {
+  [MeteorMethodIdentifier.PROPERTY_GET_ALL_LISTED]: async (): Promise<ApiProperty[]> => {
+    const listedStatus = await ListingStatusCollection.findOneAsync({ name: "Listed" });
+    if (!listedStatus) {
+      throw new InvalidDataError("Listing status 'Listed' not found.");
+    }
+
+    // 2. Get all listings with that status
+    const listedListings = await ListingCollection.find({
+      listing_status_id: listedStatus._id,
+    }).fetchAsync();
+
+    const propertyIds = listedListings.map((listing) => listing.property_id);
+
+    // 3. Get all corresponding property documents
+    const propertyDocuments = await PropertyCollection.find({
+      _id: { $in: propertyIds },
+    }).fetchAsync();
+
+    const propertyDTOs = await Promise.all(
+      propertyDocuments.map((property) => mapPropertyDocumentToPropertyDTO(property))
+    );
+
     return propertyDTOs;
   },
 };
@@ -189,4 +218,5 @@ async function getTenantDocumentById(
 Meteor.methods({
   ...propertyGetMethod,
   ...propertyGetAllMethod,
+  ...getAllListedProperties
 });

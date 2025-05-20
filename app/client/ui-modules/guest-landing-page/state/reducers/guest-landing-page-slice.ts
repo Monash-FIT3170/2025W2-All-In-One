@@ -19,7 +19,7 @@ const initialState: GuestLandingPageUiState = {
 export const fetchProperties = createAsyncThunk(
   "guestLandingPage/fetchProperties",
   async () => {
-    const response = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_ALL);
+    const response = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_ALL_LISTED);
     return response as ApiProperty[];
   }
 );

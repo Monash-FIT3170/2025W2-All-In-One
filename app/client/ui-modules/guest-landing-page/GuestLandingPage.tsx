@@ -10,7 +10,7 @@ import { Input } from "../theming-shadcn/Input";
 import { agentLinks } from "../navigation-bars/side-nav-bars/side-nav-link-definitions";
 import { PropertyCard } from "./components/PropertyCard";
 import { fetchProperties } from "./state/reducers/guest-landing-page-slice";
-import type { AppDispatch, RootState } from "../../store"; // Adjusted path and added RootState
+import type { AppDispatch } from "../../store"; // Adjusted path and added RootState
 
 export function GuestLandingPageBase() {
     const dispatch = useDispatch<AppDispatch>();
