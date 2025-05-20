@@ -38,10 +38,10 @@ export function PropertyFormPage() {
       postcode: values.postal_code,
       property_status_id: PropertyStatusName.VACANT,
       description: values.description,
-      summary_description: values.description.slice(0, 60),
+      summary_description: values.description.slice(0, 60), // takes first 60 characters?? not sure what summary description is
       bathrooms: values.bathroom_number,
       bedrooms: values.bedroom_number,
-      parking: 0,
+      parking: 0, // not collected yet
       property_feature_ids: amenitiesList, // Currently accepting id: not the actual name.
       type: values.property_type,
       area: values.space,
