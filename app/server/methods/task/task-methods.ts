@@ -1,3 +1,5 @@
+
+
 import { get } from "react-hook-form";
 import { TaskDocument } from "../../database/task/models/TaskDocument";
 import { TaskCollection } from "../../database/task/task-collections";
@@ -6,11 +8,19 @@ import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 
-// This method is used to get a task by its ID
-// It returns a promise that resolves to an Apitask object
-// If the task is not found, it throws an InvalidDataError
-// If there is an error while mapping the task document to DTO, it throws an InvalidDataError
-// The method is wrapped in a Meteor method so it can be called from the client
+/**
+ * Retrieves a task by its ID and returns it as an `ApiTask` DTO.
+ *
+ * This Meteor method can be called from the client. It performs the following steps:
+ * 1. Fetches the task document from the database using the provided ID.
+ * 2. Throws an `InvalidDataError` if the task is not found.
+ * 3. Maps the task document to an `ApiTask` DTO using `mapTaskDocumentTotaskDTO`.
+ * 4. Throws an `InvalidDataError` if there is an error during mapping.
+ *
+ * @param id - The unique identifier of the task to retrieve.
+ * @returns A promise that resolves to an `ApiTask` object.
+ * @throws {InvalidDataError} If the task is not found or mapping fails.
+ */
 const taskGetMethod = {
   [MeteorMethodIdentifier.TASK_GET]: async (id: string): Promise<ApiTask> => {
     const taskDocument = await getTaskDocumentById(id);
@@ -30,14 +40,15 @@ const taskGetMethod = {
     return taskDTO;
   },
 };
-// This method is used to map a task document to an Apitask DTO.
-// This function transforms a TaskDocument (raw database document) into an Apitask (structured DTO) for client use. It performs the following steps:
-// 1. Fetches the task status document by its ID
-// 2. Fetches the latest task price document for the task
-// 3. Fetches the task features documents matching the IDs in the task document
-// It takes a TaskDocument as input and returns a promise that resolves to an Apitask object
-// It fetches the task status, latest task price, and task features documents
-
+/**
+ * Maps a TaskDocument to an ApiTask DTO.
+ *
+ * This function transforms a TaskDocument (raw database document) into an ApiTask (structured DTO) for client use.
+ * It extracts relevant fields from the TaskDocument and constructs an ApiTask object.
+ *
+ * @param task - The TaskDocument to be mapped.
+ * @returns A promise that resolves to an ApiTask object.
+ */
 async function mapTaskDocumentTotaskDTO(task: TaskDocument): Promise<ApiTask> {
   return {
     taskId: task._id,
