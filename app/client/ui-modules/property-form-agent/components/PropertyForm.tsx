@@ -10,18 +10,21 @@ import FormPropertyImages from "./FormPropertyImages";
 import FormListingOptions from "./FormListingOptions";
 import { formSchema, FormSchemaType } from "./FormSchema";
 import { Button } from "../../theming-shadcn/Button";
+import { ApiLandlord } from "/app/shared/api-models/user/api-roles/ApiLandlord";
 
 export function PropertyForm({
   form,
   onSubmit,
+  landlords,
 }: {
   form: UseFormReturn<FormSchemaType>;
   onSubmit: (values: FormSchemaType) => void;
+  landlords: ApiLandlord[];
 }) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FormBasicInformation form={form} />
+        <FormBasicInformation form={form} landlords={landlords}/>
         <FormPropertyDetails form={form} />
         <FormPropertyImages form={form} />
         <FormListingOptions form={form} />
