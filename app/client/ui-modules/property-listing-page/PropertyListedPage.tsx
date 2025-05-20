@@ -25,6 +25,7 @@ import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonI
 import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
 import { ReviewTenantButton } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantButton";
+import { ReviewTenantModal } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantModal"; 
 
 // Define interface for property data (matching what PropertyListingPage sends)
 interface PropertyData {
@@ -56,6 +57,9 @@ export function PropertyListedPage({
 }): React.JSX.Element {
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // State for the review tenant modal
+  const [showReviewModal, setShowReviewModal] = React.useState(false);
 
   // Extract property data from navigation state
   const propertyData: PropertyData | null = location.state?.propertyData || null;
@@ -82,6 +86,30 @@ export function PropertyListedPage({
     );
   }
 
+  // Create property address string for the modal
+  const propertyAddress = `${propertyData.streetNumber} ${propertyData.street}, ${propertyData.suburb}, ${propertyData.province} ${propertyData.postcode}`;
+
+  // Handle different tenant application actions
+  const handleRejectApplication = (applicationId: string) => {
+    console.log(`Rejected application: ${applicationId}`);
+  };
+
+  const handleProgressApplication = (applicationId: string) => {
+    console.log(`Progressed application: ${applicationId}`);
+  };
+
+  const handleBackgroundPass = (applicationId: string) => {
+    console.log(`Background check passed for application: ${applicationId}`);
+  };
+
+  const handleBackgroundFail = (applicationId: string) => {
+    console.log(`Background check failed for application: ${applicationId}`);
+  };
+
+  const handleSendToLandlord = (applicationId: string) => {
+    console.log(`Sending application to landlord: ${applicationId}`);
+  };
+
   return (
     <>
       <ListingPageContent
@@ -92,7 +120,6 @@ export function PropertyListedPage({
         province={propertyData.province}
         postcode={propertyData.postcode}
         summaryDescription={propertyData.summaryDescription}
-        // Override status to show it's now listed (not draft)
         propertyStatusText="Listed"
         propertyStatusPillVariant={PropertyStatusPillVariant.VACANT}
         propertyDescription={propertyData.propertyDescription}
@@ -112,7 +139,7 @@ export function PropertyListedPage({
         shouldDisplayReviewTenantButton={true}
         onBack={() => {
           console.log("back button pressed");
-          //TODO: Navigate to the previous page
+          //TODO: Navigate back to the properties page
         }}
         onBook={(index: number) => {
           console.log(`booking button ${index} pressed`);
@@ -122,8 +149,23 @@ export function PropertyListedPage({
         }}
         onContactAgent={() => console.log("contacting agent!")}
         onSubmitDraftListing={() => console.log("draft submitted!")}
-        onReviewTenantApplications={() => console.log("reviewing tenant applications!")}
+        onReviewTenantApplications={() => {
+          console.log("Opening review tenant applications modal");
+          setShowReviewModal(true);
+        }}
         className={twMerge("p-5", className)}
+      />
+
+      {/* Review Tenant Modal */}
+      <ReviewTenantModal
+        isOpen={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+        onReject={handleRejectApplication}
+        onProgress={handleProgressApplication}
+        onBackgroundPass={handleBackgroundPass}
+        onBackgroundFail={handleBackgroundFail}
+        onSendToLandlord={handleSendToLandlord}
+        propertyAddress={propertyAddress}
       />
     </>
   );
