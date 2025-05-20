@@ -22,7 +22,7 @@ const updateProfileDataMethod = {
 
 function mapProfileDataDocumentToDTO(
   profile: ProfileDataDocument
-): ApiProfileData {
+): Promise<ApiProfileData> {
   return {
     userAccountId: profile._id,
     firstName: profile.firstName,
