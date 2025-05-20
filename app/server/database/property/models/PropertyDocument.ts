@@ -15,4 +15,7 @@ export type PropertyDocument = {
   property_feature_ids: string[];
   type: string;
   area?: number;
+  agent_id: string;
+  landlord_id: string;
+  tenant_id: string;
 }

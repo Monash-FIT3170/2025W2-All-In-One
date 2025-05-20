@@ -1,5 +1,4 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
-import { homePageSlice } from "./ui-modules/home-example/state/reducers/home-page-slice";
 import { agentDashboardSlice } from "./ui-modules/role-dashboard/agent-dashboard/state/agent-dashboard-slice";
 import { landlordDashboardSlice } from "./ui-modules/role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
 import { guestLandingPageSlice } from "./ui-modules/guest-landing-page/state/reducers/guest-landing-page-slice";
@@ -14,7 +13,6 @@ import { currentUserSlice } from "./ui-modules/user-authentication/state/reducer
 
 export const store = configureStore({
   reducer: {
-    exampleHomePage: homePageSlice.reducer,
     agentDashboard: agentDashboardSlice.reducer,
     tenantDashboard: tenantDashboardSlice.reducer,
     guestLandingPage: guestLandingPageSlice.reducer,

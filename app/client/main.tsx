@@ -1,7 +1,6 @@
 import React from "react";
 import { Container, createRoot } from "react-dom/client";
 import { Meteor } from "meteor/meteor";
-import { ExampleHomePage } from "./ui-modules/home-example/ExampleHomePage";
 import { GuestLandingPage } from "./ui-modules/guest-landing-page/GuestLandingPage";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { Provider } from "react-redux";
@@ -57,9 +56,7 @@ function AppRoot(): React.JSX.Element {
               <Route path="/landlord-calendar" element={<LandlordCalendar />} />
               <Route path="/landlord-tasks" element={<LandlordTask />} />
               <Route path="/test" element={<PropertyListingPage />} />
-              <Route path="/home-example" element={<ExampleHomePage />} />
               <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/example" element={<ExampleHomePage />} />
               <Route path="/propertyform" element={<PropertyFormPage />} />
               <Route path="/login" element={<AuthTabs initialTab="login" />} />
               <Route path="/profile" element={<ProfilePage />} />

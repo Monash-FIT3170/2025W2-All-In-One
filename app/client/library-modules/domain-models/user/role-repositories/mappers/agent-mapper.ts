@@ -5,6 +5,7 @@ export function mapApiAgentToAgent(agent: ApiAgent): Agent {
   return {
     agentId: agent.agentId, 
     userAccountId: agent.userAccountId,
+    tasks: agent.tasks,
     firstName: agent.firstName,
     lastName: agent.lastName,
     email: agent.email,

@@ -5,6 +5,7 @@ export function mapApiTenantToTenant(tenant: ApiTenant): Tenant {
   return {
     tenantId: tenant.tenantId, 
     userAccountId: tenant.userAccountId,
+    tasks: tenant.tasks,
     firstName: tenant.firstName,
     lastName: tenant.lastName,
     email: tenant.email,

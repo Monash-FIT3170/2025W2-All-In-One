@@ -1,5 +1,6 @@
 export type TenantDocument = {
   _id: string; // tenant id - primary key
-  userId: string; // id for the user account - used for auth/admin purposes only
+  userAccountId: string; // id for the user account - used for auth/admin purposes only
+  task_ids: string[]; // array of task ids
   createdAt: Date;
 };
