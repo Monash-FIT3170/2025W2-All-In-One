@@ -30,7 +30,7 @@ const landlordGetMethod = {
   [MeteorMethodIdentifier.LANDLORD_GET]: async (
     userId: string
   ): Promise<ApiLandlord> => {
-    const landlordDoc = await LandlordCollection.findOneAsync({ userId });
+    const landlordDoc = await LandlordCollection.findOneAsync({ userAccountId: userId });
 
     if (!landlordDoc) {
       throw meteorWrappedInvalidDataError(
@@ -52,7 +52,7 @@ async function mapLandlordDocumentToDTO(
 
   return {
     landlordId: landlord._id!,
-    userAccountId: landlord.userId,
+    userAccountId: landlord.userAccountId,
     tasks: taskDocuments.map((doc) => doc.name), // will be empty if no tasks
     firstName: landlord.firstName,
     lastName: landlord.lastName,

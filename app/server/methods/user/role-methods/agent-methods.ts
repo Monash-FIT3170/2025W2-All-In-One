@@ -30,7 +30,7 @@ const agentGetMethod = {
   [MeteorMethodIdentifier.AGENT_GET]: async (
     userId: string
   ): Promise<ApiAgent> => {
-    const agentDoc = await AgentCollection.findOneAsync({ userId });
+    const agentDoc = await AgentCollection.findOneAsync({ userAccountId: userId });
 
     if (!agentDoc) {
       throw meteorWrappedInvalidDataError(
@@ -52,7 +52,7 @@ async function mapAgentDocumentToDTO(agent: AgentDocument): Promise<ApiAgent> {
 
   return {
     agentId: agent._id!,
-    userAccountId: agent.userId,
+    userAccountId: agent.userAccountId,
     tasks: taskDocuments.map((doc) => doc.name),
     firstName: agent.firstName,
     lastName: agent.lastName,

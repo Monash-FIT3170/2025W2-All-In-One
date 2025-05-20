@@ -26,14 +26,93 @@ import {
 import { Role } from "../shared/user-role-identifier";
 import { TaskStatus } from "../shared/task-status-identifier";
 import { MeteorMethodIdentifier } from "../shared/meteor-method-identifier";
+import { ApiAgent } from "../shared/api-models/user/api-roles/ApiAgent";
+import { ApiTenant } from "../shared/api-models/user/api-roles/ApiTenant";
+import { ApiLandlord } from "../shared/api-models/user/api-roles/ApiLandlord";
+
+let globalAgent: ApiAgent;
+let globalTenant: ApiTenant;
+let globalLandlord: ApiLandlord;
 
 Meteor.startup(async () => {
-  await tempSeedUserAndRoleData();   
-  await tempSeedPropertyData();      
-  await tempSeedTaskData();          
+  await tempSeedUserAndRoleData();
+  await tempSeedPropertyData();
+  await tempSeedTaskData();
 });
 
-// This function is used to seed the database with initial property data
+async function tempSeedUserAndRoleData(): Promise<void> {
+  const seedUsers = [
+    {
+      email: "testingagent@gmail.com",
+      password: "password123",
+      firstName: "CassandraAgent",
+      lastName: "Vemor",
+      accountType: Role.AGENT,
+      agentCode: "AGENT123",
+    },
+    {
+      email: "testingtenantemail@gmail.com",
+      password: "password123",
+      firstName: "TestTenant",
+      lastName: "Rod",
+      accountType: Role.TENANT,
+    },
+    {
+      email: "testinglandlordemail@gmail.com",
+      password: "password123",
+      firstName: "TestLandlord",
+      lastName: "Rod",
+      accountType: Role.LANDLORD,
+    },
+  ];
+
+  for (const user of seedUsers) {
+    const existing = await Meteor.users.findOneAsync({
+      "emails.address": user.email,
+    });
+    if (existing) {
+      console.log(`[Seed] Skipped existing user: ${user.email}`);
+      const dto = await Meteor.callAsync(
+        user.accountType === Role.AGENT
+          ? MeteorMethodIdentifier.AGENT_GET
+          : user.accountType === Role.TENANT
+          ? MeteorMethodIdentifier.TENANT_GET
+          : MeteorMethodIdentifier.LANDLORD_GET,
+        existing._id
+      );
+
+      if (user.accountType === Role.AGENT) globalAgent = dto;
+      if (user.accountType === Role.TENANT) globalTenant = dto;
+      if (user.accountType === Role.LANDLORD) globalLandlord = dto;
+      continue;
+    }
+
+    try {
+      const { userAccountId } = await Meteor.callAsync(
+        MeteorMethodIdentifier.USER_REGISTER,
+        user
+      );
+
+      const dto = await Meteor.callAsync(
+        user.accountType === Role.AGENT
+          ? MeteorMethodIdentifier.AGENT_GET
+          : user.accountType === Role.TENANT
+          ? MeteorMethodIdentifier.TENANT_GET
+          : MeteorMethodIdentifier.LANDLORD_GET,
+        userAccountId
+      );
+
+      if (user.accountType === Role.AGENT) globalAgent = dto;
+      if (user.accountType === Role.TENANT) globalTenant = dto;
+      if (user.accountType === Role.LANDLORD) globalLandlord = dto;
+
+      console.log(`[Seed] Created user: ${user.email}`);
+    } catch (err) {
+      console.error(`[Seed] Failed to create user: ${user.email}`, err);
+    }
+  }
+}
+
 async function tempSeedPropertyData(): Promise<void> {
   console.log("Seeding property data...");
   if ((await PropertyCollection.find().countAsync()) === 0) {
@@ -75,9 +154,9 @@ async function tempSeedPropertyData(): Promise<void> {
       property_feature_ids: ["1", "2"],
       type: "House",
       area: 500,
-      agent_id: "1",
-      landlord_id: "1",
-      tenant_id: "1",
+      agent_id: globalAgent.agentId,
+      landlord_id: globalLandlord.landlordId,
+      tenant_id: globalTenant.tenantId,
     });
 
     InspectionCollection.insertAsync({
@@ -102,10 +181,7 @@ async function tempSeedPropertyData(): Promise<void> {
       inspection_ids: ["1", "2"],
     });
 
-    ListingStatusCollection.insertAsync({
-      _id: "1",
-      name: "Draft",
-    });
+    ListingStatusCollection.insertAsync({ _id: "1", name: "Draft" });
   }
 }
 // This function is used to seed the database with initial task data
@@ -146,45 +222,5 @@ async function tempSeedTaskData(): Promise<void> {
         "Check in with the client to provide updates and address any questions.",
       priority: "Medium",
     });
-  }
-}
-
-// This function is used to seed the database with initial user + role
-async function tempSeedUserAndRoleData(): Promise<void> {
-  const existingUsers = await Meteor.users.find().countAsync();
-  if (existingUsers > 0) return;
-
-  const seedUsers = [
-    {
-      email: "cassandratest@gmail.com",
-      password: "password123",
-      firstName: "CassandraAgent",
-      lastName: "Vemor",
-      accountType: Role.AGENT,
-      agentCode: "AGENT123", 
-    },
-    {
-      email: "testingtenantemail@gmail.com",
-      password: "password123",
-      firstName: "TestTenant",
-      lastName: "Rod",
-      accountType: Role.TENANT,
-    },
-    {
-      email: "testinglandlordemail@gmail.com",
-      password: "password123",
-      firstName: "TestLandlord",
-      lastName: "Rod",
-      accountType: Role.LANDLORD,
-    },
-  ];
-
-  for (const user of seedUsers) {
-    try {
-      await Meteor.callAsync(MeteorMethodIdentifier.USER_REGISTER, user);
-      console.log(`[Seed] Created user: ${user.email}`);
-    } catch (err) {
-      console.error(`[Seed] Failed to create user: ${user.email}`, err);
-    }
   }
 }
