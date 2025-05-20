@@ -176,6 +176,42 @@ async function getTenantDocumentById(
   return await TenantCollection.findOneAsync(id);
 }
 
+const propertyInsertMethod = {
+  [MeteorMethodIdentifier.PROPERTY_INSERT]: async (
+  data: Omit<PropertyDocument, "_id">
+): Promise<string> => {
+  try {
+    const statusDoc = await PropertyStatusCollection.findOneAsync({ name: data.property_status_id });
+    if (!statusDoc) throw new InvalidDataError(
+      `Property status with name "${data.property_status_id}" not found. Ensure the name matches an entry in PropertyStatusCollection.`
+    );
+
+    const landlord = await LandlordCollection.findOneAsync({ _id: data.landlord_id });
+    if (!landlord) throw new InvalidDataError(
+      `Landlord with ID "${data.landlord_id}" not found in LandlordCollection.`
+    );
+
+    const featureDocs = await PropertyFeatureCollection.find({
+      _id: { $in: data.property_feature_ids },
+    }).fetchAsync();
+
+    if (featureDocs.length !== data.property_feature_ids.length) {
+      throw new InvalidDataError("Some features not found");
+    }
+
+    const propertyId = await PropertyCollection.insertAsync({
+      ...data,
+      property_status_id: statusDoc._id,
+    });
+    return propertyId;
+  } catch (error) {
+    console.error("Failed to insert property:", error);
+    throw meteorWrappedInvalidDataError(error as InvalidDataError);
+  }
+}
+}
+
 Meteor.methods({
   ...propertyGetMethod,
+  ...propertyInsertMethod
 });
