@@ -23,18 +23,15 @@ import {
   TaskCollection,
   TaskStatusCollection,
 } from "/app/server/database/task/task-collections";
-import {
-  AgentCollection,
-  TenantCollection,
-  UserAccountCollection,
-  LandlordCollection,
-} from "./database/user/user-collections";
 import { Role } from "../shared/user-role-identifier";
 import { TaskStatus } from "../shared/task-status-identifier";
+import { MeteorMethodIdentifier } from "../shared/meteor-method-identifier";
 
-Meteor.startup(tempSeedPropertyData);
-Meteor.startup(tempSeedTaskData);
-Meteor.startup(tempSeedUserAndRoleData);
+Meteor.startup(async () => {
+  await tempSeedUserAndRoleData();   
+  await tempSeedPropertyData();      
+  await tempSeedTaskData();          
+});
 
 // This function is used to seed the database with initial property data
 async function tempSeedPropertyData(): Promise<void> {
@@ -154,82 +151,40 @@ async function tempSeedTaskData(): Promise<void> {
 
 // This function is used to seed the database with initial user + role
 async function tempSeedUserAndRoleData(): Promise<void> {
-  if ((await UserAccountCollection.find().countAsync()) === 0) {
-    UserAccountCollection.insertAsync({
-      _id: "1",
-      role: Role.AGENT,
-    });
+  const existingUsers = await Meteor.users.find().countAsync();
+  if (existingUsers > 0) return;
 
-    UserAccountCollection.insertAsync({
-      _id: "2",
-      role: Role.LANDLORD,
-    });
+  const seedUsers = [
+    {
+      email: "cassandratest@gmail.com",
+      password: "password123",
+      firstName: "CassandraAgent",
+      lastName: "Vemor",
+      accountType: Role.AGENT,
+      agentCode: "AGENT123", 
+    },
+    {
+      email: "testingtenantemail@gmail.com",
+      password: "password123",
+      firstName: "TestTenant",
+      lastName: "Rod",
+      accountType: Role.TENANT,
+    },
+    {
+      email: "testinglandlordemail@gmail.com",
+      password: "password123",
+      firstName: "TestLandlord",
+      lastName: "Rod",
+      accountType: Role.LANDLORD,
+    },
+  ];
 
-    UserAccountCollection.insertAsync({
-      _id: "3",
-      role: Role.TENANT,
-    });
-
-    UserAccountCollection.insertAsync({
-      _id: "4",
-      role: Role.LANDLORD,
-    });
-
-    UserAccountCollection.insertAsync({
-      _id: "5",
-      role: Role.AGENT,
-    });
-
-    AgentCollection.insertAsync({
-      _id: "1", // agent id - primary key
-      userId: "1", // id for the user account - used for auth/admin purposes only
-      task_ids: [], // array of task ids
-      firstName: "CassandraAgent", // first name of the agent
-      lastName: "Vemor", // last name of the agent
-      email: "cassandratestgmail@gmail.com", // email of the agent,
-      agentCode: "AGT123", // NOT SURE WHAT THIS FIELD IS FOR
-      createdAt: new Date(), // current date
-    });
-
-    TenantCollection.insertAsync({
-      _id: "2", // tenant id - primary key
-      userId: "3", // id for the user account - used for auth/admin purposes only
-      task_ids: [], // array of task ids
-      firstName: "TestTenant", // first name of the tenant
-      lastName: "Rod", // last name of the tenant
-      email: "testingtenantemail@gmail.com", // email of the tenant
-      createdAt: new Date(), // current date
-    });
-
-    LandlordCollection.insertAsync({
-      _id: "3", // landlord id - primary key
-      userId: "2", // id for the user account - used for auth/admin purposes only
-      task_ids: [], // array of task ids
-      firstName: "TestLandlord", // first name of the landlord
-      lastName: "Rod", // last name of the landlord
-      email: "testinglandlordemail@gmail.com", // email of the landlord
-      createdAt: new Date(), // current date
-    });
-
-    LandlordCollection.insertAsync({
-      _id: "4", // landlord id - primary key
-      userId: "4", // id for the user account - used for auth/admin purposes only
-      task_ids: [], // array of task ids
-      firstName: "landlordLucy", // first name of the landlord
-      lastName: "Trainer", // last name of the landlord
-      email: "lucylandlordtestemail@gmail.com", // email of the landlord
-      createdAt: new Date(), // current date
-    });
-
-    AgentCollection.insertAsync({
-      _id: "5", // agent id - primary key
-      userId: "5", // id for the user account - used for auth/admin purposes only
-      task_ids: [], // array of task ids
-      firstName: "AgentTrent", // first name of the agent
-      lastName: "Todd", // last name of the agent
-      email: "trenttodtest@gmail.com", // email of the agent,
-      agentCode: "AGT444", // NOT SURE WHAT THIS FIELD IS FOR
-      createdAt: new Date(), // current date
-    });
+  for (const user of seedUsers) {
+    try {
+      await Meteor.callAsync(MeteorMethodIdentifier.USER_REGISTER, user);
+      console.log(`[Seed] Created user: ${user.email}`);
+    } catch (err) {
+      console.error(`[Seed] Failed to create user: ${user.email}`, err);
+    }
   }
 }
