@@ -4,6 +4,7 @@ export enum MeteorMethodIdentifier {
   BLOB_UPLOAD_FILE = "blobs.uploadFile",
   BLOB_UPLOAD_FILES = "blobs.uploadFiles",
   PROPERTY_GET = "properties.getOne",
+  PROPERTY_INSERT = "properties.insert",
   LISTING_GET_FOR_PROPERTY = "listings.getForProperty",
   USER_REGISTER = "user.register",
   USER_ACCOUNT_INSERT = "users.insert",
@@ -14,4 +15,5 @@ export enum MeteorMethodIdentifier {
   TENANT_GET = "tenants.getOne",
   LANDLORD_INSERT = "landlords.insert",
   LANDLORD_GET = "landlords.getOne",
+  LANDLORD_GET_ALL = "landlords.getAll",
 }
