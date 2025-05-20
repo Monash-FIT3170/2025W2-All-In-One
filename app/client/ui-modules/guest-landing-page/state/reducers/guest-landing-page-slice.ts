@@ -1,18 +1,50 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { GuestLandingPageUiState } from "../GuestLandingPageUiState";
+import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "/app/client/store";
+import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+
+export type GuestLandingPageUiState = {
+  isLoading: boolean;
+  properties: ApiProperty[];
+  error: string | null;
+};
 
 const initialState: GuestLandingPageUiState = {
   isLoading: false,
+  properties: [],
+  error: null,
 };
+
+// Async thunk to fetch properties from the server
+export const fetchProperties = createAsyncThunk(
+  "guestLandingPage/fetchProperties",
+  async () => {
+    const response = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_ALL);
+    return response as ApiProperty[];
+  }
+);
 
 export const guestLandingPageSlice = createSlice({
   name: "guestLandingPage",
-  initialState: initialState,
+  initialState,
   reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchProperties.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchProperties.fulfilled, (state, action: PayloadAction<ApiProperty[]>) => {
+        state.isLoading = false;
+        state.properties = action.payload;
+      })
+      .addCase(fetchProperties.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || "Failed to load properties";
+      });
+  },
 });
 
-export const selectGuestLandingPageUiState = (state: RootState) =>
-  state.guestLandingPage;
+export const selectGuestLandingPageUiState = (state: RootState) => state.guestLandingPage;
 
 export default guestLandingPageSlice.reducer;

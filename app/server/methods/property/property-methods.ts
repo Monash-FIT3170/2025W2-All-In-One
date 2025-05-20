@@ -36,6 +36,16 @@ const propertyGetMethod = {
   },
 };
 
+const propertyGetAllMethod = {
+[MeteorMethodIdentifier.PROPERTY_GET_ALL]: async (): Promise<ApiProperty[]> => {
+    const propertyDocuments = await PropertyCollection.find({}).fetchAsync();
+    const propertyDTOs = await Promise.all(
+      propertyDocuments.map((property) => mapPropertyDocumentToPropertyDTO(property))
+    );
+    return propertyDTOs;
+  },
+};
+
 async function mapPropertyDocumentToPropertyDTO(
   property: PropertyDocument
 ): Promise<ApiProperty> {
@@ -117,4 +127,5 @@ async function getLatestPropertyPriceDocumentForProperty(
 
 Meteor.methods({
   ...propertyGetMethod,
+  ...propertyGetAllMethod,
 });

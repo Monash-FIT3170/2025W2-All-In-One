@@ -2,7 +2,7 @@ import React from "react";
 import { Container, createRoot } from "react-dom/client";
 import { Meteor } from "meteor/meteor";
 import { ExampleHomePage } from "./ui-modules/home-example/ExampleHomePage";
-import { GuestLandingPage } from "./ui-modules/guest-landing-page/GuestLandingPage";
+import { GuestLandingPageBase } from "./ui-modules/guest-landing-page/GuestLandingPage";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { Provider } from "react-redux";
 import { store } from "./store";
@@ -46,7 +46,7 @@ function AppRoot(): React.JSX.Element {
         <DefaultTheme>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<GuestLandingPage />} />
+              <Route path="/" element={<GuestLandingPageBase />} />
               <Route path="/agent-dashboard" element={<AgentDashboard />} />
               <Route path="/agent-properties" element={<AgentProperty />} />
               <Route path="/agent-calendar" element={<AgentCalendar />} />
