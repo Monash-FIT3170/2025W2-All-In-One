@@ -1,11 +1,5 @@
 import { BlobUploadCommonResponse } from "@azure/storage-blob";
 
-// export type UploadResult = {
-//     blobName: string; 
-//     success: boolean;
-//     url: string;
-//     response?: BlobUploadCommonResponse;
-//   }
 export type UploadResult =  UploadResultSuccess | UploadResultFail; 
 
 export type UploadResultSuccess = {
