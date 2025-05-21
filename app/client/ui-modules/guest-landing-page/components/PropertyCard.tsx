@@ -7,37 +7,32 @@ export function PropertyCard({
     streetnumber,
     streetname,
     suburb,
-    province,
-    postcode,
     pricePerMonth,
     propertyStatus,
-    description,
     bathrooms,
     bedrooms,
-    parking,
-    features,
-    area,
 }: ApiProperty) {
-    const address = `${streetnumber} ${streetname}, ${suburb}`;
+    const address = `${streetnumber} ${streetname}`;
+    const availability = propertyStatus === "Available now" ? "Available now" : propertyStatus;
+
     return (
         <CardWidget
-            title={address}
-            value={`$${pricePerMonth} / month`}
             className="w-full max-w-sm overflow-hidden"
+            title={address}
+            value={`$${(pricePerMonth / 4).toFixed(0)} per week`}
         >
             <img
                 src={`/images/properties/${propertyId}.jpg`}
                 alt={address}
                 className="h-48 w-full object-cover rounded-t-lg"
             />
-            <p className="text-sm text-gray-600 mt-2">
-                {bedrooms} bed • {bathrooms} bath • {propertyStatus}
-            </p>
-            <ul className="text-sm text-gray-500 mt-1">
-                <li><strong>Parking:</strong> {parking}</li>
-                <li><strong>Features:</strong> {features.join(", ")}</li>
-                <li><strong>Area:</strong> {area} sqft</li>
-            </ul>
+            <div className="p-4">
+                <h2 className="text-lg font-semibold">{address}</h2>
+                <p className="text-sm text-gray-600 mt-1">
+                    {bedrooms} bed • {bathrooms} bath • {availability}
+                </p>
+                <p className="text-md font-semibold mt-2">${(pricePerMonth / 4).toFixed(0)} per week</p>
+            </div>
         </CardWidget>
     );
 }

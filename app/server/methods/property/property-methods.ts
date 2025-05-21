@@ -70,7 +70,8 @@ const getAllListedProperties = {
   [MeteorMethodIdentifier.PROPERTY_GET_ALL_LISTED]: async (): Promise<ApiProperty[]> => {
     const listedStatus = await ListingStatusCollection.findOneAsync({ name: "Listed" });
     if (!listedStatus) {
-      throw new InvalidDataError("Listing status 'Listed' not found.");
+      console.warn("Listing status 'Listed' not found. Returning empty array for listed properties.");
+      return []; 
     }
 
     // 2. Get all listings with that status

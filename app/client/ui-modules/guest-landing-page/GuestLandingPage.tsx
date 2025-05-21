@@ -10,7 +10,7 @@ import { Input } from "../theming-shadcn/Input";
 import { agentLinks } from "../navigation-bars/side-nav-bars/side-nav-link-definitions";
 import { PropertyCard } from "./components/PropertyCard";
 import { fetchProperties } from "./state/reducers/guest-landing-page-slice";
-import type { AppDispatch } from "../../store"; // Adjusted path and added RootState
+import type { AppDispatch } from "../../store"; 
 
 export function GuestLandingPageBase() {
     const dispatch = useDispatch<AppDispatch>();
@@ -26,10 +26,6 @@ export function GuestLandingPageBase() {
 
     if (isLoading) {
         return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div className="text-red-500">Error loading properties: {error}</div>;
     }
 
     return (
@@ -48,20 +44,26 @@ export function GuestLandingPageBase() {
                         </Link>
                     </div>
                     <div className="py-10 text-center">
-                        <h2 className="text-xl font-semibold mb-6">Featured Rental Properties</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-items-center px-4">
-                            {properties.slice(0, visibleCount).map((prop) => (
-                                <PropertyCard key={prop.propertyId} {...prop} />
-                            ))}
-                        </div>
-                        {visibleCount < properties.length && (
-                            <div className="mt-6">
-                                <Button onClick={() => setVisibleCount(visibleCount + 3)}>
-                                    View More
-                                </Button>
-                            </div>
+                        {(error || properties.length === 0) ? (
+                            <div>No properties found at the moment. Please check back later!</div>
+                        ) : (
+                            <>
+                                <h2 className="text-xl font-semibold mb-6">Featured Rental Properties</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-items-center px-4">
+                                    {properties.slice(0, visibleCount).map((prop) => (
+                                        <PropertyCard key={prop.propertyId} {...prop} />
+                                    ))}
+                                </div>
+                                {visibleCount < properties.length && (
+                                    <div className="mt-6">
+                                        <Button onClick={() => setVisibleCount(visibleCount + 3)}>
+                                            View More
+                                        </Button>
+                                    </div>
+                                )}
+                            </>
                         )}
-                    </div>
+                            </div>
                 </div>
             </div>
         </div>
