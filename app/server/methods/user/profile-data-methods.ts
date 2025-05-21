@@ -36,10 +36,33 @@ const getProfileDataMethod = {
 
 const updateProfileDataMethod = {
     [MeteorMethodIdentifier.PROFILE_EDIT]: async (
-        userId: string
+        userId: string,
+        updatedProfileData: Partial<ApiProfileData>
     ): Promise<ApiProfileData> => {
-        // TODO : implement
-        return undefined;
+        //Validating input
+        if (!userId || !updatedProfileData) {
+          throw meteorWrappedInvalidDataError(
+            new InvalidDataError("User ID as well as updated data are required to edit the data")
+          );
+        }
+        try { 
+          // Update the profile in the db
+            const updatedDocument = await updateProfileDocumentById(
+              userId,
+              updatedProfileData
+            );
+            if (!updatedDocument) {
+              throw meteorWrappedInvalidDataError(
+                new InvalidDataError(`Profile for user ${userId} not found or update failed.`)
+              );
+            }
+            //Convert and return DTO
+            return await mapProfileDataDocumentToDTO(updatedDocument);
+        } catch (error: any) {
+          throw meteorWrappedInvalidDataError(
+            error instanceof Error ? error : new Error("Profile update failed.")
+          )
+        }
     },
 };
 
