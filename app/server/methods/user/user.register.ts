@@ -98,7 +98,7 @@ async function createRoleSpecificRecord(
     userId: string,
     data: RegisterPayload
 ): Promise<void> {
-    const profileID = await Meteor.callAsync(
+    const profileDataId = await Meteor.callAsync(
         // creates a profile in the collection, returns id
         MeteorMethodIdentifier.PROFILE_INSERT,
         {
@@ -110,7 +110,7 @@ async function createRoleSpecificRecord(
 
     const common = {
         userAccountId: userId,
-        profileID,
+        profileDataId: profileDataId,
         createdAt: new Date(),
     };
 

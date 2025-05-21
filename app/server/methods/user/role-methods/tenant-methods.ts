@@ -51,6 +51,7 @@ async function mapTenantDocumentToDTO(
 
     return {
         tenantId: tenant._id!,
+        profileDataId: tenant.profileDataId,
         userAccountId: tenant.userAccountId,
         tasks: taskDocuments.map((doc) => doc.name),
         createdAt: tenant.createdAt,

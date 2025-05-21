@@ -58,11 +58,9 @@ async function mapAgentDocumentToDTO(agent: AgentDocument): Promise<ApiAgent> {
         agentId: agent._id!,
         userAccountId: agent.userAccountId,
         tasks: taskDocuments.map((doc) => doc.name),
-        firstName: agent.firstName,
-        lastName: agent.lastName,
-        email: agent.email,
         agentCode: agent.agentCode,
         createdAt: agent.createdAt,
+        profileDataId: agent.profileDataId,
     };
 }
 

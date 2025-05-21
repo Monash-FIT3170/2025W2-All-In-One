@@ -56,6 +56,7 @@ async function mapLandlordDocumentToDTO(
 
     return {
         landlordId: landlord._id!,
+        profileDataId: landlord.profileDataId,
         userAccountId: landlord.userAccountId,
         tasks: taskDocuments.map((doc) => doc.name), // will be empty if no tasks
         createdAt: landlord.createdAt,
