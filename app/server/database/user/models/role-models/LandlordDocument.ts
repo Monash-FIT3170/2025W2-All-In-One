@@ -3,4 +3,5 @@ export type LandlordDocument = {
     userAccountId: string; // id for the user account - used for auth/admin purposes only
     task_ids: string[]; // array of task ids
     createdAt: Date;
+    profileDataId: string;
 };

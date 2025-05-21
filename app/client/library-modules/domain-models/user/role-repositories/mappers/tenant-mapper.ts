@@ -6,6 +6,7 @@ export function mapApiTenantToTenant(tenant: ApiTenant): Tenant {
         tenantId: tenant.tenantId,
         userAccountId: tenant.userAccountId,
         tasks: tenant.tasks,
+        profileDataId: tenant.profileDataId,
         createdAt: tenant.createdAt.toISOString(),
     };
 }

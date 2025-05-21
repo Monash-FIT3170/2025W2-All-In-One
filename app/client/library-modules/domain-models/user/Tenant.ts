@@ -3,4 +3,5 @@ export type Tenant = {
     userAccountId: string;
     tasks: string[];
     createdAt: string;
+    profileDataId: string;
 };

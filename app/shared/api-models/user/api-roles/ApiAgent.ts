@@ -5,6 +5,6 @@ export type ApiAgent = {
     userAccountId: string; // id for the user account - used for auth/admin purposes only
     tasks: string[]; // array of task ids
     createdAt: Date;
-    profile: ApiProfileData;
+    profileDataId: string;
     agentCode: string;
 };
