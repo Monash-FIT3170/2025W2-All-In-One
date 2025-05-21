@@ -1,11 +1,13 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../store";
+import { apiGetProfileData, apiUpdateProfileData } from "../../library-modules/apis/user/user-role-api";
 import {
   resetProfile,
   selectIsEditing,
   selectProfileData,
   setEditing,
   updateField,
+  setProfileData,
 } from "./state/profile-slice";
 import { AgentTopNavbar } from "../navigation-bars/TopNavbar";
 import { RoleSideNavBar } from "../navigation-bars/side-nav-bars/SideNavbar";
@@ -19,6 +21,7 @@ import { PersonalInfoCard } from "./components/PersonalInfoCard";
 import { ContactInfoCard } from "./components/ContactInfoCard";
 import { EmploymentInfoCard } from "./components/EmploymentInfoCard";
 import { VehicleInfoCard } from "./components/VehicleInfoCard";
+import { current } from "@reduxjs/toolkit";
 
 export function ProfilePage(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
@@ -32,22 +35,54 @@ export function ProfilePage(): React.JSX.Element {
   );
 
   const [localProfile, setLocalProfile] = React.useState(profile);
+  
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+
+  React.useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        if (!currentUser?.profileDataId) throw new Error("User is not logged in");
+
+        const data = await apiGetProfileData(currentUser.profileDataId);
+        dispatch(setProfileData(data)) //Updating redux store
+      } catch (error) {
+        console.error("Failed to retrieve profile:", error)
+      }
+    };
+    loadProfile();
+  }, [currentUser?.profileDataId]);
+  
   // NEED TO MAKE A "Local profile" so that u can make multiple changes without saving until the btn is pressed
   React.useEffect(() => {
     if (isEditing) {
       setLocalProfile(profile); // clone the latest profile when edit mode begins
     }
-  }, [isEditing, profile]);
+  }, [isEditing]);
 
   // in handle save, we can add validation for fields and cancel it if fields incorrect
-  const handleSave = () => {
-    Object.entries(localProfile).forEach(([field, value]) =>
-      dispatch(
-        updateField({ field: field as keyof typeof localProfile, value })
-      )
-    );
-    dispatch(setEditing(false));
+  const handleSave = async () => {
+    try {
+      // const userId = Meteor.userId();
+      if (!currentUser?.profileDataId) throw new Error("User is not logged in");
+
+      // Send updates to the backend
+      const updatedProfile = await apiUpdateProfileData(currentUser.profileDataId, localProfile);
+      // Update Redux store with the latest data
+      dispatch(setProfileData(updatedProfile));
+      dispatch(setEditing(false));
+      
+    } catch (error) {
+      console.error("Failed to update profile:", error)
+    }
   };
+
+  //   Object.entries(localProfile).forEach(([field, value]) =>
+  //     dispatch(
+  //       updateField({ field: field as keyof typeof localProfile, value })
+  //     )
+  //   );
+  //   dispatch(setEditing(false));
+  // };
 
   const cards = [
     { Component: PersonalInfoCard, key: "personal" },
