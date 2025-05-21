@@ -8,22 +8,23 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 // client method
 const getProfileDataMethod = {
     [MeteorMethodIdentifier.PROFILE_GET]: async (
-        userId: string
+        profileId: string
     ): Promise<ApiProfileData> => {
         // TODO : implement
-        const profileDataDocument = await getProfileDataDocumentById(userId);
+        const profileDataDocument = await getProfileDataDocumentById(profileId);
 
         if (!profileDataDocument) {
             throw meteorWrappedInvalidDataError(
                 new InvalidDataError(
-                    `Data for user with ID ${userId} not found.`
+                    `Data for user with ID ${profileId} not found.`
                 )
             );
         }
 
         try {
             const profileDataDTO = await mapProfileDataDocumentToDTO(
-                profileDataDocument
+                profileDataDocument,
+                profileId
             );
             return profileDataDTO;
         } catch (error: any) {
@@ -36,59 +37,70 @@ const getProfileDataMethod = {
 
 const updateProfileDataMethod = {
     [MeteorMethodIdentifier.PROFILE_EDIT]: async (
-        userId: string,
+        profileId: string,
         updatedProfileData: Partial<ApiProfileData>
     ): Promise<ApiProfileData> => {
         //Validating input
-        if (!userId || !updatedProfileData) {
-          throw meteorWrappedInvalidDataError(
-            new InvalidDataError("User ID as well as updated data are required to edit the data")
-          );
+        if (!profileId || !updatedProfileData) {
+            throw meteorWrappedInvalidDataError(
+                new InvalidDataError(
+                    "User ID as well as updated data are required to edit the data"
+                )
+            );
         }
-        try { 
-          // Update the profile in the db
+        try {
+            // Update the profile in the db
             const updatedDocument = await updateProfileDocumentById(
-              userId,
-              updatedProfileData
+                profileId,
+                updatedProfileData
             );
             if (!updatedDocument) {
-              throw meteorWrappedInvalidDataError(
-                new InvalidDataError(`Profile for user ${userId} not found or update failed.`)
-              );
+                throw meteorWrappedInvalidDataError(
+                    new InvalidDataError(
+                        `Profile for user ${profileId} not found or update failed.`
+                    )
+                );
             }
             //Convert and return DTO
-            return await mapProfileDataDocumentToDTO(updatedDocument);
+            return await mapProfileDataDocumentToDTO(
+                updatedDocument,
+                profileId
+            );
         } catch (error: any) {
-          throw meteorWrappedInvalidDataError(
-            error instanceof Error ? error : new Error("Profile update failed.")
-          )
+            throw meteorWrappedInvalidDataError(
+                error instanceof Error
+                    ? error
+                    : new Error("Profile update failed.")
+            );
         }
     },
 };
 
 // Data access from backend
 async function getProfileDataDocumentById(
-    id: string
+    profileId: string
 ): Promise<ProfileDataDocument | undefined> {
-    return await ProfileCollection.findOneAsync({ _id: id });
+    return await ProfileCollection.findOneAsync({ _id: profileId });
 }
 
 export async function updateProfileDocumentById(
-    id: string,
+    profileId: string,
     updatedData: Partial<ApiProfileData>
 ): Promise<ProfileDataDocument | undefined> {
     const updateCount = await ProfileCollection.updateAsync(
-      { _id: id },
-      { $set: updatedData },
+        { _id: profileId },
+        { $set: updatedData }
     );
     if (updateCount > 0)
-      return await ProfileCollection.findOneAsync({_id: id}) 
+        return await ProfileCollection.findOneAsync({ _id: profileId });
 }
 
 async function mapProfileDataDocumentToDTO(
-    profile: ProfileDataDocument
+    profile: ProfileDataDocument,
+    profileId: string
 ): Promise<ApiProfileData> {
     return {
+        profileDataId: profileId,
         userAccountId: profile._id,
         firstName: profile.firstName,
         lastName: profile.lastName,

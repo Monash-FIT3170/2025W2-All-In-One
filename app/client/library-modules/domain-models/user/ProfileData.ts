@@ -1,6 +1,6 @@
-export type ApiProfileData = {
-    profileDataId: string;
-    userAccountId: string; // Probably user id
+export type ProfileData = {
+    profileId: string;
+    userAccountId: string;
     firstName: string;
     lastName: string;
     email: string;
