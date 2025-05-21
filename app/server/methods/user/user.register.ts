@@ -105,13 +105,13 @@ async function createRoleSpecificRecord(
             firstName: data.firstName,
             lastName: data.lastName,
             email: data.email,
-            createdAt: new Date(),
         }
     );
 
     const common = {
         userAccountId: userId,
         profileID,
+        createdAt: new Date(),
     };
 
     switch (data.accountType) {

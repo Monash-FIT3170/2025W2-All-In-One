@@ -15,6 +15,7 @@ import {
     ListingStatusCollection,
 } from "/app/server/database/property-listing/listing-collections";
 import "./methods/user/user.register";
+import "./methods/user/profile-data-methods";
 import "./methods/user/user-account-methods";
 import "./methods/user/role-methods/agent-methods";
 import "./methods/user/role-methods/tenant-methods";
