@@ -1,15 +1,29 @@
 import { BlobUploadCommonResponse } from "@azure/storage-blob";
 
-export type UploadResult = {
+// export type UploadResult = {
+//     blobName: string; 
+//     success: boolean;
+//     url: string;
+//     response?: BlobUploadCommonResponse;
+//   }
+export type UploadResult =  UploadResultSuccess | UploadResultFail; 
+
+export type UploadResultSuccess = {
     blobName: string; 
-    success: boolean;
-    url?: string;
-    error?: string;
-    response?: BlobUploadCommonResponse;
+    success: true;
+    url: string;
+    response: BlobUploadCommonResponse;    
+}
+
+export type UploadResultFail = {
+    blobName: string; 
+    success: false;
+    error: string;
   }
+
 export type UploadResults = {
-    success: UploadResult[];
-    failed: UploadResult[];
+    success: UploadResultSuccess[];
+    failed: UploadResultFail[];
   }
 export type FileInfo = {
     data: Uint8Array<ArrayBufferLike>,
@@ -29,4 +43,8 @@ export function isValidBlobContentType(type: string): type is BlobContentType {
   return (AllowedBlobContentType as readonly string[]).includes(type);
 }
 
-export type BlobNamePrefix = 'property/' | 'document/';
+
+export enum BlobNamePrefix{
+    PROPERTY = 'property/',
+    DOCUMENT = 'document/',
+}
