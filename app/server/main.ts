@@ -237,5 +237,13 @@ async function permSeedListingStatusData(): Promise<void> {
       _id: "2",
       name: ListingStatus.LISTED,
     });
+    await ListingStatusCollection.insertAsync({
+      _id: "3",
+      name: ListingStatus.TENANT_SELECTION,
+    });
+    await ListingStatusCollection.insertAsync({
+      _id: "4",
+      name: ListingStatus.TENANT_APPROVAL,
+    });
   }
 }

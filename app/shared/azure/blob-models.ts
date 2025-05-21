@@ -41,4 +41,5 @@ export function isValidBlobContentType(type: string): type is BlobContentType {
 export enum BlobNamePrefix{
     PROPERTY = 'property/',
     DOCUMENT = 'document/',
+    PHOTO = 'photo/',
 }
