@@ -5,6 +5,18 @@ import { meteorWrappedInvalidDataError } from "../../utils/error-utils";
 import { ApiProfileData } from "/app/shared/api-models/user/api-roles/ApiProfileData";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
+const profileDataInsertMethod = {
+    [MeteorMethodIdentifier.PROFILE_INSERT]: async (
+        data: Omit<ProfileDataDocument, "_id"> // omitting id
+    ): Promise<string> => {
+        const newProfile: Mongo.OptionalId<ProfileDataDocument> = {
+            ...data,
+        };
+
+        return await ProfileCollection.insertAsync(newProfile);
+    },
+};
+
 // client method
 const getProfileDataMethod = {
     [MeteorMethodIdentifier.PROFILE_GET]: async (
@@ -120,4 +132,8 @@ async function mapProfileDataDocumentToDTO(
     };
 }
 
-Meteor.methods({ ...updateProfileDataMethod, ...getProfileDataMethod });
+Meteor.methods({
+    ...updateProfileDataMethod,
+    ...getProfileDataMethod,
+    ...profileDataInsertMethod,
+});
