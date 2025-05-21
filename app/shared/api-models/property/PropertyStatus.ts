@@ -1,3 +1,3 @@
-export enum PropertyStatusName {
+export enum PropertyStatus {
   VACANT = "Vacant",
 }
