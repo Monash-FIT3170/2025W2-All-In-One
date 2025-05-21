@@ -25,3 +25,14 @@ export async function apiGetProfileData(
         profileId
     );
 }
+
+export async function apiUpdateProfileData(
+    profileId: string,
+    updatedData: Partial<ApiProfileData>
+): Promise<ApiProfileData> {
+    return await Meteor.callAsync(
+        MeteorMethodIdentifier.PROFILE_EDIT,
+        profileId,
+        updatedData,
+    );
+}
