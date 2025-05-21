@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { use, useEffect } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { EyeIcon } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
@@ -9,6 +9,8 @@ import {
   selectSignupFormUIState,
 } from "./state/reducers/signup-form-slice";
 import { SignupFormUIState } from "./state/SignupFormUIState";
+import { useRedirectToDashboard } from "../hooks/redirectToDashboardHook";
+import { Role } from "/app/shared/user-role-identifier";
 
 const inputClass =
   "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200 text-sm";
@@ -17,14 +19,19 @@ const labelClass = "block mb-1 text-sm font-medium text-gray-700";
 export const SignupForm = () => {
   const dispatch = useAppDispatch();
   const formState = useAppSelector(selectSignupFormUIState);
+  const redirectToDashboard = useRedirectToDashboard();
 
   useEffect(() => {
     dispatch(clearForm());
   }, [dispatch]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(registerUser());
+    const result = await dispatch(registerUser());
+
+    if (registerUser.fulfilled.match(result)) {
+      redirectToDashboard(formState.accountType);
+    }
   };
 
   const handleChange =
@@ -46,15 +53,15 @@ export const SignupForm = () => {
         >
           <Tabs.List className="grid grid-cols-3 gap-2 mt-2">
             {[
-              { type: "tenant", label: "Tenant", icon: "👤" },
-              { type: "landlord", label: "Landlord", icon: "🏢" },
-              { type: "agent", label: "Agent", icon: "💼" },
+              { type: Role.TENANT, label: "Tenant", icon: "👤" },
+              { type: Role.LANDLORD, label: "Landlord", icon: "🏢" },
+              { type: Role.AGENT, label: "Agent", icon: "💼" },
             ].map(({ type, label, icon }) => (
               <Tabs.Trigger
                 key={type}
                 value={type}
                 className={`
-                  flex items-center justify-center gap-2 rounded-md border px-4 py-3 text-sm font-medium transition-all
+                  flex items-center justify-center gap-2 rounded-md px-4 py-3 text-sm font-medium transition-all
                   border border-gray-300 text-gray-700 bg-white
                   data-[state=active]:border-black data-[state=active]:shadow-sm
                 `}
