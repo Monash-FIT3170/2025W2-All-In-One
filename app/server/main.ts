@@ -183,7 +183,6 @@ async function tempSeedPropertyData(): Promise<void> {
       inspection_ids: ["1", "2"],
     });
 
-    await ListingStatusCollection.insertAsync({ _id: "1", name: ListingStatus.DRAFT });
   }
 }
 // This function is used to seed the database with initial task data
