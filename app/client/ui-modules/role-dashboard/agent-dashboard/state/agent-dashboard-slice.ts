@@ -49,6 +49,7 @@ export const { setLoading, setProperties, setTasks, setError } = agentDashboardS
 
 export const selectAgentDashboard = (state: RootState) => state.agentDashboard;
 export const selectProperties = (state: RootState) => state.agentDashboard.properties;
+//The selectTasks function is a selector that retrieves the tasks from the Redux store's agentDashboard slice.
 export const selectTasks = (state: RootState) => state.agentDashboard.tasks;
 
 export default agentDashboardSlice.reducer;

@@ -22,7 +22,7 @@ export const userRegisterMethod = {
     const userId = await createAuthUser(data.email, data.password);
     // create a user account record
     await createUserAccount(userId, data.accountType);
-    // creating the role specifci record whether a tenant/agent/landlord account
+    // creating the role specific record whether a tenant/agent/landlord account
     await createRoleSpecificRecord(userId, data);
 
     return { userId };
@@ -80,7 +80,7 @@ async function createUserAccount(userId: string, role: Role): Promise<void> {
 
 async function createRoleSpecificRecord(userId: string, data: RegisterPayload): Promise<void> {
   const common = {
-    userId,
+    userAccountId: userId,
     firstName: data.firstName,
     lastName: data.lastName,
     email: data.email,
