@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { setTasks, selectTasks } from "../state/agent-dashboard-slice";
 import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
 import { AgentTopNavbar } from "../../../navigation-bars/TopNavbar";
 import {
   agentDashboardLinks,
   settingLinks,
 } from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
+import { fetchAgentTasks, selectTasks, selectLoading } from "../state/agent-dashboard-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 export function AgentCalendar(): React.JSX.Element {
@@ -16,6 +16,7 @@ export function AgentCalendar(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
+  const loading = useAppSelector(selectLoading);
 
   const handleDateSelection = (formatted: string, iso: string) => {
     setSelectedDate(formatted);
@@ -23,32 +24,13 @@ export function AgentCalendar(): React.JSX.Element {
   };
 
   useEffect(() => {
-    // Dispatch dummy tasks to the Redux store
-    // This useEffect hook is used to set the initial state of tasks when the component mounts.
-    dispatch(
-      setTasks([
-        {
-          title: "Schedule an annual property inspection",
-          address: "123 Main St",
-          datetime: "20/05/2025",
-          status: "Upcoming",
-        },
-        {
-          title: "First listing meeting with landlord",
-          address: "456 Oak Ave",
-          datetime: "25/05/2025",
-          status: "Due Soon",
-        },
-        {
-          title: "Prepare for tenant move-in",
-          address: "789 Pine Rd",
-          datetime: "15/06/2025",
-          status: "Upcoming",
-        },
-      ])
-    );
+    // Replace "1" with the actual user ID of the agent
+    dispatch(fetchAgentTasks("1"));
   }, [dispatch]);
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="min-h-screen">
       <AgentTopNavbar onSideBarOpened={onSideBarOpened} />

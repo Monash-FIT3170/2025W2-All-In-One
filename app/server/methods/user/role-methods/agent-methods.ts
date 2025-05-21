@@ -30,45 +30,43 @@ const agentGetMethod = {
   [MeteorMethodIdentifier.AGENT_GET]: async (
     userId: string
   ): Promise<ApiAgent> => {
-    const agentDoc = await AgentCollection.findOneAsync({ userAccountId: userId });
+    const agentDoc = await AgentCollection.findOneAsync({
+      userAccountId: userId,
+    });
 
     if (!agentDoc) {
       throw meteorWrappedInvalidDataError(
         new InvalidDataError(`Agent with user ID ${userId} not found.`)
       );
     }
-    const agentDTO = await mapAgentDocumentToDTO(agentDoc).catch((error) => {
-      throw meteorWrappedInvalidDataError(error);
-    });
-    return agentDTO;
+
+    // Fetch tasks associated with the agent
+    const taskIds = agentDoc.task_ids ?? [];
+    const taskDocuments =
+      taskIds.length > 0
+        ? await TaskCollection.find({ _id: { $in: taskIds } }).fetchAsync()
+        : [];
+
+    // Map tasks to a simplified format for the API
+    const tasks = taskDocuments.map((task: TaskDocument) => ({
+      id: task._id,
+      name: task.name,
+      datetime: task.dueDate,
+      status: task.taskStatus,
+    }));
+
+    return {
+      agentId: agentDoc._id!,
+      userAccountId: agentDoc.userAccountId,
+      tasks, // Include tasks in the response
+      firstName: agentDoc.firstName,
+      lastName: agentDoc.lastName,
+      email: agentDoc.email,
+      agentCode: agentDoc.agentCode,
+      createdAt: agentDoc.createdAt,
+    };
   },
 };
-
-async function mapAgentDocumentToDTO(agent: AgentDocument): Promise<ApiAgent> {
-  const taskIds = agent.task_ids ?? [];
-
-  const taskDocuments =
-    taskIds.length > 0 ? await getTaskDocumentsMatchingIds(taskIds) : [];
-
-  return {
-    agentId: agent._id!,
-    userAccountId: agent.userAccountId,
-    tasks: taskDocuments.map((doc) => doc.name),
-    firstName: agent.firstName,
-    lastName: agent.lastName,
-    email: agent.email,
-    agentCode: agent.agentCode,
-    createdAt: agent.createdAt,
-  };
-}
-
-async function getTaskDocumentsMatchingIds(
-  ids: string[]
-): Promise<TaskDocument[]> {
-  return await TaskCollection.find({
-    _id: { $in: ids },
-  }).fetchAsync();
-}
 
 Meteor.methods({
   ...agentInsertMethod,

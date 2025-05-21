@@ -1,5 +1,7 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ApiAgent } from "/app/shared/api-models/user/api-roles/ApiAgent";
 import { RootState } from "../../../../store";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 interface Property {
   address: string;
@@ -26,6 +28,17 @@ const initialState: AgentDashboardState = {
   error: null,
 };
 
+export const fetchAgentTasks = createAsyncThunk(
+  "agentDashboard/fetchAgentTasks",
+  async (userId: string) => {
+    const response = await Meteor.callAsync(
+      MeteorMethodIdentifier.AGENT_GET,
+      userId
+    );
+    return response as ApiAgent;
+  }
+);
+
 export const agentDashboardSlice = createSlice({
   name: "agentDashboard",
   initialState,
@@ -43,13 +56,36 @@ export const agentDashboardSlice = createSlice({
       state.error = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchAgentTasks.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchAgentTasks.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // Ensure tasks are mapped to the correct shape if needed
+        state.tasks = Array.isArray(action.payload.tasks)
+          ? action.payload.tasks.map((task: any) =>
+              typeof task === "string"
+                ? { title: task, address: "", datetime: "", status: "Upcoming" }
+                : task
+            )
+          : [];
+      })
+      .addCase(fetchAgentTasks.rejected, (state) => {
+        state.isLoading = false;
+      });
+  },
 });
 
-export const { setLoading, setProperties, setTasks, setError } = agentDashboardSlice.actions;
+export const { setLoading, setProperties, setTasks, setError } =
+  agentDashboardSlice.actions;
 
 export const selectAgentDashboard = (state: RootState) => state.agentDashboard;
-export const selectProperties = (state: RootState) => state.agentDashboard.properties;
-//The selectTasks function is a selector that retrieves the tasks from the Redux store's agentDashboard slice.
+export const selectProperties = (state: RootState) =>
+  state.agentDashboard.properties;
 export const selectTasks = (state: RootState) => state.agentDashboard.tasks;
+export const selectLoading = (state: RootState) =>
+  state.agentDashboard.isLoading;
 
 export default agentDashboardSlice.reducer;
