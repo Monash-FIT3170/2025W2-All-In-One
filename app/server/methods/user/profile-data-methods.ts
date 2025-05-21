@@ -5,7 +5,7 @@ import { meteorWrappedInvalidDataError } from "../../utils/error-utils";
 import { ApiProfileData } from "/app/shared/api-models/user/api-roles/ApiProfileData";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
-/// client method
+// client method
 const getProfileDataMethod = {
     [MeteorMethodIdentifier.PROFILE_GET]: async (
         userId: string
@@ -34,13 +34,6 @@ const getProfileDataMethod = {
     },
 };
 
-// Data access from backend
-async function getProfileDataDocumentById(
-    id: string
-): Promise<ProfileDataDocument | undefined> {
-    return await ProfileCollection.findOneAsync({ _id: id });
-}
-
 const updateProfileDataMethod = {
     [MeteorMethodIdentifier.PROFILE_EDIT]: async (
         userId: string
@@ -50,6 +43,25 @@ const updateProfileDataMethod = {
     },
 };
 
+// Data access from backend
+async function getProfileDataDocumentById(
+    id: string
+): Promise<ProfileDataDocument | undefined> {
+    return await ProfileCollection.findOneAsync({ _id: id });
+}
+
+export async function updateProfileDocumentById(
+    id: string,
+    updatedData: Partial<ApiProfileData>
+): Promise<ProfileDataDocument | undefined> {
+    const updateCount = await ProfileCollection.updateAsync(
+      { _id: id },
+      { $set: updatedData },
+    );
+    if (updateCount > 0)
+      return await ProfileCollection.findOneAsync({_id: id}) 
+}
+
 async function mapProfileDataDocumentToDTO(
     profile: ProfileDataDocument
 ): Promise<ApiProfileData> {
@@ -58,7 +70,7 @@ async function mapProfileDataDocumentToDTO(
         firstName: profile.firstName,
         lastName: profile.lastName,
         email: profile.email,
-        dob: profile.email,
+        dob: profile.dob,
         occupation: profile.occupation,
         phone: profile.phone,
         emergencyContact: profile.emergencyContact,
