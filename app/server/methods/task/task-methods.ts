@@ -40,6 +40,8 @@ const taskGetMethod = {
     return taskDTO;
   },
 };
+
+
 /**
  * Maps a TaskDocument to an ApiTask DTO.
  *
@@ -60,6 +62,7 @@ async function mapTaskDocumentTotaskDTO(task: TaskDocument): Promise<ApiTask> {
     priority: task.priority,
   };
 }
+
 
 async function getTaskDocumentById(
   id: string

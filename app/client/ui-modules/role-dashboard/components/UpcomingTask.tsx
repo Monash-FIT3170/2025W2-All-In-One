@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { CardWidget } from "./CardWidget";
 import { Button } from "../../theming-shadcn/Button";
 
@@ -10,14 +10,41 @@ interface Task {
 }
 
 interface UpcomingTasksProps {
-  tasks: Task[];
+  taskIds: string[];
   className?: string;
 }
 
 export function UpcomingTasks({
-  tasks,
+  taskIds,
   className = "",
 }: UpcomingTasksProps): React.JSX.Element {
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  useEffect(() => {
+    async function fetchTasks() {
+      if (!taskIds || taskIds.length === 0) {
+        setTasks([]);
+        return;
+      }
+      // Fetch all tasks in parallel
+      const fetchedTasks = await Promise.all(
+        taskIds.map(async (id) => {
+          // Replace with your actual Meteor or API call
+          const task = await Meteor.callAsync("tasks.getOne", id);
+          // Transform to your Task shape if needed
+          return {
+            title: task.task_name,
+            address: task.task_description,
+            datetime: new Date(task.task_duedate).toLocaleDateString(),
+            status: task.task_status, // Map to your status type if needed
+          };
+        })
+      );
+      setTasks(fetchedTasks);
+    }
+    fetchTasks();
+  }, [taskIds]);
+
   return (
     <CardWidget
       title="Upcoming Tasks"

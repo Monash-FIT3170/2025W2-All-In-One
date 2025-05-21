@@ -15,17 +15,58 @@ import {
   tenantDashboardLinks,
   settingLinks,
 } from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
+import { setLoading } from "../../agent-dashboard/state/agent-dashboard-slice";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 function TenantDashboard() {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
   const dispatch = useAppDispatch();
   const tasks = useAppSelector(selectTasks);
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-  const userTasks = useAppSelector((state) => state.tenantDashboard.tasks);
-  // const userTasks = user?.tasks;
-  console.log(currentUser);
-  console.log(userTasks);
-  // Dummy data for upcoming tasks
+  const userTasks = useAppSelector(
+    (state) => state.currentUser.currentUser?.tasks
+  );
+
+  // console.log(currentUser);
+
+  // Fetch user data when component mounts
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!currentUser?.userAccountId) {
+        const userId = Meteor.userId();
+        if (!userId) return;
+
+        try {
+          // Fetch tenant-specific data only
+          const tenantData = await Meteor.callAsync(
+            MeteorMethodIdentifier.TENANT_GET,
+            userId
+          );
+          console.log("Fetched Tenant Data:", tenantData);
+
+          // Convert Date fields if needed
+          const payload = {
+            ...tenantData,
+            createdAt:
+              tenantData.createdAt && tenantData.createdAt instanceof Date
+                ? tenantData.createdAt.toISOString()
+                : tenantData.createdAt,
+          };
+
+          dispatch({
+            type: "currentUser/setCurrentUser",
+            payload,
+          });
+        } catch (error) {
+          console.error("Error fetching tenant data:", error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [dispatch]);
+
+  // // Dummy data for upcoming tasks
   // useEffect(() => {
   //   dispatch(
   //     setTasks([
@@ -117,7 +158,7 @@ function TenantDashboard() {
             <DashboardCards />
             <div className=" grid grid-cols-1 md:grid-cols-3 gap-6 px-6">
               <div className="mt-5">
-                <UpcomingTasks tasks={userTasks} />
+                <UpcomingTasks taskIds={userTasks ?? []} />
               </div>
 
               <div className="mt-5">
