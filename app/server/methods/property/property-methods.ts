@@ -19,6 +19,7 @@ import { TenantDocument } from "../../database/user/models/role-models/TenantDoc
 import { AgentCollection } from "../../database/user/user-collections";
 import { LandlordCollection } from "../../database/user/user-collections";
 import { TenantCollection } from "../../database/user/user-collections";
+import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
@@ -178,7 +179,7 @@ async function getTenantDocumentById(
 
 const propertyInsertMethod = {
   [MeteorMethodIdentifier.PROPERTY_INSERT]: async (
-  data: Omit<PropertyDocument, "_id">
+  data: PropertyInsertData
 ): Promise<string> => {
   try {
     const statusDoc = await PropertyStatusCollection.findOneAsync({ name: data.property_status_id });
@@ -190,14 +191,6 @@ const propertyInsertMethod = {
     if (!landlord) throw new InvalidDataError(
       `Landlord with ID "${data.landlord_id}" not found in LandlordCollection.`
     );
-
-    const featureDocs = await PropertyFeatureCollection.find({
-      _id: { $in: data.property_feature_ids },
-    }).fetchAsync();
-
-    if (featureDocs.length !== data.property_feature_ids.length) {
-      throw new InvalidDataError("Some features not found");
-    }
 
     const propertyId = await PropertyCollection.insertAsync({
       ...data,

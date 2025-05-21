@@ -171,35 +171,6 @@ export default function FormBasicInformation({
           />
         </div>
       </div>
-
-      <FormField
-        control={form.control}
-        name="monthly_rent"
-        render={({ field }) => (
-          <FormItem className="py-2">
-            <FormLabel>Monthly Rent</FormLabel>
-            <FormControl>
-              <Input placeholder="2500" type="number" {...field} />
-            </FormControl>
-
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="bond"
-        render={({ field }) => (
-          <FormItem className="py-2">
-            <FormLabel>Bond / Security Deposit</FormLabel>
-            <FormControl>
-              <Input placeholder="2500" type="number" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
     </div>
   );
 }

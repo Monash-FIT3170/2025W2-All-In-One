@@ -24,11 +24,6 @@ export function PropertyFormPage() {
 
   const handleSubmit = (values: FormSchemaType) => {
     const addressParts = values.address.trim().split(" ");
-
-    const amenitiesList = values.amenities
-    .split(/[\n,]+/)
-    .map((s) => s.trim())
-    .filter(Boolean);
   
     const insertDoc: Omit<PropertyDocument, "_id"> = {
       streetnumber: addressParts[0],
@@ -42,7 +37,7 @@ export function PropertyFormPage() {
       bathrooms: values.bathroom_number,
       bedrooms: values.bedroom_number,
       parking: 0, // not collected yet
-      property_feature_ids: amenitiesList, // Currently accepting id: not the actual name.
+      property_feature_ids: [], // Currently accepting id: not the actual name.
       type: values.property_type,
       area: values.space,
       agent_id: "", // not collected yet
