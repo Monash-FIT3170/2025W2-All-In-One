@@ -1,3 +1,4 @@
+import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
@@ -6,3 +7,8 @@ export async function apiGetPropertyById(id: string): Promise<ApiProperty> {
 
   return fetchedProperty;
 }
+
+export async function apiGetPropertyStatusId(name: PropertyStatus): Promise<string> {
+  return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_STATUS_GET, name);
+}
+
