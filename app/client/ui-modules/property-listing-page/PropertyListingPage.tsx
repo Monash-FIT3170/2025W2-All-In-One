@@ -1,4 +1,4 @@
-import React, { use, useEffect } from "react";
+import React, { use, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { PropertyFeatures } from "./components/PropertyFeatures";
 import { ListingPropertyDetails } from "./components/ListingPropertyDetails";
@@ -24,11 +24,14 @@ import { BackLink } from "../theming/components/BackLink";
 import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonIcon";
 import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
+import { ReviewTenantButton } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantButton";
+import { ReviewTenantModal } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantModal";
 import { useAppDispatch } from "/app/client/store";
 import { useSelector } from "react-redux";
 import {
   load,
   selectPropertyListingUiState,
+  submitDraftListing,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import { AgentTopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
@@ -82,6 +85,7 @@ export function PropertyListingPage({
           listingStatusPillVariant={state.listingStatusPillVariant}
           shouldDisplayListingStatus={state.shouldDisplayListingStatus}
           shouldDisplaySubmitDraftButton={state.shouldDisplaySubmitDraftButton}
+          shouldDisplayReviewTenantButton={state.shouldDisplayReviewTenantButton}
           onBack={() => {
             console.log("back button pressed");
           }}
@@ -92,7 +96,10 @@ export function PropertyListingPage({
             console.log("applied!");
           }}
           onContactAgent={() => console.log("contacting agent!")}
-          onSubmitDraftListing={() => console.log("draft submitted!")}
+          onSubmitDraftListing={() => {
+            console.log("draft submitted!");
+            dispatch(submitDraftListing());
+          }}
           className={twMerge("p-5", className)}
         />
       </>
@@ -123,6 +130,7 @@ function ListingPageContent({
   listingStatusPillVariant,
   shouldDisplayListingStatus,
   shouldDisplaySubmitDraftButton,
+  shouldDisplayReviewTenantButton,
   onBack,
   onBook,
   onApply,
@@ -152,6 +160,7 @@ function ListingPageContent({
   listingStatusPillVariant: ListingStatusPillVariant;
   shouldDisplayListingStatus: boolean;
   shouldDisplaySubmitDraftButton: boolean;
+  shouldDisplayReviewTenantButton: boolean;
   onBack: () => void;
   onBook: (index: number) => void;
   onApply: () => void;
@@ -159,6 +168,8 @@ function ListingPageContent({
   onSubmitDraftListing: () => void;
   className?: string;
 }): React.JSX.Element {
+  const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
+
   return (
     <div className={className}>
       <TopBar
@@ -197,7 +208,30 @@ function ListingPageContent({
       />
       <BottomBar
         shouldDisplaySubmitDraftButton={shouldDisplaySubmitDraftButton}
+        shouldDisplayReviewTenantButton={shouldDisplayReviewTenantButton}
         onSubmitDraftListing={onSubmitDraftListing}
+        onReviewTenant={() => setIsReviewTenantModalOpen(true)}
+      />
+      
+      <ReviewTenantModal
+        isOpen={isReviewTenantModalOpen}
+        onClose={() => setIsReviewTenantModalOpen(false)}
+        onReject={(applicationId: string) => {
+          console.log(`Rejected application ${applicationId}`);
+        }}
+        onProgress={(applicationId: string) => {
+          console.log(`Progressed application ${applicationId}`);
+        }}
+        onBackgroundPass={(applicationId: string) => {
+          console.log(`Background check passed for application ${applicationId}`);
+        }}
+        onBackgroundFail={(applicationId: string) => {
+          console.log(`Background check failed for application ${applicationId}`);
+        }}
+        onSendToLandlord={(applicationId: string) => {
+          console.log(`Sent application ${applicationId} to landlord`);
+        }}
+        propertyAddress={`${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`}
       />
     </div>
   );
@@ -355,21 +389,37 @@ function ListingDetails({
 
 function BottomBar({
   shouldDisplaySubmitDraftButton,
+  shouldDisplayReviewTenantButton,
   onSubmitDraftListing,
+  onReviewTenant,
   className = "",
 }: {
   shouldDisplaySubmitDraftButton: boolean;
+  shouldDisplayReviewTenantButton: boolean;
   onSubmitDraftListing: () => void;
+  onReviewTenant: () => void;
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={twMerge("flex", className)}>
-      {shouldDisplaySubmitDraftButton && (
-        <SubmitDraftListingButton
-          onClick={onSubmitDraftListing}
-          className="ml-auto"
-        />
-      )}
+    <div className={twMerge("flex justify-between items-center", className)}>
+      {/* Left side - Review Tenant Button */}
+      <div className="flex">
+        {shouldDisplayReviewTenantButton && (
+          <ReviewTenantButton onClick={onReviewTenant} />
+        )}
+      </div>
+
+      {/* For tenant rental agreement*/}
+      <div className="flex">
+        {/* Space for potential middle buttons */}
+      </div>
+
+      {/* Right side - for approve contract button*/}
+      <div className="flex">
+        {shouldDisplaySubmitDraftButton && (
+          <SubmitDraftListingButton onClick={onSubmitDraftListing} />
+        )}
+      </div>
     </div>
   );
 }

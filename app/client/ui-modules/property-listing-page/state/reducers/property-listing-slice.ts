@@ -32,13 +32,33 @@ const initialState: PropertyListingPageUiState = {
   listingStatusPillVariant: ListingStatusPillVariant.DRAFT,
   shouldDisplayListingStatus: true,
   shouldDisplaySubmitDraftButton: true,
+  shouldDisplayReviewTenantButton: false,
   shouldShowLoadingState: true,
 };
+
+export const submitDraftListingAsync = createAsyncThunk(
+  "propertyListing/submitDraftListing",
+  async (propertyId: string) => {
+    // TODO: Replace with actual API call to update listing status
+    // Example: await updateListingStatusUseCase(propertyId, "current");
+    console.log(`Submitting draft listing for property ${propertyId}`);
+    return { success: true };
+  }
+);
 
 export const propertyListingSlice = createSlice({
   name: "propertyListing",
   initialState: initialState,
-  reducers: {},
+  reducers: {
+    submitDraftListing: (state) => {
+      // Change listing status to current/listed
+      state.listingStatusText = getListingStatusDisplayString("current");
+      state.listingStatusPillVariant = getListingStatusPillVariant("current");
+      // Hide submit draft button and show review tenant button
+      state.shouldDisplaySubmitDraftButton = false;
+      state.shouldDisplayReviewTenantButton = true;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(load.fulfilled, (state, action) => {
       state.streetNumber = action.payload.streetnumber;
@@ -77,7 +97,21 @@ export const propertyListingSlice = createSlice({
       state.listingStatusPillVariant = getListingStatusPillVariant(
         action.payload.listing_status
       );
+      
+      // Set button visibility based on listing status
+      const isDraft = action.payload.listing_status.toLowerCase() === "draft";
+      state.shouldDisplaySubmitDraftButton = isDraft;
+      state.shouldDisplayReviewTenantButton = !isDraft;
+      
       state.shouldShowLoadingState = false;
+    });
+    
+    builder.addCase(submitDraftListingAsync.fulfilled, (state) => {
+      // Update the state when backend submission is successful
+      state.listingStatusText = getListingStatusDisplayString("current");
+      state.listingStatusPillVariant = getListingStatusPillVariant("current");
+      state.shouldDisplaySubmitDraftButton = false;
+      state.shouldDisplayReviewTenantButton = true;
     });
   },
 });
@@ -94,6 +128,8 @@ function getListingStatusDisplayString(status: string): string {
   switch (status.toLowerCase()) {
     case "draft":
       return "DRAFT LISTING";
+    case "current":
+      return "CURRENT LISTING";
     default:
       return "Unknown Status";
   }
@@ -130,6 +166,9 @@ export const load = createAsyncThunk(
     return propertyWithListingData;
   }
 );
+
+// Export the actions
+export const { submitDraftListing } = propertyListingSlice.actions;
 
 export const selectPropertyListingUiState = (state: RootState) =>
   state.propertyListing;
