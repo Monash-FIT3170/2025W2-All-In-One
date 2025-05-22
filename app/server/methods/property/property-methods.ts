@@ -22,6 +22,7 @@ import { AgentCollection } from "../../database/user/user-collections";
 import { LandlordCollection } from "../../database/user/user-collections";
 import { TenantCollection } from "../../database/user/user-collections";
 
+import { ListingStatus } from "../../../shared/api-models/property-listing/ListingStatus";
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
 // If the property is not found, it throws an InvalidDataError
@@ -68,7 +69,7 @@ const propertyGetAllMethod = {
 
 const getAllListedProperties = {
   [MeteorMethodIdentifier.PROPERTY_GET_ALL_LISTED]: async (): Promise<ApiProperty[]> => {
-    const listedStatus = await ListingStatusCollection.findOneAsync({ name: "Listed" });
+    const listedStatus = await ListingStatusCollection.findOneAsync({ status: ListingStatus.LISTED });
     if (!listedStatus) {
       console.warn("Listing status 'Listed' not found. Returning empty array for listed properties.");
       return []; 

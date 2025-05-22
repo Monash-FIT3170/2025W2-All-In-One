@@ -183,6 +183,66 @@ async function tempSeedPropertyData(): Promise<void> {
       inspection_ids: ["1", "2"],
     });
 
+    // Seed 10 additional properties with "Listed" status
+    const listedStatusId = "2"; // Corresponds to ListingStatus.LISTED from permSeedListingStatusData
+    const propertyStatusVacantId = "1"; // Corresponds to "Vacant"
+    const defaultFeatureIds = ["1", "2"]; // Default features
+
+    for (let i = 2; i <= 11; i++) {
+      const propertyId = i.toString();
+      await PropertyCollection.insertAsync({
+        _id: propertyId,
+        streetnumber: `${i * 10} Park Ave`,
+        streetname: "Central",
+        suburb: ["Metropolis", "Gotham", "Star City", "Coast City"][i % 4],
+        province: "NY",
+        postcode: `${10000 + i}`,
+        property_status_id: propertyStatusVacantId,
+        description:
+          `Spacious ${ (i % 3) + 2}-bedroom property in a prime location. Features modern amenities and excellent transport links. ` +
+          `Ideal for families or professionals looking for comfort and convenience. Property includes a well-maintained garden and off-street parking.`,
+        summary_description: `Beautiful ${ (i % 3) + 2}-bed property in ${["Metropolis", "Gotham", "Star City", "Coast City"][i % 4]}.`,
+        bathrooms: (i % 2) + 1,
+        bedrooms: (i % 3) + 2,
+        parking: (i % 2) + 1,
+        property_feature_ids: defaultFeatureIds,
+        type: (i % 2 === 0) ? "Apartment" : "Townhouse",
+        area: 300 + i * 20,
+        agent_id: globalAgent?.agentId || "fallback_agent_id", // Use optional chaining and a fallback if globalAgent might not be set
+        landlord_id: globalLandlord?.landlordId || "fallback_landlord_id", // Use optional chaining
+        tenant_id: "", // Newly listed properties likely don't have a tenant yet
+      });
+
+      await PropertyPriceCollection.insertAsync({
+        property_id: propertyId,
+        price_per_month: 1200 + i * 100,
+        date_set: new Date(),
+      });
+
+      // Generate some image URLs for variety
+      const imageUrls = [
+        `https://picsum.photos/seed/${propertyId}_1/800/600`,
+        `https://picsum.photos/seed/${propertyId}_2/800/600`,
+        `https://picsum.photos/seed/${propertyId}_3/800/600`,
+      ];
+
+      // Create some mock inspection IDs if needed, or leave empty
+      const inspectionIds = [];
+      if (i % 3 === 0) { // Add inspections for some properties
+        const inspectionIdBase = i * 10;
+        await InspectionCollection.insertAsync({ _id: inspectionIdBase.toString(), starttime: new Date(), endtime: new Date(Date.now() + 3600 * 1000) });
+        await InspectionCollection.insertAsync({ _id: (inspectionIdBase + 1).toString(), starttime: new Date(Date.now() + 24 * 3600 * 1000), endtime: new Date(Date.now() + 25 * 3600 * 1000) });
+        inspectionIds.push(inspectionIdBase.toString(), (inspectionIdBase+1).toString());
+      }
+
+      await ListingCollection.insertAsync({
+        property_id: propertyId,
+        listing_status_id: listedStatusId, // "Listed"
+        image_urls: imageUrls,
+        inspection_ids: inspectionIds,
+      });
+      console.log(`[Seed] Created listed property: ${propertyId}`);
+    }
   }
 }
 // This function is used to seed the database with initial task data
