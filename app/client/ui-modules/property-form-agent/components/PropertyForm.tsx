@@ -10,7 +10,8 @@ import FormPropertyImages from "./FormPropertyImages";
 import FormListingOptions from "./FormListingOptions";
 import { formSchema, FormSchemaType } from "./FormSchema";
 import { Button } from "../../theming-shadcn/Button";
-import { ApiLandlord } from "/app/shared/api-models/user/api-roles/ApiLandlord";
+import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
+
 
 export function PropertyForm({
   form,
@@ -19,7 +20,7 @@ export function PropertyForm({
 }: {
   form: UseFormReturn<FormSchemaType>;
   onSubmit: (values: FormSchemaType) => void;
-  landlords: ApiLandlord[];
+  landlords: Landlord[];
 }) {
   return (
     <Form {...form}>

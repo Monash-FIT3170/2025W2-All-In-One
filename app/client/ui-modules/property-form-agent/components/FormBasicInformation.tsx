@@ -18,14 +18,14 @@ import { Input } from "../../theming-shadcn/Input";
 import { UseFormReturn } from "react-hook-form";
 import { FormSchemaType } from "./FormSchema";
 import { FormHeading } from "./FormHeading";
-import { ApiLandlord } from "/app/shared/api-models/user/api-roles/ApiLandlord";
+import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 
 export default function FormBasicInformation({
   form,
   landlords,
 }: {
   form: UseFormReturn<FormSchemaType>;
-  landlords: ApiLandlord[];
+  landlords: Landlord[];
 }) {
 
   return (
