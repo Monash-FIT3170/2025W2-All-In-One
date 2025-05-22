@@ -15,6 +15,9 @@ import { load, selectPropertyFormUiState } from "./state/reducers/property-form-
 import { useSelector } from "react-redux";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 import { getPropertyStatusId } from "../../library-modules/domain-models/property/repositories/property-repository";
+import { uploadFilesHandler } from "../../library-modules/apis/azure/blob-api";
+import { BlobNamePrefix, UploadResults } from "/app/shared/azure/blob-models";
+import { apiInsertPropertyListing } from "../../library-modules/apis/property-listing/listing-api";
 
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
@@ -64,6 +67,10 @@ export function PropertyFormPage() {
         console.log("Property inserted with ID:", propertyId);
       }
     });
+    // const uploadReturnValues: UploadResults = await uploadFilesHandler(values.images,BlobNamePrefix.PROPERTY)
+    // console.log(uploadReturnValues)
+    // const imageUrls: string[] = uploadReturnValues.success.map((uploadResult) => {return uploadResult.url})
+    // console.log(await apiInsertPropertyListing("999",imageUrls)) <- Insert the property_id in place of 999
   };
   
   return (
