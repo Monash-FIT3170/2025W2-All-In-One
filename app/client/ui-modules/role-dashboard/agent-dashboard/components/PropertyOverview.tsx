@@ -7,7 +7,7 @@ import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 
 interface Property {
   address: string;
-  status: "Closed" | "Maintenance" | "Draft" | "Listed"
+  status: "Closed" | "Under Maintenance" | "Draft" | "Listed" | "Vacant" | "Occupied"
   rent: number;
 }
 
@@ -28,7 +28,7 @@ export function PropertyOverview({
           const apiProperties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, currentUser.agentId) as ApiProperty[];
           const mappedProperties: Property[] = apiProperties.map((property: ApiProperty) => ({
             address: `${property.streetnumber} ${property.streetname}`,
-            status: property.propertyStatus as "Closed" | "Maintenance" | "Draft" | "Listed",
+            status: property.propertyStatus as "Closed" | "Under Maintenance" | "Draft" | "Listed" | "Vacant" | "Occupied",
             rent: property.pricePerMonth,
           }));
           setProperties(mappedProperties);
@@ -74,10 +74,12 @@ export function PropertyOverview({
                   <td className="px-6 py-4">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       property.status === "Closed" ? "bg-gray-100 text-gray-800" :
-                      property.status === "Draft" ? "bg-yellow-100 text-yellow-800" :
-                      property.status === "Listed" ? "bg-green-100 text-green-800" :
-                      property.status === "Maintenance" ? "bg-blue-100 text-blue-800" :
-                      "bg-red-100 text-red-800"
+                      property.status === "Draft" ? "bg-purple-100 text-purple-800" :
+                      property.status === "Listed" ? "bg-blue-100 text-blue-800" :
+                      property.status === "Under Maintenance" ? "bg-yellow-100 text-yellow-800" :
+                      property.status === "Vacant" ? "bg-red-100 text-red-800":
+                      property.status === "Occupied" ? "bg-green-100 text-green-800":
+                      "bg-grey-100 text-grey-800"
                     }`}>
                       {property.status}
                     </span>
