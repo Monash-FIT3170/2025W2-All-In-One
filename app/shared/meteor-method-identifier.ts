@@ -1,6 +1,8 @@
 export enum MeteorMethodIdentifier {
   TASK_INSERT = "tasks.insert",
   TASK_GET = "tasks.getOne",
+  TASK_GET_PENDING_COUNT = "tasks.getPendingCount",
+  TASK_GET_PENDING_LIST = "tasks.getPendingList",
   BLOB_UPLOAD_FILE = "blobs.uploadFile",
   BLOB_UPLOAD_FILES = "blobs.uploadFiles",
   PROPERTY_GET = "properties.getOne",

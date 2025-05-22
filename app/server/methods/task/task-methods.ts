@@ -1,5 +1,4 @@
-
-
+import { Meteor } from "meteor/meteor";
 import { get } from "react-hook-form";
 import { TaskDocument } from "../../database/task/models/TaskDocument";
 import { TaskCollection } from "../../database/task/task-collections";
@@ -7,6 +6,7 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
+import { TaskStatus } from "/app/shared/task-status-identifier";
 
 /**
  * Retrieves a task by its ID and returns it as an `ApiTask` DTO.
@@ -40,6 +40,24 @@ const taskGetMethod = {
     return taskDTO;
   },
 };
+
+const taskGetPendingCountMethod = {
+  [MeteorMethodIdentifier.TASK_GET_PENDING_COUNT]: async (): Promise<number> => {
+    return await TaskCollection.find({
+      taskStatus: { $ne: TaskStatus.COMPLETED }
+    }).countAsync();
+  },
+};
+
+const taskGetPendingListMethod = {
+  [MeteorMethodIdentifier.TASK_GET_PENDING_LIST]: async (): Promise<ApiTask[]> => {
+    const tasks = await TaskCollection.find({
+      taskStatus: { $ne: TaskStatus.COMPLETED }
+    }).fetchAsync();
+    return Promise.all(tasks.map(mapTaskDocumentTotaskDTO));
+  },
+};
+
 /**
  * Maps a TaskDocument to an ApiTask DTO.
  *
@@ -69,4 +87,6 @@ async function getTaskDocumentById(
 
 Meteor.methods({
   ...taskGetMethod,
+  ...taskGetPendingCountMethod,
+  ...taskGetPendingListMethod,
 });
