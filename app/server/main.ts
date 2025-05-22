@@ -245,7 +245,7 @@ async function tempSeedPropertyData(): Promise<void> {
     });
 
     await InspectionCollection.insertAsync({
-      _id: "2",
+      _id: "3",
       starttime: new Date("2025-04-16T10:00:00Z"),
       endtime: new Date("2025-04-17T11:00:00Z"),
     });
