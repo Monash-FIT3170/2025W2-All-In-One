@@ -16,4 +16,5 @@ export enum MeteorMethodIdentifier {
   LANDLORD_INSERT = "landlords.insert",
   LANDLORD_GET = "landlords.getOne",
   LANDLORD_GET_ALL = "landlords.getAll",
+  PROPERTY_STATUS_GET = "propertyStatus.getOne",
 }

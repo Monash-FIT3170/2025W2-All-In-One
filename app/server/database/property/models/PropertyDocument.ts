@@ -1,5 +1,3 @@
-import { PropertyStatus} from "/app/shared/api-models/property/PropertyStatus";
-
 export type PropertyDocument = {
   _id: string;
   streetnumber: string;
@@ -7,7 +5,7 @@ export type PropertyDocument = {
   suburb: string;
   province: string;
   postcode: string;
-  property_status_id: PropertyStatus;
+  property_status_id: string;
   description: string;
   summary_description: string;
   bathrooms: number;
