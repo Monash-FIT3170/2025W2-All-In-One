@@ -7,6 +7,9 @@ import { ArrowLeftIcon } from "lucide-react";
 import { PropertyForm } from "./components/PropertyForm";
 import { formSchema, FormSchemaType } from "./components/FormSchema";
 import { formDefaultValues } from "./components/PropertyForm";
+import { uploadFilesHandler } from "../../library-modules/apis/azure/blob-api";
+import { BlobNamePrefix, UploadResults } from "/app/shared/azure/blob-models";
+import { apiInsertPropertyListing } from "../../library-modules/apis/property-listing/listing-api";
 
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
@@ -18,8 +21,12 @@ export function PropertyFormPage() {
     console.log("Attempting to return to previous route.");
   };
 
-  const handleSubmit = (values: FormSchemaType) => {
+  const handleSubmit = async (values: FormSchemaType) => {
     console.log("Form submitted!", values);
+    // const uploadReturnValues: UploadResults = await uploadFilesHandler(values.images,BlobNamePrefix.PROPERTY)
+    // console.log(uploadReturnValues)
+    // const imageUrls: string[] = uploadReturnValues.success.map((uploadResult) => {return uploadResult.url})
+    // console.log(await apiInsertPropertyListing("999",imageUrls)) <- Insert the property_id in place of 999
   };
 
   return (
