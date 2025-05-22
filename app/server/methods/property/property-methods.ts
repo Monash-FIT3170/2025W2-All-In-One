@@ -19,6 +19,7 @@ import { TenantDocument } from "../../database/user/models/role-models/TenantDoc
 import { AgentCollection } from "../../database/user/user-collections";
 import { LandlordCollection } from "../../database/user/user-collections";
 import { TenantCollection } from "../../database/user/user-collections";
+import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
@@ -176,6 +177,23 @@ async function getTenantDocumentById(
   return await TenantCollection.findOneAsync(id);
 }
 
+const propertyInsertMethod = {
+  [MeteorMethodIdentifier.PROPERTY_INSERT]: async (
+  data: PropertyInsertData
+): Promise<string> => {
+  try {
+    const propertyId = await PropertyCollection.insertAsync({
+      ...data,
+    });
+    return propertyId;
+  } catch (error) {
+    console.error("Failed to insert property:", error);
+    throw meteorWrappedInvalidDataError(error as InvalidDataError);
+  }
+}
+}
+
 Meteor.methods({
   ...propertyGetMethod,
+  ...propertyInsertMethod
 });

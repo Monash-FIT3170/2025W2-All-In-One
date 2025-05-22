@@ -1,5 +1,6 @@
+import { PropertyStatus } from "../../../../shared/api-models/property/PropertyStatus";
 
 export type PropertyStatusDocument = {
   _id: string;
-  name: string;
+  name: PropertyStatus;
 }

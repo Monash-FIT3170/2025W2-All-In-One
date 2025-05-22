@@ -10,6 +10,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { propertyListingSlice } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
 import { currentUserSlice } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
+import { propertyFormSlice } from "./ui-modules/property-form-agent/state/reducers/property-form-slice";
 
 export const store = configureStore({
   reducer: {
@@ -22,7 +23,8 @@ export const store = configureStore({
     loginForm: loginFormSlice.reducer,
     propertyListing: propertyListingSlice.reducer,
     signupForm: signupFormSlice.reducer,
-    currentUser: currentUserSlice.reducer
+    currentUser: currentUserSlice.reducer,
+    propertyForm: propertyFormSlice.reducer,
   },
 });
 
