@@ -1,37 +1,49 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon } from "lucide-react";
 import { PropertyForm } from "./components/PropertyForm";
 import { formSchema, FormSchemaType } from "./components/FormSchema";
 import { formDefaultValues } from "./components/PropertyForm";
-import { PropertyDocument } from "/app/server/database/property/models/PropertyDocument";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { PropertyStatusName } from "/app/shared/api-models/property/PropertyStatus";
-import { ApiLandlord } from "/app/shared/api-models/user/api-roles/ApiLandlord";
+import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
+import { useAppDispatch } from "../../store";
+import { PropertyFormPageUiState } from "./state/PropertyFormPageUIState";
+import { load, selectPropertyFormUiState } from "./state/reducers/property-form-slice";
+import { useSelector } from "react-redux";
+import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
+import { getPropertyStatusId } from "../../library-modules/domain-models/property/repositories/property-repository";
 
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: formDefaultValues,
   });
+  const dispatch = useAppDispatch();
+  const state: PropertyFormPageUiState = useSelector(
+    selectPropertyFormUiState
+  );
+
+  useEffect(() => {
+    dispatch(load());
+  }, []);
 
   const onClick = () => {
     console.log("Attempting to return to previous route.");
   };
 
-  const handleSubmit = (values: FormSchemaType) => {
+  const handleSubmit = async (values: FormSchemaType) => {
     const addressParts = values.address.trim().split(" ");
   
-    const insertDoc: Omit<PropertyDocument, "_id"> = {
+    const insertDoc: PropertyInsertData = {
       streetnumber: addressParts[0],
       streetname: addressParts.slice(1).join(" "),
       suburb: values.city,
       province: values.state,
       postcode: values.postal_code,
-      property_status_id: PropertyStatusName.VACANT,
+      property_status_id: await getPropertyStatusId(PropertyStatus.VACANT),
       description: values.description,
       summary_description: values.description.slice(0, 60), // takes first 60 characters?? not sure what summary description is
       bathrooms: values.bathroom_number,
@@ -54,23 +66,6 @@ export function PropertyFormPage() {
     });
   };
   
-  const [landlords, setLandlords] = useState<ApiLandlord[]>([]);
-
-  useEffect(() => {
-    Meteor.call(
-      MeteorMethodIdentifier.LANDLORD_GET_ALL,
-      (err: Meteor.Error | null, res: ApiLandlord[]) => {
-        if (err) {
-          console.error("Failed to fetch landlords:", err);
-        } else {
-          console.log("✅ Received landlords:", res); // <- Add this
-          setLandlords(res);
-        }
-      }
-    );
-  }, []);
-  
-  
   return (
     <div className="mt-6 ml-10">
       <div className="flex flex-col items-start">
@@ -90,7 +85,7 @@ export function PropertyFormPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-6 py-10 rounded-md space-y-10">
-          <PropertyForm onSubmit={handleSubmit} form={form} landlords={landlords} />
+          <PropertyForm onSubmit={handleSubmit} form={form} landlords={state.landlords} />
       </div>
     </div>
   );
