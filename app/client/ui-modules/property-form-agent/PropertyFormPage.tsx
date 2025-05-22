@@ -14,7 +14,7 @@ import { PropertyFormPageUiState } from "./state/PropertyFormPageUIState";
 import { load, selectPropertyFormUiState } from "./state/reducers/property-form-slice";
 import { useSelector } from "react-redux";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
-import { getPropertyStatusId } from "../../library-modules/domain-models/property/repositories/property-repository";
+import { getPropertyStatusId, insertProperty} from "../../library-modules/domain-models/property/repositories/property-repository";
 import { uploadFilesHandler } from "../../library-modules/apis/azure/blob-api";
 import { BlobNamePrefix, UploadResults } from "/app/shared/azure/blob-models";
 import { apiInsertPropertyListing } from "../../library-modules/apis/property-listing/listing-api";
@@ -60,13 +60,9 @@ export function PropertyFormPage() {
       tenant_id: "", // not collected yet
     };
   
-    Meteor.call(MeteorMethodIdentifier.PROPERTY_INSERT, insertDoc, (err: Meteor.Error | null, propertyId: string | undefined)=> {
-      if (err) {
-        console.error("Insert failed", err);
-      } else {
-        console.log("Property inserted with ID:", propertyId);
-      }
-    });
+    const propertyId = await insertProperty(insertDoc);
+    console.log("Property inserted with ID:", propertyId);
+
     // const uploadReturnValues: UploadResults = await uploadFilesHandler(values.images,BlobNamePrefix.PROPERTY)
     // console.log(uploadReturnValues)
     // const imageUrls: string[] = uploadReturnValues.success.map((uploadResult) => {return uploadResult.url})
