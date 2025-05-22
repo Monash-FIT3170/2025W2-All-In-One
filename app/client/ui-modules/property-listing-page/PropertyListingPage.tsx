@@ -369,7 +369,7 @@ function BottomBar({
 }): React.JSX.Element {
   return (
     <div className={twMerge("flex items-center gap-2", className)}>
-      <EditListing/>
+      <EditListing />
       {shouldDisplaySubmitDraftButton && (
         <SubmitDraftListingButton
           onClick={onSubmitDraftListing}
@@ -405,7 +405,7 @@ function EditListing({
   ];
 
   // Parse the area value from propertyLandArea by removing non-numeric characters
-  const areaValue = parseInt(state.propertyLandArea.replace(/[^0-9]/g, ''));
+  const areaValue = parseInt(state.propertyLandArea.replace(/[^0-9]/g, ""));
 
   const listingInfo: FormSchemaType = {
     landlord: mockLandlords[0].landlordId, // Use the landlord ID instead of name
@@ -423,12 +423,17 @@ function EditListing({
     available_dates: new Date(),
     lease_term: "12_months",
     show_contact_boolean: true,
-    };
+  };
 
   return (
     <>
-      <EditDraftListingButton onClick={toggleModal}/>
-        <EditDraftListingModal isOpen={isModalOpen} toggle={toggleModal} propertyForm={listingInfo} landlords={mockLandlords}/>
+      <EditDraftListingButton onClick={toggleModal} />
+      <EditDraftListingModal
+        isOpen={isModalOpen}
+        toggle={toggleModal}
+        propertyForm={listingInfo}
+        landlords={mockLandlords}
+      />
     </>
   );
 }

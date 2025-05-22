@@ -1,8 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { FormSchemaType, formSchema } from "../../property-form-agent/components/FormSchema";
-import { formDefaultValues, PropertyForm } from "../../property-form-agent/components/PropertyForm";
-import { ThemedButton, ThemedButtonVariant } from "../../theming/components/ThemedButton";
+import {
+  FormSchemaType,
+  formSchema,
+} from "../../property-form-agent/components/FormSchema";
+import {
+  formDefaultValues,
+  PropertyForm,
+} from "../../property-form-agent/components/PropertyForm";
+import {
+  ThemedButton,
+  ThemedButtonVariant,
+} from "../../theming/components/ThemedButton";
 import React from "react";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
@@ -17,7 +26,9 @@ interface EditDraftListingModalProps {
   landlords: Landlord[];
 }
 
-export default function EditDraftListingModal(props: EditDraftListingModalProps) {
+export default function EditDraftListingModal(
+  props: EditDraftListingModalProps
+) {
   const listingInfo = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: props.propertyForm,
@@ -45,15 +56,18 @@ export default function EditDraftListingModal(props: EditDraftListingModalProps)
       features: [],
       type: values.property_type,
       area: values.space,
-    }
+    };
 
-    await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_UPDATE, updatedProperty);
+    await Meteor.callAsync(
+      MeteorMethodIdentifier.PROPERTY_UPDATE,
+      updatedProperty
+    );
 
     // Refresh the page
     window.location.reload();
-    
+
     // Close modal
-    console.log("Finished updating listing, closing modal")
+    console.log("Finished updating listing, closing modal");
     props.toggle();
   };
 
@@ -61,22 +75,28 @@ export default function EditDraftListingModal(props: EditDraftListingModalProps)
     <>
       {props.isOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70">
-          <div 
+          <div
             onClick={(e) => e.stopPropagation()}
-            className="flex h-[85vh] w-[50%] flex-col overflow-hidden rounded-xl bg-white p-4">
+            className="flex h-[85vh] w-[50%] flex-col overflow-hidden rounded-xl bg-white p-4"
+          >
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <div className="w-full max-w-3xl mx-auto">
-                <PropertyForm onSubmit={handleSaveChanges} form={listingInfo} landlords={props.landlords} mode={"edit"}/>
+                <PropertyForm
+                  onSubmit={handleSaveChanges}
+                  form={listingInfo}
+                  landlords={props.landlords}
+                  mode={"edit"}
+                />
               </div>
             </div>
 
             <div className="sticky bottom-0 flex justify-end gap-4 border-t border-gray-300 bg-white pt-4 pb-4">
-              <ThemedButton 
-              variant={ThemedButtonVariant.SECONDARY} 
-              onClick={() => {
-                listingInfo.reset();
-                props.toggle();
-              }}
+              <ThemedButton
+                variant={ThemedButtonVariant.SECONDARY}
+                onClick={() => {
+                  listingInfo.reset();
+                  props.toggle();
+                }}
               >
                 Cancel
               </ThemedButton>
@@ -86,5 +106,4 @@ export default function EditDraftListingModal(props: EditDraftListingModalProps)
       )}
     </>
   );
-
 }
