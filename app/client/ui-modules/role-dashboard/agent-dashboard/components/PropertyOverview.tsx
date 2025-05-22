@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../../../theming-shadcn/Button";
 import { CardWidget } from "../../components/CardWidget";
- 
+import { useAppSelector } from "../../../../store";
+import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
+import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
+
 interface Property {
   address: string;
   status: "Closed" | "Maintenance" | "Draft" | "Listed"
@@ -9,14 +12,36 @@ interface Property {
 }
 
 interface PropertyOverviewProps {
-  properties: Property[];
   className?: string;
 }
 
 export function PropertyOverview({
-  properties,
   className = "",
 }: PropertyOverviewProps): React.JSX.Element {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+
+  useEffect(() => {
+    const getPropertyList = async () => {
+      if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
+        try {
+          const apiProperties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, currentUser.agentId) as ApiProperty[];
+          const mappedProperties: Property[] = apiProperties.map((prop: ApiProperty) => ({
+            address: `${prop.streetnumber} ${prop.streetname}`,
+            status: prop.propertyStatus as "Closed" | "Maintenance" | "Draft" | "Listed",
+            rent: prop.pricePerMonth,
+          }));
+          setProperties(mappedProperties);
+        } catch (error) {
+          setProperties([]);
+          console.error('Error fetching properties:', error);
+        }
+      }
+    };
+
+    getPropertyList();
+  }, [currentUser]);
+
   return (
     <CardWidget
       title="Property Overview"
@@ -33,7 +58,6 @@ export function PropertyOverview({
       }
     >
       <div className="mt-2">
-
         <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -67,8 +91,8 @@ export function PropertyOverview({
       </div>
 
       <div className="mt-4">
-      <Button variant="ghost" className="w-full">
-        View All Properties
+        <Button variant="ghost" className="w-full">
+          View All Properties
         </Button>
       </div>
     </CardWidget>
