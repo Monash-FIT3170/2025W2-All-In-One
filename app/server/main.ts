@@ -201,7 +201,7 @@ async function tempSeedPropertyData(): Promise<void> {
       bathrooms: 1,
       bedrooms: 2,
       parking: 1,
-      property_feature_ids: ["3", "4"],
+      property_feature_ids: ["1", "2"],
       type: "House",
       area: 350,
       agent_id: globalAgent.agentId,
@@ -216,7 +216,7 @@ async function tempSeedPropertyData(): Promise<void> {
       suburb: "Santa Monica",
       province: "CA",
       postcode: "90401",
-      property_status_id: "1",
+      property_status_id: "3",
       description:
         "Luxury penthouse apartment with panoramic ocean views. Floor-to-ceiling windows, open concept living and dining, and a rooftop terrace. Includes smart home features and access to building amenities such as a gym and pool.",
       summary_description:
@@ -224,7 +224,7 @@ async function tempSeedPropertyData(): Promise<void> {
       bathrooms: 2,
       bedrooms: 2,
       parking: 2,
-      property_feature_ids: ["5", "6"],
+      property_feature_ids: ["1", "3"],
       type: "Apartment",
       area: 220,
       agent_id: globalAgent.agentId,
