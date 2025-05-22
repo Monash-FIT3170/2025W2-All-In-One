@@ -106,6 +106,9 @@ async function mapPropertyDocumentToPropertyDTO(
   const propertyFeaturesDocuments =
     await getPropertyFeatureDocumentsMatchingIds(property.property_feature_ids);
 
+  const listingDocument = await ListingCollection.findOneAsync({ property_id: property._id });
+  const imageUrls = listingDocument?.image_urls && listingDocument.image_urls.length > 0 ? listingDocument.image_urls : [];
+
   const AgentDocument = property.agent_id
     ? await getAgentDocumentById(property.agent_id)
     : null; // Handle missing agent_id gracefully
@@ -168,6 +171,7 @@ async function mapPropertyDocumentToPropertyDTO(
     agentId: AgentDocument ? AgentDocument._id : '', // Always string
     landlordId: LandlordDocument ? LandlordDocument._id : '', // Always string
     tenantId: TenantDocument ? TenantDocument._id : '', // Always string
+    imageUrls: imageUrls,
   };
 }
 

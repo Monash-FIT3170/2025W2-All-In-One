@@ -19,4 +19,5 @@ export type ApiProperty = {
   agentId: string;
   landlordId: string;
   tenantId: string;
+  imageUrls: string[];
 }

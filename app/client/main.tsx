@@ -55,7 +55,7 @@ function AppRoot(): React.JSX.Element {
               <Route path="/landlord-properties" element={<LandlordProperty />} />
               <Route path="/landlord-calendar" element={<LandlordCalendar />} />
               <Route path="/landlord-tasks" element={<LandlordTask />} />
-              <Route path="/test" element={<PropertyListingPage />} />
+              <Route path="/property-listing" element={<PropertyListingPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/propertyform" element={<PropertyFormPage />} />
               <Route path="/login" element={<AuthTabs initialTab="login" />} />
