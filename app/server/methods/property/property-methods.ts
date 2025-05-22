@@ -13,7 +13,6 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
-import { ListingStatusCollection } from "/app/server/database/property-listing/listing-collections";
 import { ListingCollection } from "/app/server/database/property-listing/listing-collections";
 import { AgentDocument } from "../../database/user/models/role-models/AgentDocument";
 import { LandlordDocument } from "../../database/user/models/role-models/LandlordDocument";
@@ -22,7 +21,6 @@ import { AgentCollection } from "../../database/user/user-collections";
 import { LandlordCollection } from "../../database/user/user-collections";
 import { TenantCollection } from "../../database/user/user-collections";
 
-import { ListingStatus } from "../../../shared/api-models/property-listing/ListingStatus";
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
 // If the property is not found, it throws an InvalidDataError
@@ -69,15 +67,11 @@ const propertyGetAllMethod = {
 
 const getAllListedProperties = {
   [MeteorMethodIdentifier.PROPERTY_GET_ALL_LISTED]: async (): Promise<ApiProperty[]> => {
-    const listedStatus = await ListingStatusCollection.findOneAsync({ status: ListingStatus.LISTED });
-    if (!listedStatus) {
-      console.warn("Listing status 'Listed' not found. Returning empty array for listed properties.");
-      return []; 
-    }
+    // use '2' as the ID for "Listed" status
+    const listedStatusId = "2";
 
-    // 2. Get all listings with that status
     const listedListings = await ListingCollection.find({
-      listing_status_id: listedStatus._id,
+      listing_status_id: listedStatusId,
     }).fetchAsync();
 
     const propertyIds = listedListings.map((listing) => listing.property_id);

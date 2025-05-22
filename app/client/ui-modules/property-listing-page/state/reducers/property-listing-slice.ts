@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ListingStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingStatusPill";
 import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingSummary";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
@@ -8,6 +8,7 @@ import {
   getFormattedTimeStringFromDate,
 } from "/app/client/library-modules/utils/date-utils";
 import { RootState } from "/app/client/store";
+import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 
 const initialState: PropertyListingPageUiState = {
   streetNumber: "",
@@ -32,14 +33,48 @@ const initialState: PropertyListingPageUiState = {
   listingStatusPillVariant: ListingStatusPillVariant.DRAFT,
   shouldDisplayListingStatus: true,
   shouldDisplaySubmitDraftButton: true,
-  shouldShowLoadingState: true,
+  isLoading: false, 
+  propertyIdToLoad: null,
+  loadedPropertyId: null, 
+  error: null, // Added for error handling
 };
 
 export const propertyListingSlice = createSlice({
   name: "propertyListing",
   initialState: initialState,
-  reducers: {},
+  reducers: {
+    prepareForLoad(state, action: PayloadAction<string>) {
+      const newPropertyIdToLoad = action.payload;
+      if (state.loadedPropertyId !== newPropertyIdToLoad) {
+        state.streetNumber = initialState.streetNumber;
+        state.street = initialState.street;
+        state.suburb = initialState.suburb;
+        state.province = initialState.province;
+        state.postcode = initialState.postcode;
+        state.summaryDescription = initialState.summaryDescription;
+        state.propertyStatusText = initialState.propertyStatusText;
+        state.propertyStatusPillVariant = initialState.propertyStatusPillVariant; // Or set to a specific default like DEFAULT if applicable
+        state.propertyDescription = initialState.propertyDescription;
+        state.propertyFeatures = initialState.propertyFeatures;
+        state.propertyType = initialState.propertyType;
+        state.propertyLandArea = initialState.propertyLandArea;
+        state.propertyBathrooms = initialState.propertyBathrooms;
+        state.propertyParkingSpaces = initialState.propertyParkingSpaces;
+        state.propertyBedrooms = initialState.propertyBedrooms;
+        state.propertyPrice = initialState.propertyPrice;
+        state.inspectionBookingUiStateList = initialState.inspectionBookingUiStateList;
+        state.listingImageUrls = initialState.listingImageUrls;
+      }
+      state.propertyIdToLoad = newPropertyIdToLoad;
+      state.isLoading = true;
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
+    builder.addCase(load.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
     builder.addCase(load.fulfilled, (state, action) => {
       state.streetNumber = action.payload.streetnumber;
       state.street = action.payload.streetname;
@@ -77,7 +112,16 @@ export const propertyListingSlice = createSlice({
       state.listingStatusPillVariant = getListingStatusPillVariant(
         action.payload.listing_status
       );
-      state.shouldShowLoadingState = false;
+      state.isLoading = false;
+      state.propertyIdToLoad = null; // Reset after successful load
+      state.loadedPropertyId = action.meta.arg; // Store the ID of the property that was just loaded
+      state.error = null;
+    });
+    builder.addCase(load.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.error.message || "Failed to load property details";
+      state.propertyIdToLoad = null; // Reset on failure
+      state.loadedPropertyId = null; // Clear loaded ID on failure
     });
   },
 });
@@ -91,30 +135,39 @@ function getPropertyPriceDisplayString(price: number): string {
 }
 
 function getListingStatusDisplayString(status: string): string {
-  switch (status.toLowerCase()) {
-    case "draft":
+  const lowerStatus = status.toLowerCase();
+  switch (lowerStatus) {
+    case ListingStatus.DRAFT.toLowerCase():
       return "DRAFT LISTING";
+    case ListingStatus.LISTED.toLowerCase():
+      return "LISTED";
+    case ListingStatus.TENANT_SELECTION.toLowerCase():
+      return "TENANT SELECTION";
+    case ListingStatus.TENANT_APPROVAL.toLowerCase():
+      return "TENANT APPROVAL";
     default:
-      return "Unknown Status";
+      return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : "Unknown Status";
   }
 }
 
 function getPropertyStatusPillVariant(
   status: string
 ): PropertyStatusPillVariant {
-  switch (status.toLowerCase()) {
-    case "vacant":
-      return PropertyStatusPillVariant.VACANT;
-    default:
-      return PropertyStatusPillVariant.VACANT;
+  const lowerStatus = status.toLowerCase();
+  if (lowerStatus === "vacant") {
+    return PropertyStatusPillVariant.VACANT;
   }
+  return (PropertyStatusPillVariant as any).DEFAULT || PropertyStatusPillVariant.VACANT; // Fallback 
 }
 
 function getListingStatusPillVariant(status: string): ListingStatusPillVariant {
-  switch (status.toLowerCase()) {
-    case "draft":
+  const lowerStatus = status.toLowerCase();
+  switch (lowerStatus) {
+    case ListingStatus.DRAFT.toLowerCase():
       return ListingStatusPillVariant.DRAFT;
-    case "current":
+    case ListingStatus.LISTED.toLowerCase():
+    case ListingStatus.TENANT_SELECTION.toLowerCase():
+    case ListingStatus.TENANT_APPROVAL.toLowerCase():
       return ListingStatusPillVariant.CURRENT;
     default:
       return ListingStatusPillVariant.DRAFT;
@@ -133,3 +186,5 @@ export const load = createAsyncThunk(
 
 export const selectPropertyListingUiState = (state: RootState) =>
   state.propertyListing;
+
+export const { prepareForLoad } = propertyListingSlice.actions;
