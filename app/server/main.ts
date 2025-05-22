@@ -29,6 +29,7 @@ import { MeteorMethodIdentifier } from "../shared/meteor-method-identifier";
 import { ApiAgent } from "../shared/api-models/user/api-roles/ApiAgent";
 import { ApiTenant } from "../shared/api-models/user/api-roles/ApiTenant";
 import { ApiLandlord } from "../shared/api-models/user/api-roles/ApiLandlord";
+import { ListingStatus } from "../shared/api-models/property-listing/ListingStatus";
 
 let globalAgent: ApiAgent;
 let globalTenant: ApiTenant;
@@ -38,6 +39,7 @@ Meteor.startup(async () => {
   await tempSeedUserAndRoleData();
   await tempSeedPropertyData();
   await tempSeedTaskData();
+  await permSeedListingStatusData();
 });
 
 async function tempSeedUserAndRoleData(): Promise<void> {
@@ -181,7 +183,6 @@ async function tempSeedPropertyData(): Promise<void> {
       inspection_ids: ["1", "2"],
     });
 
-    await ListingStatusCollection.insertAsync({ _id: "1", name: "Draft" });
   }
 }
 // This function is used to seed the database with initial task data
@@ -221,6 +222,28 @@ async function tempSeedTaskData(): Promise<void> {
       description:
         "Check in with the client to provide updates and address any questions.",
       priority: "Medium",
+    });
+  }
+}
+
+async function permSeedListingStatusData(): Promise<void> {
+  if ((await ListingStatusCollection.find().countAsync()) === 0) {
+    console.log("Seeding listing status data...");
+    await ListingStatusCollection.insertAsync({
+      _id: "1",
+      name: ListingStatus.DRAFT,
+    });
+    await ListingStatusCollection.insertAsync({
+      _id: "2",
+      name: ListingStatus.LISTED,
+    });
+    await ListingStatusCollection.insertAsync({
+      _id: "3",
+      name: ListingStatus.TENANT_SELECTION,
+    });
+    await ListingStatusCollection.insertAsync({
+      _id: "4",
+      name: ListingStatus.TENANT_APPROVAL,
     });
   }
 }
