@@ -13,11 +13,51 @@ import {
   agentDashboardLinks,
   settingLinks,
 } from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
+import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
+import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 
 export function AgentDashboard(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
   const dispatch = useAppDispatch();
+  const [propertyList, setPropertyList] = useState<ApiProperty[]>([]);
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const tasks = useAppSelector(selectTasks);
+
+  // Fetch properties
+  useEffect(() => {
+    const getPropertyList = async () => {
+      if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
+        try {
+          const properties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, currentUser.agentId);
+          setPropertyList(properties);
+        } catch (error) {
+          setPropertyList([]);
+          console.error('Error fetching property count:', error);
+        }
+      }
+    };
+    getPropertyList();
+  }, [currentUser]);
+
+  // Set dummy task data
+  useEffect(() => {
+    dispatch(
+      setTasks([
+        {
+          title: "Property Inspection",
+          address: "123 Main St, Apt 4B",
+          datetime: "May 1, 2024",
+          status: "Due Soon" as const,
+        },
+        {
+          title: "Tenant Meeting",
+          address: "123 Main St, Apt 4B",
+          datetime: "April 25, 2024",
+          status: "Upcoming" as const,
+        },
+      ])
+    );
+  }, [dispatch]);
 
   return (
     <div className="min-h-screen">
