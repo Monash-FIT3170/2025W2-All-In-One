@@ -390,6 +390,23 @@ function EditListing({
   const state: PropertyListingPageUiState = useSelector(
     selectPropertyListingUiState
   );
+
+  // Temporary hardcoded landlords
+  const mockLandlords = [
+    {
+      landlordId: "h76d4FJ7yeywiiLSg",
+      userAccountId: "XFoFNBYEAXJsCa6B3",
+      tasks: [], // assuming tasks are not present in your current mock
+      firstName: "TestLandlord",
+      lastName: "Rod",
+      email: "testinglandlordemail@gmail.com",
+      createdAt: "2025-05-22T06:27:51.855Z",
+    },
+  ];
+
+  // Parse the area value from propertyLandArea by removing non-numeric characters
+  const areaValue = parseInt(state.propertyLandArea.replace(/[^0-9]/g, ''));
+
   const listingInfo: FormSchemaType = {
     landlord: "Dylan Hoang",
     property_type: state.propertyType,
@@ -398,23 +415,20 @@ function EditListing({
     state: state.province,
     postal_code: state.postcode,
     apartment_number: "",
-    monthly_rent: Number(state.propertyPrice),
-    bond: 2500, // Not actually displyed on property listing page
     bedroom_number: Number(state.propertyBedrooms),
     bathroom_number: Number(state.propertyBathrooms),
-    space: Number(state.propertyLandArea),
+    space: isNaN(areaValue) ? 0 : areaValue,
     description: state.propertyDescription,
-    amenities: state.propertyFeatures.join(", "),
     images: [],
     available_dates: new Date(),
-    lease_term: "12_months", // Not actually displyed on property listing page
+    lease_term: "12_months",
     show_contact_boolean: true,
     };
 
   return (
     <>
       <EditDraftListingButton onClick={toggleModal}/>
-        <EditDraftListingModal isOpen={isModalOpen} toggle={toggleModal} propertyForm={listingInfo}/>
+        <EditDraftListingModal isOpen={isModalOpen} toggle={toggleModal} propertyForm={listingInfo} landlords={mockLandlords}/>
     </>
   );
 }

@@ -5,11 +5,15 @@ import { formDefaultValues, PropertyForm } from "../../property-form-agent/compo
 import { ThemedButton, ThemedButtonVariant } from "../../theming/components/ThemedButton";
 import React from "react";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
+import { getPropertyStatusId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
+import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 
 interface EditDraftListingModalProps {
   toggle: () => void;
   isOpen: boolean;
   propertyForm: FormSchemaType;
+  landlords: Landlord[];
 }
 
 export default function EditDraftListingModal(props: EditDraftListingModalProps) {
@@ -21,21 +25,23 @@ export default function EditDraftListingModal(props: EditDraftListingModalProps)
   const handleSaveChanges = async (values: FormSchemaType) => {
     // Update property details
     console.log("Updating listing details:", values);
+
+    const addressParts = values.address.trim().split(" ");
+
     const updatedProperty = {
       propertyId: "1",
-      streetnumber: "22",
-      streetname: "Police Road",
+      streetnumber: addressParts[0],
+      streetname: addressParts.slice(1).join(" "),
       suburb: "Clayton",
       province: values.state,
       postcode: values.postal_code,
-      pricePerMonth: values.monthly_rent,
-      propertyStatus: "1",
+      propertyStatus: await getPropertyStatusId(PropertyStatus.VACANT),
       description: values.description,
       summaryDescription: "I updated this summary description.",
       bathrooms: values.bathroom_number,
       bedrooms: values.bedroom_number,
       parking: 100,
-      features: ["1", "2"],
+      features: [],
       type: values.property_type,
       area: values.space,
     }
@@ -56,7 +62,7 @@ export default function EditDraftListingModal(props: EditDraftListingModalProps)
             className="flex h-[85vh] w-[50%] flex-col overflow-hidden rounded-xl bg-white p-4">
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <div className="w-full max-w-3xl mx-auto">
-                <PropertyForm onSubmit={handleSaveChanges} form={listingInfo} mode={"edit"}/>
+                <PropertyForm onSubmit={handleSaveChanges} form={listingInfo} landlords={props.landlords} mode={"edit"}/>
               </div>
             </div>
 

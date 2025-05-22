@@ -220,6 +220,6 @@ Meteor.methods({
 
 Meteor.methods({
   ...propertyGetMethod,
-  ...propertyInsertMethod
+  ...propertyInsertMethod,
   ...updateProperty,
 });
