@@ -408,8 +408,8 @@ function EditListing({
   const areaValue = parseInt(state.propertyLandArea.replace(/[^0-9]/g, ''));
 
   const listingInfo: FormSchemaType = {
-    landlord: "Dylan Hoang",
-    property_type: state.propertyType,
+    landlord: mockLandlords[0].landlordId, // Use the landlord ID instead of name
+    property_type: state.propertyType.toLowerCase(), // Ensure property type matches dropdown options (house or apartment)
     address: `${state.streetNumber} ${state.street}`,
     city: state.suburb,
     state: state.province,
