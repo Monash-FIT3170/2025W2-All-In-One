@@ -6,7 +6,6 @@ import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 import { useAppSelector } from '/app/client/store';
 
 export function DashboardCards() {
-  const [pendingTasksCount, setPendingTasksCount] = useState<number>(0);
   const [propertyCount, setPropertyCount] = useState<number>(0);
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   useEffect(() => {
