@@ -121,6 +121,16 @@ async function tempSeedPropertyData(): Promise<void> {
       name: "Vacant",
     });
 
+    await PropertyStatusCollection.insertAsync({
+      _id: "2",
+      name: "Occupied",
+    });
+
+    await PropertyStatusCollection.insertAsync({
+      _id: "3",
+      name: "Under Maintenance",
+    });
+
     await PropertyFeatureCollection.insertAsync({
       _id: "1",
       name: "Pool",
@@ -130,9 +140,26 @@ async function tempSeedPropertyData(): Promise<void> {
       name: "Lots of space",
     });
 
+    await PropertyFeatureCollection.insertAsync({
+      _id: "3",
+      name: "Garden",
+    });
+
     await PropertyPriceCollection.insertAsync({
       property_id: "1",
       price_per_month: 1500,
+      date_set: new Date(),
+    });
+
+    await PropertyPriceCollection.insertAsync({
+      property_id: "2",
+      price_per_month: 1300,
+      date_set: new Date(),
+    });
+
+    await PropertyPriceCollection.insertAsync({
+      property_id: "3",
+      price_per_month: 2000,
       date_set: new Date(),
     });
 
@@ -159,6 +186,53 @@ async function tempSeedPropertyData(): Promise<void> {
       tenant_id: globalTenant.tenantId,
     });
 
+    await PropertyCollection.insertAsync({
+      _id: "2",
+      streetnumber: "45",
+      streetname: "Maple Avenue",
+      suburb: "Riverdale",
+      province: "NY",
+      postcode: "10471",
+      property_status_id: "2",
+      description:
+        "Charming two-story home located in a quiet neighborhood. Features include hardwood floors, a spacious backyard with a patio, and a recently updated kitchen with stainless steel appliances. Perfect for families or those who enjoy entertaining.",
+      summary_description:
+        "Charming two-story home with a spacious backyard and updated kitchen.",
+      bathrooms: 1,
+      bedrooms: 2,
+      parking: 1,
+      property_feature_ids: ["3", "4"],
+      type: "House",
+      area: 350,
+      agent_id: globalAgent.agentId,
+      landlord_id: globalLandlord.landlordId,
+      tenant_id: globalTenant.tenantId,
+    });
+
+    await PropertyCollection.insertAsync({
+      _id: "3",
+      streetnumber: "88",
+      streetname: "Ocean View Blvd",
+      suburb: "Santa Monica",
+      province: "CA",
+      postcode: "90401",
+      property_status_id: "1",
+      description:
+        "Luxury penthouse apartment with panoramic ocean views. Floor-to-ceiling windows, open concept living and dining, and a rooftop terrace. Includes smart home features and access to building amenities such as a gym and pool.",
+      summary_description:
+        "Luxury penthouse with ocean views and rooftop terrace.",
+      bathrooms: 2,
+      bedrooms: 2,
+      parking: 2,
+      property_feature_ids: ["5", "6"],
+      type: "Apartment",
+      area: 220,
+      agent_id: globalAgent.agentId,
+      landlord_id: globalLandlord.landlordId,
+      tenant_id: globalTenant.tenantId,
+    });
+
+
     await InspectionCollection.insertAsync({
       _id: "1",
       starttime: new Date("2025-04-12T10:00:00Z"),
@@ -168,6 +242,12 @@ async function tempSeedPropertyData(): Promise<void> {
       _id: "2",
       starttime: new Date("2025-04-14T10:00:00Z"),
       endtime: new Date("2025-04-15T11:00:00Z"),
+    });
+
+    await InspectionCollection.insertAsync({
+      _id: "2",
+      starttime: new Date("2025-04-16T10:00:00Z"),
+      endtime: new Date("2025-04-17T11:00:00Z"),
     });
 
     await ListingCollection.insertAsync({
