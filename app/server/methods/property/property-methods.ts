@@ -13,8 +13,19 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
-import { Property } from "/app/client/library-modules/domain-models/property/Property";
+import { AgentDocument } from "../../database/user/models/role-models/AgentDocument";
+import { LandlordDocument } from "../../database/user/models/role-models/LandlordDocument";
+import { TenantDocument } from "../../database/user/models/role-models/TenantDocument";
+import { AgentCollection } from "../../database/user/user-collections";
+import { LandlordCollection } from "../../database/user/user-collections";
+import { TenantCollection } from "../../database/user/user-collections";
+import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 
+// This method is used to get a property by its ID
+// It returns a promise that resolves to an ApiProperty object
+// If the property is not found, it throws an InvalidDataError
+// If there is an error while mapping the property document to DTO, it throws an InvalidDataError
+// The method is wrapped in a Meteor method so it can be called from the client
 const propertyGetMethod = {
   [MeteorMethodIdentifier.PROPERTY_GET]: async (
     id: string
@@ -36,6 +47,13 @@ const propertyGetMethod = {
     return propertyDTO;
   },
 };
+// This method is used to map a property document to an ApiProperty DTO.
+// This function transforms a PropertyDocument (raw database document) into an ApiProperty (structured DTO) for client use. It performs the following steps:
+// 1. Fetches the property status document by its ID
+// 2. Fetches the latest property price document for the property
+// 3. Fetches the property features documents matching the IDs in the property document
+// It takes a PropertyDocument as input and returns a promise that resolves to an ApiProperty object
+// It fetches the property status, latest property price, and property features documents
 
 async function mapPropertyDocumentToPropertyDTO(
   property: PropertyDocument
@@ -48,6 +66,30 @@ async function mapPropertyDocumentToPropertyDTO(
   );
   const propertyFeaturesDocuments =
     await getPropertyFeatureDocumentsMatchingIds(property.property_feature_ids);
+
+  const AgentDocument = property.agent_id
+    ? await getAgentDocumentById(property.agent_id)
+    : null; // Handle missing agent_id gracefully
+
+  const LandlordDocument = property.landlord_id
+    ? await getLandlordDocumentById(property.landlord_id)
+    : null; // Handle missing landlord_id gracefully
+
+  const TenantDocument = property.tenant_id
+    ? await getTenantDocumentById(property.tenant_id)
+    : null; // Handle missing tenant_id gracefully
+
+    if (!AgentDocument) {
+      console.warn(`Agent for Property id ${property._id} not found.`);
+    }
+    if (!LandlordDocument) {
+      console.warn(`Landlord for Property id ${property._id} not found.`);
+    }
+
+  //Check if I need this, as I we don't necessarily need a tenant for a property
+  if (!TenantDocument) {
+    console.warn(`Tenant for Property id ${property._id} not found.`);
+  }
 
   if (!propertyStatusDocument) {
     throw new InvalidDataError(
@@ -84,6 +126,9 @@ async function mapPropertyDocumentToPropertyDTO(
     features: propertyFeaturesDocuments.map((doc) => doc.name),
     type: property.type,
     area: property.area,
+    agentId: AgentDocument ? AgentDocument._id : '', // Always string
+    landlordId: LandlordDocument ? LandlordDocument._id : '', // Always string
+    tenantId: TenantDocument ? TenantDocument._id : '', // Always string
   };
 }
 
@@ -116,6 +161,38 @@ async function getLatestPropertyPriceDocumentForProperty(
   );
 }
 
+async function getAgentDocumentById(
+  id: string
+): Promise<AgentDocument | undefined> {
+  return await AgentCollection.findOneAsync(id);
+}
+async function getLandlordDocumentById(
+  id: string
+): Promise<LandlordDocument | undefined> {
+  return await LandlordCollection.findOneAsync(id);
+}
+async function getTenantDocumentById(
+  id: string
+): Promise<TenantDocument | undefined> {
+  return await TenantCollection.findOneAsync(id);
+}
+
+const propertyInsertMethod = {
+  [MeteorMethodIdentifier.PROPERTY_INSERT]: async (
+  data: PropertyInsertData
+): Promise<string> => {
+  try {
+    const propertyId = await PropertyCollection.insertAsync({
+      ...data,
+    });
+    return propertyId;
+  } catch (error) {
+    console.error("Failed to insert property:", error);
+    throw meteorWrappedInvalidDataError(error as InvalidDataError);
+  }
+}
+}
+
 async function updateProperty(property: ApiProperty): Promise<void> {
   await PropertyCollection.updateAsync(property.propertyId, {
     $set: {
@@ -143,5 +220,6 @@ Meteor.methods({
 
 Meteor.methods({
   ...propertyGetMethod,
+  ...propertyInsertMethod
   ...updateProperty,
 });

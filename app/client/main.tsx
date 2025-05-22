@@ -1,7 +1,6 @@
 import React from "react";
 import { Container, createRoot } from "react-dom/client";
 import { Meteor } from "meteor/meteor";
-import { ExampleHomePage } from "./ui-modules/home-example/ExampleHomePage";
 import { GuestLandingPage } from "./ui-modules/guest-landing-page/GuestLandingPage";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { Provider } from "react-redux";
@@ -23,11 +22,12 @@ import { PropertyFormPage } from "./ui-modules/property-form-agent/PropertyFormP
 import { AuthTabs } from "./ui-modules/user-authentication/AuthTabs";
 import TenantDashboard from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDashboard";
 import TenantProperty from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantProperty";
-import TenantCalender from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantCalender";
+import { TenantCalendar } from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantCalender";
 import TenantMaintenance from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMaintenance";
 import TenantMessages from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMessages";
 import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDocument";
 import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
+import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -51,39 +51,23 @@ function AppRoot(): React.JSX.Element {
               <Route path="/agent-calendar" element={<AgentCalendar />} />
               <Route path="/agent-messages" element={<AgentMessage />} />
               <Route path="/agent-tasks" element={<AgentTask />} />
-              <Route
-                path="/landlord-dashboard"
-                element={<LandlordDashboard />}
-              />
-              <Route
-                path="/landlord-properties"
-                element={<LandlordProperty />}
-              />
+              <Route path="/landlord-dashboard" element={<LandlordDashboard />} />
+              <Route path="/landlord-properties" element={<LandlordProperty />} />
               <Route path="/landlord-calendar" element={<LandlordCalendar />} />
               <Route path="/landlord-tasks" element={<LandlordTask />} />
               <Route path="/test" element={<PropertyListingPage />} />
-              <Route path="/home-example" element={<ExampleHomePage />} />
               <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/example" element={<ExampleHomePage />} />
               <Route path="/propertyform" element={<PropertyFormPage />} />
               <Route path="/login" element={<AuthTabs initialTab="login" />} />
-              <Route
-                path="/signup"
-                element={<AuthTabs initialTab="signup" />}
-              />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/signup" element={<AuthTabs initialTab="signup" />} />
               <Route path="/tenant-dashboard" element={<TenantDashboard />} />
               <Route path="/tenant-property" element={<TenantProperty />} />
-              <Route path="/tenant-calender" element={<TenantCalender />} />
-              <Route
-                path="/tenant-maintenance"
-                element={<TenantMaintenance />}
-              />
+              <Route path="/tenant-calendar" element={<TenantCalendar />} />
+              <Route path="/tenant-maintenance"element={<TenantMaintenance />} />
               <Route path="/tenant-messages" element={<TenantMessages />} />
               <Route path="/tenant-documents" element={<TenantDocument />} />
-              <Route
-                path="/tenant-search-properties"
-                element={<TenantSearchProperties />}
-              />
+              <Route path="/tenant-search-properties" element={<TenantSearchProperties />} />
             </Routes>
             <BottomNavbar />
           </BrowserRouter>

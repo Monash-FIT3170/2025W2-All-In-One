@@ -5,6 +5,9 @@ import { PropManagerLogoText } from "../theming/components/logo/PropManagerLogoT
 import { Button } from "../theming-shadcn/Button";
 import { BellIcon } from "../theming/icons/BellIcon";
 import { SideBarSliderIcon } from "../theming/icons/SideBarSlider";
+import { useAppSelector } from "/app/client/store";
+import { ProfileFooter } from "../navigation-bars/side-nav-bars/components/ProfileFooter";
+
 interface TopNavbarProps {
   onSideBarOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -23,9 +26,15 @@ interface LandlordTopNavbarProps {
 
 export function AgentTopNavbar({
   onSideBarOpened,
-  name = "Bob Builder",
-  title = "Agent",
+  // name = "Bob Builder",
+  // title = "Agent",
 }: AgentTopNavbarProps): React.JSX.Element {
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const firstName = currentUser?.firstName || "Unknown";
+  const lastName = currentUser?.lastName || "User";
+  const title = "Agent";
+  console.log("Current User:", currentUser);
+
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
       <div className="flex justify-between items-center px-4">
@@ -36,12 +45,12 @@ export function AgentTopNavbar({
             className="text-gray-600"
           />
           <div className="flex items-center gap-2">
-            <PropManagerLogoIcon variant="light" />
-            <PropManagerLogoText />
+            <PropManagerLogoIcon variant="light" className="w-10 h-10" />
+            <PropManagerLogoText className="text-2xl font-bold" />
           </div>
         </div>
 
-        {/* Right-aligned actions */}
+        {/* Right-aligned profile section */}
         <div className="flex items-center gap-4">
           <div className="ml-2">
             <BellIcon
@@ -50,17 +59,7 @@ export function AgentTopNavbar({
               onClick={() => console.log("Notification clicked")}
             />
           </div>
-          <div className="flex items-center gap-3">
-            <div
-              className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-400 cursor-pointer transition-colors duration-200"
-              onClick={() => console.log("Profile clicked")}
-            >
-              {name
-                .split(" ")
-                .map((part) => part.charAt(0))
-                .join("")}
-            </div>
-          </div>
+          <ProfileFooter firstName={firstName} lastName={lastName} title={title} />
         </div>
       </div>
     </header>
@@ -69,9 +68,11 @@ export function AgentTopNavbar({
 
 export function LandlordTopNavbar({
   onSideBarOpened,
-  name = "Bradley Smith",
-  title = "Landlord",
 }: LandlordTopNavbarProps): React.JSX.Element {
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const firstName = currentUser?.firstName || "Unknown";
+  const lastName = currentUser?.lastName || "User";
+  const title = "Landlord";
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
       <div className="flex justify-between items-center px-4">
@@ -82,12 +83,12 @@ export function LandlordTopNavbar({
             className="text-gray-600"
           />
           <div className="flex items-center gap-2">
-            <PropManagerLogoIcon variant="light" />
-            <PropManagerLogoText />
+            <PropManagerLogoIcon variant="light" className="w-10 h-10" />
+            <PropManagerLogoText className="text-2xl font-bold" />
           </div>
         </div>
 
-        {/* Right-aligned actions */}
+        {/* Right-aligned profile section */}
         <div className="flex items-center gap-4">
           <div className="ml-2">
             <BellIcon
@@ -96,17 +97,7 @@ export function LandlordTopNavbar({
               onClick={() => console.log("Notification clicked")}
             />
           </div>
-          <div className="flex items-center gap-3">
-            <div
-              className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-400 cursor-pointer transition-colors duration-200"
-              onClick={() => console.log("Profile clicked")}
-            >
-              {name
-                .split(" ")
-                .map((part) => part.charAt(0))
-                .join("")}
-            </div>
-          </div>
+          <ProfileFooter firstName={firstName} lastName={lastName} title={title} />
         </div>
       </div>
     </header>
@@ -115,9 +106,11 @@ export function LandlordTopNavbar({
 
 export function TenantTopNavbar({
   onSideBarOpened,
-  name = "Bob Builder",
-  title = "Agent",
 }: AgentTopNavbarProps): React.JSX.Element {
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const firstName = currentUser?.firstName || "Unknown";
+  const lastName = currentUser?.lastName || "User";
+  const title = "Tenant";
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
       <div className="flex justify-between items-center px-4">
@@ -128,12 +121,12 @@ export function TenantTopNavbar({
             className="text-gray-600"
           />
           <div className="flex items-center gap-2">
-            <PropManagerLogoIcon variant="light" />
-            <PropManagerLogoText />
+            <PropManagerLogoIcon variant="light" className="w-10 h-10" />
+            <PropManagerLogoText className="text-2xl font-bold" />
           </div>
         </div>
 
-        {/* Right-aligned actions */}
+        {/* Right-aligned profile section */}
         <div className="flex items-center gap-4">
           <div className="ml-2">
             <BellIcon
@@ -142,17 +135,7 @@ export function TenantTopNavbar({
               onClick={() => console.log("Notification clicked")}
             />
           </div>
-          <div className="flex items-center gap-3">
-            <div
-              className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-400 cursor-pointer transition-colors duration-200"
-              onClick={() => console.log("Profile clicked")}
-            >
-              {name
-                .split(" ")
-                .map((part) => part.charAt(0))
-                .join("")}
-            </div>
-          </div>
+          <ProfileFooter firstName={firstName} lastName={lastName} title={title} />
         </div>
       </div>
     </header>
@@ -170,8 +153,8 @@ export function TopNavbar({
           onClick={() => onSideBarOpened(true)} // Open the sidebar when the logo is clicked
           className="flex items-center gap-2 cursor-pointer"
         >
-          <PropManagerLogoIcon variant="light" />
-          <PropManagerLogoText />
+          <PropManagerLogoIcon variant="light" className="w-10 h-10" />
+          <PropManagerLogoText className="text-2xl font-bold" />
         </div>
 
         {/* Right-aligned buttons */}

@@ -6,6 +6,7 @@ import {
   setPassword,
   loginUser,
 } from "./state/reducers/login-form-slice";
+import { useRedirectToDashboard } from "../hooks/redirectToDashboardHook";
 
 const inputClass =
   "w-full px-4 py-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-200 text-sm";
@@ -14,10 +15,15 @@ const labelClass = "block mb-1 text-sm font-medium text-gray-700";
 export const LoginForm = () => {
   const dispatch = useAppDispatch();
   const loginState = useAppSelector(selectLoginFormUIState);
+  const redirectToDashboard = useRedirectToDashboard();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(loginUser());
+    const result = await dispatch(loginUser());
+
+    if (loginUser.fulfilled.match(result)) {
+      redirectToDashboard(result.payload);
+    }
   };
 
   return (
@@ -29,7 +35,7 @@ export const LoginForm = () => {
         <input
           id="email"
           name="email"
-          type="text"
+          type="email"
           placeholder="example@email.com"
           required
           className={inputClass}
