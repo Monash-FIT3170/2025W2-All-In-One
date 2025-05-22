@@ -26,7 +26,7 @@ export function DashboardCards() {
       <CardWidget
         title="Total Properties"
         value= {propertyCount.toString()}
-        subtitle="+2 from last month"
+        subtitle="+1 from last month"
       />
       <CardWidget
         title="Occupancy Rate"
@@ -37,7 +37,7 @@ export function DashboardCards() {
       <CardWidget
         title="Pending Tasks"
         value="7"
-        subtitle="5 due this week"
+        subtitle="1 due this week"
       />
       <CardWidget
         title="Monthly Revenue"

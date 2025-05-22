@@ -26,10 +26,10 @@ export function PropertyOverview({
       if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
         try {
           const apiProperties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, currentUser.agentId) as ApiProperty[];
-          const mappedProperties: Property[] = apiProperties.map((prop: ApiProperty) => ({
-            address: `${prop.streetnumber} ${prop.streetname}`,
-            status: prop.propertyStatus as "Closed" | "Maintenance" | "Draft" | "Listed",
-            rent: prop.pricePerMonth,
+          const mappedProperties: Property[] = apiProperties.map((property: ApiProperty) => ({
+            address: `${property.streetnumber} ${property.streetname}`,
+            status: property.propertyStatus as "Closed" | "Maintenance" | "Draft" | "Listed",
+            rent: property.pricePerMonth,
           }));
           setProperties(mappedProperties);
         } catch (error) {
