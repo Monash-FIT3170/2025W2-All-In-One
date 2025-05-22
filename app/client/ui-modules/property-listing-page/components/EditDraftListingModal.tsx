@@ -8,6 +8,7 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { getPropertyStatusId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
+import { load } from "../../property-form-agent/state/reducers/property-form-slice";
 
 interface EditDraftListingModalProps {
   toggle: () => void;
@@ -48,6 +49,9 @@ export default function EditDraftListingModal(props: EditDraftListingModalProps)
 
     await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_UPDATE, updatedProperty);
 
+    // Refresh the page
+    window.location.reload();
+    
     // Close modal
     console.log("Finished updating listing, closing modal")
     props.toggle();
