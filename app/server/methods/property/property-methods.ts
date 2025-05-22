@@ -54,8 +54,8 @@ const propertyGetCountMethod = {
 };
 
 const propertyGetListMethod = {
-  [MeteorMethodIdentifier.PROPERTY_GET_LIST]: async (): Promise<ApiProperty[]> => {
-    const properties = await PropertyCollection.find().fetchAsync();
+  [MeteorMethodIdentifier.PROPERTY_GET_LIST]: async (agentId: string): Promise<ApiProperty[]> => {
+    const properties = await PropertyCollection.find({ agent_id: agentId }).fetchAsync();
     return Promise.all(properties.map(mapPropertyDocumentToPropertyDTO));
   },
 };
