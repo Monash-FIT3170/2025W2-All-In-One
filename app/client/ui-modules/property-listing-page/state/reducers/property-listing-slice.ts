@@ -53,7 +53,7 @@ export const propertyListingSlice = createSlice({
         state.postcode = initialState.postcode;
         state.summaryDescription = initialState.summaryDescription;
         state.propertyStatusText = initialState.propertyStatusText;
-        state.propertyStatusPillVariant = initialState.propertyStatusPillVariant; // Or set to a specific default like DEFAULT if applicable
+        state.propertyStatusPillVariant = initialState.propertyStatusPillVariant;
         state.propertyDescription = initialState.propertyDescription;
         state.propertyFeatures = initialState.propertyFeatures;
         state.propertyType = initialState.propertyType;
@@ -98,13 +98,15 @@ export const propertyListingSlice = createSlice({
       state.propertyPrice = getPropertyPriceDisplayString(
         action.payload.pricePerMonth
       );
-      state.inspectionBookingUiStateList = action.payload.inspections.map(
-        (inspection) => ({
-          date: getFormattedDateStringFromDate(inspection.start_time),
-          startingTime: getFormattedTimeStringFromDate(inspection.start_time),
-          endingTime: getFormattedTimeStringFromDate(inspection.end_time),
-        })
-      );
+      state.inspectionBookingUiStateList = Array.isArray(action.payload.inspections)
+        ? action.payload.inspections.map(
+            (inspection) => ({
+              date: getFormattedDateStringFromDate(inspection.start_time),
+              startingTime: getFormattedTimeStringFromDate(inspection.start_time),
+              endingTime: getFormattedTimeStringFromDate(inspection.end_time),
+            })
+          )
+        : [];
       state.listingImageUrls = action.payload.image_urls;
       state.listingStatusText = getListingStatusDisplayString(
         action.payload.listing_status

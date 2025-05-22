@@ -232,20 +232,12 @@ async function tempSeedPropertyData(): Promise<void> {
         "https://cdn.pixabay.com/photo/2024/05/26/10/15/bird-8788491_1280.jpg",
       ];
 
-      
-      const inspectionIds = [];
-      if (i % 3 === 0) { 
-        const inspectionIdBase = i * 10;
-        await InspectionCollection.insertAsync({ _id: inspectionIdBase.toString(), starttime: new Date(), endtime: new Date(Date.now() + 3600 * 1000) });
-        await InspectionCollection.insertAsync({ _id: (inspectionIdBase + 1).toString(), starttime: new Date(Date.now() + 24 * 3600 * 1000), endtime: new Date(Date.now() + 25 * 3600 * 1000) });
-        inspectionIds.push(inspectionIdBase.toString(), (inspectionIdBase+1).toString());
-      }
 
       await ListingCollection.insertAsync({
         property_id: propertyId,
         listing_status_id: listedStatusId, // "Listed"
         image_urls: imageUrls,
-        inspection_ids: inspectionIds,
+        inspection_ids: ["1","2"],
       });
       console.log(`[Seed] Created listed property: ${propertyId}`);
     }
