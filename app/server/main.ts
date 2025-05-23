@@ -29,6 +29,7 @@ import { MeteorMethodIdentifier } from "../shared/meteor-method-identifier";
 import { ApiAgent } from "../shared/api-models/user/api-roles/ApiAgent";
 import { ApiTenant } from "../shared/api-models/user/api-roles/ApiTenant";
 import { ApiLandlord } from "../shared/api-models/user/api-roles/ApiLandlord";
+import { AgentCollection } from "./database/user/user-collections";
 
 let globalAgent: ApiAgent;
 let globalTenant: ApiTenant;
@@ -267,6 +268,7 @@ async function tempSeedPropertyData(): Promise<void> {
 // This function is used to seed the database with initial task data
 async function tempSeedTaskData(): Promise<void> {
   if ((await TaskCollection.find().countAsync()) === 0) {
+    // First, create task statuses
     await TaskStatusCollection.insertAsync({
       _id: "1",
       name: "Not Started",
@@ -282,25 +284,52 @@ async function tempSeedTaskData(): Promise<void> {
       name: "Completed",
     });
 
-    await TaskCollection.insertAsync({
+    // Create tasks for the agent
+    const taskIds = [];
+
+    // Task 1: Property Inspection
+    const task1Id = await TaskCollection.insertAsync({
       _id: "1",
-      name: "Initial listing meeting",
+      name: "Property Inspection - 123 Sample St",
       taskStatus: TaskStatus.NOTSTARTED,
-      createdDate: new Date("2025-04-12T10:00:00Z"),
-      dueDate: new Date("2025-04-19T10:00:00Z"),
-      description:
-        "Meet with the client to discuss the property listing process and gather necessary information.",
+      createdDate: new Date(),
+      dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+      description: "Conduct initial property inspection for new listing",
       priority: "High",
+      agentId: globalAgent.agentId
     });
-    await TaskCollection.insertAsync({
+    taskIds.push(task1Id);
+
+    // Task 2: Client Meeting
+    const task2Id = await TaskCollection.insertAsync({
       _id: "2",
-      name: "Follow-up with client",
+      name: "Client Meeting - Property Listing",
       taskStatus: TaskStatus.INPROGRESS,
-      createdDate: new Date("2025-04-20T10:00:00Z"),
-      dueDate: new Date("2025-04-27T10:00:00Z"),
-      description:
-        "Check in with the client to provide updates and address any questions.",
-      priority: "Medium",
+      createdDate: new Date(),
+      dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
+      description: "Meet with landlord to discuss property listing details",
+      priority: "High",
+      agentId: globalAgent.agentId
     });
+    taskIds.push(task2Id);
+
+    // Task 3: Marketing Preparation
+    const task3Id = await TaskCollection.insertAsync({
+      _id: "3",
+      name: "Prepare Marketing Materials",
+      taskStatus: TaskStatus.NOTSTARTED,
+      createdDate: new Date(),
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      description: "Create marketing materials for new property listings",
+      priority: "Medium",
+      agentId: globalAgent.agentId
+    });
+    taskIds.push(task3Id);
+
+    // Update the agent document with task IDs
+    await AgentCollection.updateAsync(
+      { _id: globalAgent.agentId },
+      { $set: { task_ids: taskIds } }
+    );
   }
 }
