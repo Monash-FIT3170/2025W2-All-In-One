@@ -407,7 +407,7 @@ function EditListing({
   const areaValue = parseInt(state.propertyLandArea.replace(/[^0-9]/g, ""));
 
   const listingInfo: FormSchemaType = {
-    landlord: mockLandlords[0].landlordId, // Use the landlord ID instead of name
+    landlord: state.propertyLandlordId,
     property_type: state.propertyType.toLowerCase(), // Ensure property type matches dropdown options (house or apartment)
     address: `${state.streetNumber} ${state.street}`,
     city: state.suburb,
@@ -431,7 +431,8 @@ function EditListing({
         isOpen={isModalOpen}
         toggle={toggleModal}
         propertyForm={listingInfo}
-        landlords={mockLandlords}
+        landlords={state.landlords}
+        propertyId={state.propertyId}
       />
     </>
   );

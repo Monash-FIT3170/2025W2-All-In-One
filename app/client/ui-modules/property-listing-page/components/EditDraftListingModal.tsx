@@ -20,6 +20,7 @@ interface EditDraftListingModalProps {
   isOpen: boolean;
   propertyForm: FormSchemaType;
   landlords: Landlord[];
+  propertyId: string;
 }
 
 export default function EditDraftListingModal(
@@ -37,7 +38,7 @@ export default function EditDraftListingModal(
     const addressParts = values.address.trim().split(" ");
 
     const updatedProperty = {
-      propertyId: "1",
+      propertyId: props.propertyId,
       streetnumber: addressParts[0],
       streetname: addressParts.slice(1).join(" "),
       suburb: "Clayton",

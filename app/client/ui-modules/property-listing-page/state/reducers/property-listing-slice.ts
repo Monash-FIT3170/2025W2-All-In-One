@@ -8,8 +8,12 @@ import {
   getFormattedTimeStringFromDate,
 } from "/app/client/library-modules/utils/date-utils";
 import { RootState } from "/app/client/store";
+import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
+import { getAllLandlords } from "/app/client/library-modules/domain-models/user/role-repositories/landlord-repository";
 
 const initialState: PropertyListingPageUiState = {
+  propertyId: "",
+  propertyLandlordId: "",
   streetNumber: "",
   street: "",
   suburb: "",
@@ -33,6 +37,7 @@ const initialState: PropertyListingPageUiState = {
   shouldDisplayListingStatus: true,
   shouldDisplaySubmitDraftButton: true,
   shouldShowLoadingState: true,
+  landlords: [],
 };
 
 export const propertyListingSlice = createSlice({
@@ -41,6 +46,8 @@ export const propertyListingSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(load.fulfilled, (state, action) => {
+      state.propertyId = action.payload.propertyId;
+      state.propertyLandlordId = action.payload.landlordId;
       state.streetNumber = action.payload.streetnumber;
       state.street = action.payload.streetname;
       state.suburb = action.payload.suburb;
@@ -78,6 +85,7 @@ export const propertyListingSlice = createSlice({
         action.payload.listing_status
       );
       state.shouldShowLoadingState = false;
+      state.landlords = action.payload.landlords;
     });
   },
 });
@@ -127,7 +135,8 @@ export const load = createAsyncThunk(
     const propertyWithListingData = await getPropertyWithListingDataUseCase(
       propertyId
     );
-    return propertyWithListingData;
+    const landlords: Landlord[] = await getAllLandlords();
+    return {...propertyWithListingData, landlords};
   }
 );
 

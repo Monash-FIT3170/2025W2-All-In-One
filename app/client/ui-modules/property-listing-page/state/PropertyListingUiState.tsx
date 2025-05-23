@@ -1,8 +1,11 @@
+import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { ListingStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingStatusPill";
 import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingSummary";
 import { InspectionBookingListUiState } from "/app/client/ui-modules/property-listing-page/components/PropertyInspections";
 
 export type PropertyListingPageUiState = {
+  propertyId: string;
+  propertyLandlordId: string;
   streetNumber: string;
   street: string;
   suburb: string;
@@ -26,4 +29,5 @@ export type PropertyListingPageUiState = {
   shouldDisplayListingStatus: boolean;
   shouldDisplaySubmitDraftButton: boolean;
   shouldShowLoadingState: boolean;
+  landlords: Landlord[];
 };
