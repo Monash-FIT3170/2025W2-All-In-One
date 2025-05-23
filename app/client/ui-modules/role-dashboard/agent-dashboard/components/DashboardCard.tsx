@@ -58,7 +58,7 @@ export function DashboardCards() {
       />
       <CardWidget
         title="Occupancy Rate"
-        value={`${occupancyRate}%`}
+        value={`${occupancyRate.toFixed(2)}%`}
       >
         <Progress value={occupancyRate} className="mt-2" />
       </CardWidget>
