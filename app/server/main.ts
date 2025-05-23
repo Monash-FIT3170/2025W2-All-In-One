@@ -14,6 +14,7 @@ import {
   ListingCollection,
   ListingStatusCollection,
 } from "/app/server/database/property-listing/listing-collections";
+import "/app/server/methods/property-status/property-status-methods";
 import "./methods/user/user.register";
 import "./methods/user/user-account-methods";
 import "./methods/user/role-methods/agent-methods";
@@ -29,6 +30,9 @@ import { MeteorMethodIdentifier } from "../shared/meteor-method-identifier";
 import { ApiAgent } from "../shared/api-models/user/api-roles/ApiAgent";
 import { ApiTenant } from "../shared/api-models/user/api-roles/ApiTenant";
 import { ApiLandlord } from "../shared/api-models/user/api-roles/ApiLandlord";
+import { PropertyStatus } from "../shared/api-models/property/PropertyStatus";
+
+import { ListingStatus } from "../shared/api-models/property-listing/ListingStatus";
 
 let globalAgent: ApiAgent;
 let globalTenant: ApiTenant;
@@ -38,6 +42,8 @@ Meteor.startup(async () => {
   await tempSeedUserAndRoleData();
   await tempSeedPropertyData();
   await tempSeedTaskData();
+  await tempSeedPropertyStatusData();
+  await permSeedListingStatusData();
 });
 
 async function tempSeedUserAndRoleData(): Promise<void> {
@@ -116,34 +122,34 @@ async function tempSeedUserAndRoleData(): Promise<void> {
 async function tempSeedPropertyData(): Promise<void> {
   console.log("Seeding property data...");
   if ((await PropertyCollection.find().countAsync()) === 0) {
-    PropertyStatusCollection.insertAsync({
+    await PropertyStatusCollection.insertAsync({
       _id: "1",
-      name: "Vacant",
+      name: PropertyStatus.VACANT,
     });
 
-    PropertyFeatureCollection.insertAsync({
+    await PropertyFeatureCollection.insertAsync({
       _id: "1",
       name: "Pool",
     });
-    PropertyFeatureCollection.insertAsync({
+    await PropertyFeatureCollection.insertAsync({
       _id: "2",
       name: "Lots of space",
     });
 
-    PropertyPriceCollection.insertAsync({
+    await PropertyPriceCollection.insertAsync({
       property_id: "1",
       price_per_month: 1500,
       date_set: new Date(),
     });
 
-    PropertyCollection.insertAsync({
+    await PropertyCollection.insertAsync({
       _id: "1",
       streetnumber: "123",
       streetname: "Sample St",
       suburb: "Springfield",
       province: "IL",
       postcode: "62704",
-      property_status_id: "1",
+      property_status_id: PropertyStatus.VACANT,
       description:
         "Modern apartment with spacious living areas and a beautiful garden. Recently renovated with new appliances and fixtures throughout. The property features an open-plan kitchen and dining area that flows onto a private balcony with city views. The master bedroom includes an ensuite bathroom and built-in wardrobes, while the second bedroom is generously sized and located near the main bathroom.",
       summary_description:
@@ -159,18 +165,18 @@ async function tempSeedPropertyData(): Promise<void> {
       tenant_id: globalTenant.tenantId,
     });
 
-    InspectionCollection.insertAsync({
+    await InspectionCollection.insertAsync({
       _id: "1",
       starttime: new Date("2025-04-12T10:00:00Z"),
       endtime: new Date("2025-04-13T11:00:00Z"),
     });
-    InspectionCollection.insertAsync({
+    await InspectionCollection.insertAsync({
       _id: "2",
       starttime: new Date("2025-04-14T10:00:00Z"),
       endtime: new Date("2025-04-15T11:00:00Z"),
     });
 
-    ListingCollection.insertAsync({
+    await ListingCollection.insertAsync({
       property_id: "1",
       listing_status_id: "1",
       image_urls: [
@@ -181,28 +187,27 @@ async function tempSeedPropertyData(): Promise<void> {
       inspection_ids: ["1", "2"],
     });
 
-    ListingStatusCollection.insertAsync({ _id: "1", name: "Draft" });
   }
 }
 // This function is used to seed the database with initial task data
 async function tempSeedTaskData(): Promise<void> {
   if ((await TaskCollection.find().countAsync()) === 0) {
-    TaskStatusCollection.insertAsync({
+    await TaskStatusCollection.insertAsync({
       _id: "1",
       name: "Not Started",
     });
 
-    TaskStatusCollection.insertAsync({
+    await TaskStatusCollection.insertAsync({
       _id: "2",
       name: "In Progress",
     });
 
-    TaskStatusCollection.insertAsync({
+    await TaskStatusCollection.insertAsync({
       _id: "3",
       name: "Completed",
     });
 
-    TaskCollection.insertAsync({
+    await TaskCollection.insertAsync({
       _id: "1",
       name: "Initial listing meeting",
       taskStatus: TaskStatus.NOTSTARTED,
@@ -212,7 +217,7 @@ async function tempSeedTaskData(): Promise<void> {
         "Meet with the client to discuss the property listing process and gather necessary information.",
       priority: "High",
     });
-    TaskCollection.insertAsync({
+    await TaskCollection.insertAsync({
       _id: "2",
       name: "Follow-up with client",
       taskStatus: TaskStatus.INPROGRESS,
@@ -221,6 +226,39 @@ async function tempSeedTaskData(): Promise<void> {
       description:
         "Check in with the client to provide updates and address any questions.",
       priority: "Medium",
+    });
+  }
+}
+
+  async function tempSeedPropertyStatusData(): Promise<void> {
+    if ((await PropertyStatusCollection.find().countAsync()) != 2){
+      PropertyStatusCollection.insertAsync({
+        name: PropertyStatus.VACANT
+      })
+      PropertyStatusCollection.insertAsync({
+        name:PropertyStatus.OCCUPIED
+      })
+    }
+  }
+
+async function permSeedListingStatusData(): Promise<void> {
+  if ((await ListingStatusCollection.find().countAsync()) === 0) {
+    console.log("Seeding listing status data...");
+    await ListingStatusCollection.insertAsync({
+      _id: "1",
+      name: ListingStatus.DRAFT,
+    });
+    await ListingStatusCollection.insertAsync({
+      _id: "2",
+      name: ListingStatus.LISTED,
+    });
+    await ListingStatusCollection.insertAsync({
+      _id: "3",
+      name: ListingStatus.TENANT_SELECTION,
+    });
+    await ListingStatusCollection.insertAsync({
+      _id: "4",
+      name: ListingStatus.TENANT_APPROVAL,
     });
   }
 }

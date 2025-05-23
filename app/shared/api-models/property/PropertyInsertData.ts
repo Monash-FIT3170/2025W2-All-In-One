@@ -1,5 +1,4 @@
-export type PropertyDocument = {
-  _id: string;
+export type PropertyInsertData = {
   streetnumber: string;
   streetname: string;
   suburb: string;
