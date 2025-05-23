@@ -27,44 +27,44 @@ function TenantDashboard() {
     (state) => state.currentUser.currentUser?.tasks
   );
 
-  // console.log(currentUser);
+  console.log(currentUser);
 
   // Fetch user data when component mounts
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (!currentUser?.userAccountId) {
-        const userId = Meteor.userId();
-        if (!userId) return;
+  // useEffect(() => {
+  //   const fetchUserData = async () => {
+  //     if (!currentUser?.userAccountId) {
+  //       const userId = Meteor.userId();
+  //       if (!userId) return;
 
-        try {
-          // Fetch tenant-specific data only
-          const tenantData = await Meteor.callAsync(
-            MeteorMethodIdentifier.TENANT_GET,
-            userId
-          );
-          console.log("Fetched Tenant Data:", tenantData);
+  //       try {
+  //         // Fetch tenant-specific data only
+  //         const tenantData = await Meteor.callAsync(
+  //           MeteorMethodIdentifier.TENANT_GET,
+  //           userId
+  //         );
+  //         console.log("Fetched Tenant Data:", tenantData);
 
-          // Convert Date fields if needed
-          const payload = {
-            ...tenantData,
-            createdAt:
-              tenantData.createdAt && tenantData.createdAt instanceof Date
-                ? tenantData.createdAt.toISOString()
-                : tenantData.createdAt,
-          };
+  //         // Convert Date fields if needed
+  //         const payload = {
+  //           ...tenantData,
+  //           createdAt:
+  //             tenantData.createdAt && tenantData.createdAt instanceof Date
+  //               ? tenantData.createdAt.toISOString()
+  //               : tenantData.createdAt,
+  //         };
 
-          dispatch({
-            type: "currentUser/setCurrentUser",
-            payload,
-          });
-        } catch (error) {
-          console.error("Error fetching tenant data:", error);
-        }
-      }
-    };
+  //         dispatch({
+  //           type: "currentUser/setCurrentUser",
+  //           payload,
+  //         });
+  //       } catch (error) {
+  //         console.error("Error fetching tenant data:", error);
+  //       }
+  //     }
+  //   };
 
-    fetchUserData();
-  }, [dispatch]);
+  //   fetchUserData();
+  // }, [dispatch]);
 
   // // Dummy data for upcoming tasks
   // useEffect(() => {

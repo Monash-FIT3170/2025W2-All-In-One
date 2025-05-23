@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { CardWidget } from "./CardWidget";
 import { Button } from "../../theming-shadcn/Button";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 
 interface Task {
   title: string;
   address: string;
   datetime: string;
-  status: "Upcoming" | "Due Soon" | "Overdue" | "Pending";
+  status: "Upcoming" | "Due Soon" | "Overdue" | "Completed";
 }
 
 interface UpcomingTasksProps {
@@ -26,22 +28,35 @@ export function UpcomingTasks({
         setTasks([]);
         return;
       }
-      // Fetch all tasks in parallel
-      const fetchedTasks = await Promise.all(
-        taskIds.map(async (id) => {
-          // Replace with your actual Meteor or API call
-          const task = await Meteor.callAsync("tasks.getOne", id);
-          // Transform to your Task shape if needed
-          return {
-            title: task.task_name,
-            address: task.task_description,
-            datetime: new Date(task.task_duedate).toLocaleDateString(),
-            status: task.task_status, // Map to your status type if needed
-          };
-        })
-      );
-      setTasks(fetchedTasks);
+
+      try {
+        // Fetch all tasks in one go
+        const apiTasks = await Meteor.callAsync(
+          MeteorMethodIdentifier.TASK_GET_MULTIPLE,
+          taskIds
+        );
+
+        // Transform ApiTasks to the format needed by the UI
+        const transformedTasks = apiTasks.map((task: ApiTask) => ({
+          title: task.name,
+          address: task.description,
+          datetime: new Date(task.dueDate).toLocaleDateString(),
+          status: task.status === "completed"
+            ? "Completed"
+            : new Date(task.dueDate) < new Date()
+            ? "Overdue"
+            : new Date(task.dueDate) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            ? "Due Soon"
+            : "Upcoming",
+        }));
+
+        setTasks(transformedTasks);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+        setTasks([]);
+      }
     }
+
     fetchTasks();
   }, [taskIds]);
 
@@ -75,7 +90,7 @@ function TaskItem({ task }: { task: Task }): React.JSX.Element {
         return "bg-yellow-100 text-yellow-800";
       case "Overdue":
         return "bg-red-100 text-red-800";
-      case "Pending":
+      case "Completed":
         return "bg-gray-100 text-gray-800";
     }
   };
