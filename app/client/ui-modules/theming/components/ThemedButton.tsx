@@ -5,6 +5,7 @@ export enum ThemedButtonVariant {
   PRIMARY,
   SECONDARY,
   TERTIARY,
+  QUATERNARY,
 }
 
 /**
@@ -26,6 +27,7 @@ export function ThemedButton({
     [ThemedButtonVariant.PRIMARY]: "bg-(--button-black-color) text-white",
     [ThemedButtonVariant.SECONDARY]: "border border-(--divider-color)",
     [ThemedButtonVariant.TERTIARY]: "bg-(--button-blue-color) text-white",
+    [ThemedButtonVariant.QUATERNARY]: "bg-[#1E40AF] text-white",
   };
 
   return (
