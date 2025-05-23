@@ -7,12 +7,13 @@ import { useAppSelector } from '/app/client/store';
 import { ApiAgent } from '/app/shared/api-models/user/api-roles/ApiAgent';
 import { Role } from '/app/shared/user-role-identifier';
 import { ApiProperty } from '/app/shared/api-models/property/ApiProperty';
+import { set } from 'date-fns';
 
 export function DashboardCards() {
   const [propertyCount, setPropertyCount] = useState<number>(0);
   const [monthlyRevenue, setMonthlyRevenue] = useState<number>(0);
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-
+  const [occupancyRate, setOccupancyRate] = useState<number>(0);
   useEffect(() => {
     const getPropertyCount = async () => {
       if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
@@ -32,6 +33,12 @@ export function DashboardCards() {
           const occupiedProperties = properties.filter(property => property.propertyStatus === "Occupied");
           const totalRevenue = occupiedProperties.reduce((sum, property) => sum + property.pricePerMonth, 0);
           setMonthlyRevenue(totalRevenue);
+
+
+          // Calculate occupancy rate
+          const totalProperties = properties.length;
+          const occupancyRate = totalProperties > 0 ? (occupiedProperties.length / totalProperties) * 100 : 0;
+          setOccupancyRate(occupancyRate);
         } catch (error) {
           console.error('Error fetching monthly revenue:', error);
         }
@@ -51,14 +58,14 @@ export function DashboardCards() {
       />
       <CardWidget
         title="Occupancy Rate"
-        value="85%"
+        value={`${occupancyRate}%`}
       >
-        <Progress value={85} className="mt-2" />
+        <Progress value={occupancyRate} className="mt-2" />
       </CardWidget>
       <CardWidget
         title="Pending Tasks"
         value="7"
-        subtitle="5 due this week"
+        subtitle="1 due this week"
       />
       <CardWidget
         title="Monthly Revenue"
