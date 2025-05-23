@@ -390,19 +390,6 @@ function EditListing({
     selectPropertyListingUiState
   );
 
-  // Temporary hardcoded landlords
-  const mockLandlords = [
-    {
-      landlordId: "h76d4FJ7yeywiiLSg",
-      userAccountId: "XFoFNBYEAXJsCa6B3",
-      tasks: [], // assuming tasks are not present in your current mock
-      firstName: "TestLandlord",
-      lastName: "Rod",
-      email: "testinglandlordemail@gmail.com",
-      createdAt: "2025-05-22T06:27:51.855Z",
-    },
-  ];
-
   // Parse the area value from propertyLandArea by removing non-numeric characters
   const areaValue = parseInt(state.propertyLandArea.replace(/[^0-9]/g, ""));
 
