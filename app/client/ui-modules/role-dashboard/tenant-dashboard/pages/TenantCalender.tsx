@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { setTasks, selectTasks } from "../state/tenant-dashboard-slice";
 import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
-import { TenantTopNavbar } from "../../../navigation-bars/TopNavbar";
+import { RoleTopNavbar } from "../../../navigation-bars/TopNavbar";
 import {
   tenantDashboardLinks,
   settingLinks,
@@ -51,7 +51,7 @@ export function TenantCalendar(): React.JSX.Element {
 
   return (
     <div className="min-h-screen">
-      <TenantTopNavbar onSideBarOpened={onSideBarOpened} />
+      <RoleTopNavbar onSideBarOpened={onSideBarOpened} />
       <div className="flex">
         <RoleSideNavBar
           isOpen={isSidebarOpen}

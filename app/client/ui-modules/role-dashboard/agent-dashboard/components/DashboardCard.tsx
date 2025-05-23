@@ -4,19 +4,13 @@ import { CardWidget } from '../../components/CardWidget';
 import { Meteor } from 'meteor/meteor';
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 import { useAppSelector } from '/app/client/store';
-import { ApiAgent } from '/app/shared/api-models/user/api-roles/ApiAgent';
-import { Role } from '/app/shared/user-role-identifier';
 import { ApiProperty } from '/app/shared/api-models/property/ApiProperty';
-import { set } from 'date-fns';
 
 export function DashboardCards() {
   const [propertyCount, setPropertyCount] = useState<number>(0);
   const [monthlyRevenue, setMonthlyRevenue] = useState<number>(0);
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const [occupancyRate, setOccupancyRate] = useState<number>(0);
-  const [notificationOpen, setNotificationOpen] = useState<boolean>(false);
-  const [pendingTasks, setPendingTasks] = useState<any[]>([]);
-  const [pendingTasksCount, setPendingTasksCount] = useState<number>(0);
 
   useEffect(() => {
     const getPropertyCount = async () => {
