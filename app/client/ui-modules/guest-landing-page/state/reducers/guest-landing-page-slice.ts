@@ -21,22 +21,18 @@ export const fetchProperties = createAsyncThunk(
   async () => {
     const response = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_ALL_LISTED);
 
-    // Helper to safely convert Date objects (or pass through strings)
     const safeSerializeDate = (dateInput: Date | string): string => {
       if (dateInput instanceof Date) {
-        // Check if the Date object is valid before calling toISOString()
         if (!isNaN(dateInput.getTime())) {
           return dateInput.toISOString();
         } else {
-          // If Date object is invalid, return a string that new Date() will also parse as invalid
           return "Invalid Date"; 
         }
       }
-      // If it's already a string, return it as is
+  
       return dateInput;
     };
 
-    // Ensure dates in inspections are stringified before reaching the store
     const propertiesWithSerializableDates = (response as ApiProperty[]).map(property => ({
       ...property,
       inspections: property.inspections?.map(inspection => ({
