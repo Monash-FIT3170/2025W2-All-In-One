@@ -22,7 +22,7 @@ export function PropertyForm({
   form: UseFormReturn<FormSchemaType>;
   onSubmit: (values: FormSchemaType) => void;
   landlords: Landlord[];
-  mode?: "create" | "edit";
+  mode: "create" | "edit";
 }) {
   return (
     <Form {...form}>

@@ -38,7 +38,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formSchema, FormSchemaType } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
 
-// TODO: To re-add edit draft listing modal
 export function PropertyListingPage({
   className = "",
 }: {
