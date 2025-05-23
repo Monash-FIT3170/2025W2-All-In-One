@@ -4,20 +4,16 @@ import {
   FormSchemaType,
   formSchema,
 } from "../../property-form-agent/components/FormSchema";
-import {
-  formDefaultValues,
-  PropertyForm,
-} from "../../property-form-agent/components/PropertyForm";
+import { PropertyForm } from "../../property-form-agent/components/PropertyForm";
 import {
   ThemedButton,
   ThemedButtonVariant,
 } from "../../theming/components/ThemedButton";
 import React from "react";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { getPropertyStatusId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
-import { load } from "../../property-form-agent/state/reducers/property-form-slice";
+import { apiUpdateProperty } from "/app/client/library-modules/apis/property/property-api";
 
 interface EditDraftListingModalProps {
   toggle: () => void;
@@ -56,12 +52,13 @@ export default function EditDraftListingModal(
       features: [],
       type: values.property_type,
       area: values.space,
+      pricePerMonth: 0, // TODO: Replace with actual value if available
+      agentId: "", // TODO: Replace with actual value if available
+      landlordId: "", // TODO: Replace with actual value if available
+      tenantId: "", // TODO: Replace with actual value if available
     };
 
-    await Meteor.callAsync(
-      MeteorMethodIdentifier.PROPERTY_UPDATE,
-      updatedProperty
-    );
+    const prop = await apiUpdateProperty(updatedProperty);
 
     // Refresh the page
     window.location.reload();
