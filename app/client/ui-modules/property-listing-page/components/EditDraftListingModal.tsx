@@ -43,7 +43,7 @@ export default function EditDraftListingModal(
       suburb: "Clayton",
       province: values.state,
       postcode: values.postal_code,
-      propertyStatus: await getPropertyStatusId(PropertyStatus.VACANT),
+      propertyStatus: PropertyStatus.VACANT,
       description: values.description,
       summaryDescription: "I updated this summary description.",
       bathrooms: values.bathroom_number,
