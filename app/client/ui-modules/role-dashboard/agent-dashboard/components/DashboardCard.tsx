@@ -14,6 +14,10 @@ export function DashboardCards() {
   const [monthlyRevenue, setMonthlyRevenue] = useState<number>(0);
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const [occupancyRate, setOccupancyRate] = useState<number>(0);
+  const [notificationOpen, setNotificationOpen] = useState<boolean>(false);
+  const [pendingTasks, setPendingTasks] = useState<any[]>([]);
+  const [pendingTasksCount, setPendingTasksCount] = useState<number>(0);
+
   useEffect(() => {
     const getPropertyCount = async () => {
       if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
@@ -34,7 +38,6 @@ export function DashboardCards() {
           const totalRevenue = occupiedProperties.reduce((sum, property) => sum + property.pricePerMonth, 0);
           setMonthlyRevenue(totalRevenue);
 
-
           // Calculate occupancy rate
           const totalProperties = properties.length;
           const occupancyRate = totalProperties > 0 ? (occupiedProperties.length / totalProperties) * 100 : 0;
@@ -45,9 +48,14 @@ export function DashboardCards() {
       }
     };
 
+
     getPropertyCount();
     getMonthlyRevenue();
   }, [currentUser]);
+
+  const handleBellClick = () => {
+    setNotificationOpen((prev) => !prev);
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">

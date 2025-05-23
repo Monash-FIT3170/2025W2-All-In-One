@@ -112,6 +112,7 @@ export function LandlordTopNavbar({
           </div>
         </div>
 
+
         {/* Right-aligned profile section */}
         <div className="flex items-center gap-4">
           <div className="ml-2">
