@@ -1,6 +1,9 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { apiGetProfileData, apiUpdateProfileData } from "../../library-modules/apis/user/user-role-api";
+import {
+  apiGetProfileData,
+  apiUpdateProfileData,
+} from "../../library-modules/apis/user/user-role-api";
 import {
   resetProfile,
   selectIsEditing,
@@ -22,6 +25,7 @@ import { ContactInfoCard } from "./components/ContactInfoCard";
 import { EmploymentInfoCard } from "./components/EmploymentInfoCard";
 import { VehicleInfoCard } from "./components/VehicleInfoCard";
 import { current } from "@reduxjs/toolkit";
+import { uploadFileHandler } from "../../library-modules/apis/azure/blob-api";
 
 export function ProfilePage(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
@@ -35,23 +39,24 @@ export function ProfilePage(): React.JSX.Element {
   );
 
   const [localProfile, setLocalProfile] = React.useState(profile);
-  
+
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
 
   React.useEffect(() => {
     const loadProfile = async () => {
       try {
-        if (!currentUser?.profileDataId) throw new Error("User is not logged in");
+        if (!currentUser?.profileDataId)
+          throw new Error("User is not logged in");
 
         const data = await apiGetProfileData(currentUser.profileDataId);
-        dispatch(setProfileData(data)) //Updating redux store
+        dispatch(setProfileData(data)); //Updating redux store
       } catch (error) {
-        console.error("Failed to retrieve profile:", error)
+        console.error("Failed to retrieve profile:", error);
       }
     };
     loadProfile();
   }, [currentUser?.profileDataId]);
-  
+
   // NEED TO MAKE A "Local profile" so that u can make multiple changes without saving until the btn is pressed
   React.useEffect(() => {
     if (isEditing) {
@@ -66,13 +71,15 @@ export function ProfilePage(): React.JSX.Element {
       if (!currentUser?.profileDataId) throw new Error("User is not logged in");
 
       // Send updates to the backend
-      const updatedProfile = await apiUpdateProfileData(currentUser.profileDataId, localProfile);
+      const updatedProfile = await apiUpdateProfileData(
+        currentUser.profileDataId,
+        localProfile
+      );
       // Update Redux store with the latest data
       dispatch(setProfileData(updatedProfile));
       dispatch(setEditing(false));
-      
     } catch (error) {
-      console.error("Failed to update profile:", error)
+      console.error("Failed to update profile:", error);
     }
   };
 
@@ -108,9 +115,20 @@ export function ProfilePage(): React.JSX.Element {
             <div className="flex items-start gap-4">
               <EditableAvatar
                 editing={isEditing}
-                imageUrl={tempProfileImage ?? profile.profileImage}
-                onImageChange={(file) => {
-                  const imageUrl = URL.createObjectURL(file);
+                imageUrl={tempProfileImage ?? profile.profilePicture}
+                onImageChange={async (file) => {
+                  const blobName = `${Date.now()}-${file.name}`; // gives it the time of creation for uniqueness (not sure if needed)
+
+                  const uploadedImage = await uploadFileHandler(file, blobName);
+                  const imageUrl = uploadedImage.url ?? tempProfileImage;
+
+                  if (!imageUrl)
+                    throw new Error("Upload failed or no URL returned");
+
+                  setLocalProfile((prev) => ({
+                    ...prev,
+                    profilePicture: imageUrl,
+                  }));
                   setProfileImage(imageUrl);
                 }}
               />
