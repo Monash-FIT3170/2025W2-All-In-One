@@ -53,10 +53,6 @@ export function DashboardCards() {
     getMonthlyRevenue();
   }, [currentUser]);
 
-  const handleBellClick = () => {
-    setNotificationOpen((prev) => !prev);
-  };
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
       <CardWidget

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { PropManagerLogoIcon } from "../theming/components/logo/PropManagerLogoIcon";
 import { PropManagerLogoText } from "../theming/components/logo/PropManagerLogoText";
@@ -41,15 +41,23 @@ export function AgentTopNavbar({
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [pendingTasks, setPendingTasks] = useState<ApiTask[]>([]);
 
+  const getPendingTasks = async () => {
+    try {
+      const tasks = await Meteor.callAsync(MeteorMethodIdentifier.TASK_GET_PENDING_LIST);
+      setPendingTasks(tasks);
+    } catch (error) {
+      setPendingTasks([]);
+      console.error('Failed to fetch pending tasks:', error);
+    }
+  };
+
+  useEffect(() => {
+    getPendingTasks();
+  }, []);
+
   const handleBellClick = async () => {
     if (!notificationOpen) {
-      try {
-        const tasks = await Meteor.callAsync(MeteorMethodIdentifier.TASK_GET_PENDING_LIST);
-        setPendingTasks(tasks);
-      } catch (error) {
-        setPendingTasks([]);
-        console.error('Failed to fetch pending tasks:', error);
-      }
+      await getPendingTasks();
     }
     setNotificationOpen((prev) => !prev);
   };
