@@ -28,7 +28,7 @@ import TenantMessages from "./ui-modules/role-dashboard/tenant-dashboard/pages/T
 import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDocument";
 import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
 import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
-import { PropertyListedPage } from "/app/client/ui-modules/property-listing-page/PropertyListedPage";
+
 
 Meteor.startup(initialiseReactRoot);
 
@@ -57,7 +57,6 @@ function AppRoot(): React.JSX.Element {
               <Route path="/landlord-calendar" element={<LandlordCalendar />} />
               <Route path="/landlord-tasks" element={<LandlordTask />} />
               <Route path="/test" element={<PropertyListingPage />} />
-              <Route path="/property-listed" element={<PropertyListedPage />} />
               {/* <Route path="/home-example" element={<ExampleHomePage />} /> */}
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/propertyform" element={<PropertyFormPage />} />

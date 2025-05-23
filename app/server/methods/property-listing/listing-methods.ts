@@ -35,6 +35,59 @@ const getListingForProperty = {
   },
 };
 
+
+const submitDraftListing = {
+  [MeteorMethodIdentifier.LISTING_SUBMIT_DRAFT]: async (
+    propertyId: string
+  ): Promise<{ success: boolean; propertyId: string }> => {
+    try {
+      // Find the listing for this property
+      const listing = await getListingDocumentAssociatedWithProperty(propertyId);
+      
+      if (!listing) {
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(
+            `No listing found for property with Id ${propertyId}`
+          )
+        );
+      }
+
+      // Find the "current" listing status ID
+      const ListingStatus = await ListingStatusCollection.findOneAsync({
+        name: "Draft"
+      });
+
+      if (!ListingStatus) {
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError("Property listing status not found in database")
+        );
+      }
+
+      // Update the listing status
+      const result = await ListingCollection.updateAsync(
+        { property_id: propertyId },
+        { 
+          $set: { 
+            listing_status_id: ListingStatus._id,
+
+          } 
+        }
+      );
+
+      if (result === 0) {
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(`Failed to update listing for property ${propertyId}`)
+        );
+      }
+
+      return { success: true, propertyId };
+    } catch (error) {
+      console.error('Error submitting draft listing:', error);
+      throw error;
+    }
+  },
+};
+
 async function mapListingDocumentToListingDTO(
   listing: ListingDocument
 ): Promise<ApiListing> {
@@ -91,4 +144,5 @@ async function getListingStatusDocumentById(
 
 Meteor.methods({
   ...getListingForProperty,
+  ...submitDraftListing, 
 });

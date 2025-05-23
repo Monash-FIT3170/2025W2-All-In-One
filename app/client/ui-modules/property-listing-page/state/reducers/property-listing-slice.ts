@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { Meteor } from "meteor/meteor";
 import { ListingStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingStatusPill";
 import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingSummary";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
@@ -8,6 +9,7 @@ import {
   getFormattedTimeStringFromDate,
 } from "/app/client/library-modules/utils/date-utils";
 import { RootState } from "/app/client/store";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 const initialState: PropertyListingPageUiState = {
   streetNumber: "",
@@ -39,10 +41,17 @@ const initialState: PropertyListingPageUiState = {
 export const submitDraftListingAsync = createAsyncThunk(
   "propertyListing/submitDraftListing",
   async (propertyId: string) => {
-    // TODO: Replace with actual API call to update listing status
-    // Example: await updateListingStatusUseCase(propertyId, "current");
-    console.log(`Submitting draft listing for property ${propertyId}`);
-    return { success: true };
+    return new Promise((resolve, reject) => {
+      Meteor.call(MeteorMethodIdentifier.LISTING_SUBMIT_DRAFT, propertyId, (error: any, result: any) => {
+        if (error) {
+          console.error('Meteor method error:', error);
+          reject(new Error(error.reason || error.message || 'Failed to update listing'));
+        } else {
+          console.log('Meteor method success:', result);
+          resolve(result);
+        }
+      });
+    });
   }
 );
 
@@ -105,13 +114,21 @@ export const propertyListingSlice = createSlice({
       
       state.shouldShowLoadingState = false;
     });
+
+
+    builder.addCase(submitDraftListingAsync.fulfilled, (state, action) => {
+      console.log('Draft listing submitted successfully:', action.payload);
+    });
     
-    builder.addCase(submitDraftListingAsync.fulfilled, (state) => {
-      // Update the state when backend submission is successful
-      state.listingStatusText = getListingStatusDisplayString("current");
-      state.listingStatusPillVariant = getListingStatusPillVariant("current");
-      state.shouldDisplaySubmitDraftButton = false;
-      state.shouldDisplayReviewTenantButton = true;
+    builder.addCase(submitDraftListingAsync.rejected, (state, action) => {
+      console.error('Failed to submit draft listing:', action.error.message);
+      // Revert UI changes on error
+      state.listingStatusText = getListingStatusDisplayString("draft");
+      state.listingStatusPillVariant = getListingStatusPillVariant("draft");
+      state.shouldDisplaySubmitDraftButton = true;
+      state.shouldDisplayReviewTenantButton = false;
+
+      alert(`Failed to update listing: ${action.error.message}`);
     });
   },
 });

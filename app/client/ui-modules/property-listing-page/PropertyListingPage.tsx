@@ -1,5 +1,4 @@
 import React, { use, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import { PropertyFeatures } from "./components/PropertyFeatures";
 import { ListingPropertyDetails } from "./components/ListingPropertyDetails";
 import {
@@ -32,6 +31,7 @@ import {
   load,
   selectPropertyListingUiState,
   submitDraftListing,
+  submitDraftListingAsync,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import { AgentTopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
@@ -99,6 +99,8 @@ export function PropertyListingPage({
           onSubmitDraftListing={() => {
             console.log("draft submitted!");
             dispatch(submitDraftListing());
+            // Change value of "1" later to property I
+            dispatch(submitDraftListingAsync("1"));
           }}
           className={twMerge("p-5", className)}
         />

@@ -14,4 +14,5 @@ export enum MeteorMethodIdentifier {
   TENANT_GET = "tenants.getOne",
   LANDLORD_INSERT = "landlords.insert",
   LANDLORD_GET = "landlords.getOne",
+  LISTING_SUBMIT_DRAFT = "listing.submitDraft",
 }
