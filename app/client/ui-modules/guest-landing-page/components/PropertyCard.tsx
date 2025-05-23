@@ -1,5 +1,5 @@
 import React from "react";
-import { BedDouble, Bath, Calendar } from "lucide-react";
+import { BedDouble, Bath, CalendarDays } from "lucide-react";
 import { CardWidget } from "../../role-dashboard/components/CardWidget";
 import { ApiProperty } from "../../../../shared/api-models/property/ApiProperty";
 import { useDispatch } from "react-redux";
@@ -62,8 +62,8 @@ export function PropertyCard({
                             <span>{bathrooms}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            <span>{propertyStatus}</span>
+                            <CalendarDays className="w-4 h-4" />
+                            <span>{"3 Days"}</span>
                         </div>
                     </div>
 
