@@ -41,13 +41,15 @@ export function UpcomingTasks({
           title: task.name,
           address: task.description,
           datetime: new Date(task.dueDate).toLocaleDateString(),
-          status: task.status === "completed"
-            ? "Completed"
-            : new Date(task.dueDate) < new Date()
-            ? "Overdue"
-            : new Date(task.dueDate) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-            ? "Due Soon"
-            : "Upcoming",
+          status:
+            task.status === "completed"
+              ? "Completed"
+              : new Date(task.dueDate) < new Date()
+              ? "Overdue"
+              : new Date(task.dueDate) <
+                new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+              ? "Due Soon"
+              : "Upcoming",
         }));
 
         setTasks(transformedTasks);
