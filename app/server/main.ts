@@ -171,7 +171,11 @@ async function tempSeedPropertyData(): Promise<void> {
       starttime: new Date("2025-04-14T10:00:00Z"),
       endtime: new Date("2025-04-15T11:00:00Z"),
     });
-
+    await InspectionCollection.insertAsync({
+      _id: "3",
+      starttime: new Date("2026-04-14T10:00:00Z"),
+      endtime: new Date("2026-04-15T11:00:00Z"),
+    });
     await ListingCollection.insertAsync({
       property_id: "1",
       listing_status_id: "1",
@@ -237,7 +241,7 @@ async function tempSeedPropertyData(): Promise<void> {
         property_id: propertyId,
         listing_status_id: listedStatusId, // "Listed"
         image_urls: imageUrls,
-        inspection_ids: ["1","2"],
+        inspection_ids: ["1","2","3"],
       });
       console.log(`[Seed] Created listed property: ${propertyId}`);
     }

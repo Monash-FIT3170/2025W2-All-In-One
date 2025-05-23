@@ -1,10 +1,33 @@
 import React from "react";
-import { BedDouble, Bath, CalendarDays } from "lucide-react";
+import { BedDouble, Bath, DoorOpen, CalendarDays } from "lucide-react";
 import { CardWidget } from "../../role-dashboard/components/CardWidget";
 import { ApiProperty } from "../../../../shared/api-models/property/ApiProperty";
+import { ApiInspection } from "../../../../shared/api-models/property/ApiInspection";
 import { useDispatch } from "react-redux";
 import { prepareForLoad } from "../../property-listing-page/state/reducers/property-listing-slice";
 import { AppDispatch } from "../../../store";
+
+function getNextInspectionDisplay(inspections?: ApiInspection[]): string {
+    if (!inspections || inspections.length === 0) {
+        return "No upcoming inspections";
+    }
+
+    const now = new Date();
+    const upcomingInspections = inspections
+        .map(inspection_item => ({
+            ...inspection_item,
+            start_time: new Date(inspection_item.start_time),
+        }))
+        .filter(inspection_item => !isNaN(inspection_item.start_time.getTime()) && inspection_item.start_time > now)
+        .sort((a, b) => a.start_time.getTime() - b.start_time.getTime());
+
+    if (upcomingInspections.length === 0) {
+        return "No upcoming inspections";
+    }
+
+    const nextInspection = upcomingInspections[0];
+    return `${nextInspection.start_time.toLocaleDateString()}`;
+}
 
 export function PropertyCard({
     propertyId,
@@ -16,10 +39,12 @@ export function PropertyCard({
     bathrooms,
     bedrooms,
     imageUrls,
+    inspections,
 }: ApiProperty) {
     const address = `${streetnumber} ${streetname}`;
     const weeklyPrice = (pricePerMonth / 4).toFixed(0);
     const displayImage = imageUrls && imageUrls.length > 0 ? imageUrls[0] : "/images/default-property-image.jpg";
+    const nextInspectionDateString = getNextInspectionDisplay(inspections);
 
     const dispatch = useDispatch<AppDispatch>();
 
@@ -63,7 +88,11 @@ export function PropertyCard({
                         </div>
                         <div className="flex items-center gap-1">
                             <CalendarDays className="w-4 h-4" />
-                            <span>{"3 Days"}</span>
+                            <span>{nextInspectionDateString}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <DoorOpen className="w-4 h-4" />
+                            <span>{propertyStatus}</span>
                         </div>
                     </div>
 

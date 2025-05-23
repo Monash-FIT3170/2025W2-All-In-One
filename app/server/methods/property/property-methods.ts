@@ -9,10 +9,13 @@ import { PropertyFeatureDocument } from "/app/server/database/property/models/Pr
 import { PropertyPriceDocument } from "/app/server/database/property/models/PropertyPriceDocument";
 import { PropertyStatusDocument } from "/app/server/database/property/models/PropertyStatusDocument";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
-import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
-import { ListingCollection } from "/app/server/database/property-listing/listing-collections";
+import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
+import { ApiInspection } from "../../../shared/api-models/property/ApiInspection";
+import {
+  InspectionCollection,
+  ListingCollection } from "/app/server/database/property-listing/listing-collections";
 import { AgentDocument } from "../../database/user/models/role-models/AgentDocument";
 import { LandlordDocument } from "../../database/user/models/role-models/LandlordDocument";
 import { TenantDocument } from "../../database/user/models/role-models/TenantDocument";
@@ -103,6 +106,19 @@ async function mapPropertyDocumentToPropertyDTO(
   const listingDocument = await ListingCollection.findOneAsync({ property_id: property._id });
   const imageUrls = listingDocument?.image_urls && listingDocument.image_urls.length > 0 ? listingDocument.image_urls : [];
 
+  let apiInspections: ApiInspection[] = [];
+  if (listingDocument && listingDocument.inspection_ids && listingDocument.inspection_ids.length > 0) {
+    const inspectionDocs = await InspectionCollection.find({
+      _id: { $in: listingDocument.inspection_ids },
+    }).fetchAsync();
+    apiInspections = inspectionDocs.map(inspDoc => ({
+      inspection_id: inspDoc._id,
+      property_id: property._id, // Add property_id for context if needed
+      start_time: new Date(inspDoc.starttime), // Convert DB 'starttime' to 'start_time: Date'
+      end_time: new Date(inspDoc.endtime),     // Convert DB 'endtime' to 'end_time: Date'
+    }));
+  }
+
   const AgentDocument = property.agent_id
     ? await getAgentDocumentById(property.agent_id)
     : null; // Handle missing agent_id gracefully
@@ -166,6 +182,7 @@ async function mapPropertyDocumentToPropertyDTO(
     landlordId: LandlordDocument ? LandlordDocument._id : '', // Always string
     tenantId: TenantDocument ? TenantDocument._id : '', // Always string
     imageUrls: imageUrls,
+    inspections: apiInspections,
   };
 }
 
