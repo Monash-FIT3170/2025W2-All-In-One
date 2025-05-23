@@ -4,10 +4,13 @@ import { CardWidget } from '../../components/CardWidget';
 import { Meteor } from 'meteor/meteor';
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 import { useAppSelector } from '/app/client/store';
+import { ApiProperty } from '/app/shared/api-models/property/ApiProperty';
 
 export function DashboardCards() {
   const [propertyCount, setPropertyCount] = useState<number>(0);
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const [monthlyRevenue, setMonthlyRevenue] = useState<number>(0);
+
   useEffect(() => {
     const getPropertyCount = async () => {
       if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
@@ -19,6 +22,23 @@ export function DashboardCards() {
         }
       }
     };
+
+  useEffect(() => {
+    const getMonthlyRevenue = async () => {
+      if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
+        try {
+          const properties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, currentUser.agentId) as ApiProperty[];
+          const totalRevenue = properties.reduce((sum, property) => sum + property.pricePerMonth, 0);
+          setMonthlyRevenue(totalRevenue);
+        } catch (error) {
+          console.error('Error fetching monthly revenue:', error);
+        }
+      }
+    };
+
+    getMonthlyRevenue();
+  })
+
     getPropertyCount();
   }, [currentUser]);
   return (
