@@ -193,7 +193,34 @@ const propertyInsertMethod = {
 }
 }
 
+async function updateProperty(property: ApiProperty): Promise<void> {
+  await PropertyCollection.updateAsync(property.propertyId, {
+    $set: {
+      streetnumber: property.streetnumber,
+      streetname: property.streetname,
+      suburb: property.suburb,
+      province: property.province,
+      postcode: property.postcode,
+      description: property.description,
+      summary_description: property.summaryDescription,
+      bathrooms: property.bathrooms,
+      bedrooms: property.bedrooms,
+      parking: property.parking,
+      features: property.features,
+      type: property.type,
+      area: property.area,
+      landlord_id: property.landlordId,
+    },
+  });
+}
+
+Meteor.methods({
+  [MeteorMethodIdentifier.PROPERTY_UPDATE]: updateProperty,
+});
+
+
 Meteor.methods({
   ...propertyGetMethod,
-  ...propertyInsertMethod
+  ...propertyInsertMethod,
+  ...updateProperty,
 });

@@ -40,13 +40,13 @@ export default function FormBasicInformation({
         render={({ field }) => (
           <FormItem>
             <FormLabel>Select Landlord</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a landlord" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="bg-white">
+              <SelectContent side="bottom" position="popper" className="z-[9999] bg-white">
                 {landlords.map((landlord) => (
                   <SelectItem key={landlord.landlordId} value={landlord.landlordId}>
                     {landlord.firstName} {landlord.lastName}
@@ -65,13 +65,13 @@ export default function FormBasicInformation({
         render={({ field }) => (
           <FormItem className="py-2">
             <FormLabel>Property Type</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select property type" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="bg-white">
+              <SelectContent side="bottom" position="popper" className="z-[9999] bg-white">
                 <SelectItem value="house">House</SelectItem>
                 <SelectItem value="apartment">Apartment</SelectItem>
               </SelectContent>

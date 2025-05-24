@@ -11,32 +11,37 @@ import FormListingOptions from "./FormListingOptions";
 import { formSchema, FormSchemaType } from "./FormSchema";
 import { Button } from "../../theming-shadcn/Button";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
-
+import { PropertyFormMode } from "../enum/PropertyFormMode";
 
 export function PropertyForm({
   form,
   onSubmit,
   landlords,
+  mode = PropertyFormMode.CREATE,
 }: {
   form: UseFormReturn<FormSchemaType>;
   onSubmit: (values: FormSchemaType) => void;
   landlords: Landlord[];
+  mode: PropertyFormMode;
 }) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FormBasicInformation form={form} landlords={landlords}/>
+        <FormBasicInformation form={form} landlords={landlords} />
         <FormPropertyDetails form={form} />
         <FormPropertyImages form={form} />
         <FormListingOptions form={form} />
         <div className="flex justify-end mt-5">
-        <Button type="submit">Create Listing</Button>
+          <Button type="submit">
+            {mode === PropertyFormMode.CREATE
+              ? "Create Listing"
+              : "Save Changes"}
+          </Button>
         </div>
       </form>
     </Form>
   );
 }
-
 
 export const formDefaultValues: z.infer<typeof formSchema> = {
   landlord: "",

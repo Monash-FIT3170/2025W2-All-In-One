@@ -85,6 +85,7 @@ export default function FormListingOptions({
             <FormLabel>Lease Term</FormLabel>
             <FormControl>
               <RadioGroup
+                value={field.value}
                 onValueChange={field.onChange}
                 className="flex flex-col space-y-2"
               >

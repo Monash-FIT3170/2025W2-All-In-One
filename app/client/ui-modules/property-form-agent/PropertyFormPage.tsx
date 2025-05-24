@@ -4,9 +4,8 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon } from "lucide-react";
-import { PropertyForm } from "./components/PropertyForm";
 import { formSchema, FormSchemaType } from "./components/FormSchema";
-import { formDefaultValues } from "./components/PropertyForm";
+import { formDefaultValues, PropertyForm } from "./components/PropertyForm";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { useAppDispatch } from "../../store";
@@ -18,6 +17,7 @@ import { getPropertyStatusId, insertProperty} from "../../library-modules/domain
 import { uploadFilesHandler } from "../../library-modules/apis/azure/blob-api";
 import { BlobNamePrefix, UploadResults } from "/app/shared/azure/blob-models";
 import { apiInsertPropertyListing } from "../../library-modules/apis/property-listing/listing-api";
+import { PropertyFormMode } from "./enum/PropertyFormMode";
 
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
@@ -88,7 +88,7 @@ export function PropertyFormPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-6 py-10 rounded-md space-y-10">
-          <PropertyForm onSubmit={handleSubmit} form={form} landlords={state.landlords} />
+          <PropertyForm onSubmit={handleSubmit} form={form} landlords={state.landlords} mode={PropertyFormMode.CREATE} />
       </div>
     </div>
   );
