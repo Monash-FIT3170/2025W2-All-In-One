@@ -3,11 +3,12 @@ import { BedDouble, Bath, DoorOpen, CalendarDays } from "lucide-react";
 import { CardWidget } from "../../role-dashboard/components/CardWidget";
 import { ApiProperty } from "../../../../shared/api-models/property/ApiProperty";
 import { ApiInspection } from "../../../../shared/api-models/property/ApiInspection";
-import { useDispatch } from "react-redux";
 import { prepareForLoad } from "../../property-listing-page/state/reducers/property-listing-slice";
-import { AppDispatch } from "../../../store";
+import { useAppDispatch } from "../../../store";
+import { useNavigate } from "react-router";
+import { getFormattedDateStringFromDate } from "../../../library-modules/utils/date-utils";
 
-function getNextInspectionDisplay(inspections?: ApiInspection[]): string {
+function getNextInspectionDateString(inspections?: ApiInspection[]): string {
     if (!inspections || inspections.length === 0) {
         return "No upcoming inspections";
     }
@@ -26,7 +27,7 @@ function getNextInspectionDisplay(inspections?: ApiInspection[]): string {
     }
 
     const nextInspection = upcomingInspections[0];
-    return `${nextInspection.start_time.toLocaleDateString()}`;
+    return getFormattedDateStringFromDate(nextInspection.start_time);
 }
 
 export function PropertyCard({
@@ -41,17 +42,17 @@ export function PropertyCard({
     imageUrls,
     inspections,
 }: ApiProperty) {
-    const address = `${streetnumber} ${streetname}`;
+    const address = `${streetnumber} ${streetname}`; 
     const weeklyPrice = (pricePerMonth / 4).toFixed(0);
     const displayImage = imageUrls && imageUrls.length > 0 ? imageUrls[0] : "/images/default-property-image.jpg";
-    const nextInspectionDateString = getNextInspectionDisplay(inspections);
-
-    const dispatch = useDispatch<AppDispatch>();
+    const nextInspectionDateString = getNextInspectionDateString(inspections);
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
     const handleClick = () => {
-        if (propertyId) {
+        if (propertyId) { 
             dispatch(prepareForLoad(propertyId));
-            window.location.assign(`/property-listing?propertyId=${propertyId}`);
+            navigate(`/property-listing?propertyId=${propertyId}`);
         }
     };
 

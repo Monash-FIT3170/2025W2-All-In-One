@@ -15,7 +15,7 @@ import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
 import { ApiInspection } from "../../../shared/api-models/property/ApiInspection";
 import {
   InspectionCollection,
-  ListingCollection } from "/app/server/database/property-listing/listing-collections";
+  ListingCollection, ListingStatusCollection} from "/app/server/database/property-listing/listing-collections";
 import { AgentDocument } from "../../database/user/models/role-models/AgentDocument";
 import { LandlordDocument } from "../../database/user/models/role-models/LandlordDocument";
 import { TenantDocument } from "../../database/user/models/role-models/TenantDocument";
@@ -23,6 +23,7 @@ import { AgentCollection } from "../../database/user/user-collections";
 import { LandlordCollection } from "../../database/user/user-collections";
 import { TenantCollection } from "../../database/user/user-collections";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
+import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
@@ -70,20 +71,28 @@ const propertyGetAllMethod = {
 
 const getAllListedProperties = {
   [MeteorMethodIdentifier.PROPERTY_GET_ALL_LISTED]: async (): Promise<ApiProperty[]> => {
-    // use '2' as the ID for "Listed" status
-    const listedStatusId = "2";
+    const listedStatusName = ListingStatus.LISTED;
 
-    const listedListings = await ListingCollection.find({
-      listing_status_id: listedStatusId,
+    const listedStatusDocument = await ListingStatusCollection.findOneAsync({
+      name: listedStatusName,
+    });
+
+    if (!listedStatusDocument) {
+      return []; 
+    }
+    const relevantListings = await ListingCollection.find({
+      listing_status_id: listedStatusDocument._id,
     }).fetchAsync();
 
-    const propertyIds = listedListings.map((listing) => listing.property_id);
+    if (relevantListings.length === 0) {
+      return []; 
+    }
 
-    // 3. Get all corresponding property documents
+    const propertyIds = relevantListings.map((listing) => listing.property_id);
+
     const propertyDocuments = await PropertyCollection.find({
       _id: { $in: propertyIds },
     }).fetchAsync();
-
     const propertyDTOs = await Promise.all(
       propertyDocuments.map((property) => mapPropertyDocumentToPropertyDTO(property))
     );

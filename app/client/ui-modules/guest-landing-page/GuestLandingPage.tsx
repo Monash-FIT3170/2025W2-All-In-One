@@ -12,7 +12,7 @@ import { PropertyCard } from "./components/PropertyCard";
 import { fetchProperties } from "./state/reducers/guest-landing-page-slice";
 import { useAppDispatch } from "../../store";
 
-export function GuestLandingPageBase() {
+export function GuestLandingPage() {
     const dispatch = useAppDispatch();
     const { isLoading, properties, error } = useSelector(
         (state: { guestLandingPage: GuestLandingPageUiState }) => state.guestLandingPage

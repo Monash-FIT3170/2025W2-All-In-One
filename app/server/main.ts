@@ -192,7 +192,7 @@ async function tempSeedPropertyData(): Promise<void> {
     });
 
     // Seed 10 additional properties with "Listed" status
-    const listedStatusId = "2"; // Corresponds to ListingStatus.LISTED 
+    const listedStatusId = "2"; 
     const propertyStatusVacantId = "1"; // Corresponds to "Vacant"
     const defaultFeatureIds = ["1", "2"]; // Default features
 
@@ -228,12 +228,7 @@ async function tempSeedPropertyData(): Promise<void> {
       });
 
       
-      // // Generate some random image URLs for variety
-      // const imageUrls = [
-      //   `https://picsum.photos/seed/${propertyId}_1/800/600`,
-      //   `https://picsum.photos/seed/${propertyId}_2/800/600`,
-      //   `https://picsum.photos/seed/${propertyId}_3/800/600`,
-      // ];
+  
       const imageUrls = [
         "https://cdn.pixabay.com/photo/2018/08/04/11/30/draw-3583548_1280.png",
         "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",

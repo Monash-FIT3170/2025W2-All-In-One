@@ -45,29 +45,34 @@ export const propertyListingSlice = createSlice({
   reducers: {
     prepareForLoad(state, action: PayloadAction<string>) {
       const newPropertyIdToLoad = action.payload;
-      if (state.loadedPropertyId !== newPropertyIdToLoad) {
-        state.streetNumber = initialState.streetNumber;
-        state.street = initialState.street;
-        state.suburb = initialState.suburb;
-        state.province = initialState.province;
-        state.postcode = initialState.postcode;
-        state.summaryDescription = initialState.summaryDescription;
-        state.propertyStatusText = initialState.propertyStatusText;
-        state.propertyStatusPillVariant = initialState.propertyStatusPillVariant;
-        state.propertyDescription = initialState.propertyDescription;
-        state.propertyFeatures = initialState.propertyFeatures;
-        state.propertyType = initialState.propertyType;
-        state.propertyLandArea = initialState.propertyLandArea;
-        state.propertyBathrooms = initialState.propertyBathrooms;
-        state.propertyParkingSpaces = initialState.propertyParkingSpaces;
-        state.propertyBedrooms = initialState.propertyBedrooms;
-        state.propertyPrice = initialState.propertyPrice;
-        state.inspectionBookingUiStateList = initialState.inspectionBookingUiStateList;
-        state.listingImageUrls = initialState.listingImageUrls;
-      }
+
+      state.streetNumber = initialState.streetNumber;
+      state.street = initialState.street;
+      state.suburb = initialState.suburb;
+      state.province = initialState.province;
+      state.postcode = initialState.postcode;
+      state.summaryDescription = initialState.summaryDescription;
+      state.propertyStatusText = initialState.propertyStatusText;
+      state.propertyStatusPillVariant = initialState.propertyStatusPillVariant;
+      state.propertyDescription = initialState.propertyDescription;
+      state.propertyFeatures = initialState.propertyFeatures;
+      state.propertyType = initialState.propertyType;
+      state.propertyLandArea = initialState.propertyLandArea;
+      state.propertyBathrooms = initialState.propertyBathrooms;
+      state.propertyParkingSpaces = initialState.propertyParkingSpaces;
+      state.propertyBedrooms = initialState.propertyBedrooms;
+      state.propertyPrice = initialState.propertyPrice;
+      state.inspectionBookingUiStateList = initialState.inspectionBookingUiStateList;
+      state.listingImageUrls = initialState.listingImageUrls;
+      state.listingStatusText = initialState.listingStatusText;
+      state.listingStatusPillVariant = initialState.listingStatusPillVariant;
+      state.shouldDisplayListingStatus = initialState.shouldDisplayListingStatus;
+      state.shouldDisplaySubmitDraftButton = initialState.shouldDisplaySubmitDraftButton;
+
       state.propertyIdToLoad = newPropertyIdToLoad;
       state.isLoading = true;
       state.error = null;
+      state.loadedPropertyId = null; // Crucial: Indicate no property is "loaded" for this new attempt.
     },
   },
   extraReducers: (builder) => {

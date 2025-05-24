@@ -22,10 +22,10 @@ import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonI
 import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
-import { // Import load and selectPropertyListingUiState
+import {
   load,
   selectPropertyListingUiState,
-  prepareForLoad, // Ensure prepareForLoad is imported
+  prepareForLoad
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import { AgentTopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
