@@ -30,14 +30,6 @@ import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard
 import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
 import { TopNavbar } from "./ui-modules/navigation-bars/TopNavbar";
 import { RoleSideNavBar } from "./ui-modules/navigation-bars/side-nav-bars/SideNavbar";
-
-import { Role } from "../shared/user-role-identifier";
-import {
-  agentDashboardLinks,
-  landlordDashboardLinks,
-  tenantDashboardLinks,
-  settingLinks,
-} from "./ui-modules/navigation-bars/side-nav-bars/side-nav-link-definitions";
 import { loadCurrentUser } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
 
 Meteor.startup(initialiseReactRoot);
@@ -47,7 +39,8 @@ function initialiseReactRoot(): void {
   const root = createRoot(container);
 
   root.render(
-    // moving the store redux setup to this level so can be used for current user info
+    // Wrap the entire app with Redux Provider at the root level
+    // to ensure global state (including current user data) is accessible across all components
     <React.StrictMode>
       <Provider store={store}>
         <AppRoot />
@@ -57,11 +50,13 @@ function initialiseReactRoot(): void {
 }
 
 function AppRoot(): React.JSX.Element {
-  // side bar logics to be handled on top level to ensure its consistent across all pages
+  // Global sidebar open/close state, lifted to the top level
+  // so the sidebar can be consistently controlled across all pages and components
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const dispatch = useAppDispatch();
-  
-  // avoid page refresh wiping redux states!
+
+  // On app load, restore the logged-in user into Redux state
+  // to prevent losing session data on page refresh or reload
   useEffect(() => {
     const userId = Meteor.userId();
     if (userId) {

@@ -7,7 +7,6 @@ export function TenantCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const tasks = useAppSelector(selectTasks); // Retrieve tasks from Redux store
 
-  const [isSidebarOpen, onSideBarOpened] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
 
