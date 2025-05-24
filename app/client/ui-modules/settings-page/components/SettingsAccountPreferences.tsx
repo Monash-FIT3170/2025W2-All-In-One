@@ -14,12 +14,19 @@ import {
   FormItem,
   FormLabel,
 } from "/app/client/ui-modules/settings-page/components/Form";
+import { useAppDispatch } from "/app/client/store";
+import { useNavigate } from "react-router";
+import { signoutUser } from "../../user-authentication/state/reducers/current-user-slice";
+
 const FormSchema = z.object({
   marketing_emails: z.boolean().default(false).optional(),
   security_emails: z.boolean(),
 });
 
 export function SettingsAccountPreferences() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -32,6 +39,15 @@ export function SettingsAccountPreferences() {
       title: "You submitted the following values:",
       content: JSON.stringify(data, null, 2),
     });
+  }
+
+  async function handleLogout() {
+    try {
+      await dispatch(signoutUser()).unwrap();
+      navigate("/"); // redirect to landing page
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   }
 
   return (
@@ -69,7 +85,9 @@ export function SettingsAccountPreferences() {
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Button variant="destructive">Sign Out </Button>
+                    <Button variant="destructive" onClick={handleLogout}>
+                      Sign Out
+                    </Button>
                   </FormControl>
                 </FormItem>
               )}

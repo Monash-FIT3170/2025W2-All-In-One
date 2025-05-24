@@ -77,14 +77,14 @@ export const registerUser = createAsyncThunk<
     const currentUser = Meteor.user();
 
     // 3. If not logged in OR logged in user email doesn't match the new one, log in manually
-    const loggedInEmail = currentUser?.emails?.[0]?.address;
-    const userNeedsLogin = !currentUser || loggedInEmail !== payload.email;
+    const signedInEmail = currentUser?.emails?.[0]?.address;
+    const userNeedsSignin = !currentUser || signedInEmail !== payload.email;
 
-    if (userNeedsLogin) {
+    if (userNeedsSignin) {
       await new Promise<void>((resolve, reject) => {
         Meteor.loginWithPassword(payload.email, payload.password, (error) => {
           if (error)
-            return reject(new Error("Auto-login failed after registration."));
+            return reject(new Error("Auto-signin failed after registration."));
           resolve();
         });
       });
@@ -92,7 +92,7 @@ export const registerUser = createAsyncThunk<
 
     // 4. Load the correct current user
     const finalUserId = Meteor.userId();
-    if (!finalUserId) throw new Error("Unable to establish login session.");
+    if (!finalUserId) throw new Error("Unable to establish signin session.");
 
     await dispatch(loadCurrentUser(finalUserId));
 

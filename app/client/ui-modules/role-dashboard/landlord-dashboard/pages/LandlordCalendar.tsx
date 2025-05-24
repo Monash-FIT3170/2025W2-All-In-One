@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { setTasks, selectTasks } from "../state/landlord-dashboard-slice";
-import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
-import { LandlordTopNavbar } from "../../../navigation-bars/TopNavbar";
-import {
-  landlordDashboardLinks,
-  settingLinks,
-} from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 export function LandlordCalendar(): React.JSX.Element {
@@ -51,14 +45,7 @@ export function LandlordCalendar(): React.JSX.Element {
 
   return (
     <div className="min-h-screen">
-      <LandlordTopNavbar onSideBarOpened={onSideBarOpened} />
       <div className="flex">
-        <RoleSideNavBar
-          isOpen={isSidebarOpen}
-          onClose={() => onSideBarOpened(false)}
-          dashboardLinks={landlordDashboardLinks} // Pass the dashboard links to the sidebar
-          settingsLinks={settingLinks} // Pass the links to the sidebar
-        />
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-bold mb-6">Landlord Calendar</h1>
           <div className="flex gap-6">

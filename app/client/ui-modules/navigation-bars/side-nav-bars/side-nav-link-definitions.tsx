@@ -21,7 +21,7 @@ export const agentDashboardLinks = [
 export const tenantDashboardLinks = [
   { to: "/tenant-dashboard", label: "Overview" },
   { to: "/tenant-property", label: "My Property" },
-  { to: "/tenant-calender", label: "Calendar" },
+  { to: "/tenant-calendar", label: "Calendar" },
   { to: "/tenant-maintenance", label: "Maintenance" },
   { to: "/tenant-messages", label: "Messages" },
   { to: "/tenant-documents", label: "Documents" },

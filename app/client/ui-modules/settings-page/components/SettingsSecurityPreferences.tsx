@@ -64,9 +64,9 @@ export function SettingsSecurityPreferences() {
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                   <div className="space-y-0.5">
-                    <FormLabel>Login History</FormLabel>
+                    <FormLabel>Sign in History</FormLabel>
                     <FormDescription>
-                      View your recent login history
+                      View your recent Sign in history
                     </FormDescription>
                   </div>
                   <FormControl>
