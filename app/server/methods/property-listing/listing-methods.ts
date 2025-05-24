@@ -10,6 +10,8 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ListingStatusDocument } from "/app/server/database/property-listing/models/ListingStatusDocument";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
+import { IncompleteListingInsertData } from "/app/shared/api-models/property-listing/ListingInsertData";
+import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 
 const getListingForProperty = {
   [MeteorMethodIdentifier.LISTING_GET_FOR_PROPERTY]: async (
@@ -88,7 +90,31 @@ async function getListingStatusDocumentById(
 ): Promise<ListingStatusDocument | undefined> {
   return await ListingStatusCollection.findOneAsync(id);
 }
+const insertListingDocumentForProperty = {
+  [MeteorMethodIdentifier.LISTING_INSERT_PROPERTY]: async (data: IncompleteListingInsertData): Promise<string> => {
+    const listingStatus = await getListingStatusDocumentByName(ListingStatus.DRAFT);
+    if (!listingStatus){
+      throw new Error(`ListingStatus ${ListingStatus.DRAFT} does not exist`)
+    }
+    try{
+    return ListingCollection.insertAsync({
+      ...data,
+      listing_status_id: listingStatus._id
+    })}
+    catch (e) {
+      if (e instanceof Error) {
+        throw new Error(`Failed to insert Property into ListingCollection: ${e.message}`);
+      } else {
+        throw new Error(`Failed to insert Property into ListingCollection: ${JSON.stringify(e)}`);
+      }}
+  }
+}
+
+async function getListingStatusDocumentByName(name: ListingStatus): Promise<ListingStatusDocument | undefined> {
+  return ListingStatusCollection.findOneAsync({name: name});
+}
 
 Meteor.methods({
   ...getListingForProperty,
+  ...insertListingDocumentForProperty,
 });
