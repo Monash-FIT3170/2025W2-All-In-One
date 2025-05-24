@@ -7,7 +7,6 @@ import { BellIcon } from "../theming/icons/BellIcon";
 import { SideBarSliderIcon } from "../theming/icons/SideBarSlider";
 import { useAppSelector } from "/app/client/store";
 import { ProfileFooter } from "../navigation-bars/side-nav-bars/components/ProfileFooter";
-import { NotificationBoard } from "../theming/components/NotificationBoard";
 import { Meteor } from 'meteor/meteor';
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 import { ApiTask } from '/app/shared/api-models/task/ApiTask';
@@ -53,36 +52,13 @@ export function RoleTopNavbar({
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const firstName = currentUser?.firstName || "Unknown";
   const lastName = currentUser?.lastName || "User";
-  const [notificationOpen, setNotificationOpen] = useState(false);
-  const [pendingTasks, setPendingTasks] = useState<ApiTask[]>([]);
 
-   const getUserRole = () => {
+  const getUserRole = () => {
     if (!currentUser) return "Guest";
     if ('agentId' in currentUser) return "Agent";
     if ('landlordId' in currentUser) return "Landlord";
     if ('tenantId' in currentUser) return "Tenant";
     return "Guest";
-  };
-
-  const getPendingTasks = async () => {
-    try {
-      const tasks = await Meteor.callAsync(MeteorMethodIdentifier.TASK_GET_PENDING_LIST);
-      setPendingTasks(tasks);
-    } catch (error) {
-      setPendingTasks([]);
-      console.error('Failed to fetch pending tasks:', error);
-    }
-  };
-
-  useEffect(() => {
-    getPendingTasks();
-  }, []);
-
-  const handleBellClick = async () => {
-    if (!notificationOpen) {
-      await getPendingTasks();
-    }
-    setNotificationOpen((prev) => !prev);
   };
 
   return (
@@ -101,17 +77,12 @@ export function RoleTopNavbar({
         </div>
 
         {/* Right-aligned profile section */}
-        <div className="flex items-center gap-4 relative">
+        <div className="flex items-center gap-4">
           <div className="ml-2">
             <BellIcon
-              hasNotifications={pendingTasks.length > 0}
+              hasNotifications={true}
               className="text-gray-600"
-              onClick={handleBellClick}
-            />
-            <NotificationBoard
-              open={notificationOpen}
-              onClose={() => setNotificationOpen(false)}
-              tasks={pendingTasks}
+              onClick={() => console.log("Notification clicked")}
             />
           </div>
           <ProfileFooter firstName={firstName} lastName={lastName} title={getUserRole()} />

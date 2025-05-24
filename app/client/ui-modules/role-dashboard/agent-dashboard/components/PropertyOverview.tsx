@@ -5,9 +5,18 @@ import { useAppSelector } from "../../../../store";
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 
+export enum PropertyStatus {
+  CLOSED = "Closed",
+  UNDER_MAINTENANCE = "Under Maintenance",
+  DRAFT = "Draft",
+  LISTED = "Listed",
+  VACANT = "Vacant",
+  OCCUPIED = "Occupied"
+}
+
 interface Property {
   address: string;
-  status: "Closed" | "Under Maintenance" | "Draft" | "Listed" | "Vacant" | "Occupied"
+  status: PropertyStatus;
   rent: number;
 }
 
@@ -28,7 +37,7 @@ export function PropertyOverview({
           const apiProperties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, currentUser.agentId) as ApiProperty[];
           const mappedProperties: Property[] = apiProperties.map((property: ApiProperty) => ({
             address: `${property.streetnumber} ${property.streetname}`,
-            status: property.propertyStatus as "Closed" | "Under Maintenance" | "Draft" | "Listed" | "Vacant" | "Occupied",
+            status: property.propertyStatus as PropertyStatus,
             rent: property.pricePerMonth,
           }));
           setProperties(mappedProperties);
