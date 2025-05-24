@@ -41,23 +41,6 @@ const taskGetMethod = {
   },
 };
 
-const taskGetPendingCountMethod = {
-  [MeteorMethodIdentifier.TASK_GET_PENDING_COUNT]: async (): Promise<number> => {
-    return await TaskCollection.find({
-      taskStatus: { $ne: TaskStatus.COMPLETED }
-    }).countAsync();
-  },
-};
-
-const taskGetPendingListMethod = {
-  [MeteorMethodIdentifier.TASK_GET_PENDING_LIST]: async (): Promise<ApiTask[]> => {
-    const tasks = await TaskCollection.find({
-      taskStatus: { $ne: TaskStatus.COMPLETED }
-    }).fetchAsync();
-    return Promise.all(tasks.map(mapTaskDocumentTotaskDTO));
-  },
-};
-
 /**
  * Maps a TaskDocument to an ApiTask DTO.
  *
@@ -87,6 +70,4 @@ async function getTaskDocumentById(
 
 Meteor.methods({
   ...taskGetMethod,
-  ...taskGetPendingCountMethod,
-  ...taskGetPendingListMethod,
 });
