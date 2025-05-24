@@ -5,9 +5,8 @@ import { PropManagerLogoText } from "../theming/components/logo/PropManagerLogoT
 import { Button } from "../theming-shadcn/Button";
 import { BellIcon } from "../theming/icons/BellIcon";
 import { SideBarSliderIcon } from "../theming/icons/SideBarSlider";
-import { useAppSelector } from "/app/client/store";
+import { useAppSelector, useAppDispatch } from "/app/client/store";
 import { ProfileFooter } from "../navigation-bars/side-nav-bars/components/ProfileFooter";
-import { useAppDispatch } from "/app/client/store";
 import { signoutUser } from "../user-authentication/state/reducers/current-user-slice";
 
 interface TopNavbarProps {
@@ -24,30 +23,27 @@ export function TopNavbar({
 
   const handleSignout = async () => {
     try {
-      await dispatch(signoutUser()).unwrap(); // wait for sign out to finish
-      navigate("/"); // redirect to landing page after successful sign out
+      await dispatch(signoutUser()).unwrap();
+      navigate("/");
     } catch (error) {
-      console.error("sign out failed:", error);
+      console.error("Sign out failed:", error);
     }
   };
 
-  const handleGoHome = () => {
-    navigate("/");
-  };
-
-  const handleGoProfile = () => {
-    navigate("/profile");
-  };
+  const handleGoHome = () => navigate("/");
+  const handleGoProfile = () => navigate("/profile");
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
       <div className="flex justify-between items-center px-4">
-        {/* Left section: hamburger + logo */}
+        {/* Left section: sidebar (only if logged in) + logo */}
         <div className="flex items-center gap-4">
-          <SideBarSliderIcon
-            onClick={() => onSideBarOpened((prev) => !prev)}
-            className="text-gray-600 cursor-pointer"
-          />
+          {currentUser && (
+            <SideBarSliderIcon
+              onClick={() => onSideBarOpened((prev) => !prev)}
+              className="text-gray-600 cursor-pointer"
+            />
+          )}
           <div
             className="flex items-center gap-2 cursor-pointer"
             onClick={handleGoHome}
@@ -57,7 +53,7 @@ export function TopNavbar({
           </div>
         </div>
 
-        {/* Right section: auth-based display */}
+        {/* Right section: auth-based content */}
         <div className="flex items-center gap-4">
           {currentUser && authUser ? (
             <>
@@ -83,7 +79,7 @@ export function TopNavbar({
                 <Button>Sign in</Button>
               </Link>
               <Link to="/signup">
-                <Button variant="outline">Sign Up</Button>
+                <Button variant="outline">Sign up</Button>
               </Link>
             </div>
           )}

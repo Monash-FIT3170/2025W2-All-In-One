@@ -60,6 +60,7 @@ function AppRoot(): React.JSX.Element {
   // side bar logics to be handled on top level to ensure its consistent across all pages
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const dispatch = useAppDispatch();
+  
   // avoid page refresh wiping redux states!
   useEffect(() => {
     const userId = Meteor.userId();
@@ -68,17 +69,6 @@ function AppRoot(): React.JSX.Element {
     }
   }, [dispatch]);
 
-  // once current user is loaded then do below
-  const authUser = useAppSelector((state) => state.currentUser.authUser);
-  let dashboardLinks: { to: string; label: string; }[] = [];
-  if (authUser?.role === Role.AGENT) {
-    dashboardLinks = agentDashboardLinks;
-  } else if (authUser?.role === Role.LANDLORD) {
-    dashboardLinks = landlordDashboardLinks;
-  } else if (authUser?.role === Role.TENANT) {
-    dashboardLinks = tenantDashboardLinks;
-  }
-
   return (
     <DefaultTheme>
       <BrowserRouter>
@@ -86,8 +76,6 @@ function AppRoot(): React.JSX.Element {
         <RoleSideNavBar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
-          dashboardLinks={dashboardLinks}
-          settingsLinks={settingLinks}
         />
         <Routes>
           <Route path="/" element={<GuestLandingPage />} />
