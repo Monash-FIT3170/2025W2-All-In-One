@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { GuestLandingPageUiState} from "./state/GuestLandingPageUiState";
 import { Link } from "react-router";
 import Ripple from "./animations/Ripple";
@@ -10,10 +10,10 @@ import { Input } from "../theming-shadcn/Input";
 import { agentLinks } from "../navigation-bars/side-nav-bars/side-nav-link-definitions";
 import { PropertyCard } from "./components/PropertyCard";
 import { fetchProperties } from "./state/reducers/guest-landing-page-slice";
-import type { AppDispatch } from "../../store"; 
+import { useAppDispatch } from "../../store";
 
 export function GuestLandingPageBase() {
-    const dispatch = useDispatch<AppDispatch>();
+    const dispatch = useAppDispatch();
     const { isLoading, properties, error } = useSelector(
         (state: { guestLandingPage: GuestLandingPageUiState }) => state.guestLandingPage
     );
