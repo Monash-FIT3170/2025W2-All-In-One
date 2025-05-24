@@ -209,6 +209,7 @@ async function updateProperty(property: ApiProperty): Promise<void> {
       features: property.features,
       type: property.type,
       area: property.area,
+      landlord_id: property.landlordId,
     },
   });
 }

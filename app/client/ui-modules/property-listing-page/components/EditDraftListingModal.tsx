@@ -50,12 +50,12 @@ export default function EditDraftListingModal(
       bathrooms: values.bathroom_number,
       bedrooms: values.bedroom_number,
       parking: 100,
-      features: [],
+      features: [], // TODO: Replace with actual value if available
       type: values.property_type,
       area: values.space,
       pricePerMonth: 0, // TODO: Replace with actual value if available
       agentId: "", // TODO: Replace with actual value if available
-      landlordId: "", // TODO: Replace with actual value if available
+      landlordId: values.landlord,
       tenantId: "", // TODO: Replace with actual value if available
     };
 
