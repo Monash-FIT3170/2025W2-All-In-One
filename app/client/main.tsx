@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Container, createRoot } from "react-dom/client";
 import { Meteor } from "meteor/meteor";
 import { GuestLandingPage } from "./ui-modules/guest-landing-page/GuestLandingPage";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { Provider } from "react-redux";
-import { store, useAppSelector } from "./store";
+import { store, useAppDispatch, useAppSelector } from "./store";
 import { DefaultTheme } from "./ui-modules/theming/themes/DefaultTheme";
 import { AgentDashboard } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentDashboard";
 import { AgentCalendar } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentCalendar";
@@ -38,6 +38,7 @@ import {
   tenantDashboardLinks,
   settingLinks,
 } from "./ui-modules/navigation-bars/side-nav-bars/side-nav-link-definitions";
+import { loadCurrentUser } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -58,8 +59,17 @@ function initialiseReactRoot(): void {
 function AppRoot(): React.JSX.Element {
   // side bar logics to be handled on top level to ensure its consistent across all pages
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
-  const authUser = useAppSelector((state) => state.currentUser.authUser);
+  const dispatch = useAppDispatch();
+  // avoid page refresh wiping redux states!
+  useEffect(() => {
+    const userId = Meteor.userId();
+    if (userId) {
+      dispatch(loadCurrentUser(userId));
+    }
+  }, [dispatch]);
 
+  // once current user is loaded then do below
+  const authUser = useAppSelector((state) => state.currentUser.authUser);
   let dashboardLinks: { to: string; label: string; }[] = [];
   if (authUser?.role === Role.AGENT) {
     dashboardLinks = agentDashboardLinks;
@@ -68,6 +78,7 @@ function AppRoot(): React.JSX.Element {
   } else if (authUser?.role === Role.TENANT) {
     dashboardLinks = tenantDashboardLinks;
   }
+
   return (
     <DefaultTheme>
       <BrowserRouter>
