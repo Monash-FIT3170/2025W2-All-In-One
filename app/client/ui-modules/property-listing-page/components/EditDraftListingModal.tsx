@@ -15,7 +15,7 @@ import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { apiUpdateProperty } from "/app/client/library-modules/apis/property/property-api";
 import { useAppDispatch } from "/app/client/store";
 import { load } from "../state/reducers/property-listing-slice";
-import { PropertyFormMode } from "/app/shared/api-models/property/PropertyFormMode";
+import { PropertyFormMode } from "../../property-form-agent/enum/PropertyFormMode";
 import { PropertyForm } from "../../property-form-agent/components/PropertyForm";
 
 interface EditDraftListingModalProps {

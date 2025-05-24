@@ -11,7 +11,7 @@ import FormListingOptions from "./FormListingOptions";
 import { formSchema, FormSchemaType } from "./FormSchema";
 import { Button } from "../../theming-shadcn/Button";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
-import { PropertyFormMode } from "/app/shared/api-models/property/PropertyFormMode";
+import { PropertyFormMode } from "../enum/PropertyFormMode";
 
 export function PropertyForm({
   form,

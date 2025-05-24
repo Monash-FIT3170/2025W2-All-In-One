@@ -17,7 +17,7 @@ import { getPropertyStatusId, insertProperty} from "../../library-modules/domain
 import { uploadFilesHandler } from "../../library-modules/apis/azure/blob-api";
 import { BlobNamePrefix, UploadResults } from "/app/shared/azure/blob-models";
 import { apiInsertPropertyListing } from "../../library-modules/apis/property-listing/listing-api";
-import { PropertyFormMode } from "/app/shared/api-models/property/PropertyFormMode";
+import { PropertyFormMode } from "./enum/PropertyFormMode";
 
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
