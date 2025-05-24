@@ -4,7 +4,6 @@ import {
   FormSchemaType,
   formSchema,
 } from "../../property-form-agent/components/FormSchema";
-import { PropertyForm } from "../../property-form-agent/components/PropertyForm";
 import {
   ThemedButton,
   ThemedButtonVariant,
@@ -14,6 +13,10 @@ import { Landlord } from "/app/client/library-modules/domain-models/user/Landlor
 import { getPropertyStatusId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { apiUpdateProperty } from "/app/client/library-modules/apis/property/property-api";
+import { useAppDispatch } from "/app/client/store";
+import { load } from "../state/reducers/property-listing-slice";
+import { PropertyFormMode } from "/app/shared/api-models/property/PropertyFormMode";
+import { PropertyForm } from "../../property-form-agent/components/PropertyForm";
 
 interface EditDraftListingModalProps {
   toggle: () => void;
@@ -30,6 +33,7 @@ export default function EditDraftListingModal(
     resolver: zodResolver(formSchema),
     defaultValues: props.propertyForm,
   });
+  const dispatch = useAppDispatch();
 
   const handleSaveChanges = async (values: FormSchemaType) => {
     // Update property details
@@ -46,7 +50,8 @@ export default function EditDraftListingModal(
       postcode: values.postal_code,
       propertyStatus: PropertyStatus.VACANT,
       description: values.description,
-      summaryDescription: "I updated this summary description.",
+      summaryDescription:
+        "Modern apartment with spacious living areas and a beautiful garden.",
       bathrooms: values.bathroom_number,
       bedrooms: values.bedroom_number,
       parking: 100,
@@ -62,7 +67,7 @@ export default function EditDraftListingModal(
     const prop = await apiUpdateProperty(updatedProperty);
 
     // Refresh the page
-    window.location.reload();
+    dispatch(load(props.propertyId));
 
     // Close modal
     console.log("Finished updating listing, closing modal");
@@ -83,7 +88,7 @@ export default function EditDraftListingModal(
                   onSubmit={handleSaveChanges}
                   form={listingInfo}
                   landlords={props.landlords}
-                  mode={"edit"}
+                  mode={PropertyFormMode.EDIT}
                 />
               </div>
             </div>

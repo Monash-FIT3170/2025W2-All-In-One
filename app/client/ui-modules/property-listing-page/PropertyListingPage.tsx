@@ -36,7 +36,10 @@ import { EditDraftListingButton } from "./components/EditDraftListingButton";
 import { PropertyForm } from "../property-form-agent/components/PropertyForm";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formSchema, FormSchemaType } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
+import {
+  formSchema,
+  FormSchemaType,
+} from "/app/client/ui-modules/property-form-agent/components/FormSchema";
 
 export function PropertyListingPage({
   className = "",
@@ -56,7 +59,9 @@ export function PropertyListingPage({
     return (
       <>
         <AgentTopNavbar onSideBarOpened={() => {}} />
-        <ListingPageContentLoadingSkeleton className={twMerge("p-5", className)} />
+        <ListingPageContentLoadingSkeleton
+          className={twMerge("p-5", className)}
+        />
       </>
     );
   } else {
@@ -368,7 +373,7 @@ function BottomBar({
 }): React.JSX.Element {
   return (
     <div className={twMerge("flex items-center gap-2", className)}>
-      <EditListing />
+      <ListingModalEditor />
       {shouldDisplaySubmitDraftButton && (
         <SubmitDraftListingButton
           onClick={onSubmitDraftListing}
@@ -379,7 +384,7 @@ function BottomBar({
   );
 }
 
-function EditListing({
+function ListingModalEditor({
   className = "",
 }: {
   className?: string;

@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon } from "lucide-react";
-import { PropertyForm } from "./components/PropertyForm";
+import { PropertyForm, PropertyFormMode } from "./components/PropertyForm";
 import { formSchema, FormSchemaType } from "./components/FormSchema";
 import { formDefaultValues } from "./components/PropertyForm";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
@@ -88,7 +88,7 @@ export function PropertyFormPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-6 py-10 rounded-md space-y-10">
-          <PropertyForm onSubmit={handleSubmit} form={form} landlords={state.landlords} mode={"create"} />
+          <PropertyForm onSubmit={handleSubmit} form={form} landlords={state.landlords} mode={PropertyFormMode.CREATE} />
       </div>
     </div>
   );
