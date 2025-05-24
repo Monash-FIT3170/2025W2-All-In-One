@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, createRoot } from "react-dom/client";
 import { Meteor } from "meteor/meteor";
-import { GuestLandingPage } from "./ui-modules/guest-landing-page/GuestLandingPage";
+import { GuestLandingPageBase } from "./ui-modules/guest-landing-page/GuestLandingPage";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { Provider } from "react-redux";
 import { store } from "./store";
@@ -15,7 +15,7 @@ import { LandlordDashboard } from "./ui-modules/role-dashboard/landlord-dashboar
 import { LandlordCalendar } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordCalendar";
 import { LandlordTask } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordTask";
 import { LandlordProperty } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordProperty";
-import { BottomNavbar } from "./ui-modules/navigation-bars/BottonNavbar";
+import { BottomNavbar } from "./ui-modules/navigation-bars/BottomNavbar";
 import { PropertyListingPage } from "/app/client/ui-modules/property-listing-page/PropertyListingPage";
 import { SettingsPage } from "./ui-modules/settings-page/SettingsPage";
 import { PropertyFormPage } from "./ui-modules/property-form-agent/PropertyFormPage";
@@ -45,7 +45,7 @@ function AppRoot(): React.JSX.Element {
         <DefaultTheme>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<GuestLandingPage />} />
+              <Route path="/" element={<GuestLandingPageBase />} />
               <Route path="/agent-dashboard" element={<AgentDashboard />} />
               <Route path="/agent-properties" element={<AgentProperty />} />
               <Route path="/agent-calendar" element={<AgentCalendar />} />
@@ -55,7 +55,7 @@ function AppRoot(): React.JSX.Element {
               <Route path="/landlord-properties" element={<LandlordProperty />} />
               <Route path="/landlord-calendar" element={<LandlordCalendar />} />
               <Route path="/landlord-tasks" element={<LandlordTask />} />
-              <Route path="/test" element={<PropertyListingPage />} />
+              <Route path="/property-listing" element={<PropertyListingPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/propertyform" element={<PropertyFormPage />} />
               <Route path="/login" element={<AuthTabs initialTab="login" />} />

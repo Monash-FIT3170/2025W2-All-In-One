@@ -1,10 +1,7 @@
-import React, { use, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { PropertyFeatures } from "./components/PropertyFeatures";
 import { ListingPropertyDetails } from "./components/ListingPropertyDetails";
-import {
-  PropertyStatusPillVariant,
-  ListingSummary,
-} from "./components/ListingSummary";
+import { ListingSummary } from "./components/ListingSummary";
 import { ListingDescription } from "./components/ListingDescription";
 import { LeftCircularArrowIcon } from "/app/client/ui-modules/theming/icons/LeftCircularArrowIcon";
 import { RightCircularArrowIcon } from "/app/client/ui-modules/theming/icons/RightCircularArrowIcon";
@@ -18,19 +15,21 @@ import { ContactAgentButton } from "/app/client/ui-modules/property-listing-page
 import {
   ListingStatusPill,
   ListingStatusPillVariant,
+
 } from "/app/client/ui-modules/property-listing-page/components/ListingStatusPill";
 import { BackLink } from "../theming/components/BackLink";
 import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonIcon";
 import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
-import { useAppDispatch } from "/app/client/store";
-import { useSelector } from "react-redux";
-import {
+import { useAppDispatch, useAppSelector } from "/app/client/store";
+import { // Import load and selectPropertyListingUiState
   load,
   selectPropertyListingUiState,
+  prepareForLoad, // Ensure prepareForLoad is imported
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import { AgentTopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
+import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingSummary";
 
 // TODO: To re-add edit draft listing modal
 export function PropertyListingPage({
@@ -39,15 +38,30 @@ export function PropertyListingPage({
   className?: string;
 }): React.JSX.Element {
   const dispatch = useAppDispatch();
-  const state: PropertyListingPageUiState = useSelector(
+
+  const state: PropertyListingPageUiState = useAppSelector(
     selectPropertyListingUiState
   );
+  const { propertyIdToLoad, isLoading, streetNumber, loadedPropertyId } = state;
 
   useEffect(() => {
-    dispatch(load("1"));
-  }, []);
+    const urlParams = new URLSearchParams(window.location.search);
+    const propertyIdFromUrl = urlParams.get('propertyId');
 
-  if (state.shouldShowLoadingState) {
+    if (propertyIdFromUrl) {
+      if (propertyIdFromUrl !== loadedPropertyId && propertyIdFromUrl !== propertyIdToLoad) {
+        dispatch(prepareForLoad(propertyIdFromUrl));
+      }
+    }
+
+    if (propertyIdToLoad && isLoading) {
+      if (propertyIdToLoad !== loadedPropertyId || !streetNumber) {
+        dispatch(load(propertyIdToLoad));
+      }
+    }
+  }, [dispatch, propertyIdToLoad, isLoading, streetNumber, loadedPropertyId]);
+
+  if (state.isLoading) { 
     return (
       <>
         <AgentTopNavbar onSideBarOpened={() => {}} />

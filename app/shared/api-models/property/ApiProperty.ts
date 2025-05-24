@@ -1,4 +1,5 @@
 
+import { ApiInspection } from "./ApiInspection"; // Import ApiInspection
 export type ApiProperty = {
   propertyId: string;
   streetnumber: string;
@@ -19,4 +20,6 @@ export type ApiProperty = {
   agentId: string;
   landlordId: string;
   tenantId: string;
+  imageUrls: string[];
+  inspections?: ApiInspection[];
 }
