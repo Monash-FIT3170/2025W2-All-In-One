@@ -16,6 +16,7 @@ const tenantInsertMethod = {
   ): Promise<string> => {
     const newTenant: Mongo.OptionalId<TenantDocument> = {
       ...data,
+      task_ids: data.task_ids || [], // Ensure task_ids is initialized
       createdAt: new Date(),
     };
 
@@ -50,7 +51,7 @@ async function mapTenantDocumentToDTO(
   return {
     tenantId: tenant._id!,
     userAccountId: tenant.userAccountId,
-    tasks: taskDocuments.map((doc) => doc.name),
+    tasks: taskIds,
     firstName: tenant.firstName,
     lastName: tenant.lastName,
     email: tenant.email,

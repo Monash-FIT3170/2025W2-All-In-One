@@ -15,40 +15,17 @@ import {
   tenantDashboardLinks,
   settingLinks,
 } from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
+import { setLoading } from "../../agent-dashboard/state/agent-dashboard-slice";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 function TenantDashboard() {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
   const dispatch = useAppDispatch();
   const tasks = useAppSelector(selectTasks);
-
-  // Dummy data for upcoming tasks
-  useEffect(() => {
-    dispatch(
-      setTasks([
-        {
-          // id: "1",
-          title: "Rent Payment Due",
-          address: "123 Main St",
-          datetime: "April 1, 2024",
-          status: "Due Soon" as const,
-        },
-        {
-          // id: "2",
-          title: "Maintenance Inspection",
-          address: "123 Main St",
-          datetime: "Tomorrow, 10:00 AM",
-          status: "Upcoming" as const,
-        },
-        {
-          // id: "3",
-          title: "Lease Renewal Discussion",
-          address: "123 Main St",
-          datetime: "Mar 28, 3:30 PM",
-          status: "Upcoming" as const,
-        },
-      ])
-    );
-  }, [dispatch]);
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const userTasks = useAppSelector(
+    (state) => state.currentUser.currentUser?.tasks
+  );
 
   // Dummy data for payment history
   const dummyPayments = [
@@ -113,7 +90,7 @@ function TenantDashboard() {
             <DashboardCards />
             <div className=" grid grid-cols-1 md:grid-cols-3 gap-6 px-6">
               <div className="mt-5">
-                <UpcomingTasks tasks={tasks} />
+                <UpcomingTasks taskIds={userTasks ?? []} />
               </div>
 
               <div className="mt-5">

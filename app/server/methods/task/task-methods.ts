@@ -1,5 +1,3 @@
-
-
 import { get } from "react-hook-form";
 import { TaskDocument } from "../../database/task/models/TaskDocument";
 import { TaskCollection } from "../../database/task/task-collections";
@@ -40,6 +38,60 @@ const taskGetMethod = {
     return taskDTO;
   },
 };
+
+/**
+ * Retrieves multiple tasks by their IDs and returns them as ApiTask DTOs.
+ *
+ * This Meteor method can be called from the client. It performs the following steps:
+ * 1. Fetches all task documents from the database using the provided IDs.
+ * 2. Maps each task document to an ApiTask DTO.
+ * 3. Returns an array of ApiTask objects.
+ *
+ * @param taskIds - Array of task IDs to retrieve.
+ * @returns A promise that resolves to an array of ApiTask objects.
+ */
+const taskGetMultipleMethod = {
+  [MeteorMethodIdentifier.TASK_GET_MULTIPLE]: async (
+    taskIds: string[]
+  ): Promise<ApiTask[]> => {
+    if (!taskIds || taskIds.length === 0) {
+      return [];
+    }
+
+    try {
+      
+      // First verify the collection exists
+      if (!TaskCollection) {
+        console.error("TASK_GET_MULTIPLE - TaskCollection is not defined!");
+        return [];
+      }
+
+      // Try to get all tasks first to see what's in the collection
+      const allTasks = await TaskCollection.find().fetchAsync();
+
+
+      const taskDocuments = await TaskCollection.find(
+        { _id: { $in: taskIds } }
+      ).fetchAsync();
+
+
+      if (taskDocuments.length === 0) {
+
+        return [];
+      }
+
+    const taskDTOs = await Promise.all(
+      taskDocuments.map((doc) => mapTaskDocumentTotaskDTO(doc))
+    );
+
+      return taskDTOs;
+    } catch (error) {
+      console.error("TASK_GET_MULTIPLE - Error fetching tasks:", error);
+      return [];
+    }
+  },
+};
+
 /**
  * Maps a TaskDocument to an ApiTask DTO.
  *
@@ -69,4 +121,5 @@ async function getTaskDocumentById(
 
 Meteor.methods({
   ...taskGetMethod,
+  ...taskGetMultipleMethod,
 });
