@@ -1,6 +1,5 @@
 import React from "react";
-import { Link } from "react-router";
-import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router";
 import { PropManagerLogoIcon } from "../theming/components/logo/PropManagerLogoIcon";
 import { PropManagerLogoText } from "../theming/components/logo/PropManagerLogoText";
 import { Button } from "../theming-shadcn/Button";
@@ -8,20 +7,28 @@ import { BellIcon } from "../theming/icons/BellIcon";
 import { SideBarSliderIcon } from "../theming/icons/SideBarSlider";
 import { useAppSelector } from "/app/client/store";
 import { ProfileFooter } from "../navigation-bars/side-nav-bars/components/ProfileFooter";
-// import { logoutUser } from "/app/client/store/authSlice";
+import { useAppDispatch } from "/app/client/store";
+import { logoutUser } from "../user-authentication/state/reducers/current-user-slice";
 
 interface TopNavbarProps {
   onSideBarOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function TopNavbar({ onSideBarOpened }: TopNavbarProps): React.JSX.Element {
-  const dispatch = useDispatch();
+export function TopNavbar({
+  onSideBarOpened,
+}: TopNavbarProps): React.JSX.Element {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const authUser = useAppSelector((state) => state.currentUser.authUser);
 
-  const handleLogout = () => {
-    console.log("LOGOUT TO BE DONE LATER !!");
-    // dispatch(logoutUser());
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser()).unwrap(); // wait for logout to finish
+      navigate("/"); // redirect to landing page after successful logout
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
