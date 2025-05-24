@@ -1,6 +1,6 @@
 import React from "react";
 import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
-import { LandlordTopNavbar } from "../../../navigation-bars/TopNavbar";
+import { RoleTopNavbar } from "../../../navigation-bars/TopNavbar";
 import {
   landlordDashboardLinks,
   settingLinks,
@@ -9,7 +9,7 @@ export function LandlordTask(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
   return (
     <div className="min-h-screen">
-      <LandlordTopNavbar onSideBarOpened={onSideBarOpened} />
+      <RoleTopNavbar onSideBarOpened={onSideBarOpened} />
       <div className="flex">
         <RoleSideNavBar
           isOpen={isSidebarOpen}

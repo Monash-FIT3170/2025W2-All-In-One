@@ -1,22 +1,56 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../../../theming-shadcn/Button";
 import { CardWidget } from "../../components/CardWidget";
- 
+import { useAppSelector } from "../../../../store";
+import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
+import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
+
+export enum PropertyStatus {
+  CLOSED = "Closed",
+  UNDER_MAINTENANCE = "Under Maintenance",
+  DRAFT = "Draft",
+  LISTED = "Listed",
+  VACANT = "Vacant",
+  OCCUPIED = "Occupied"
+}
+
 interface Property {
   address: string;
-  status: "Closed" | "Maintenance" | "Draft" | "Listed"
+  status: PropertyStatus;
   rent: number;
 }
 
 interface PropertyOverviewProps {
-  properties: Property[];
   className?: string;
 }
 
 export function PropertyOverview({
-  properties,
   className = "",
 }: PropertyOverviewProps): React.JSX.Element {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+
+  useEffect(() => {
+    const getPropertyList = async () => {
+      if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
+        try {
+          const apiProperties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, currentUser.agentId) as ApiProperty[];
+          const mappedProperties: Property[] = apiProperties.map((property: ApiProperty) => ({
+            address: `${property.streetnumber} ${property.streetname}`,
+            status: property.propertyStatus as PropertyStatus,
+            rent: property.pricePerMonth,
+          }));
+          setProperties(mappedProperties);
+        } catch (error) {
+          setProperties([]);
+          console.error('Error fetching properties:', error);
+        }
+      }
+    };
+
+    getPropertyList();
+  }, [currentUser]);
+
   return (
     <CardWidget
       title="Property Overview"
@@ -33,7 +67,6 @@ export function PropertyOverview({
       }
     >
       <div className="mt-2">
-
         <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -50,10 +83,12 @@ export function PropertyOverview({
                   <td className="px-6 py-4">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       property.status === "Closed" ? "bg-gray-100 text-gray-800" :
-                      property.status === "Draft" ? "bg-yellow-100 text-yellow-800" :
-                      property.status === "Listed" ? "bg-green-100 text-green-800" :
-                      property.status === "Maintenance" ? "bg-blue-100 text-blue-800" :
-                      "bg-red-100 text-red-800"
+                      property.status === "Draft" ? "bg-purple-100 text-purple-800" :
+                      property.status === "Listed" ? "bg-blue-100 text-blue-800" :
+                      property.status === "Under Maintenance" ? "bg-yellow-100 text-yellow-800" :
+                      property.status === "Vacant" ? "bg-red-100 text-red-800":
+                      property.status === "Occupied" ? "bg-green-100 text-green-800":
+                      "bg-grey-100 text-grey-800"
                     }`}>
                       {property.status}
                     </span>
@@ -67,8 +102,8 @@ export function PropertyOverview({
       </div>
 
       <div className="mt-4">
-      <Button variant="ghost" className="w-full">
-        View All Properties
+        <Button variant="ghost" className="w-full">
+          View All Properties
         </Button>
       </div>
     </CardWidget>
