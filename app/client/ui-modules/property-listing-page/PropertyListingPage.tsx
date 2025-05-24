@@ -31,6 +31,7 @@ import {
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import { AgentTopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
+import { useLocation } from "react-router";
 
 // TODO: To re-add edit draft listing modal
 export function PropertyListingPage({
@@ -38,13 +39,21 @@ export function PropertyListingPage({
 }: {
   className?: string;
 }): React.JSX.Element {
+  const location = useLocation();
+  const {propertyId} = location.state || {};
   const dispatch = useAppDispatch();
   const state: PropertyListingPageUiState = useSelector(
     selectPropertyListingUiState
   );
 
   useEffect(() => {
-    dispatch(load("1"));
+    if (!propertyId) {
+      console.error("Property ID is not provided, loading default property");
+      dispatch(load("1"));
+      return;
+    }
+    console.log(`Loading property with ID: ${propertyId}`);
+    dispatch(load(propertyId));
   }, []);
 
   if (state.shouldShowLoadingState) {

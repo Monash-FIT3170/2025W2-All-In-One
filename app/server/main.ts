@@ -2,6 +2,7 @@ import { Meteor } from "meteor/meteor";
 import "./methods/azure/blob-methods";
 import "./methods/task/task-methods";
 import "./methods/property/property-methods";
+import "./methods/property-price/property-price-method";
 import "./methods/property-listing/listing-methods";
 import {
   PropertyCollection,
@@ -245,19 +246,15 @@ async function permSeedListingStatusData(): Promise<void> {
   if ((await ListingStatusCollection.find().countAsync()) === 0) {
     console.log("Seeding listing status data...");
     await ListingStatusCollection.insertAsync({
-      _id: "1",
       name: ListingStatus.DRAFT,
     });
     await ListingStatusCollection.insertAsync({
-      _id: "2",
       name: ListingStatus.LISTED,
     });
     await ListingStatusCollection.insertAsync({
-      _id: "3",
       name: ListingStatus.TENANT_SELECTION,
     });
     await ListingStatusCollection.insertAsync({
-      _id: "4",
       name: ListingStatus.TENANT_APPROVAL,
     });
   }
