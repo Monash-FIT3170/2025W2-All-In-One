@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { setTasks, selectTasks } from "../state/tenant-dashboard-slice";
-import {
-  tenantDashboardLinks,
-  settingLinks,
-} from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 export function TenantCalendar(): React.JSX.Element {

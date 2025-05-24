@@ -31,6 +31,14 @@ export function TopNavbar({
     }
   };
 
+  const handleGoHome = () => {
+    navigate("/");
+  };
+
+  const handleGoProfile = () => {
+    navigate("/profile");
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
       <div className="flex justify-between items-center px-4">
@@ -40,7 +48,10 @@ export function TopNavbar({
             onClick={() => onSideBarOpened((prev) => !prev)}
             className="text-gray-600 cursor-pointer"
           />
-          <div className="flex items-center gap-2 cursor-pointer">
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={handleGoHome}
+          >
             <PropManagerLogoIcon variant="light" className="w-10 h-10" />
             <PropManagerLogoText className="text-2xl font-bold" />
           </div>
@@ -55,11 +66,13 @@ export function TopNavbar({
                 className="text-gray-600"
                 onClick={() => console.log("Notification clicked")}
               />
-              <ProfileFooter
-                firstName={currentUser.firstName}
-                lastName={currentUser.lastName}
-                title={authUser.role || "User"}
-              />
+              <div className="cursor-pointer" onClick={handleGoProfile}>
+                <ProfileFooter
+                  firstName={currentUser.firstName}
+                  lastName={currentUser.lastName}
+                  title={authUser.role || "User"}
+                />
+              </div>
               <Button variant="outline" onClick={handleSignout}>
                 Sign out
               </Button>
