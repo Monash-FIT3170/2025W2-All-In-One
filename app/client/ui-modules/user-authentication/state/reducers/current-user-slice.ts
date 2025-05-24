@@ -77,18 +77,18 @@ export const loadCurrentUser = createAsyncThunk<
   }
 });
 
-// Method to logout the current user
-export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
-  "auth/logout",
+// Method to sign out the current user
+export const signoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
+  "auth/signout",
   async (_, { dispatch, rejectWithValue }) => {
     return new Promise((resolve, reject) => {
       Meteor.logout((error) => {
         if (error) {
-          console.error("Logout failed:", error);
+          console.error("Sign out failed:", error);
           const errorMessage =
             (error as Meteor.Error)?.reason ||
             error.message ||
-            "Logout failed.";
+            "Sign out failed.";
           reject(rejectWithValue(errorMessage));
         } else {
           dispatch(clearCurrentUser());

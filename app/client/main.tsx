@@ -103,7 +103,7 @@ function AppRoot(): React.JSX.Element {
           <Route path="/test" element={<PropertyListingPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/propertyform" element={<PropertyFormPage />} />
-          <Route path="/login" element={<AuthTabs initialTab="login" />} />
+          <Route path="/signin" element={<AuthTabs initialTab="signin" />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/signup" element={<AuthTabs initialTab="signup" />} />
           <Route path="/tenant-dashboard" element={<TenantDashboard />} />

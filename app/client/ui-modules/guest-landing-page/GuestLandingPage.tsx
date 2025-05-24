@@ -50,7 +50,7 @@ function GuestLandingPageBase({
             {/* Search input and button */}
             <div className="flex justify-center gap-4">
               <Input type="Search" placeholder="Enter a postcode or suburb" />
-              <Link to="/login">
+              <Link to="/signin">
                 <Button>Search</Button>
               </Link>
             </div>
