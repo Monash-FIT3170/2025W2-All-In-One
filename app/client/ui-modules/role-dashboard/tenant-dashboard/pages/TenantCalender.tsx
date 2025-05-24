@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { setTasks, selectTasks } from "../state/tenant-dashboard-slice";
-import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
-import { TenantTopNavbar } from "../../../navigation-bars/TopNavbar";
 import {
   tenantDashboardLinks,
   settingLinks,
@@ -51,14 +49,7 @@ export function TenantCalendar(): React.JSX.Element {
 
   return (
     <div className="min-h-screen">
-      <TenantTopNavbar onSideBarOpened={onSideBarOpened} />
       <div className="flex">
-        <RoleSideNavBar
-          isOpen={isSidebarOpen}
-          onClose={() => onSideBarOpened(false)}
-          dashboardLinks={tenantDashboardLinks} // Pass the dashboard links to the sidebar
-          settingsLinks={settingLinks} // Pass the links to the sidebar
-        />
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-bold mb-6">Tenant Calendar</h1>
           <div className="flex gap-6">

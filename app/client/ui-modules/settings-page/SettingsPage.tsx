@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
 import { SideNavBar } from "../navigation-bars/side-nav-bars/SideNavbar";
-import { TopNavbar } from "../navigation-bars/TopNavbar";
 import { Button } from "../theming-shadcn/Button";
 import { Input } from "../theming-shadcn/Input";
 import { agentLinks } from "../navigation-bars/side-nav-bars/side-nav-link-definitions";
@@ -50,7 +49,6 @@ function SettingsPageBase({
 
   return (
     <div className="p-5 space-y-6">
-      <TopNavbar onSideBarOpened={onSideBarOpened} />
 
       <SideNavBar
         isOpen={isSidebarOpen}

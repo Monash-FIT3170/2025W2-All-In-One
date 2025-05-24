@@ -9,8 +9,6 @@ import {
   setProperties,
   setTasks,
 } from "../state/agent-dashboard-slice";
-import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
-import { AgentTopNavbar } from "../../../navigation-bars/TopNavbar";
 import {
   agentDashboardLinks,
   settingLinks,
@@ -68,14 +66,7 @@ export function AgentDashboard(): React.JSX.Element {
 
   return (
     <div className="min-h-screen">
-      <AgentTopNavbar onSideBarOpened={onSideBarOpened} />
       <div className="flex">
-        <RoleSideNavBar
-          isOpen={isSidebarOpen}
-          onClose={() => onSideBarOpened(false)}
-          dashboardLinks={agentDashboardLinks}
-          settingsLinks={settingLinks}
-        />
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-bold mb-6">Agent Dashboard</h1>
           <DashboardCards />
