@@ -58,15 +58,37 @@ const taskGetMultipleMethod = {
       return [];
     }
 
-    const taskDocuments = await TaskCollection.find(
-      { _id: { $in: taskIds } }
-    ).fetchAsync();
+    try {
+      
+      // First verify the collection exists
+      if (!TaskCollection) {
+        console.error("TASK_GET_MULTIPLE - TaskCollection is not defined!");
+        return [];
+      }
+
+      // Try to get all tasks first to see what's in the collection
+      const allTasks = await TaskCollection.find().fetchAsync();
+
+
+      const taskDocuments = await TaskCollection.find(
+        { _id: { $in: taskIds } }
+      ).fetchAsync();
+
+
+      if (taskDocuments.length === 0) {
+
+        return [];
+      }
 
     const taskDTOs = await Promise.all(
       taskDocuments.map((doc) => mapTaskDocumentTotaskDTO(doc))
     );
 
-    return taskDTOs;
+      return taskDTOs;
+    } catch (error) {
+      console.error("TASK_GET_MULTIPLE - Error fetching tasks:", error);
+      return [];
+    }
   },
 };
 

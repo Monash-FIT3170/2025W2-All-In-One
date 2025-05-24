@@ -24,6 +24,7 @@ import {
   TaskCollection,
   TaskStatusCollection,
 } from "/app/server/database/task/task-collections";
+import { TenantCollection } from "/app/server/database/user/user-collections";
 import { Role } from "../shared/user-role-identifier";
 import { TaskStatus } from "../shared/task-status-identifier";
 import { MeteorMethodIdentifier } from "../shared/meteor-method-identifier";
@@ -31,7 +32,6 @@ import { ApiAgent } from "../shared/api-models/user/api-roles/ApiAgent";
 import { ApiTenant } from "../shared/api-models/user/api-roles/ApiTenant";
 import { ApiLandlord } from "../shared/api-models/user/api-roles/ApiLandlord";
 import { PropertyStatus } from "../shared/api-models/property/PropertyStatus";
-
 import { ListingStatus } from "../shared/api-models/property-listing/ListingStatus";
 
 let globalAgent: ApiAgent;
@@ -62,6 +62,7 @@ async function tempSeedUserAndRoleData(): Promise<void> {
       firstName: "TestTenant",
       lastName: "Rod",
       accountType: Role.TENANT,
+      task_ids: ["tenant-task-1", "tenant-task-2", "tenant-task-3"],
     },
     {
       email: "testinglandlordemail@gmail.com",
@@ -88,7 +89,16 @@ async function tempSeedUserAndRoleData(): Promise<void> {
       );
 
       if (user.accountType === Role.AGENT) globalAgent = dto;
-      if (user.accountType === Role.TENANT) globalTenant = dto;
+      if (user.accountType === Role.TENANT) {
+        globalTenant = dto;
+        const tenant = await TenantCollection.findOneAsync({ userAccountId: existing._id });
+        if (tenant && (!tenant.task_ids || tenant.task_ids.length === 0)) {
+          await TenantCollection.updateAsync(
+            { userAccountId: existing._id },
+            { $set: { task_ids: user.task_ids } }
+          );
+        }
+      }
       if (user.accountType === Role.LANDLORD) globalLandlord = dto;
       continue;
     }
@@ -98,6 +108,13 @@ async function tempSeedUserAndRoleData(): Promise<void> {
         MeteorMethodIdentifier.USER_REGISTER,
         user
       );
+
+      if (user.accountType === Role.TENANT) {
+        await TenantCollection.updateAsync(
+          { userAccountId },
+          { $set: { task_ids: user.task_ids } }
+        );
+      }
 
       const dto = await Meteor.callAsync(
         user.accountType === Role.AGENT
@@ -191,43 +208,64 @@ async function tempSeedPropertyData(): Promise<void> {
 }
 // This function is used to seed the database with initial task data
 async function tempSeedTaskData(): Promise<void> {
-  if ((await TaskCollection.find().countAsync()) === 0) {
-    await TaskStatusCollection.insertAsync({
-      _id: "1",
-      name: "Not Started",
-    });
+  // Always clear existing tasks to ensure we get fresh data
+  await TaskCollection.removeAsync({});
+  await TaskStatusCollection.removeAsync({});
 
-    await TaskStatusCollection.insertAsync({
-      _id: "2",
-      name: "In Progress",
-    });
+  // Create task statuses
+  await TaskStatusCollection.insertAsync({
+    _id: "1",
+    name: "Not Started",
+  });
+  await TaskStatusCollection.insertAsync({
+    _id: "2",
+    name: "In Progress",
+  });
+  await TaskStatusCollection.insertAsync({
+    _id: "3",
+    name: "Completed",
+  });
+  console.log("Created task statuses");
 
-    await TaskStatusCollection.insertAsync({
-      _id: "3",
-      name: "Completed",
-    });
-
-    await TaskCollection.insertAsync({
-      _id: "1",
-      name: "Initial listing meeting",
+  const tenantTasks = [
+    {
+      _id: "tenant-task-1",
+      name: "Schedule Property Viewing",
       taskStatus: TaskStatus.NOTSTARTED,
       createdDate: new Date("2025-04-12T10:00:00Z"),
-      dueDate: new Date("2025-04-19T10:00:00Z"),
-      description:
-        "Meet with the client to discuss the property listing process and gather necessary information.",
+      dueDate: new Date("2025-10-26T10:00:00Z"),
+      description: "Schedule a viewing for the property at 123 Sample St.",
       priority: "High",
-    });
-    await TaskCollection.insertAsync({
-      _id: "2",
-      name: "Follow-up with client",
+    },
+    {
+      _id: "tenant-task-2",
+      name: "Submit Rental Application",
       taskStatus: TaskStatus.INPROGRESS,
-      createdDate: new Date("2025-04-20T10:00:00Z"),
-      dueDate: new Date("2025-04-27T10:00:00Z"),
-      description:
-        "Check in with the client to provide updates and address any questions.",
+      createdDate: new Date("2025-04-14T10:00:00Z"),
+      dueDate: new Date("2025-04-21T10:00:00Z"),
+      description: "Complete and submit the rental application form with all required documents.",
+      priority: "High",
+    },
+    {
+      _id: "tenant-task-3",
+      name: "Review Lease Agreement",
+      taskStatus: TaskStatus.NOTSTARTED,
+      createdDate: new Date("2025-04-16T10:00:00Z"),
+      dueDate: new Date("2025-09-23T10:00:00Z"),
+      description: "Review the lease agreement terms and conditions before signing.",
       priority: "Medium",
-    });
+    }
+  ];
+
+ 
+  for (const task of tenantTasks) {
+    try {
+      await TaskCollection.insertAsync(task);
+    } catch (error) {
+      console.error(`Error creating task ${task._id}:`, error);
+    }
   }
+ 
 }
 
   async function tempSeedPropertyStatusData(): Promise<void> {
