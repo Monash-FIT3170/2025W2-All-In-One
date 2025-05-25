@@ -212,6 +212,46 @@ async function tempSeedTaskData(): Promise<void> {
         "Check in with the client to provide updates and address any questions.",
       priority: "Medium",
     });
+    await TaskCollection.insertAsync({
+      _id: "3",
+      name: "Select a tenant",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-28T10:00:00Z"),
+      description:
+        "Review the list of agent approved candidates and pick one.",
+      priority: "Medium",
+    });
+    await TaskCollection.insertAsync({
+      _id: "4",
+      name: "Follow-up with client",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
+      description:
+        "Attend a property listing meeting with agent.",
+      priority: "Medium",
+    });
+    await TaskCollection.insertAsync({
+      _id: "5",
+      name: "Property annual inspection",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
+      description:
+        "Attend the annual inspection.",
+      priority: "Medium",
+    });
+    await TaskCollection.insertAsync({
+      _id: "6",
+      name: "Sign rental agreement",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
+      description:
+        "Sign the rental agreement which has had the rent increased by 5%.",
+      priority: "Medium",
+    });
 
     console.log("Tasks seeded successfully.");
   }
@@ -228,7 +268,7 @@ async function tempSeedTaskData(): Promise<void> {
   if (globalTenant) {
     await TenantCollection.updateAsync(
       { _id: globalTenant.tenantId }, // Find the tenant by ID
-      { $set: { task_ids: ["1", "2"] } } // Assign task IDs
+      { $set: { task_ids: ["5", "6"] } } // Assign task IDs
     );
     console.log("Assigned tasks to Tenant:", globalTenant.tenantId);
   }
@@ -236,7 +276,7 @@ async function tempSeedTaskData(): Promise<void> {
   if (globalLandlord) {
     await LandlordCollection.updateAsync(
       { _id: globalLandlord.landlordId }, // Find the landlord by ID
-      { $set: { task_ids: ["1", "2"] } } // Assign task IDs
+      { $set: { task_ids: ["3", "4"] } } // Assign task IDs
     );
     console.log("Assigned tasks to Landlord:", globalLandlord.landlordId);
   }
