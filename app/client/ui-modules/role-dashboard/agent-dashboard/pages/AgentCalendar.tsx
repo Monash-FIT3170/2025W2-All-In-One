@@ -46,20 +46,20 @@ export function AgentCalendar(): React.JSX.Element {
         <RoleSideNavBar
           isOpen={isSidebarOpen}
           onClose={() => onSideBarOpened(false)}
-          dashboardLinks={agentDashboardLinks} // Pass the dashboard links to the sidebar
-          settingsLinks={settingLinks} // Pass the links to the sidebar
+          dashboardLinks={agentDashboardLinks} 
+          settingsLinks={settingLinks} 
         />
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-bold mb-6">Agent Calendar</h1>
           <div className="flex gap-6">
-            {/* Left Section: Calendar */}
+            {/* Left: Calendar */}
             <div className="flex-1">
               <Calendar
                 selectedDateISO={selectedDateISO}
                 onDateSelect={handleDateSelection}
               />
 
-              {/* Below the Calendar */}
+              {/* Below Calendar */}
               <div className="mt-4">
                 <h2 className="text-lg font-semibold">
                   {selectedDate
@@ -69,12 +69,11 @@ export function AgentCalendar(): React.JSX.Element {
                 <ul className="space-y-4 mt-2">
                   {tasks
                     .filter((task) => {
-                      if (!task.datetime) return false; // Skip tasks with undefined datetime
+                      if (!task.datetime) return false; // Takss without a date just get passed over
 
-                      // Get the selected date (already in YYYY-MM-DD format)
+                      // Get the selected date (it should be in YYYY-MM-DD format)
                       const selectedDateObj = selectedDateISO ? new Date(selectedDateISO) : new Date();
                       
-                      // Try to parse the task date, handling different possible formats
                       let taskDateObj;
                       try {
                         // First try direct parsing (might work if it's already a valid date string)
@@ -104,6 +103,7 @@ export function AgentCalendar(): React.JSX.Element {
                       }
                       
                       // Compare only the date part (year, month, day)
+                      // WE don't care about time here because we are selecting a date on the calendar, not a time
                       return (
                         selectedDateObj.getFullYear() === taskDateObj.getFullYear() &&
                         selectedDateObj.getMonth() === taskDateObj.getMonth() &&
@@ -158,7 +158,6 @@ export function AgentCalendar(): React.JSX.Element {
                       return false;
                     }
                     
-                    // If we still don't have a valid date, skip this task
                     if (!taskDateObj || isNaN(taskDateObj.getTime())) {
                       return false;
                     }
