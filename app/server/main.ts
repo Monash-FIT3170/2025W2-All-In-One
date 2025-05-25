@@ -20,10 +20,10 @@ import "./methods/user/user-account-methods";
 import "./methods/user/role-methods/agent-methods";
 import "./methods/user/role-methods/tenant-methods";
 import "./methods/user/role-methods/landlord-methods";
-import {
-  TaskCollection,
-  TaskStatusCollection,
-} from "/app/server/database/task/task-collections";
+import { TaskCollection } from "/app/server/database/task/task-collections";
+import { AgentCollection } from "./database/user/user-collections";
+import { TenantCollection } from "./database/user/user-collections";
+import { LandlordCollection } from "./database/user/user-collections";
 import { Role } from "../shared/user-role-identifier";
 import { TaskStatus } from "../shared/task-status-identifier";
 import { MeteorMethodIdentifier } from "../shared/meteor-method-identifier";
@@ -186,33 +186,18 @@ async function tempSeedPropertyData(): Promise<void> {
       ],
       inspection_ids: ["1", "2"],
     });
-
   }
 }
 // This function is used to seed the database with initial task data
 async function tempSeedTaskData(): Promise<void> {
   if ((await TaskCollection.find().countAsync()) === 0) {
-    await TaskStatusCollection.insertAsync({
-      _id: "1",
-      name: "Not Started",
-    });
-
-    await TaskStatusCollection.insertAsync({
-      _id: "2",
-      name: "In Progress",
-    });
-
-    await TaskStatusCollection.insertAsync({
-      _id: "3",
-      name: "Completed",
-    });
-
+    // Insert tasks into the TaskCollection
     await TaskCollection.insertAsync({
       _id: "1",
       name: "Initial listing meeting",
       taskStatus: TaskStatus.NOTSTARTED,
       createdDate: new Date("2025-04-12T10:00:00Z"),
-      dueDate: new Date("2025-04-19T10:00:00Z"),
+      dueDate: new Date("2025-05-19T10:00:00Z"),
       description:
         "Meet with the client to discuss the property listing process and gather necessary information.",
       priority: "High",
@@ -222,24 +207,91 @@ async function tempSeedTaskData(): Promise<void> {
       name: "Follow-up with client",
       taskStatus: TaskStatus.INPROGRESS,
       createdDate: new Date("2025-04-20T10:00:00Z"),
-      dueDate: new Date("2025-04-27T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
       description:
         "Check in with the client to provide updates and address any questions.",
       priority: "Medium",
     });
+    await TaskCollection.insertAsync({
+      _id: "3",
+      name: "Select a tenant",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-28T10:00:00Z"),
+      description:
+        "Review the list of agent approved candidates and pick one.",
+      priority: "Medium",
+    });
+    await TaskCollection.insertAsync({
+      _id: "4",
+      name: "Follow-up with client",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
+      description:
+        "Attend a property listing meeting with agent.",
+      priority: "Medium",
+    });
+    await TaskCollection.insertAsync({
+      _id: "5",
+      name: "Property annual inspection",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
+      description:
+        "Attend the annual inspection.",
+      priority: "Medium",
+    });
+    await TaskCollection.insertAsync({
+      _id: "6",
+      name: "Sign rental agreement",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
+      description:
+        "Sign the rental agreement which has had the rent increased by 5%.",
+      priority: "Medium",
+    });
+
+    console.log("Tasks seeded successfully.");
+  }
+
+  // Update the task_ids field for Agent, Tenant, and Landlord
+  if (globalAgent) {
+    await AgentCollection.updateAsync(
+      { _id: globalAgent.agentId }, // Find the agent by ID
+      { $set: { task_ids: ["1", "2"] } } // Assign task IDs
+    );
+    console.log("Assigned tasks to Agent:", globalAgent.agentId);
+  }
+
+  if (globalTenant) {
+    await TenantCollection.updateAsync(
+      { _id: globalTenant.tenantId }, // Find the tenant by ID
+      { $set: { task_ids: ["5", "6"] } } // Assign task IDs
+    );
+    console.log("Assigned tasks to Tenant:", globalTenant.tenantId);
+  }
+
+  if (globalLandlord) {
+    await LandlordCollection.updateAsync(
+      { _id: globalLandlord.landlordId }, // Find the landlord by ID
+      { $set: { task_ids: ["3", "4"] } } // Assign task IDs
+    );
+    console.log("Assigned tasks to Landlord:", globalLandlord.landlordId);
   }
 }
 
-  async function tempSeedPropertyStatusData(): Promise<void> {
-    if ((await PropertyStatusCollection.find().countAsync()) != 2){
-      PropertyStatusCollection.insertAsync({
-        name: PropertyStatus.VACANT
-      })
-      PropertyStatusCollection.insertAsync({
-        name:PropertyStatus.OCCUPIED
-      })
-    }
+async function tempSeedPropertyStatusData(): Promise<void> {
+  if ((await PropertyStatusCollection.find().countAsync()) != 2) {
+    PropertyStatusCollection.insertAsync({
+      name: PropertyStatus.VACANT,
+    });
+    PropertyStatusCollection.insertAsync({
+      name: PropertyStatus.OCCUPIED,
+    });
   }
+}
 
 async function permSeedListingStatusData(): Promise<void> {
   if ((await ListingStatusCollection.find().countAsync()) === 0) {
