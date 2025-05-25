@@ -20,10 +20,10 @@ import "./methods/user/user-account-methods";
 import "./methods/user/role-methods/agent-methods";
 import "./methods/user/role-methods/tenant-methods";
 import "./methods/user/role-methods/landlord-methods";
-import {
-  TaskCollection,
-  TaskStatusCollection,
-} from "/app/server/database/task/task-collections";
+import { TaskCollection } from "/app/server/database/task/task-collections";
+import { AgentCollection } from "./database/user/user-collections";
+import { TenantCollection } from "./database/user/user-collections";
+import { LandlordCollection } from "./database/user/user-collections";
 import { Role } from "../shared/user-role-identifier";
 import { TaskStatus } from "../shared/task-status-identifier";
 import { MeteorMethodIdentifier } from "../shared/meteor-method-identifier";
@@ -271,33 +271,15 @@ async function tempSeedPropertyData(): Promise<void> {
 // This function is used to seed the database with initial task data
 async function tempSeedTaskData(): Promise<void> {
   if ((await TaskCollection.find().countAsync()) === 0) {
-    // First, create task statuses
-    await TaskStatusCollection.insertAsync({
-      _id: "1",
-      name: "Not Started",
-    });
-
-    await TaskStatusCollection.insertAsync({
-      _id: "2",
-      name: "In Progress",
-    });
-
-    await TaskStatusCollection.insertAsync({
-      _id: "3",
-      name: "Completed",
-    });
-
-    // Create tasks for the agent
-    const taskIds = [];
-
-    // Task 1: Property Inspection
-    const task1Id = await TaskCollection.insertAsync({
+    // Insert tasks into the TaskCollection
+    await TaskCollection.insertAsync({
       _id: "1",
       name: "Property Inspection - 123 Sample St",
       taskStatus: TaskStatus.NOTSTARTED,
-      createdDate: new Date(),
-      dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-      description: "Conduct initial property inspection for new listing",
+      createdDate: new Date("2025-04-12T10:00:00Z"),
+      dueDate: new Date("2025-05-19T10:00:00Z"),
+      description:
+        "Meet with the client to discuss the property listing process and gather necessary information.",
       priority: "High",
       agent_id: globalAgent.agentId
     });
