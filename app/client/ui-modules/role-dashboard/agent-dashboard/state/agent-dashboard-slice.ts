@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ApiAgent } from "/app/shared/api-models/user/api-roles/ApiAgent";
 import { RootState } from "../../../../store";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
@@ -14,9 +13,12 @@ interface AgentDashboardState {
   properties: Property[];
   tasks: Array<{
     title: string;
-    address: string;
+    address?: string;
     datetime: string;
-    status: "Upcoming" | "Due Soon" | "Overdue";
+    status: string;
+    description?: string;
+    priority?: string;
+    taskId?: string;
   }>;
   error: string | null;
 }
@@ -31,11 +33,44 @@ const initialState: AgentDashboardState = {
 export const fetchAgentTasks = createAsyncThunk(
   "agentDashboard/fetchAgentTasks",
   async (userId: string) => {
-    const response = await Meteor.callAsync(
+    // First, get the agent data which includes task IDs
+    const agentResponse = await Meteor.callAsync(
       MeteorMethodIdentifier.AGENT_GET,
       userId
     );
-    return response as ApiAgent;
+    
+    // Fetch task details for each task ID
+    const taskDetails = [];
+    if (agentResponse.tasks && agentResponse.tasks.length > 0) {
+      for (const taskId of agentResponse.tasks) {
+        try {
+          // Fetch task details using the TASK_GET method
+          const taskData = await Meteor.callAsync(
+            MeteorMethodIdentifier.TASK_GET,
+            taskId
+          );
+          
+          if (taskData) {
+            // Format the task data for display
+            taskDetails.push({
+              title: taskData.name,
+              description: taskData.description,
+              datetime: taskData.dueDate ? new Date(taskData.dueDate).toLocaleDateString() : '',
+              status: taskData.status,
+              priority: taskData.priority,
+              taskId: taskData.taskId
+            });
+          }
+        } catch (error) {
+          console.error(`Error fetching task ${taskId}:`, error);
+        }
+      }
+    }
+
+    return {
+      ...agentResponse,
+      taskDetails: taskDetails,
+    };
   }
 );
 
@@ -63,14 +98,8 @@ export const agentDashboardSlice = createSlice({
       })
       .addCase(fetchAgentTasks.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Ensure tasks are mapped to the correct shape if needed
-        state.tasks = Array.isArray(action.payload.tasks)
-          ? action.payload.tasks.map((task: any) =>
-              typeof task === "string"
-                ? { title: task, address: "", datetime: "", status: "Upcoming" }
-                : task
-            )
-          : [];
+        // Use the fetched task details
+        state.tasks = action.payload.taskDetails || [];
       })
       .addCase(fetchAgentTasks.rejected, (state) => {
         state.isLoading = false;

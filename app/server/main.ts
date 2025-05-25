@@ -197,7 +197,7 @@ async function tempSeedTaskData(): Promise<void> {
       name: "Initial listing meeting",
       taskStatus: TaskStatus.NOTSTARTED,
       createdDate: new Date("2025-04-12T10:00:00Z"),
-      dueDate: new Date("2025-04-19T10:00:00Z"),
+      dueDate: new Date("2025-05-19T10:00:00Z"),
       description:
         "Meet with the client to discuss the property listing process and gather necessary information.",
       priority: "High",
@@ -207,7 +207,7 @@ async function tempSeedTaskData(): Promise<void> {
       name: "Follow-up with client",
       taskStatus: TaskStatus.INPROGRESS,
       createdDate: new Date("2025-04-20T10:00:00Z"),
-      dueDate: new Date("2025-04-27T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
       description:
         "Check in with the client to provide updates and address any questions.",
       priority: "Medium",
