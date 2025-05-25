@@ -2,8 +2,6 @@ import React from "react";
 import { BedDouble, Bath, DoorOpen, CalendarDays } from "lucide-react";
 import { CardWidget } from "../../role-dashboard/components/CardWidget";
 import { ApiProperty } from "../../../../shared/api-models/property/ApiProperty";
-import { prepareForLoad } from "../../property-listing-page/state/reducers/property-listing-slice";
-import { useAppDispatch } from "../../../store";
 import { useNavigate } from "react-router";
 import { getFormattedDateStringFromDate } from "../../../library-modules/utils/date-utils";
 import { ApiListing } from "../../../../shared/api-models/property-listing/ApiListing";
@@ -47,15 +45,13 @@ export function PropertyCard(props: PropertyCardData) {
     const address = `${streetnumber} ${streetname}`;
     const weeklyPrice = ((pricePerMonth) / 4).toFixed(0);
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
 
     const displayImageUrl = listing.image_urls?.[0];
 
     const nextInspectionDate = getNextInspectionDateString(listing.inspections);
 
     const handleClick = () => {
-        if (propertyId) {
-            dispatch(prepareForLoad(propertyId));
+        if (propertyId) {            
             navigate(`/property-listing?propertyId=${propertyId}`);
         }
     };

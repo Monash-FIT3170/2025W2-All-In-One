@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ListingStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingStatusPill";
 import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingSummary";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
@@ -33,52 +33,17 @@ const initialState: PropertyListingPageUiState = {
   listingStatusPillVariant: ListingStatusPillVariant.DRAFT,
   shouldDisplayListingStatus: true,
   shouldDisplaySubmitDraftButton: true,
-  isLoading: false, 
-  propertyIdToLoad: null,
-  loadedPropertyId: null, 
-  error: null,
+  shouldShowLoadingState: true,
+  currentPropertyId: undefined,
 };
 
 export const propertyListingSlice = createSlice({
   name: "propertyListing",
   initialState: initialState,
-  reducers: {
-    prepareForLoad(state, action: PayloadAction<string>) {
-      const newPropertyIdToLoad = action.payload;
-
-      state.streetNumber = initialState.streetNumber;
-      state.street = initialState.street;
-      state.suburb = initialState.suburb;
-      state.province = initialState.province;
-      state.postcode = initialState.postcode;
-      state.summaryDescription = initialState.summaryDescription;
-      state.propertyStatusText = initialState.propertyStatusText;
-      state.propertyStatusPillVariant = initialState.propertyStatusPillVariant;
-      state.propertyDescription = initialState.propertyDescription;
-      state.propertyFeatures = initialState.propertyFeatures;
-      state.propertyType = initialState.propertyType;
-      state.propertyLandArea = initialState.propertyLandArea;
-      state.propertyBathrooms = initialState.propertyBathrooms;
-      state.propertyParkingSpaces = initialState.propertyParkingSpaces;
-      state.propertyBedrooms = initialState.propertyBedrooms;
-      state.propertyPrice = initialState.propertyPrice;
-      state.inspectionBookingUiStateList = initialState.inspectionBookingUiStateList;
-      state.listingImageUrls = initialState.listingImageUrls;
-      state.listingStatusText = initialState.listingStatusText;
-      state.listingStatusPillVariant = initialState.listingStatusPillVariant;
-      state.shouldDisplayListingStatus = initialState.shouldDisplayListingStatus;
-      state.shouldDisplaySubmitDraftButton = initialState.shouldDisplaySubmitDraftButton;
-
-      state.propertyIdToLoad = newPropertyIdToLoad;
-      state.isLoading = true;
-      state.error = null;
-      state.loadedPropertyId = null; // Crucial: Indicate no property is "loaded" for this new attempt.
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(load.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
+      state.shouldShowLoadingState = true;
     });
     builder.addCase(load.fulfilled, (state, action) => {
       state.streetNumber = action.payload.streetnumber;
@@ -103,15 +68,13 @@ export const propertyListingSlice = createSlice({
       state.propertyPrice = getPropertyPriceDisplayString(
         action.payload.pricePerMonth
       );
-      state.inspectionBookingUiStateList = Array.isArray(action.payload.inspections)
-        ? action.payload.inspections.map(
-            (inspection) => ({
-              date: getFormattedDateStringFromDate(inspection.start_time),
-              startingTime: getFormattedTimeStringFromDate(inspection.start_time),
-              endingTime: getFormattedTimeStringFromDate(inspection.end_time),
-            })
-          )
-        : [];
+      state.inspectionBookingUiStateList = action.payload.inspections.map(
+        (inspection) => ({
+          date: getFormattedDateStringFromDate(inspection.start_time),
+          startingTime: getFormattedTimeStringFromDate(inspection.start_time),
+          endingTime: getFormattedTimeStringFromDate(inspection.end_time),
+        })
+      );
       state.listingImageUrls = action.payload.image_urls;
       state.listingStatusText = getListingStatusDisplayString(
         action.payload.listing_status
@@ -119,16 +82,8 @@ export const propertyListingSlice = createSlice({
       state.listingStatusPillVariant = getListingStatusPillVariant(
         action.payload.listing_status
       );
-      state.isLoading = false;
-      state.propertyIdToLoad = null; // Reset after successful load
-      state.loadedPropertyId = action.meta.arg; // Store the ID of the property that was just loaded
-      state.error = null;
-    });
-    builder.addCase(load.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.error.message || "Failed to load property details";
-      state.propertyIdToLoad = null; // Reset on failure
-      state.loadedPropertyId = null; // Clear loaded ID on failure
+      state.shouldShowLoadingState = false;
+      state.currentPropertyId = action.meta.arg; 
     });
   },
 });
@@ -193,5 +148,3 @@ export const load = createAsyncThunk(
 
 export const selectPropertyListingUiState = (state: RootState) =>
   state.propertyListing;
-
-export const { prepareForLoad } = propertyListingSlice.actions;

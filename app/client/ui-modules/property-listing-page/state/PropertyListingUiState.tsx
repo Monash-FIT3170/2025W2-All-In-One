@@ -25,8 +25,6 @@ export type PropertyListingPageUiState = {
   listingStatusPillVariant: ListingStatusPillVariant;
   shouldDisplayListingStatus: boolean;
   shouldDisplaySubmitDraftButton: boolean;
-  isLoading: boolean;
-  propertyIdToLoad: string | null;
-  loadedPropertyId: string | null; 
-  error: string | null;
+  shouldShowLoadingState: boolean;
+  currentPropertyId?: string;
 };
