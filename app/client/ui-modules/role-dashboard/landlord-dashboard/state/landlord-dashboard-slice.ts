@@ -112,5 +112,6 @@ export const { setLoading, setTasks, setProperties, setError } = landlordDashboa
 export const selectLandlordDashboard = (state: RootState) => state.landlordDashboard;
 export const selectTasks = (state: RootState) => state.landlordDashboard.tasks;
 export const selectProperties = (state: RootState) => state.landlordDashboard.properties;
-
+export const selectLoading = (state: RootState) =>
+  state.landlordDashboard.isLoading;
 export default landlordDashboardSlice.reducer;
