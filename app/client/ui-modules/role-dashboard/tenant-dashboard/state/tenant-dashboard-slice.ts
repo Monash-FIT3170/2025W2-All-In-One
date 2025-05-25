@@ -23,19 +23,19 @@ const initialState: TenantDashboardState = {
   error: null,
 };
 
-export const fetchLandlordTasks = createAsyncThunk(
-  "landlordDashboard/fetchLandlordTasks",
+export const fetchTenantTasks = createAsyncThunk(
+  "tenantDashboard/fetchTenantTasks",
   async (userId: string) => {
-    // First, get the agent data which includes task IDs
-    const agentResponse = await Meteor.callAsync(
-      MeteorMethodIdentifier.AGENT_GET,
+    // First, get the tenant data which includes task IDs
+    const tenantResponse = await Meteor.callAsync(
+      MeteorMethodIdentifier.TENANT_GET,
       userId
     );
 
     // Fetch task details for each task ID
     const taskDetails = [];
-    if (agentResponse.tasks && agentResponse.tasks.length > 0) {
-      for (const taskId of agentResponse.tasks) {
+    if (tenantResponse.tasks && tenantResponse.tasks.length > 0) {
+      for (const taskId of tenantResponse.tasks) {
         try {
           // Fetch task details using the TASK_GET method
           const taskData = await Meteor.callAsync(
@@ -61,7 +61,7 @@ export const fetchLandlordTasks = createAsyncThunk(
     }
 
     return {
-      ...agentResponse,
+      ...tenantResponse,
       taskDetails: taskDetails,
     };
   }
@@ -80,6 +80,20 @@ export const tenantDashboardSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTenantTasks.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchTenantTasks.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // Use the fetched task details
+        state.tasks = action.payload.taskDetails || [];
+      })
+      .addCase(fetchTenantTasks.rejected, (state) => {
+        state.isLoading = false;
+      });
   },
 });
 
