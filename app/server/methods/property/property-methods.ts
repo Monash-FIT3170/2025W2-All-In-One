@@ -47,6 +47,12 @@ const propertyGetMethod = {
     return propertyDTO;
   },
 };
+
+const propertyGetCountLandlordMethod = {
+    [MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_COUNT]: async (landlordId: string): Promise<number> => {
+      return await PropertyCollection.find({ landlord_id: landlordId }).countAsync();
+    },
+  };
 // This method is used to map a property document to an ApiProperty DTO.
 // This function transforms a PropertyDocument (raw database document) into an ApiProperty (structured DTO) for client use. It performs the following steps:
 // 1. Fetches the property status document by its ID
@@ -195,5 +201,6 @@ const propertyInsertMethod = {
 
 Meteor.methods({
   ...propertyGetMethod,
-  ...propertyInsertMethod
+  ...propertyInsertMethod,
+  ...propertyGetCountLandlordMethod
 });
