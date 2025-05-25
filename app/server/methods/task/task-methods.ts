@@ -5,6 +5,8 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
+import { TenantCollection } from "/app/server/database/user/user-collections";
+import { TaskStatus } from "/app/shared/task-status-identifier";
 
 /**
  * Retrieves a task by its ID and returns it as an `ApiTask` DTO.
@@ -21,7 +23,13 @@ import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
  */
 const taskGetMethod = {
   [MeteorMethodIdentifier.TASK_GET]: async (id: string): Promise<ApiTask> => {
+    // Debug: Log all tasks in collection
+    const allTasks = await TaskCollection.find().fetchAsync();
+    console.log("All tasks in collection:", allTasks);
+    
     const taskDocument = await getTaskDocumentById(id);
+    console.log("Looking for task with id:", id);
+    console.log("Found task document:", taskDocument);
 
     if (!taskDocument) {
       throw meteorWrappedInvalidDataError(
@@ -116,7 +124,7 @@ async function mapTaskDocumentTotaskDTO(task: TaskDocument): Promise<ApiTask> {
 async function getTaskDocumentById(
   id: string
 ): Promise<TaskDocument | undefined> {
-  return await TaskCollection.findOneAsync(id);
+  return await TaskCollection.findOneAsync({ _id: id });
 }
 
 Meteor.methods({

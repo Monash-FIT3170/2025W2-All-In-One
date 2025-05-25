@@ -52,28 +52,15 @@ const landlordGetAllMethod = {
 async function mapLandlordDocumentToDTO(
   landlord: LandlordDocument
 ): Promise<ApiLandlord> {
-  const taskIds = landlord.task_ids ?? [];
-
-  const taskDocuments =
-    taskIds.length > 0 ? await getTaskDocumentsMatchingIds(taskIds) : [];
-
   return {
     landlordId: landlord._id!,
     userAccountId: landlord.userAccountId,
-    tasks: taskDocuments.map((doc) => doc.name), // will be empty if no tasks
+    tasks: landlord.task_ids,
     firstName: landlord.firstName,
     lastName: landlord.lastName,
     email: landlord.email,
     createdAt: landlord.createdAt,
   };
-}
-
-async function getTaskDocumentsMatchingIds(
-  ids: string[]
-): Promise<TaskDocument[]> {
-  return await TaskCollection.find({
-    _id: { $in: ids },
-  }).fetchAsync();
 }
 
 Meteor.methods({

@@ -5,6 +5,7 @@ import PaymentHistory from "/app/client/ui-modules/role-dashboard/tenant-dashboa
 import PropertyDetails from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/PropertyDetails";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
+  fetchTenantTasks,
   selectTasks,
   setTasks,
 } from "../../tenant-dashboard/state/tenant-dashboard-slice";
@@ -22,10 +23,17 @@ function TenantDashboard() {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
   const dispatch = useAppDispatch();
   const tasks = useAppSelector(selectTasks);
-  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const currentUser = useAppSelector((state) => state.currentUser.authUser);
   const userTasks = useAppSelector(
     (state) => state.currentUser.currentUser?.tasks
   );
+
+  useEffect(() => {
+    if (currentUser?.userId) {
+      dispatch(fetchTenantTasks(currentUser.userId));
+    }
+  }, [dispatch, currentUser?.userId]);
+  // console.log(tasks);
 
   // Dummy data for payment history
   const dummyPayments = [
@@ -90,7 +98,7 @@ function TenantDashboard() {
             <DashboardCards />
             <div className=" grid grid-cols-1 md:grid-cols-3 gap-6 px-6">
               <div className="mt-5">
-                <UpcomingTasks taskIds={userTasks ?? []} />
+                <UpcomingTasks tasks={tasks ?? []} />
               </div>
 
               <div className="mt-5">
