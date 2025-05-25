@@ -9,7 +9,7 @@ import {
 import {
   fetchAgentTasks,
   selectTasks,
-  selectLoading,
+  selectIsLoading,
 } from "../state/agent-dashboard-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
@@ -17,7 +17,7 @@ import { Button } from "../../../theming-shadcn/Button";
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const tasks = useAppSelector(selectTasks); // Retrieve tasks from Redux store
-  const loading = useAppSelector(selectLoading);
+  const loading = useAppSelector(selectIsLoading);
   const currentUser = useAppSelector((state) => state.currentUser.authUser); // Get the authenticated user
 
   const [isSidebarOpen, onSideBarOpened] = useState(false);
@@ -46,8 +46,8 @@ export function AgentCalendar(): React.JSX.Element {
         <RoleSideNavBar
           isOpen={isSidebarOpen}
           onClose={() => onSideBarOpened(false)}
-          dashboardLinks={agentDashboardLinks} 
-          settingsLinks={settingLinks} 
+          dashboardLinks={agentDashboardLinks}
+          settingsLinks={settingLinks}
         />
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-bold mb-6">Agent Calendar</h1>
@@ -73,12 +73,12 @@ export function AgentCalendar(): React.JSX.Element {
 
                       // Get the selected date (it should be in YYYY-MM-DD format)
                       const selectedDateObj = selectedDateISO ? new Date(selectedDateISO) : new Date();
-                      
+
                       let taskDateObj;
                       try {
                         // First try direct parsing (might work if it's already a valid date string)
                         taskDateObj = new Date(task.datetime);
-                        
+
                         // Check if the date is valid
                         if (isNaN(taskDateObj.getTime())) {
                           // If not valid, try parsing as DD/MM/YYYY
@@ -96,12 +96,12 @@ export function AgentCalendar(): React.JSX.Element {
                         console.error("Error parsing date:", e);
                         return false;
                       }
-                      
+
                       // If we still don't have a valid date, skip this task
                       if (!taskDateObj || isNaN(taskDateObj.getTime())) {
                         return false;
                       }
-                      
+
                       // Compare only the date part (year, month, day)
                       // WE don't care about time here because we are selecting a date on the calendar, not a time
                       return (
@@ -119,10 +119,10 @@ export function AgentCalendar(): React.JSX.Element {
                         )}
                         <div className="mt-2">
                           <span className={`text-xs px-2 py-1 rounded-full ${
-                            task.status === "Overdue" 
-                              ? "bg-red-100 text-red-800" 
-                              : task.status === "Due Soon" 
-                              ? "bg-yellow-100 text-yellow-800" 
+                            task.status === "Overdue"
+                              ? "bg-red-100 text-red-800"
+                              : task.status === "Due Soon"
+                              ? "bg-yellow-100 text-yellow-800"
                               : "bg-blue-100 text-blue-800"
                           }`}>
                             {task.status}
@@ -132,16 +132,16 @@ export function AgentCalendar(): React.JSX.Element {
                     ))}
                   {tasks.filter(task => {
                     if (!task.datetime) return false;
-                    
+
                     // Get the selected date
                     const selectedDateObj = selectedDateISO ? new Date(selectedDateISO) : new Date();
-                    
+
                     // Try to parse the task date
                     let taskDateObj;
                     try {
                       // First try direct parsing
                       taskDateObj = new Date(task.datetime);
-                      
+
                       // Check if the date is valid
                       if (isNaN(taskDateObj.getTime())) {
                         // If not valid, try parsing as DD/MM/YYYY
@@ -157,11 +157,11 @@ export function AgentCalendar(): React.JSX.Element {
                     } catch (e) {
                       return false;
                     }
-                    
+
                     if (!taskDateObj || isNaN(taskDateObj.getTime())) {
                       return false;
                     }
-                    
+
                     // Compare only the date part
                     return (
                       selectedDateObj.getFullYear() === taskDateObj.getFullYear() &&
@@ -189,10 +189,10 @@ export function AgentCalendar(): React.JSX.Element {
                       <p className="text-xs text-gray-500">{task.description}</p>
                       <div className="mt-2">
                         <span className={`text-xs px-2 py-1 rounded-full ${
-                          task.status === "Overdue" 
-                            ? "bg-red-100 text-red-800" 
-                            : task.status === "Due Soon" 
-                            ? "bg-yellow-100 text-yellow-800" 
+                          task.status === "Overdue"
+                            ? "bg-red-100 text-red-800"
+                            : task.status === "Due Soon"
+                            ? "bg-yellow-100 text-yellow-800"
                             : "bg-blue-100 text-blue-800"
                         }`}>
                           {task.status}
