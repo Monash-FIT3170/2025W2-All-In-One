@@ -39,7 +39,7 @@ const getProfileDataMethod = {
                 profileId
             );
             return profileDataDTO;
-        } catch (error: any) {
+        } catch (error: unknown) {
             throw meteorWrappedInvalidDataError(
                 error instanceof Error ? error : new Error("Unknown error")
             );
@@ -78,7 +78,7 @@ const updateProfileDataMethod = {
                 updatedDocument,
                 profileId
             );
-        } catch (error: any) {
+        } catch (error: unknown) {
             throw meteorWrappedInvalidDataError(
                 error instanceof Error
                     ? error
