@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { GuestLandingPageUiState} from "./state/GuestLandingPageUiState";
+import { useSelector } from "react-redux"; // Changed back to useSelector for consistency
+
 import { Link } from "react-router";
 import Ripple from "./animations/Ripple";
 import { SideNavBar } from "../navigation-bars/side-nav-bars/SideNavbar";
@@ -8,20 +8,30 @@ import { TopNavbar } from "../navigation-bars/TopNavbar";
 import { Button } from "../theming-shadcn/Button";
 import { Input } from "../theming-shadcn/Input";
 import { agentLinks } from "../navigation-bars/side-nav-bars/side-nav-link-definitions";
-import { PropertyCard } from "./components/PropertyCard";
-import { fetchProperties } from "./state/reducers/guest-landing-page-slice";
-import { useAppDispatch } from "../../store";
+import { PropertyCard, PropertyCardData } from "./components/PropertyCard"; 
+import {
+    fetchPropertiesAndListings,
+    selectGuestLandingPageUiState,
+    selectGuestLandingPageProperties
+} from "./state/reducers/guest-landing-page-slice";
+import { useAppDispatch, RootState } from "../../store";
+
 
 export function GuestLandingPage() {
     const dispatch = useAppDispatch();
-    const { isLoading, properties, error } = useSelector(
-        (state: { guestLandingPage: GuestLandingPageUiState }) => state.guestLandingPage
+
+    const listedProperties: PropertyCardData[] = useSelector((state: RootState) =>
+        selectGuestLandingPageProperties(state)
     );
+
+    const { isLoading, error } = useSelector((state: RootState) => selectGuestLandingPageUiState(state));
+
+
     const [isSidebarOpen, onSideBarOpened] = useState(false);
     const [visibleCount, setVisibleCount] = useState(3);
 
     useEffect(() => {
-        dispatch(fetchProperties());
+        dispatch(fetchPropertiesAndListings()); // Dispatch the new thunk
     }, [dispatch]);
 
     if (isLoading) {
@@ -44,17 +54,17 @@ export function GuestLandingPage() {
                         </Link>
                     </div>
                     <div className="py-10 text-center">
-                        {(error || properties.length === 0) ? (
+                        {(error || listedProperties.length === 0) ? (
                             <div>No properties found at the moment. Please check back later!</div>
                         ) : (
                             <>
                                 <h2 className="text-xl font-semibold mb-6">Featured Rental Properties</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-items-center px-4">
-                                    {properties.slice(0, visibleCount).map((prop) => (
+                                    {listedProperties.slice(0, visibleCount).map((prop) => (
                                         <PropertyCard key={prop.propertyId} {...prop} />
                                     ))}
                                 </div>
-                                {visibleCount < properties.length && (
+                                {visibleCount < listedProperties.length && (
                                     <div className="mt-6">
                                         <Button onClick={() => setVisibleCount(visibleCount + 3)}>
                                             View More

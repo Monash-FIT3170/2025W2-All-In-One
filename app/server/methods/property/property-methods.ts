@@ -12,10 +12,6 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
-import { ApiInspection } from "../../../shared/api-models/property/ApiInspection";
-import {
-  InspectionCollection,
-  ListingCollection, ListingStatusCollection} from "/app/server/database/property-listing/listing-collections";
 import { AgentDocument } from "../../database/user/models/role-models/AgentDocument";
 import { LandlordDocument } from "../../database/user/models/role-models/LandlordDocument";
 import { TenantDocument } from "../../database/user/models/role-models/TenantDocument";
@@ -23,7 +19,6 @@ import { AgentCollection } from "../../database/user/user-collections";
 import { LandlordCollection } from "../../database/user/user-collections";
 import { TenantCollection } from "../../database/user/user-collections";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
-import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
@@ -68,39 +63,6 @@ const propertyGetAllMethod = {
     return propertyDTOs;
   },
 };
-
-const getAllListedProperties = {
-  [MeteorMethodIdentifier.PROPERTY_GET_ALL_LISTED]: async (): Promise<ApiProperty[]> => {
-    const listedStatusName = ListingStatus.LISTED;
-
-    const listedStatusDocument = await ListingStatusCollection.findOneAsync({
-      name: listedStatusName,
-    });
-
-    if (!listedStatusDocument) {
-      return []; 
-    }
-    const relevantListings = await ListingCollection.find({
-      listing_status_id: listedStatusDocument._id,
-    }).fetchAsync();
-
-    if (relevantListings.length === 0) {
-      return []; 
-    }
-
-    const propertyIds = relevantListings.map((listing) => listing.property_id);
-
-    const propertyDocuments = await PropertyCollection.find({
-      _id: { $in: propertyIds },
-    }).fetchAsync();
-    const propertyDTOs = await Promise.all(
-      propertyDocuments.map((property) => mapPropertyDocumentToPropertyDTO(property))
-    );
-
-    return propertyDTOs;
-  },
-};
-
 async function mapPropertyDocumentToPropertyDTO(
   property: PropertyDocument
 ): Promise<ApiProperty> {
@@ -112,23 +74,7 @@ async function mapPropertyDocumentToPropertyDTO(
   );
   const propertyFeaturesDocuments =
     await getPropertyFeatureDocumentsMatchingIds(property.property_feature_ids);
-
-  const listingDocument = await ListingCollection.findOneAsync({ property_id: property._id });
-  const imageUrls = listingDocument?.image_urls && listingDocument.image_urls.length > 0 ? listingDocument.image_urls : [];
-
-  let apiInspections: ApiInspection[] = [];
-  if (listingDocument && listingDocument.inspection_ids && listingDocument.inspection_ids.length > 0) {
-    const inspectionDocs = await InspectionCollection.find({
-      _id: { $in: listingDocument.inspection_ids },
-    }).fetchAsync();
-    apiInspections = inspectionDocs.map(inspDoc => ({
-      inspection_id: inspDoc._id,
-      property_id: property._id, // Add property_id for context if needed
-      start_time: new Date(inspDoc.starttime), // Convert DB 'starttime' to 'start_time: Date'
-      end_time: new Date(inspDoc.endtime),     // Convert DB 'endtime' to 'end_time: Date'
-    }));
-  }
-
+  
   const AgentDocument = property.agent_id
     ? await getAgentDocumentById(property.agent_id)
     : null; // Handle missing agent_id gracefully
@@ -191,8 +137,6 @@ async function mapPropertyDocumentToPropertyDTO(
     agentId: AgentDocument ? AgentDocument._id : '', // Always string
     landlordId: LandlordDocument ? LandlordDocument._id : '', // Always string
     tenantId: TenantDocument ? TenantDocument._id : '', // Always string
-    imageUrls: imageUrls,
-    inspections: apiInspections,
   };
 }
 
@@ -260,6 +204,5 @@ const propertyInsertMethod = {
 Meteor.methods({
   ...propertyGetMethod,
   ...propertyInsertMethod,
-  ...propertyGetAllMethod,
-  ...getAllListedProperties
+  ...propertyGetAllMethod
 });

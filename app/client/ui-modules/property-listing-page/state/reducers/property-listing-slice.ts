@@ -164,7 +164,7 @@ function getPropertyStatusPillVariant(
   if (lowerStatus === "vacant") {
     return PropertyStatusPillVariant.VACANT;
   }
-  return (PropertyStatusPillVariant as any).DEFAULT || PropertyStatusPillVariant.VACANT; // Fallback 
+  return PropertyStatusPillVariant.VACANT; 
 }
 
 function getListingStatusPillVariant(status: string): ListingStatusPillVariant {

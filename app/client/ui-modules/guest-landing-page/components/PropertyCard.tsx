@@ -2,55 +2,59 @@ import React from "react";
 import { BedDouble, Bath, DoorOpen, CalendarDays } from "lucide-react";
 import { CardWidget } from "../../role-dashboard/components/CardWidget";
 import { ApiProperty } from "../../../../shared/api-models/property/ApiProperty";
-import { ApiInspection } from "../../../../shared/api-models/property/ApiInspection";
 import { prepareForLoad } from "../../property-listing-page/state/reducers/property-listing-slice";
 import { useAppDispatch } from "../../../store";
 import { useNavigate } from "react-router";
 import { getFormattedDateStringFromDate } from "../../../library-modules/utils/date-utils";
+import { ApiListing } from "../../../../shared/api-models/property-listing/ApiListing";
 
-function getNextInspectionDateString(inspections?: ApiInspection[]): string {
+
+function getNextInspectionDateString(inspections?: { start_time: Date }[]): string { 
     if (!inspections || inspections.length === 0) {
         return "No upcoming inspections";
     }
 
     const now = new Date();
-    const upcomingInspections = inspections
-        .map(inspection_item => ({
-            ...inspection_item,
-            start_time: new Date(inspection_item.start_time),
-        }))
-        .filter(inspection_item => !isNaN(inspection_item.start_time.getTime()) && inspection_item.start_time > now)
+    const futureInspections = inspections
+        .filter(inspection => inspection.start_time > now)
         .sort((a, b) => a.start_time.getTime() - b.start_time.getTime());
 
-    if (upcomingInspections.length === 0) {
+    if (futureInspections.length === 0) {
         return "No upcoming inspections";
     }
-
-    const nextInspection = upcomingInspections[0];
-    return getFormattedDateStringFromDate(nextInspection.start_time);
+    return getFormattedDateStringFromDate(futureInspections[0].start_time);
 }
 
-export function PropertyCard({
-    propertyId,
-    streetnumber,
-    streetname,
-    suburb,
-    pricePerMonth,
-    propertyStatus,
-    bathrooms,
-    bedrooms,
-    imageUrls,
-    inspections,
-}: ApiProperty) {
-    const address = `${streetnumber} ${streetname}`; 
-    const weeklyPrice = (pricePerMonth / 4).toFixed(0);
-    const displayImage = imageUrls && imageUrls.length > 0 ? imageUrls[0] : "/images/default-property-image.jpg";
-    const nextInspectionDateString = getNextInspectionDateString(inspections);
+
+export type PropertyCardData = ApiProperty & {
+    listing: ApiListing;
+};
+
+export function PropertyCard(props: PropertyCardData) {
+    const {
+        propertyId,
+        streetnumber,
+        streetname,
+        suburb,
+        postcode,
+        pricePerMonth,
+        propertyStatus, 
+        bathrooms,
+        bedrooms,
+        listing,
+    } = props;
+
+    const address = `${streetnumber} ${streetname}`;
+    const weeklyPrice = ((pricePerMonth) / 4).toFixed(0);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
+    const displayImageUrl = listing.image_urls?.[0];
+
+    const nextInspectionDate = getNextInspectionDateString(listing.inspections);
+
     const handleClick = () => {
-        if (propertyId) { 
+        if (propertyId) {
             dispatch(prepareForLoad(propertyId));
             navigate(`/property-listing?propertyId=${propertyId}`);
         }
@@ -63,11 +67,11 @@ export function PropertyCard({
         >
             <CardWidget
                 className="w-full max-w-sm overflow-hidden h-full flex flex-col text-center"
-                title=""
+                title="" 
                 value=""
             >
                 <img
-                    src={displayImage}
+                    src={displayImageUrl}
                     alt={`Property at ${address}`}
                     className="h-48 w-full object-cover"
                 />
@@ -76,7 +80,7 @@ export function PropertyCard({
                         {address}
                     </h2>
 
-                    <p className="text-sm text-gray-600">{suburb}, 4000</p>
+                    <p className="text-sm text-gray-600">{suburb}, {postcode} </p>
 
                     <div className="flex justify-center items-center gap-4 text-sm text-gray-600 mt-2">
                         <div className="flex items-center gap-1">
@@ -89,7 +93,7 @@ export function PropertyCard({
                         </div>
                         <div className="flex items-center gap-1">
                             <CalendarDays className="w-4 h-4" />
-                            <span>{nextInspectionDateString}</span>
+                            <span>{nextInspectionDate}</span>
                         </div>
                         <div className="flex items-center gap-1">
                             <DoorOpen className="w-4 h-4" />
