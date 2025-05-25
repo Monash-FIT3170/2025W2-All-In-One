@@ -65,10 +65,10 @@ const propertyGetStatusCountsLandlordMethod = {
   ): Promise<{ occupied: number; vacant: number }> => {
     // get status IDs for occupied/vacant
     const occupiedStatus = await PropertyStatusCollection.findOneAsync({
-      name: PropertyStatus.OCCUPIED,
+      name: PropertyStatus.OCCUPIED
     });
     const vacantStatus = await PropertyStatusCollection.findOneAsync({
-      name: PropertyStatus.VACANT,
+      name: PropertyStatus.VACANT
     });
 
     if (!occupiedStatus || !vacantStatus) {

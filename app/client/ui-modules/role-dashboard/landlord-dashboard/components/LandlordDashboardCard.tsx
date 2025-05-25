@@ -4,9 +4,14 @@ import { Progress } from "../../components/ProgressBar";
 import { Meteor } from "meteor/meteor";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { useAppSelector } from "/app/client/store";
+import { current } from "@reduxjs/toolkit";
 
 export function LandlordDashboardCards() {
   const [propertyCount, setPropertyCount] = useState<number>(0);
+  const [statusCounts, setStatusCounts] = useState<{
+    occupied: number;
+    vacant: number;
+  } | null>(null);
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
 
   useEffect(() => {
@@ -29,14 +34,34 @@ export function LandlordDashboardCards() {
     };
 
     getPropertyCount();
+
+    const getStatusCounts = async () => {
+      if (
+        currentUser &&
+        "landlordId" in currentUser &&
+        currentUser.landlordId
+      ) {
+        try {
+          const result = await Meteor.callAsync(
+            MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_STATUS_COUNTS,
+            currentUser.landlordId
+          );
+          setStatusCounts(result);
+        } catch (error) {
+          console.error("Error fetching status counts for landlord:", error);
+        }
+      }
+    };
+
+    getStatusCounts();
   }, [currentUser]);
-  
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
       <CardWidget
         title="Total Properties"
         value={propertyCount.toString()}
-        subtitle="2 Occupied, 1 Vacant"
+        subtitle={statusCounts ? `${statusCounts.occupied} Occupied, ${statusCounts.vacant} Vacant` : "Loading..."}
       />
       <CardWidget
         title="Total Income"
