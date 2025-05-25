@@ -53,7 +53,7 @@ export function ProfilePage(): React.JSX.Element {
   const userRole = authUser?.role;
   const userSignUp = currentUser?.createdAt;
 
-  const formateDateToMonthYear = (date: string): string => {
+  const formateDateToMonthYear = (date: string | undefined): string => {
     if (!date) return "...";
     const dateObject = new Date(date);
 
