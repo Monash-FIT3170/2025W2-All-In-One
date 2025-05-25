@@ -4,11 +4,8 @@ import { Meteor } from 'meteor/meteor';
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 import { ApiProperty } from '/app/shared/api-models/property/ApiProperty';
 
-interface Property {
-  address: string;
-  status: "Closed" | "Maintenance" | "Draft" | "Listed";
-  rent: number;
-}
+
+type Property = ApiProperty;
 
 interface AgentDashboardState {
   isLoading: boolean;
@@ -111,7 +108,6 @@ export const agentDashboardSlice = createSlice({
 
 export const { setTasks } = agentDashboardSlice.actions;
 
-// Selectors
 export const selectAgentDashboard = (state: RootState) => state.agentDashboard;
 export const selectProperties = (state: RootState) => state.agentDashboard.properties;
 export const selectPropertyCount = (state: RootState) => state.agentDashboard.propertyCount;

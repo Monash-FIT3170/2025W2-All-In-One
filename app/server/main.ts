@@ -43,7 +43,6 @@ Meteor.startup(async () => {
   await tempSeedUserAndRoleData();
   await tempSeedPropertyData();
   await tempSeedTaskData();
-  await tempSeedPropertyStatusData();
   await permSeedListingStatusData();
 });
 
@@ -123,25 +122,29 @@ async function tempSeedUserAndRoleData(): Promise<void> {
 async function tempSeedPropertyData(): Promise<void> {
   console.log("Seeding property data...");
   if ((await PropertyCollection.find().countAsync()) === 0) {
-    await PropertyStatusCollection.insertAsync({
-      _id: "1",
-      name: PropertyStatus.VACANT,
-    });
+    // Seed property statuses first
+    const statuses = [
+      { _id: "1", name: PropertyStatus.VACANT },
+      { _id: "2", name: PropertyStatus.OCCUPIED },
+      { _id: "3", name: PropertyStatus.UNDER_MAINTENANCE },
+      { _id: "4", name: PropertyStatus.CLOSED },
+      { _id: "5", name: PropertyStatus.DRAFT },
+      { _id: "6", name: PropertyStatus.LISTED }
+    ];
 
-    await PropertyStatusCollection.insertAsync({
-      _id: "2",
-      name: "Occupied",
-    });
-
-    await PropertyStatusCollection.insertAsync({
-      _id: "3",
-      name: "Under Maintenance",
-    });
+    // Add new status if it doesn't exist
+    for (const status of statuses) {
+      const existingStatus = await PropertyStatusCollection.findOneAsync({ _id: status._id });
+      if (!existingStatus) {
+        await PropertyStatusCollection.insertAsync(status);
+      }
+    }
 
     await PropertyFeatureCollection.insertAsync({
       _id: "1",
       name: "Pool",
     });
+
     await PropertyFeatureCollection.insertAsync({
       _id: "2",
       name: "Lots of space",
@@ -153,18 +156,21 @@ async function tempSeedPropertyData(): Promise<void> {
     });
 
     await PropertyPriceCollection.insertAsync({
+      _id: "1",
       property_id: "1",
       price_per_month: 1500,
       date_set: new Date(),
     });
 
     await PropertyPriceCollection.insertAsync({
+      _id: "2",
       property_id: "2",
       price_per_month: 1300,
       date_set: new Date(),
     });
 
     await PropertyPriceCollection.insertAsync({
+      _id: "3",
       property_id: "3",
       price_per_month: 2000,
       date_set: new Date(),
@@ -173,21 +179,19 @@ async function tempSeedPropertyData(): Promise<void> {
     await PropertyCollection.insertAsync({
       _id: "1",
       streetnumber: "123",
-      streetname: "Sample St",
-      suburb: "Springfield",
-      province: "IL",
-      postcode: "62704",
-      property_status_id: PropertyStatus.VACANT,
-      description:
-        "Modern apartment with spacious living areas and a beautiful garden. Recently renovated with new appliances and fixtures throughout. The property features an open-plan kitchen and dining area that flows onto a private balcony with city views. The master bedroom includes an ensuite bathroom and built-in wardrobes, while the second bedroom is generously sized and located near the main bathroom.",
-      summary_description:
-        "Modern apartment with spacious living areas and a beautiful garden.",
+      streetname: "Main St",
+      suburb: "Suburbia",
+      province: "Province",
+      postcode: "1234",
+      property_status_id: "1", // Using the ID of VACANT status
+      description: "A beautiful property",
+      summary_description: "Beautiful property in a great location",
       bathrooms: 2,
       bedrooms: 3,
       parking: 2,
       property_feature_ids: ["1", "2"],
       type: "House",
-      area: 500,
+      area: 200,
       agent_id: globalAgent.agentId,
       landlord_id: globalLandlord.landlordId,
       tenant_id: globalTenant.tenantId,
@@ -195,22 +199,20 @@ async function tempSeedPropertyData(): Promise<void> {
 
     await PropertyCollection.insertAsync({
       _id: "2",
-      streetnumber: "45",
-      streetname: "Maple Avenue",
-      suburb: "Riverdale",
-      province: "NY",
-      postcode: "10471",
-      property_status_id: "2",
-      description:
-        "Charming two-story home located in a quiet neighborhood. Features include hardwood floors, a spacious backyard with a patio, and a recently updated kitchen with stainless steel appliances. Perfect for families or those who enjoy entertaining.",
-      summary_description:
-        "Charming two-story home with a spacious backyard and updated kitchen.",
+      streetnumber: "456",
+      streetname: "Oak Ave",
+      suburb: "Oakville",
+      province: "Province",
+      postcode: "5678",
+      property_status_id: "2", // Using the ID of OCCUPIED status
+      description: "Modern apartment",
+      summary_description: "Modern apartment in the city center",
       bathrooms: 1,
       bedrooms: 2,
       parking: 1,
-      property_feature_ids: ["1", "2"],
-      type: "House",
-      area: 350,
+      property_feature_ids: ["2", "3"],
+      type: "Apartment",
+      area: 100,
       agent_id: globalAgent.agentId,
       landlord_id: globalLandlord.landlordId,
       tenant_id: globalTenant.tenantId,
@@ -218,27 +220,24 @@ async function tempSeedPropertyData(): Promise<void> {
 
     await PropertyCollection.insertAsync({
       _id: "3",
-      streetnumber: "88",
-      streetname: "Ocean View Blvd",
-      suburb: "Santa Monica",
-      province: "CA",
-      postcode: "90401",
-      property_status_id: "3",
-      description:
-        "Luxury penthouse apartment with panoramic ocean views. Floor-to-ceiling windows, open concept living and dining, and a rooftop terrace. Includes smart home features and access to building amenities such as a gym and pool.",
-      summary_description:
-        "Luxury penthouse with ocean views and rooftop terrace.",
-      bathrooms: 2,
-      bedrooms: 2,
+      streetnumber: "789",
+      streetname: "Pine Rd",
+      suburb: "Pineville",
+      province: "Province",
+      postcode: "9012",
+      property_status_id: "3", // Using the ID of UNDER_MAINTENANCE status
+      description: "Spacious house",
+      summary_description: "Spacious house with large garden",
+      bathrooms: 3,
+      bedrooms: 4,
       parking: 2,
-      property_feature_ids: ["1", "3"],
-      type: "Apartment",
-      area: 220,
+      property_feature_ids: ["1", "2", "3"],
+      type: "House",
+      area: 300,
       agent_id: globalAgent.agentId,
       landlord_id: globalLandlord.landlordId,
       tenant_id: globalTenant.tenantId,
     });
-
 
     await InspectionCollection.insertAsync({
       _id: "1",
@@ -267,7 +266,6 @@ async function tempSeedPropertyData(): Promise<void> {
       ],
       inspection_ids: ["1", "2"],
     });
-
   }
 }
 // This function is used to seed the database with initial task data
@@ -339,16 +337,6 @@ async function tempSeedTaskData(): Promise<void> {
   }
 }
 
-  async function tempSeedPropertyStatusData(): Promise<void> {
-    if ((await PropertyStatusCollection.find().countAsync()) != 2){
-      PropertyStatusCollection.insertAsync({
-        name: PropertyStatus.VACANT
-      })
-      PropertyStatusCollection.insertAsync({
-        name:PropertyStatus.OCCUPIED
-      })
-    }
-  }
 
 async function permSeedListingStatusData(): Promise<void> {
   if ((await ListingStatusCollection.find().countAsync()) === 0) {
