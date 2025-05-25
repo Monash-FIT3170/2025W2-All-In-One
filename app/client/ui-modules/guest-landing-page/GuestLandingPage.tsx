@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux"; // Changed back to useSelector for consistency
+import { useSelector } from "react-redux"; 
 
 import { Link } from "react-router";
 import Ripple from "./animations/Ripple";

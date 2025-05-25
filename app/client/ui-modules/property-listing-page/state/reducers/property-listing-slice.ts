@@ -36,7 +36,7 @@ const initialState: PropertyListingPageUiState = {
   isLoading: false, 
   propertyIdToLoad: null,
   loadedPropertyId: null, 
-  error: null, // Added for error handling
+  error: null,
 };
 
 export const propertyListingSlice = createSlice({
