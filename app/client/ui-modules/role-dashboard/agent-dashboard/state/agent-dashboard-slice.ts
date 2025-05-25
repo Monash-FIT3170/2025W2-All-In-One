@@ -23,8 +23,7 @@ interface AgentDashboardState {
     taskId?: string;
   }>;
   error: string | null;
-}
-
+};
 const initialState: AgentDashboardState = {
   isLoading: false,
   properties: [],
@@ -65,6 +64,8 @@ export const fetchPropertiesAndMetrics = createAsyncThunk(
     } catch (error) {
       return rejectWithValue('Failed to fetch properties and metrics');
     }
+  }
+);
 export const fetchAgentTasks = createAsyncThunk(
   "agentDashboard/fetchAgentTasks",
   async (userId: string) => {
@@ -146,10 +147,7 @@ export const agentDashboardSlice = createSlice({
       .addCase(fetchPropertiesAndMetrics.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
-      });
-  },
-  extraReducers: (builder) => {
-    builder
+      })
       .addCase(fetchAgentTasks.pending, (state) => {
         state.isLoading = true;
       })
@@ -165,7 +163,6 @@ export const agentDashboardSlice = createSlice({
 });
 
 export const { setTasks } = agentDashboardSlice.actions;
-
 export const selectAgentDashboard = (state: RootState) => state.agentDashboard;
 export const selectProperties = (state: RootState) => state.agentDashboard.properties;
 export const selectPropertyCount = (state: RootState) => state.agentDashboard.propertyCount;

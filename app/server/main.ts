@@ -21,16 +21,12 @@ import "./methods/user/role-methods/agent-methods";
 import "./methods/user/role-methods/tenant-methods";
 import "./methods/user/role-methods/landlord-methods";
 import { TaskCollection } from "/app/server/database/task/task-collections";
-import { AgentCollection } from "./database/user/user-collections";
-import { TenantCollection } from "./database/user/user-collections";
-import { LandlordCollection } from "./database/user/user-collections";
 import { Role } from "../shared/user-role-identifier";
 import { TaskStatus } from "../shared/task-status-identifier";
 import { MeteorMethodIdentifier } from "../shared/meteor-method-identifier";
 import { ApiAgent } from "../shared/api-models/user/api-roles/ApiAgent";
 import { ApiTenant } from "../shared/api-models/user/api-roles/ApiTenant";
 import { ApiLandlord } from "../shared/api-models/user/api-roles/ApiLandlord";
-import { AgentCollection } from "./database/user/user-collections";
 import { PropertyStatus } from "../shared/api-models/property/PropertyStatus";
 
 import { ListingStatus } from "../shared/api-models/property-listing/ListingStatus";
@@ -284,7 +280,7 @@ async function tempSeedTaskData(): Promise<void> {
     });
 
     // Task 2: Client Meeting
-    const task2Id = await TaskCollection.insertAsync({
+    await TaskCollection.insertAsync({
       _id: "2",
       name: "Client Meeting - Property Listing",
       taskStatus: TaskStatus.INPROGRESS,
@@ -295,7 +291,7 @@ async function tempSeedTaskData(): Promise<void> {
     });
 
     // Task 3: Marketing Preparation
-    const task3Id = await TaskCollection.insertAsync({
+    await TaskCollection.insertAsync({
       _id: "3",
       name: "Prepare Marketing Materials",
       taskStatus: TaskStatus.NOTSTARTED,
@@ -304,8 +300,8 @@ async function tempSeedTaskData(): Promise<void> {
       description: "Create marketing materials for new property listings",
       priority: "Medium",
     });
-
-
+  }
+}
 
 
 async function permSeedListingStatusData(): Promise<void> {
