@@ -1,14 +1,8 @@
-<<<<<<< HEAD
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../../store";
 import { Meteor } from 'meteor/meteor';
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 import { ApiProperty } from '/app/shared/api-models/property/ApiProperty';
-=======
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../../../../store";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
->>>>>>> 104d7d3260c2f8060e318fc1213f1f6b3c65fd63
 
 
 type Property = ApiProperty;
@@ -41,7 +35,6 @@ const initialState: AgentDashboardState = {
   error: null,
 };
 
-<<<<<<< HEAD
 // Async thunks
 export const fetchPropertyCount = createAsyncThunk(
   'agentDashboard/fetchPropertyCount',
@@ -72,7 +65,6 @@ export const fetchPropertiesAndMetrics = createAsyncThunk(
     } catch (error) {
       return rejectWithValue('Failed to fetch properties and metrics');
     }
-=======
 export const fetchAgentTasks = createAsyncThunk(
   "agentDashboard/fetchAgentTasks",
   async (userId: string) => {
@@ -81,7 +73,7 @@ export const fetchAgentTasks = createAsyncThunk(
       MeteorMethodIdentifier.AGENT_GET,
       userId
     );
-    
+
     // Fetch task details for each task ID
     const taskDetails = [];
     if (agentResponse.tasks && agentResponse.tasks.length > 0) {
@@ -92,7 +84,7 @@ export const fetchAgentTasks = createAsyncThunk(
             MeteorMethodIdentifier.TASK_GET,
             taskId
           );
-          
+
           if (taskData) {
             // Format the task data for display
             taskDetails.push({
@@ -114,7 +106,6 @@ export const fetchAgentTasks = createAsyncThunk(
       ...agentResponse,
       taskDetails: taskDetails,
     };
->>>>>>> 104d7d3260c2f8060e318fc1213f1f6b3c65fd63
   }
 );
 
@@ -173,7 +164,6 @@ export const agentDashboardSlice = createSlice({
   },
 });
 
-<<<<<<< HEAD
 export const { setTasks } = agentDashboardSlice.actions;
 
 export const selectAgentDashboard = (state: RootState) => state.agentDashboard;
@@ -184,16 +174,5 @@ export const selectOccupancyRate = (state: RootState) => state.agentDashboard.oc
 export const selectTasks = (state: RootState) => state.agentDashboard.tasks;
 export const selectIsLoading = (state: RootState) => state.agentDashboard.isLoading;
 export const selectError = (state: RootState) => state.agentDashboard.error;
-=======
-export const { setLoading, setProperties, setTasks, setError } =
-  agentDashboardSlice.actions;
-
-export const selectAgentDashboard = (state: RootState) => state.agentDashboard;
-export const selectProperties = (state: RootState) =>
-  state.agentDashboard.properties;
-export const selectTasks = (state: RootState) => state.agentDashboard.tasks;
-export const selectLoading = (state: RootState) =>
-  state.agentDashboard.isLoading;
->>>>>>> 104d7d3260c2f8060e318fc1213f1f6b3c65fd63
 
 export default agentDashboardSlice.reducer;

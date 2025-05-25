@@ -281,9 +281,7 @@ async function tempSeedTaskData(): Promise<void> {
       description:
         "Meet with the client to discuss the property listing process and gather necessary information.",
       priority: "High",
-      agent_id: globalAgent.agentId
     });
-    taskIds.push(task1Id);
 
     // Task 2: Client Meeting
     const task2Id = await TaskCollection.insertAsync({
@@ -294,9 +292,7 @@ async function tempSeedTaskData(): Promise<void> {
       dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
       description: "Meet with landlord to discuss property listing details",
       priority: "High",
-      agent_id: globalAgent.agentId
     });
-    taskIds.push(task2Id);
 
     // Task 3: Marketing Preparation
     const task3Id = await TaskCollection.insertAsync({
@@ -307,17 +303,9 @@ async function tempSeedTaskData(): Promise<void> {
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       description: "Create marketing materials for new property listings",
       priority: "Medium",
-      agent_id: globalAgent.agentId
     });
-    taskIds.push(task3Id);
 
-    // Update the agent document with task IDs
-    await AgentCollection.updateAsync(
-      { _id: globalAgent.agentId },
-      { $set: { task_ids: taskIds } }
-    );
-  }
-}
+
 
 
 async function permSeedListingStatusData(): Promise<void> {
