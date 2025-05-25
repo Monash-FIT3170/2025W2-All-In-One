@@ -30,7 +30,6 @@ import { useSelector } from "react-redux";
 import {
   load,
   selectPropertyListingUiState,
-  submitDraftListing,
   submitDraftListingAsync,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
@@ -98,8 +97,7 @@ export function PropertyListingPage({
           onContactAgent={() => console.log("contacting agent!")}
           onSubmitDraftListing={() => {
             console.log("draft submitted!");
-            dispatch(submitDraftListing());
-            // Change value of "1" later to property I
+            // Change value of "1" later to property ID
             dispatch(submitDraftListingAsync("1"));
           }}
           className={twMerge("p-5", className)}
