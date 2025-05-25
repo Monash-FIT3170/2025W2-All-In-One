@@ -395,9 +395,6 @@ function ListingModalEditor({
     selectPropertyListingUiState
   );
 
-  // Parse the area value from propertyLandArea by removing non-numeric characters
-  const areaValue = parseInt(state.propertyLandArea.replace(/[^0-9]/g, ""));
-
   const listingInfo: FormSchemaType = {
     landlord: state.propertyLandlordId,
     property_type: state.propertyType.toLowerCase(), // Ensure property type matches dropdown options (house or apartment)
@@ -408,7 +405,7 @@ function ListingModalEditor({
     apartment_number: "",
     bedroom_number: Number(state.propertyBedrooms),
     bathroom_number: Number(state.propertyBathrooms),
-    space: isNaN(areaValue) ? 0 : areaValue,
+    space:  Number(state.areaValue),
     description: state.propertyDescription,
     images: [],
     available_dates: new Date(),

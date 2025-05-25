@@ -12,6 +12,7 @@ export type PropertyListingPageUiState = {
   province: string;
   postcode: string;
   summaryDescription: string;
+  areaValue: number
   propertyStatusText: string;
   propertyStatusPillVariant: PropertyStatusPillVariant;
   propertyDescription: string;

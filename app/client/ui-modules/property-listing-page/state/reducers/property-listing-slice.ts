@@ -20,6 +20,7 @@ const initialState: PropertyListingPageUiState = {
   province: "",
   postcode: "",
   summaryDescription: "",
+  areaValue: 0,
   propertyStatusText: "",
   propertyStatusPillVariant: PropertyStatusPillVariant.VACANT,
   propertyDescription: "",
@@ -54,6 +55,7 @@ export const propertyListingSlice = createSlice({
       state.province = action.payload.province;
       state.postcode = action.payload.postcode;
       state.summaryDescription = action.payload.summaryDescription;
+      state.areaValue = action.payload.area ?? 0;
       state.propertyStatusText = action.payload.propertyStatus;
       state.propertyStatusPillVariant = getPropertyStatusPillVariant(
         action.payload.propertyStatus
@@ -136,7 +138,7 @@ export const load = createAsyncThunk(
       propertyId
     );
     const landlords: Landlord[] = await getAllLandlords();
-    return {...propertyWithListingData, landlords};
+    return { ...propertyWithListingData, landlords };
   }
 );
 
