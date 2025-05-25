@@ -100,7 +100,7 @@ export const tenantDashboardSlice = createSlice({
 export const { setLoading, setTasks, setError } = tenantDashboardSlice.actions;
 
 export const selectTenantDashboard = (state: RootState) => state.tenantDashboard;
-// export const selectProperties = (state: RootState) => state.agentDashboard.properties;
 export const selectTasks = (state: RootState) => state.tenantDashboard.tasks;
-
+export const selectLoading = (state: RootState) =>
+  state.tenantDashboard.isLoading;
 export default tenantDashboardSlice.reducer;
