@@ -1,29 +1,62 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Progress } from '../../components/ProgressBar';
 import { CardWidget } from '../../components/CardWidget';
+import { useAppSelector, useAppDispatch } from '/app/client/store';
+import {
+  fetchPropertyCount,
+  fetchPropertiesAndMetrics,
+  selectPropertyCount,
+  selectMonthlyRevenue,
+  selectOccupancyRate,
+  selectIsLoading,
+  selectError
+} from '../state/agent-dashboard-slice';
 
 export function DashboardCards() {
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const propertyCount = useAppSelector(selectPropertyCount);
+  const monthlyRevenue = useAppSelector(selectMonthlyRevenue);
+  const occupancyRate = useAppSelector(selectOccupancyRate);
+  const isLoading = useAppSelector(selectIsLoading);
+  const error = useAppSelector(selectError);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
+      dispatch(fetchPropertyCount(currentUser.agentId));
+      dispatch(fetchPropertiesAndMetrics(currentUser.agentId));
+    }
+  }, [currentUser, dispatch]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
       <CardWidget
         title="Total Properties"
-        value="12"
+        value={propertyCount.toString()}
         subtitle="+2 from last month"
       />
       <CardWidget
         title="Occupancy Rate"
-        value="85%"
+        value={`${occupancyRate.toFixed(2)}%`}
       >
-        <Progress value={85} className="mt-2" />
+        <Progress value={occupancyRate} className="mt-2" />
       </CardWidget>
       <CardWidget
         title="Pending Tasks"
         value="7"
-        subtitle="5 due this week"
+        subtitle="1 due this week"
       />
       <CardWidget
         title="Monthly Revenue"
-        value="$24,500"
+        value={`$${monthlyRevenue.toLocaleString()}`}
         subtitle="+5% from last month"
       />
     </div>
