@@ -312,7 +312,7 @@ async function tempSeedTaskData(): Promise<void> {
       dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
       description: "Meet with landlord to discuss property listing details",
       priority: "High",
-      agentId: globalAgent.agentId
+      agent_id: globalAgent.agentId
     });
     taskIds.push(task2Id);
 
@@ -325,7 +325,7 @@ async function tempSeedTaskData(): Promise<void> {
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       description: "Create marketing materials for new property listings",
       priority: "Medium",
-      agentId: globalAgent.agentId
+      agent_id: globalAgent.agentId
     });
     taskIds.push(task3Id);
 
