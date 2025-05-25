@@ -1,5 +1,5 @@
 export type PropertyInsertData = {
-  streetnumber: string;
+  streetnumber: number;
   streetname: string;
   suburb: string;
   province: string;

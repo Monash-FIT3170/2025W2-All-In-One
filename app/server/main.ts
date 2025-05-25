@@ -31,7 +31,7 @@ import { ApiAgent } from "../shared/api-models/user/api-roles/ApiAgent";
 import { ApiTenant } from "../shared/api-models/user/api-roles/ApiTenant";
 import { ApiLandlord } from "../shared/api-models/user/api-roles/ApiLandlord";
 import { PropertyStatus } from "../shared/api-models/property/PropertyStatus";
-
+import "/app/server/methods/property/property-features/property-features-methods";
 import { ListingStatus } from "../shared/api-models/property-listing/ListingStatus";
 
 let globalAgent: ApiAgent;
@@ -40,6 +40,7 @@ let globalLandlord: ApiLandlord;
 
 Meteor.startup(async () => {
   await tempSeedUserAndRoleData();
+  await tempSeedPropertyStatusData();
   await tempSeedPropertyData();
   await tempSeedTaskData();
   await tempSeedPropertyStatusData();
