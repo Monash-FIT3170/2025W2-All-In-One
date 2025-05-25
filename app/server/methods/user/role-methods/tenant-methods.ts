@@ -27,7 +27,9 @@ const tenantGetMethod = {
   [MeteorMethodIdentifier.TENANT_GET]: async (
     userId: string
   ): Promise<ApiTenant> => {
-    const tenantDoc = await TenantCollection.findOneAsync({ userAccountId: userId });
+    const tenantDoc = await TenantCollection.findOneAsync({
+      userAccountId: userId,
+    });
 
     if (!tenantDoc) {
       throw meteorWrappedInvalidDataError(
@@ -42,28 +44,15 @@ const tenantGetMethod = {
 async function mapTenantDocumentToDTO(
   tenant: TenantDocument
 ): Promise<ApiTenant> {
-  const taskIds = tenant.task_ids ?? [];
-
-  const taskDocuments =
-    taskIds.length > 0 ? await getTaskDocumentsMatchingIds(taskIds) : [];
-
   return {
     tenantId: tenant._id!,
     userAccountId: tenant.userAccountId,
-    tasks: taskDocuments.map((doc) => doc.name),
+    tasks: tenant.task_ids,
     firstName: tenant.firstName,
     lastName: tenant.lastName,
     email: tenant.email,
     createdAt: tenant.createdAt,
   };
-}
-
-async function getTaskDocumentsMatchingIds(
-  ids: string[]
-): Promise<TaskDocument[]> {
-  return await TaskCollection.find({
-    _id: { $in: ids },
-  }).fetchAsync();
 }
 
 Meteor.methods({

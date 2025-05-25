@@ -39,26 +39,12 @@ const agentGetMethod = {
         new InvalidDataError(`Agent with user ID ${userId} not found.`)
       );
     }
-
-    // Fetch tasks associated with the agent
-    const taskIds = agentDoc.task_ids ?? [];
-    const taskDocuments =
-      taskIds.length > 0
-        ? await TaskCollection.find({ _id: { $in: taskIds } }).fetchAsync()
-        : [];
-
-    // Map tasks to a simplified format for the API
-    const tasks = taskDocuments.map((task: TaskDocument) => ({
-      id: task._id,
-      name: task.name,
-      datetime: task.dueDate,
-      status: task.taskStatus,
-    }));
+    
 
     return {
       agentId: agentDoc._id!,
       userAccountId: agentDoc.userAccountId,
-      tasks, // Include tasks in the response
+      tasks: agentDoc.task_ids,
       firstName: agentDoc.firstName,
       lastName: agentDoc.lastName,
       email: agentDoc.email,
