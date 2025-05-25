@@ -4,6 +4,8 @@ export enum MeteorMethodIdentifier {
   BLOB_UPLOAD_FILE = "blobs.uploadFile",
   BLOB_UPLOAD_FILES = "blobs.uploadFiles",
   PROPERTY_GET = "properties.getOne",
+  PROPERTY_GET_COUNT = "properties.getCount",
+  PROPERTY_GET_LIST = "properties.getList",
   PROPERTY_INSERT = "properties.insert",
   PROPERTY_LANDLORD_GET_COUNT = "properties.getCountLandlord",
   PROPERTY_LANDLORD_GET_STATUS_COUNTS = "properties.getStatusCountsLandlord",
