@@ -31,7 +31,7 @@ export const fetchTenantTasks = createAsyncThunk(
     const tenantResponse = await Meteor.callAsync(
       MeteorMethodIdentifier.TENANT_GET, userId
     );
-    console.log(tenantResponse)
+    // console.log(tenantResponse)
 
     //fetch task details for each task Id
     const taskDetails = [];
@@ -55,14 +55,14 @@ export const fetchTenantTasks = createAsyncThunk(
         } catch (error){
           console.error(`Error fetching task ${taskId}:`, error);
         }
+        }
       }
-    }
     
     return {
-      ...tenantResponse,
+        ...tenantResponse,
       taskDetails: taskDetails,
     };
-  }
+    }
 );
 
 export const tenantDashboardSlice = createSlice({
