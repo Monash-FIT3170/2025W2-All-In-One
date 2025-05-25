@@ -6,8 +6,6 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { ApiTenant } from "../../../../shared/api-models/user/api-roles/ApiTenant";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
-import { TaskDocument } from "/app/server/database/task/models/TaskDocument";
-import { TaskCollection } from "/app/server/database/task/task-collections";
 
 // -- INSERT TENANT --
 const tenantInsertMethod = {
