@@ -1,25 +1,71 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../../store";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 
 interface TenantDashboardState {
   isLoading: boolean;
-//   properties: Property[];
   tasks: Array<{
     title: string;
-    address: string;
+    address?: string;
     datetime: string;
-    status: "Upcoming" | "Due Soon" | "Overdue";
+    status: string;
+    description?: string;
+    priority?: string;
+    taskId?: string;
   }>;
   error: string | null;
 }
 
 const initialState: TenantDashboardState = {
   isLoading: false,
-//   properties: [],
   tasks: [],
   error: null,
 };
+
+export const fetchTenantTasks = createAsyncThunk(
+  "tenantDashboard/fetchTenantTasks",
+  async (userId: string) => {
+    // First, get the tenant data which includes task IDs
+    const tenantResponse = await Meteor.callAsync(
+      MeteorMethodIdentifier.TENANT_GET,
+      userId
+    );
+
+    // Fetch task details for each task ID
+    const taskDetails = [];
+    if (tenantResponse.tasks && tenantResponse.tasks.length > 0) {
+      for (const taskId of tenantResponse.tasks) {
+        try {
+          // Fetch task details using the TASK_GET method
+          const taskData = await Meteor.callAsync(
+            MeteorMethodIdentifier.TASK_GET,
+            taskId
+          );
+
+          if (taskData) {
+            // Format the task data for display
+            taskDetails.push({
+              title: taskData.name,
+              description: taskData.description,
+              datetime: taskData.dueDate ? new Date(taskData.dueDate).toLocaleDateString() : '',
+              status: taskData.status,
+              priority: taskData.priority,
+              taskId: taskData.taskId
+            });
+          }
+        } catch (error) {
+          console.error(`Error fetching task ${taskId}:`, error);
+        }
+      }
+    }
+
+    return {
+      ...tenantResponse,
+      taskDetails: taskDetails,
+    };
+  }
+);
 
 export const tenantDashboardSlice = createSlice({
   name: "tenantDashboard",
@@ -28,9 +74,6 @@ export const tenantDashboardSlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
-    // setProperties: (state, action: PayloadAction<Property[]>) => {
-    //   state.properties = action.payload;
-    // },
     setTasks: (state, action: PayloadAction<TenantDashboardState["tasks"]>) => {
       state.tasks = action.payload;
     },
@@ -38,12 +81,26 @@ export const tenantDashboardSlice = createSlice({
       state.error = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTenantTasks.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchTenantTasks.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // Use the fetched task details
+        state.tasks = action.payload.taskDetails || [];
+      })
+      .addCase(fetchTenantTasks.rejected, (state) => {
+        state.isLoading = false;
+      });
+  },
 });
 
 export const { setLoading, setTasks, setError } = tenantDashboardSlice.actions;
 
 export const selectTenantDashboard = (state: RootState) => state.tenantDashboard;
-// export const selectProperties = (state: RootState) => state.agentDashboard.properties;
 export const selectTasks = (state: RootState) => state.tenantDashboard.tasks;
-
+export const selectLoading = (state: RootState) =>
+  state.tenantDashboard.isLoading;
 export default tenantDashboardSlice.reducer;

@@ -6,8 +6,6 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { ApiTenant } from "../../../../shared/api-models/user/api-roles/ApiTenant";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
-import { TaskDocument } from "/app/server/database/task/models/TaskDocument";
-import { TaskCollection } from "/app/server/database/task/task-collections";
 
 // -- INSERT TENANT --
 const tenantInsertMethod = {
@@ -27,44 +25,27 @@ const tenantGetMethod = {
   [MeteorMethodIdentifier.TENANT_GET]: async (
     userId: string
   ): Promise<ApiTenant> => {
-    const tenantDoc = await TenantCollection.findOneAsync({ userAccountId: userId });
+    const tenantDoc = await TenantCollection.findOneAsync({
+      userAccountId: userId,
+    });
 
     if (!tenantDoc) {
       throw meteorWrappedInvalidDataError(
         new InvalidDataError(`Tenant with user ID ${userId} not found.`)
       );
     }
-
-    return mapTenantDocumentToDTO(tenantDoc);
+    return {
+      tenantId: tenantDoc._id!,
+      userAccountId: tenantDoc.userAccountId,
+      tasks: tenantDoc.task_ids,
+      firstName: tenantDoc.firstName,
+      lastName: tenantDoc.lastName,
+      email: tenantDoc.email,
+      createdAt: tenantDoc.createdAt,
+    };
   },
 };
 
-async function mapTenantDocumentToDTO(
-  tenant: TenantDocument
-): Promise<ApiTenant> {
-  const taskIds = tenant.task_ids ?? [];
-
-  const taskDocuments =
-    taskIds.length > 0 ? await getTaskDocumentsMatchingIds(taskIds) : [];
-
-  return {
-    tenantId: tenant._id!,
-    userAccountId: tenant.userAccountId,
-    tasks: taskDocuments.map((doc) => doc.name),
-    firstName: tenant.firstName,
-    lastName: tenant.lastName,
-    email: tenant.email,
-    createdAt: tenant.createdAt,
-  };
-}
-
-async function getTaskDocumentsMatchingIds(
-  ids: string[]
-): Promise<TaskDocument[]> {
-  return await TaskCollection.find({
-    _id: { $in: ids },
-  }).fetchAsync();
-}
 
 Meteor.methods({
   ...tenantInsertMethod,
