@@ -40,7 +40,6 @@ let globalLandlord: ApiLandlord;
 
 Meteor.startup(async () => {
   await tempSeedUserAndRoleData();
-  await tempSeedPropertyStatusData();
   await tempSeedPropertyData();
   await tempSeedTaskData();
   await permSeedListingStatusData();
