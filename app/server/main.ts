@@ -299,7 +299,7 @@ async function tempSeedTaskData(): Promise<void> {
       dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
       description: "Conduct initial property inspection for new listing",
       priority: "High",
-      agentId: globalAgent.agentId
+      agent_id: globalAgent.agentId
     });
     taskIds.push(task1Id);
 

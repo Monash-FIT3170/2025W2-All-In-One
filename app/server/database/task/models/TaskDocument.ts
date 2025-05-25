@@ -7,4 +7,5 @@ export type TaskDocument = {
   dueDate: Date;
   description: string;
   priority: string;
+  agent_id: string;
 }
