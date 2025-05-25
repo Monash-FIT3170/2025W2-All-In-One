@@ -19,4 +19,5 @@ export enum MeteorMethodIdentifier {
   LANDLORD_GET = "landlords.getOne",
   LANDLORD_GET_ALL = "landlords.getAll",
   PROPERTY_STATUS_GET = "propertyStatus.getOne",
+  PROPERTY_FEATURES_GET_ALL = "propertyFeatures.getAll"
 }
