@@ -8,30 +8,25 @@ import { TopNavbar } from "../navigation-bars/TopNavbar";
 import { Button } from "../theming-shadcn/Button";
 import { Input } from "../theming-shadcn/Input";
 import { agentLinks } from "../navigation-bars/side-nav-bars/side-nav-link-definitions";
-import { PropertyCard, PropertyCardData } from "./components/PropertyCard"; 
+import { PropertyCard } from "./components/PropertyCard"; 
 import {
     fetchPropertiesAndListings,
-    selectGuestLandingPageUiState,
-    selectGuestLandingPageProperties
+    selectGuestLandingPageUiState
 } from "./state/reducers/guest-landing-page-slice";
 import { useAppDispatch, RootState } from "../../store";
 
 
 export function GuestLandingPage() {
     const dispatch = useAppDispatch();
-
-    const listedProperties: PropertyCardData[] = useSelector((state: RootState) =>
-        selectGuestLandingPageProperties(state)
+    const { properties: listedProperties, isLoading, error } = useSelector(
+        (state: RootState) => selectGuestLandingPageUiState(state)
     );
-
-    const { isLoading, error } = useSelector((state: RootState) => selectGuestLandingPageUiState(state));
-
 
     const [isSidebarOpen, onSideBarOpened] = useState(false);
     const [visibleCount, setVisibleCount] = useState(3);
 
     useEffect(() => {
-        dispatch(fetchPropertiesAndListings()); // Dispatch the new thunk
+        dispatch(fetchPropertiesAndListings());
     }, [dispatch]);
 
     if (isLoading) {
