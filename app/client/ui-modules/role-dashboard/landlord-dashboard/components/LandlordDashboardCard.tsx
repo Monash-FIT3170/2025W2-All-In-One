@@ -61,7 +61,11 @@ export function LandlordDashboardCards() {
       <CardWidget
         title="Total Properties"
         value={propertyCount.toString()}
-        subtitle={statusCounts ? `${statusCounts.occupied} Occupied, ${statusCounts.vacant} Vacant` : "Loading..."}
+        subtitle={
+          statusCounts
+            ? `${statusCounts.occupied} Occupied, ${statusCounts.vacant} Vacant`
+            : "Loading..."
+        }
       />
       <CardWidget
         title="Total Income"
