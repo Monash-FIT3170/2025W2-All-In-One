@@ -41,7 +41,7 @@ export function PropertyForm({
 export const formDefaultValues: z.infer<typeof formSchema> = {
   landlord: "",
   property_type: "",
-  address_number: 0,
+  address_number: "",
   address: "",
   suburb: "",
   city: "",

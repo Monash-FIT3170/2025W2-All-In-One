@@ -3,7 +3,7 @@ import * as z from "zod";
 export const formSchema = z.object({
   landlord: z.string().min(1, { message: "Please assign a landlord" }),
   property_type: z.string().min(1, { message: "Please select a property type" }),
-  address_number: z.coerce.number().min(1, { message: "Please fill out field" }),
+  address_number: z.string().min(1, { message: "Please fill out field" }),
   address: z.string().min(1, { message: "Please fill out field" }),
   suburb: z.string().min(1, { message: "Please fill out field" }),
   city: z.string().min(1, { message: "Please fill out field" }),
