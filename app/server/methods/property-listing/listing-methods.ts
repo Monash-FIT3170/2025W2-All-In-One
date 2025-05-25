@@ -54,12 +54,12 @@ const submitDraftListing = {
         );
       }
 
-      // Find the "current" listing status ID
-      const ListingStatus = await ListingStatusCollection.findOneAsync({
-        name: "Draft"
+      // Find the "Listed" listing status ID
+      const listedStatus = await ListingStatusCollection.findOneAsync({
+        name: ListingStatus.LISTED
       });
 
-      if (!ListingStatus) {
+      if (!listedStatus) {
         throw meteorWrappedInvalidDataError(
           new InvalidDataError("Property listing status not found in database")
         );
@@ -70,7 +70,7 @@ const submitDraftListing = {
         { property_id: propertyId },
         { 
           $set: { 
-            listing_status_id: ListingStatus._id,
+            listing_status_id: listedStatus._id,
 
           } 
         }
