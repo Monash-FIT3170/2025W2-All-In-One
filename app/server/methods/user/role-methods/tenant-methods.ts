@@ -34,24 +34,18 @@ const tenantGetMethod = {
         new InvalidDataError(`Tenant with user ID ${userId} not found.`)
       );
     }
-
-    return mapTenantDocumentToDTO(tenantDoc);
+    return {
+      tenantId: tenantDoc._id!,
+      userAccountId: tenantDoc.userAccountId,
+      tasks: tenantDoc.task_ids,
+      firstName: tenantDoc.firstName,
+      lastName: tenantDoc.lastName,
+      email: tenantDoc.email,
+      createdAt: tenantDoc.createdAt,
+    };
   },
 };
 
-async function mapTenantDocumentToDTO(
-  tenant: TenantDocument
-): Promise<ApiTenant> {
-  return {
-    tenantId: tenant._id!,
-    userAccountId: tenant.userAccountId,
-    tasks: tenant.task_ids,
-    firstName: tenant.firstName,
-    lastName: tenant.lastName,
-    email: tenant.email,
-    createdAt: tenant.createdAt,
-  };
-}
 
 Meteor.methods({
   ...tenantInsertMethod,
