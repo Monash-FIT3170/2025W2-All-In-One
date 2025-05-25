@@ -6,9 +6,6 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiLandlord } from "../../../../shared/api-models/user/api-roles/ApiLandlord";
-import { TaskDocument } from "/app/server/database/task/models/TaskDocument";
-import { TaskCollection } from "/app/server/database/task/task-collections";
-
 // -- INSERT LANDLORD --
 const landlordInsertMethod = {
   [MeteorMethodIdentifier.LANDLORD_INSERT]: async (
