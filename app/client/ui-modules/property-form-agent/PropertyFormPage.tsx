@@ -7,7 +7,6 @@ import { ArrowLeftIcon } from "lucide-react";
 import { PropertyForm } from "./components/PropertyForm";
 import { formSchema, FormSchemaType } from "./components/FormSchema";
 import { formDefaultValues } from "./components/PropertyForm";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { useAppDispatch } from "../../store";
 import { PropertyFormPageUiState } from "./state/PropertyFormPageUIState";
@@ -18,7 +17,9 @@ import { getPropertyStatusId, insertProperty} from "../../library-modules/domain
 import { uploadFilesHandler } from "../../library-modules/apis/azure/blob-api";
 import { BlobNamePrefix, UploadResults } from "/app/shared/azure/blob-models";
 import { apiInsertPropertyListing } from "../../library-modules/apis/property-listing/listing-api";
-
+import { useNavigate } from "react-router";
+import { apiPropertyInsertPrice } from "../../library-modules/apis/property-price/price-api";
+import { NavigationPath } from "../../navigation";
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
@@ -28,6 +29,7 @@ export function PropertyFormPage() {
   const state: PropertyFormPageUiState = useSelector(
     selectPropertyFormUiState
   );
+  const navigator = useNavigate();
 
   useEffect(() => {
     dispatch(load());
@@ -59,14 +61,25 @@ export function PropertyFormPage() {
       landlord_id: values.landlord,
       tenant_id: "", // not collected yet
     };
-  
+    console.log("Insert Document:", insertDoc); 
     const propertyId = await insertProperty(insertDoc);
     console.log("Property inserted with ID:", propertyId);
 
-    // const uploadReturnValues: UploadResults = await uploadFilesHandler(values.images,BlobNamePrefix.PROPERTY)
-    // console.log(uploadReturnValues)
-    // const imageUrls: string[] = uploadReturnValues.success.map((uploadResult) => {return uploadResult.url})
-    // console.log(await apiInsertPropertyListing("999",imageUrls)) <- Insert the property_id in place of 999
+    await apiPropertyInsertPrice(propertyId, 1500);
+    console.log("Property price inserted for ID:", propertyId);
+
+    const uploadReturnValues: UploadResults = await uploadFilesHandler(values.images,BlobNamePrefix.PROPERTY)
+
+    if (uploadReturnValues.failed.length > 0) {
+      console.error("Failed to upload some images:", uploadReturnValues.failed);
+      throw new Meteor.Error(`Image upload failed. Please try again.`);
+      return;
+    } 
+
+    const imageUrls: string[] = uploadReturnValues.success.map((uploadResult) => {return uploadResult.url})
+    await apiInsertPropertyListing(propertyId,imageUrls)
+
+    navigator(NavigationPath.PropertyListing, { state: { propertyId } });
   };
   
   return (

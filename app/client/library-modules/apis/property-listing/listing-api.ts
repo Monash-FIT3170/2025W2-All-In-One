@@ -1,5 +1,5 @@
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
-import { IncompleteListingInsertData } from "/app/shared/api-models/property-listing/ListingInsertData";
+import { ApiInsertListingPayload } from "/app/shared/api-models/property-listing/ListingInsertData";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 export async function apiGetListingForProperty(propertyId: string): Promise<ApiListing> {
@@ -9,7 +9,7 @@ export async function apiGetListingForProperty(propertyId: string): Promise<ApiL
 }
 
 export async function apiInsertPropertyListing(propertyId: string,imageUrls: string[]){
-  const data: IncompleteListingInsertData = {
+  const data: ApiInsertListingPayload = {
     property_id : propertyId,
     image_urls : imageUrls,
     inspection_ids : [],

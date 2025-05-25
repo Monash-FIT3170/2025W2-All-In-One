@@ -4,9 +4,14 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 
 export async function apiGetPropertyById(id: string): Promise<ApiProperty> {
-  const fetchedProperty = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET, id);
+  try {
+    const fetchedProperty = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET, id);
+    return fetchedProperty;
 
-  return fetchedProperty;
+  } catch (error) {
+    console.error(`Error fetching property with ID ${id}:`, error);
+    throw error;
+  }
 }
 
 export async function apiGetPropertyStatusId(name: PropertyStatus): Promise<string> {
