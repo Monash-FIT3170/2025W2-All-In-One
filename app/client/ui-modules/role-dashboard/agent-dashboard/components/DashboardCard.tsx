@@ -25,7 +25,6 @@ export function DashboardCards() {
     if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
       dispatch(fetchPropertyCount(currentUser.agentId));
       dispatch(fetchPropertiesAndMetrics(currentUser.agentId));
-      dispatch
     }
   }, [currentUser, dispatch]);
 
