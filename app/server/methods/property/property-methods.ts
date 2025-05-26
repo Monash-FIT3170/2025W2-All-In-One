@@ -139,6 +139,30 @@ const propertyGetLandlordTotalIncomeMethod = {
   },
 };
 
+const propertyGetLandlordOccupancyRateMethod = {
+    [MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_OCCUPANCY_RATE]: async (
+        landlordId: string
+      ): Promise<number> => {
+        const occupiedStatus = await PropertyStatusCollection.findOneAsync({
+          name: PropertyStatus.OCCUPIED,
+        });
+
+        const properties = await PropertyCollection.find({
+            landlord_id: landlordId,
+        }).fetchAsync();
+
+        const total = properties.length;
+
+        const occupied = properties.filter(
+            (p) => p.property_status_id === occupiedStatus?._id
+        ).length;
+
+        const occupancyRate = total > 0 ? (occupied / total) * 100 : 0;
+        return Math.round(occupancyRate);
+    },
+};
+
+
 const propertyGetCountMethod = {
   [MeteorMethodIdentifier.PROPERTY_GET_COUNT]: async (
     agentId: string
