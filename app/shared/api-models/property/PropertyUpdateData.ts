@@ -13,6 +13,5 @@ export type PropertyUpdateData = {
   features: string[],
   type: string,
   area: number,
-  pricePerMonth: number,
   landlordId: string,
 };

@@ -21,6 +21,7 @@ import { LandlordCollection } from "../../database/user/user-collections";
 import { TenantCollection } from "../../database/user/user-collections";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
+import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
 
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
@@ -255,7 +256,7 @@ const propertyInsertMethod = {
   },
 };
 
-async function updatePropertyData(property: ApiProperty): Promise<void> {
+async function updatePropertyData(property: PropertyUpdateData): Promise<void> {
   await PropertyCollection.updateAsync(property.propertyId, {
     $set: {
       streetnumber: property.streetnumber,

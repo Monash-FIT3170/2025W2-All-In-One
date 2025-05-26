@@ -57,7 +57,6 @@ export default function EditDraftListingModal(
       features: [], // TODO: Replace with actual value if available
       type: values.property_type,
       area: values.space,
-      pricePerMonth: 0, // TODO: Replace with actual value if available
       landlordId: values.landlord,
     };
 
