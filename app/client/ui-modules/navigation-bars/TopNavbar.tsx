@@ -11,7 +11,12 @@ import { Meteor } from 'meteor/meteor';
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 import { ApiTask } from '/app/shared/api-models/task/ApiTask';
 import { current } from "@reduxjs/toolkit";
-
+import { NotificationBoard } from "../theming/components/NotificationBoard";
+import {
+  fetchAgentTasks,
+  selectProperties,
+  selectTasks,
+} from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
 interface TopNavbarProps {
   onSideBarOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -52,6 +57,7 @@ export function RoleTopNavbar({
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const firstName = currentUser?.firstName || "Unknown";
   const lastName = currentUser?.lastName || "User";
+  const [notificationOpen, setNotificationOpen] = useState(false);
 
   const getUserRole = () => {
     if (!currentUser) return "Guest";
@@ -60,6 +66,19 @@ export function RoleTopNavbar({
     if ('tenantId' in currentUser) return "Tenant";
     return "Guest";
   };
+
+  const handleBellClick = async () => {
+    if (!notificationOpen & currentUser?.userAccountId) {
+      dispatch(fetchAgentTasks(currentUser.userAccountId));
+    }
+    setNotificationOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+      if (currentUser?.userAccountId) {
+        dispatch(fetchAgentTasks(currentUser.userAccountId));
+      }
+    }, [dispatch, currentUser?.userAccountId]);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
