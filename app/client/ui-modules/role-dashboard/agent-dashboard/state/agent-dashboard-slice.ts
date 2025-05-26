@@ -23,6 +23,9 @@ interface AgentDashboardState {
     taskId?: string;
   }>;
   error: string | null;
+  propertyList: ApiProperty[];
+  propertyListLoading: boolean;
+  propertyListError: string | null;
 };
 const initialState: AgentDashboardState = {
   isLoading: false,
@@ -32,6 +35,9 @@ const initialState: AgentDashboardState = {
   occupancyRate: 0,
   tasks: [],
   error: null,
+  propertyList: [] as ApiProperty[],
+  propertyListLoading: false,
+  propertyListError: null as string | null,
 };
 
 // Async thunks
@@ -110,6 +116,14 @@ export const fetchAgentTasks = createAsyncThunk(
   }
 );
 
+export const loadPropertyList = createAsyncThunk(
+  "agentDashboard/loadPropertyList",
+  async (agentId: string) => {
+    const properties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, agentId) as ApiProperty[];
+    return properties;
+  }
+);
+
 export const agentDashboardSlice = createSlice({
   name: "agentDashboard",
   initialState,
@@ -158,6 +172,18 @@ export const agentDashboardSlice = createSlice({
       })
       .addCase(fetchAgentTasks.rejected, (state) => {
         state.isLoading = false;
+      })
+      .addCase(loadPropertyList.pending, (state) => {
+        state.propertyListLoading = true;
+        state.propertyListError = null;
+      })
+      .addCase(loadPropertyList.fulfilled, (state, action) => {
+        state.propertyList = action.payload;
+        state.propertyListLoading = false;
+      })
+      .addCase(loadPropertyList.rejected, (state, action) => {
+        state.propertyListLoading = false;
+        state.propertyListError = action.error.message || "Failed to load properties";
       });
   },
 });
@@ -172,4 +198,10 @@ export const selectTasks = (state: RootState) => state.agentDashboard.tasks;
 export const selectIsLoading = (state: RootState) => state.agentDashboard.isLoading;
 export const selectError = (state: RootState) => state.agentDashboard.error;
 
+
+
+
+export const selectPropertyList = (state: RootState) => state.agentDashboard.propertyList;
+export const selectPropertyListLoading = (state: RootState) => state.agentDashboard.propertyListLoading;
+export const selectPropertyListError = (state: RootState) => state.agentDashboard.propertyListError;
 export default agentDashboardSlice.reducer;

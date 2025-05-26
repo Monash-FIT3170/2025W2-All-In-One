@@ -43,21 +43,12 @@ const initialState: PropertyListingPageUiState = {
   landlords: [],
 };
 
-export const loadPropertyList = createAsyncThunk(
-  "propertyListing/loadPropertyList",
-  async (agentId: string) => {
-    const properties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, agentId) as ApiProperty[];
-    return properties;
-  }
-);
+
 
 export const propertyListingSlice = createSlice({
   name: "propertyListing",
   initialState: {
-    ...initialState,
-    propertyList: [] as ApiProperty[],
-    propertyListLoading: false,
-    propertyListError: null as string | null,
+    ...initialState
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -104,18 +95,6 @@ export const propertyListingSlice = createSlice({
         state.shouldShowLoadingState = false;
       state.landlords = action.payload.landlords;
       })
-      .addCase(loadPropertyList.pending, (state) => {
-        state.propertyListLoading = true;
-        state.propertyListError = null;
-      })
-      .addCase(loadPropertyList.fulfilled, (state, action) => {
-        state.propertyList = action.payload;
-        state.propertyListLoading = false;
-      })
-      .addCase(loadPropertyList.rejected, (state, action) => {
-        state.propertyListLoading = false;
-        state.propertyListError = action.error.message || "Failed to load properties";
-      });
   },
 });
 
@@ -172,6 +151,3 @@ export const load = createAsyncThunk(
 export const selectPropertyListingUiState = (state: RootState) =>
   state.propertyListing;
 
-export const selectPropertyList = (state: RootState) => state.propertyListing.propertyList;
-export const selectPropertyListLoading = (state: RootState) => state.propertyListing.propertyListLoading;
-export const selectPropertyListError = (state: RootState) => state.propertyListing.propertyListError;
