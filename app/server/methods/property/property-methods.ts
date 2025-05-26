@@ -101,15 +101,26 @@ const propertyGetLandlordTotalIncomeMethod = {
   [MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_TOTAL_INCOME]: async (
     landlordId: string
   ): Promise<{ weekly: number; monthly: number }> => {
-    const properties = await PropertyCollection.find({
-      landlord_id: landlordId,
-    }).fetchAsync();
-    const propertyIds = properties.map((p) => p._id);
+    const occupiedStatus = await PropertyStatusCollection.findOneAsync({
+      name: PropertyStatus.OCCUPIED,
+    });
 
+    if (!occupiedStatus) {
+      throw new Meteor.Error(
+        "status-not-found",
+        "Could not find occupied status IDs"
+      );
+    }
+    const occupiedProperties = await PropertyCollection.find({
+      landlord_id: landlordId,
+      property_status_id: occupiedStatus._id,
+    }).fetchAsync();
+
+    const propertyIds = occupiedProperties.map((p) => p._id);
     let totalMonthly = 0;
 
     for (const propertyId of propertyIds) {
-      const latestPrice = await PropertyPriceCollection.findOne(
+      const latestPrice = await PropertyPriceCollection.findOneAsync(
         { property_id: propertyId },
         { sort: { date_set: -1 } } //uses most recent date for rent
       );
@@ -121,7 +132,7 @@ const propertyGetLandlordTotalIncomeMethod = {
     const totalWeekly = totalMonthly * (12 / 52);
 
     return {
-    // round to 2 d.p. 
+      // round to 2 d.p.
       weekly: Math.round(totalWeekly * 100) / 100,
       monthly: Math.round(totalMonthly * 100) / 100,
     };
@@ -323,6 +334,7 @@ Meteor.methods({
   ...propertyInsertMethod,
   ...propertyGetCountLandlordMethod,
   ...propertyGetStatusCountsLandlordMethod,
+  ...propertyGetLandlordTotalIncomeMethod,
   ...propertyGetCountMethod,
   ...propertyGetListMethod,
   ...propertyInsertMethod,
