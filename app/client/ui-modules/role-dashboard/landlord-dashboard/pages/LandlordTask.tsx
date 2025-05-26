@@ -1,6 +1,5 @@
 import React from "react";
 export function LandlordTask(): React.JSX.Element {
-  const [isSidebarOpen, onSideBarOpened] = React.useState(false);
   return (
     <div className="min-h-screen">
       <div className="flex">

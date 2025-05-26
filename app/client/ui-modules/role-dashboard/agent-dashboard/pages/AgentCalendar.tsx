@@ -14,7 +14,6 @@ export function AgentCalendar(): React.JSX.Element {
   const loading = useAppSelector(selectIsLoading);
   const currentUser = useAppSelector((state) => state.currentUser.authUser); // Get the authenticated user
 
-  const [isSidebarOpen, onSideBarOpened] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
 

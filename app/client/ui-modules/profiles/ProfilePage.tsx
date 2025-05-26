@@ -15,7 +15,6 @@ import { EmploymentInfoCard } from "./components/EmploymentInfoCard";
 import { VehicleInfoCard } from "./components/VehicleInfoCard";
 
 export function ProfilePage(): React.JSX.Element {
-  const [isSidebarOpen, onSideBarOpened] = React.useState(false);
 
   const dispatch = useAppDispatch();
   const profile = useAppSelector(selectProfileData);

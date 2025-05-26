@@ -5,7 +5,6 @@ import { Link } from "react-router";
 import Ripple from "./animations/Ripple";
 import { Button } from "../theming-shadcn/Button";
 import { Input } from "../theming-shadcn/Input";
-import { agentLinks } from "../navigation-bars/side-nav-bars/side-nav-link-definitions";
 import { PropertyCard } from "./components/PropertyCard"; 
 import {
     fetchPropertiesAndListings,
@@ -19,8 +18,7 @@ export function GuestLandingPage() {
     const { properties: listedProperties, isLoading, error } = useSelector(
         (state: RootState) => selectGuestLandingPageUiState(state)
     );
-
-    const [isSidebarOpen, onSideBarOpened] = useState(false);
+    
     const [visibleCount, setVisibleCount] = useState(3);
 
     useEffect(() => {
