@@ -4,6 +4,7 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 import { Property } from "../../domain-models/property/Property";
 import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
+import { Meteor } from 'meteor/meteor';
 
 export async function apiGetPropertyById(id: string): Promise<ApiProperty> {
   const fetchedProperty = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET, id);
@@ -22,3 +23,7 @@ export async function apiInsertProperty(property: PropertyInsertData): Promise<s
 export async function apiUpdatePropertyData(updatedProperty: PropertyUpdateData): Promise<string> {
   return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_DATA_UPDATE, updatedProperty);
 }
+
+export const getPropertyList = async (agentId: string): Promise<ApiProperty[]> => {
+  return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, agentId) as ApiProperty[];
+};

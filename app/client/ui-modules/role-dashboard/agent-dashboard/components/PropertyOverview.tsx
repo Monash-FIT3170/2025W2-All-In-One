@@ -2,8 +2,9 @@ import React, { useEffect } from "react";
 import { Button } from "../../../theming-shadcn/Button";
 import { CardWidget } from "../../components/CardWidget";
 import { useAppSelector, useAppDispatch } from "../../../../store";
-import { loadPropertyList, selectPropertyList, selectPropertyListLoading, selectPropertyListError } from "../../../property-listing-page/state/reducers/property-listing-slice";
+import { loadPropertyList, selectPropertyList, selectPropertyListLoading, selectPropertyListError } from "../state/agent-dashboard-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
+import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 
 interface Property {
   address: string;
@@ -20,9 +21,9 @@ export function PropertyOverview({
 }: PropertyOverviewProps): React.JSX.Element {
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-  const properties = useAppSelector(selectPropertyList);
-  const isLoading = useAppSelector(selectPropertyListLoading);
-  const error = useAppSelector(selectPropertyListError);
+  const properties: ApiProperty[] = useAppSelector(selectPropertyList);
+  const isLoading: boolean = useAppSelector(selectPropertyListLoading);
+  const error: string | null = useAppSelector(selectPropertyListError);
 
   useEffect(() => {
     if (currentUser && 'agentId' in currentUser && currentUser.agentId) {

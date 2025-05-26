@@ -3,6 +3,7 @@ import { RootState } from "../../../../store";
 import { Meteor } from 'meteor/meteor';
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 import { ApiProperty } from '/app/shared/api-models/property/ApiProperty';
+import { getPropertyList } from "../../../../library-modules/apis/property/property-api";
 
 
 type Property = ApiProperty;
@@ -119,7 +120,7 @@ export const fetchAgentTasks = createAsyncThunk(
 export const loadPropertyList = createAsyncThunk(
   "agentDashboard/loadPropertyList",
   async (agentId: string) => {
-    const properties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, agentId) as ApiProperty[];
+    const properties = await getPropertyList(agentId);
     return properties;
   }
 );
@@ -188,20 +189,22 @@ export const agentDashboardSlice = createSlice({
   },
 });
 
-export const { setTasks } = agentDashboardSlice.actions;
-export const selectAgentDashboard = (state: RootState) => state.agentDashboard;
-export const selectProperties = (state: RootState) => state.agentDashboard.properties;
-export const selectPropertyCount = (state: RootState) => state.agentDashboard.propertyCount;
-export const selectMonthlyRevenue = (state: RootState) => state.agentDashboard.monthlyRevenue;
-export const selectOccupancyRate = (state: RootState) => state.agentDashboard.occupancyRate;
-export const selectTasks = (state: RootState) => state.agentDashboard.tasks;
-export const selectIsLoading = (state: RootState) => state.agentDashboard.isLoading;
-export const selectError = (state: RootState) => state.agentDashboard.error;
+// Type the root state to include our slice
+type RootStateWithAgentDashboard = RootState & {
+  agentDashboard: AgentDashboardState;
+};
 
+// Update selectors with proper typing
+export const selectAgentDashboard = (state: RootStateWithAgentDashboard) => state.agentDashboard;
+export const selectProperties = (state: RootStateWithAgentDashboard) => state.agentDashboard.properties;
+export const selectPropertyCount = (state: RootStateWithAgentDashboard) => state.agentDashboard.propertyCount;
+export const selectMonthlyRevenue = (state: RootStateWithAgentDashboard) => state.agentDashboard.monthlyRevenue;
+export const selectOccupancyRate = (state: RootStateWithAgentDashboard) => state.agentDashboard.occupancyRate;
+export const selectTasks = (state: RootStateWithAgentDashboard) => state.agentDashboard.tasks;
+export const selectIsLoading = (state: RootStateWithAgentDashboard) => state.agentDashboard.isLoading;
+export const selectError = (state: RootStateWithAgentDashboard) => state.agentDashboard.error;
+export const selectPropertyList = (state: RootStateWithAgentDashboard) => state.agentDashboard.propertyList;
+export const selectPropertyListLoading = (state: RootStateWithAgentDashboard) => state.agentDashboard.propertyListLoading;
+export const selectPropertyListError = (state: RootStateWithAgentDashboard) => state.agentDashboard.propertyListError;
 
-
-
-export const selectPropertyList = (state: RootState) => state.agentDashboard.propertyList;
-export const selectPropertyListLoading = (state: RootState) => state.agentDashboard.propertyListLoading;
-export const selectPropertyListError = (state: RootState) => state.agentDashboard.propertyListError;
 export default agentDashboardSlice.reducer;
