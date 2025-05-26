@@ -41,6 +41,7 @@ Meteor.startup(async () => {
   await tempSeedUserAndRoleData();
   await tempSeedPropertyData();
   await tempSeedTaskData();
+  // await tempSeedPropertyStatusData();
   await permSeedListingStatusData();
 });
 
@@ -60,7 +61,6 @@ async function tempSeedUserAndRoleData(): Promise<void> {
       firstName: "TestTenant",
       lastName: "Rod",
       accountType: Role.TENANT,
-      // task_ids: ["1", "2"],
     },
     {
       email: "testinglandlordemail@gmail.com",
