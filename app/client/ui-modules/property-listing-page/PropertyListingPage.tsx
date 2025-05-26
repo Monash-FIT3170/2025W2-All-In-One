@@ -30,7 +30,7 @@ import {
   selectPropertyListingUiState,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
-import { AgentTopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
+import { TopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
 import EditDraftListingModal from "./components/EditDraftListingModal";
 import { EditDraftListingButton } from "./components/EditDraftListingButton";
 import { PropertyForm } from "../property-form-agent/components/PropertyForm";
@@ -58,7 +58,7 @@ export function PropertyListingPage({
   if (state.shouldShowLoadingState) {
     return (
       <>
-        <AgentTopNavbar onSideBarOpened={() => {}} />
+        <TopNavbar onSideBarOpened={() => {}} />
         <ListingPageContentLoadingSkeleton
           className={twMerge("p-5", className)}
         />
@@ -67,7 +67,7 @@ export function PropertyListingPage({
   } else {
     return (
       <>
-        <AgentTopNavbar onSideBarOpened={() => {}} />
+        <TopNavbar onSideBarOpened={() => {}} />
         <ListingPageContent
           streetNumber={state.streetNumber}
           street={state.street}
