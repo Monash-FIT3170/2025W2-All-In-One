@@ -27,11 +27,12 @@ export default function FormPropertyDetails({
   useEffect(() => {
     const fetchFeatures = async () => {
       const features = await getAllPropertyFeatures();
-      const mapped = features.map((f) => ({ value: f._id, label: f.name }));
+      const mapped = features.map((feature) => ({ value: feature._id, label: feature.name }));
       setFeatureOptions(mapped);
     };
     fetchFeatures();
   }, []);
+  
   return (
     <div className="border border-(--divider-color) w-full p-7 rounded-md mb-3">
       <FormHeading

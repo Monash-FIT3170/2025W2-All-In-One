@@ -40,6 +40,7 @@ let globalLandlord: ApiLandlord;
 
 Meteor.startup(async () => {
   await tempSeedUserAndRoleData();
+  await permSeedPropertyFeaturesData();
   await tempSeedPropertyData();
   await tempSeedTaskData();
   await permSeedListingStatusData();
@@ -138,21 +139,6 @@ async function tempSeedPropertyData(): Promise<void> {
         await PropertyStatusCollection.insertAsync(status);
       }
     }
-
-    await PropertyFeatureCollection.insertAsync({
-      _id: "1",
-      name: "Pool",
-    });
-
-    await PropertyFeatureCollection.insertAsync({
-      _id: "2",
-      name: "Lots of space",
-    });
-
-    await PropertyFeatureCollection.insertAsync({
-      _id: "3",
-      name: "Garden",
-    });
 
     await PropertyPriceCollection.insertAsync({
       _id: "1",
@@ -381,5 +367,25 @@ async function permSeedListingStatusData(): Promise<void> {
       _id: "4",
       name: ListingStatus.TENANT_APPROVAL,
     });
+  }
+}
+
+async function permSeedPropertyFeaturesData(): Promise<void> {
+  const features = [
+    { _id: "1", name: "Washing Machine" },
+    { _id: "2", name: "Hair Dryer" },
+    { _id: "3", name: "Garden" },
+    { _id: "4", name: "Air Conditioning" },
+    { _id: "5", name: "Heater" },
+    { _id: "6", name: "Garage" },
+    { _id: "7", name: "Pool" },
+  ];
+
+  for (const feature of features) {
+    const existing = await PropertyFeatureCollection.findOneAsync({ _id: feature._id });
+    if (!existing) {
+      await PropertyFeatureCollection.insertAsync(feature);
+      console.log(`[Seed] Inserted feature: ${feature.name}`);
+    }
   }
 }
