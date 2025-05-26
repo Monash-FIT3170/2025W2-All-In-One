@@ -1,3 +1,5 @@
+import { TenantApplication } from './TenantApplication';
+
 export type ReviewTenantModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -7,4 +9,5 @@ export type ReviewTenantModalProps = {
   onBackgroundFail: (applicationId: string) => void;
   onSendToLandlord: (applicationId: string) => void;
   propertyAddress?: string;
+  tenantApplications?: TenantApplication[];
 }

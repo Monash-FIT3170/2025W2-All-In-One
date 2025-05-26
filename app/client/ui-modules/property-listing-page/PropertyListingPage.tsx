@@ -98,7 +98,7 @@ export function PropertyListingPage({
           onSubmitDraftListing={() => {
             console.log("draft submitted!");
             // Change value of "1" later to property ID
-            dispatch(submitDraftListingAsync("1"));
+            dispatch(submitDraftListingAsync(state.propertyId));
           }}
           className={twMerge("p-5", className)}
         />

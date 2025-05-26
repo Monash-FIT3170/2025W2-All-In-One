@@ -18,9 +18,8 @@ export function ReviewTenantModal({
   onBackgroundFail,
   onSendToLandlord,
   propertyAddress,
-}: ReviewTenantModalProps): React.JSX.Element {
-  // Mock data matching figma
-  const [applications, setApplications] = React.useState<TenantApplication[]>([
+  tenantApplications = [
+    // Default mock data for backward compatibility
     {
       id: '1',
       name: 'Rehan W',
@@ -52,9 +51,16 @@ export function ReviewTenantModal({
       status: TenantApplicationStatus.ACCEPTED,
       backgroundCheck: BackgroundCheckStatus.PASS,
     },
-  ]);
+  ],
+}: ReviewTenantModalProps): React.JSX.Element {
+  const [applications, setApplications] = React.useState<TenantApplication[]>(tenantApplications);
 
   const [activeFilter, setActiveFilter] = React.useState<FilterType>(FilterType.ALL);
+
+  // update applications when tenantApplications changes
+  React.useEffect(() => {
+    setApplications(tenantApplications);
+  }, [tenantApplications]);
 
   const handleReject = (applicationId: string) => {
     setApplications(currentApplications => 
