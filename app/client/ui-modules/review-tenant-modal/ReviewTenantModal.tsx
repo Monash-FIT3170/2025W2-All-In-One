@@ -57,11 +57,6 @@ export function ReviewTenantModal({
 
   const [activeFilter, setActiveFilter] = React.useState<FilterType>(FilterType.ALL);
 
-  // update applications when tenantApplications changes
-  React.useEffect(() => {
-    setApplications(tenantApplications);
-  }, [tenantApplications]);
-
   const handleReject = (applicationId: string) => {
     setApplications(currentApplications => 
       currentApplications.map(app => 

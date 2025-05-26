@@ -41,6 +41,7 @@ const initialState: PropertyListingPageUiState = {
   shouldDisplayListingStatus: true,
   shouldDisplaySubmitDraftButton: true,
   shouldDisplayReviewTenantButton: false,
+  shouldDisplayEditListingButton: true,
   shouldShowLoadingState: true,
   landlords: [],
   isSubmittingDraft: false,
@@ -118,6 +119,7 @@ export const propertyListingSlice = createSlice({
       const isDraft = action.payload.listing_status.toLowerCase() === "draft";
       state.shouldDisplaySubmitDraftButton = isDraft;
       state.shouldDisplayReviewTenantButton = !isDraft;
+      state.shouldDisplayEditListingButton = isDraft;
       
       state.shouldShowLoadingState = false;
       state.landlords = action.payload.landlords;
@@ -146,6 +148,7 @@ export const propertyListingSlice = createSlice({
       state.listingStatusPillVariant = getListingStatusPillVariant("listed");
       state.shouldDisplaySubmitDraftButton = false;
       state.shouldDisplayReviewTenantButton = true;
+      state.shouldDisplayEditListingButton = false;
       state.isSubmittingDraft = false;
     });
     

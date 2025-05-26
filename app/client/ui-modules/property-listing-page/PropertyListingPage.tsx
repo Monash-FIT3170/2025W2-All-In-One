@@ -95,6 +95,7 @@ export function PropertyListingPage({
           shouldDisplayListingStatus={state.shouldDisplayListingStatus}
           shouldDisplaySubmitDraftButton={state.shouldDisplaySubmitDraftButton}
           shouldDisplayReviewTenantButton={state.shouldDisplayReviewTenantButton}
+          shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
           onBack={() => {
             console.log("back button pressed");
           }}
@@ -141,6 +142,7 @@ function ListingPageContent({
   shouldDisplayListingStatus,
   shouldDisplaySubmitDraftButton,
   shouldDisplayReviewTenantButton,
+  shouldDisplayEditListingButton,
   onBack,
   onBook,
   onApply,
@@ -171,6 +173,7 @@ function ListingPageContent({
   shouldDisplayListingStatus: boolean;
   shouldDisplaySubmitDraftButton: boolean;
   shouldDisplayReviewTenantButton: boolean;
+  shouldDisplayEditListingButton: boolean;
   onBack: () => void;
   onBook: (index: number) => void;
   onApply: () => void;
@@ -219,6 +222,7 @@ function ListingPageContent({
       <BottomBar
         shouldDisplaySubmitDraftButton={shouldDisplaySubmitDraftButton}
         shouldDisplayReviewTenantButton={shouldDisplayReviewTenantButton}
+        shouldDisplayEditListingButton={shouldDisplayEditListingButton}
         onSubmitDraftListing={onSubmitDraftListing}
         onReviewTenant={() => setIsReviewTenantModalOpen(true)}
       />
@@ -400,12 +404,14 @@ function ListingDetails({
 function BottomBar({
   shouldDisplaySubmitDraftButton,
   shouldDisplayReviewTenantButton,
+  shouldDisplayEditListingButton,
   onSubmitDraftListing,
   onReviewTenant,
   className = "",
 }: {
   shouldDisplaySubmitDraftButton: boolean;
   shouldDisplayReviewTenantButton: boolean;
+  shouldDisplayEditListingButton: boolean;
   onSubmitDraftListing: () => void;
   onReviewTenant: () => void;
   className?: string;
@@ -419,10 +425,9 @@ function BottomBar({
         )}
       </div>
 
-      {/* Right side - for approve contract button*/}
       <div className="flex">
-        <ListingModalEditor />
-      {shouldDisplaySubmitDraftButton && (
+        {shouldDisplayEditListingButton && <ListingModalEditor />}
+        {shouldDisplaySubmitDraftButton && (
           <SubmitDraftListingButton onClick={onSubmitDraftListing} />
         )}
       </div>

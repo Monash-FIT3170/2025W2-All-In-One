@@ -30,6 +30,7 @@ export type PropertyListingPageUiState = {
   shouldDisplayListingStatus: boolean;
   shouldDisplaySubmitDraftButton: boolean;
   shouldDisplayReviewTenantButton: boolean;
+  shouldDisplayEditListingButton: boolean;
   shouldShowLoadingState: boolean;
   landlords: Landlord[];
   isSubmittingDraft: boolean;
