@@ -76,44 +76,44 @@ export const propertyListingSlice = createSlice({
     builder.addCase(load.fulfilled, (state, action) => {
       state.propertyId = action.payload.propertyId;
       state.propertyLandlordId = action.payload.landlordId;
-        state.propertyId = action.payload.propertyId;
+      state.propertyId = action.payload.propertyId;
       state.streetNumber = action.payload.streetnumber;
-        state.street = action.payload.streetname;
-        state.suburb = action.payload.suburb;
-        state.province = action.payload.province;
-        state.postcode = action.payload.postcode;
-        state.summaryDescription = action.payload.summaryDescription;
+      state.street = action.payload.streetname;
+      state.suburb = action.payload.suburb;
+      state.province = action.payload.province;
+      state.postcode = action.payload.postcode;
+      state.summaryDescription = action.payload.summaryDescription;
       state.areaValue = action.payload.area ?? 0;
-        state.propertyStatusText = action.payload.propertyStatus;
-        state.propertyStatusPillVariant = getPropertyStatusPillVariant(
-          action.payload.propertyStatus
-        );
-        state.propertyDescription = action.payload.description;
-        state.propertyFeatures = action.payload.features;
-        state.propertyType = action.payload.type;
-        state.propertyLandArea = action.payload.area
-          ? getPropertyAreaDisplayString(action.payload.area)
-          : "N/A";
-        state.propertyBathrooms = action.payload.bathrooms.toString();
-        state.propertyParkingSpaces = action.payload.parking.toString();
-        state.propertyBedrooms = action.payload.bedrooms.toString();
-        state.propertyPrice = getPropertyPriceDisplayString(
-          action.payload.pricePerMonth
-        );
-        state.inspectionBookingUiStateList = action.payload.inspections.map(
-          (inspection) => ({
-            date: getFormattedDateStringFromDate(inspection.start_time),
-            startingTime: getFormattedTimeStringFromDate(inspection.start_time),
-            endingTime: getFormattedTimeStringFromDate(inspection.end_time),
-          })
-        );
-        state.listingImageUrls = action.payload.image_urls;
-        state.listingStatusText = getListingStatusDisplayString(
-          action.payload.listing_status
-        );
-        state.listingStatusPillVariant = getListingStatusPillVariant(
-          action.payload.listing_status
-        );
+      state.propertyStatusText = action.payload.propertyStatus;
+      state.propertyStatusPillVariant = getPropertyStatusPillVariant(
+        action.payload.propertyStatus
+      );
+      state.propertyDescription = action.payload.description;
+      state.propertyFeatures = action.payload.features;
+      state.propertyType = action.payload.type;
+      state.propertyLandArea = action.payload.area
+        ? getPropertyAreaDisplayString(action.payload.area)
+        : "N/A";
+      state.propertyBathrooms = action.payload.bathrooms.toString();
+      state.propertyParkingSpaces = action.payload.parking.toString();
+      state.propertyBedrooms = action.payload.bedrooms.toString();
+      state.propertyPrice = getPropertyPriceDisplayString(
+        action.payload.pricePerMonth
+      );
+      state.inspectionBookingUiStateList = action.payload.inspections.map(
+        (inspection) => ({
+          date: getFormattedDateStringFromDate(inspection.start_time),
+          startingTime: getFormattedTimeStringFromDate(inspection.start_time),
+          endingTime: getFormattedTimeStringFromDate(inspection.end_time),
+        })
+      );
+      state.listingImageUrls = action.payload.image_urls;
+      state.listingStatusText = getListingStatusDisplayString(
+        action.payload.listing_status
+      );
+      state.listingStatusPillVariant = getListingStatusPillVariant(
+        action.payload.listing_status
+      );
         
       // Set button visibility based on listing status
       const isDraft = action.payload.listing_status.toLowerCase() === "draft";
