@@ -4,6 +4,7 @@ import "./methods/task/task-methods";
 import "./methods/property/property-methods";
 import "./methods/property-price/property-price-method";
 import "./methods/property-listing/listing-methods";
+
 import {
   PropertyCollection,
   PropertyFeatureCollection,
@@ -34,18 +35,17 @@ import { ApiLandlord } from "../shared/api-models/user/api-roles/ApiLandlord";
 import { PropertyStatus } from "../shared/api-models/property/PropertyStatus";
 
 import { ListingStatus } from "../shared/api-models/property-listing/ListingStatus";
-import { getPropertyStatusId } from "../client/library-modules/domain-models/property/repositories/property-repository";
 
 let globalAgent: ApiAgent;
 let globalTenant: ApiTenant;
 let globalLandlord: ApiLandlord;
 
 Meteor.startup(async () => {
+  await tempSeedPropertyStatusData();
+  await permSeedListingStatusData();
   await tempSeedUserAndRoleData();
   await tempSeedPropertyData();
   await tempSeedTaskData();
-  await tempSeedPropertyStatusData();
-  await permSeedListingStatusData();
 });
 
 async function tempSeedUserAndRoleData(): Promise<void> {
@@ -122,12 +122,12 @@ async function tempSeedUserAndRoleData(): Promise<void> {
 }
 
 async function tempSeedPropertyData(): Promise<void> {
-  console.log("Seeding property data...");
   if ((await PropertyCollection.find().countAsync()) === 0) {
-    await PropertyStatusCollection.insertAsync({
-      _id: "1",
-      name: PropertyStatus.VACANT,
-    });
+      console.log("Seeding property data...");
+    // await PropertyStatusCollection.insertAsync({
+    //   _id: "1",
+    //   name: PropertyStatus.VACANT,
+    // });
 
     await PropertyFeatureCollection.insertAsync({
       _id: "1",
@@ -143,7 +143,6 @@ async function tempSeedPropertyData(): Promise<void> {
       price_per_month: 1500,
       date_set: new Date(),
     });
-
     await PropertyCollection.insertAsync({
       _id: "1",
       streetnumber: "123",
@@ -151,7 +150,7 @@ async function tempSeedPropertyData(): Promise<void> {
       suburb: "Springfield",
       province: "IL",
       postcode: "62704",
-      property_status_id: await getPropertyStatusId(PropertyStatus.VACANT),
+      property_status_id: await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_STATUS_GET, PropertyStatus.VACANT),  
       description:
         "Modern apartment with spacious living areas and a beautiful garden. Recently renovated with new appliances and fixtures throughout. The property features an open-plan kitchen and dining area that flows onto a private balcony with city views. The master bedroom includes an ensuite bathroom and built-in wardrobes, while the second bedroom is generously sized and located near the main bathroom.",
       summary_description:
@@ -177,10 +176,10 @@ async function tempSeedPropertyData(): Promise<void> {
       starttime: new Date("2025-04-14T10:00:00Z"),
       endtime: new Date("2025-04-15T11:00:00Z"),
     });
-
+    console.log(await Meteor.callAsync(MeteorMethodIdentifier.LISTING_STATUS_GET_BY_NAME, ListingStatus.DRAFT))
     await ListingCollection.insertAsync({
       property_id: "1",
-      listing_status_id: "1",
+      listing_status_id: await Meteor.callAsync(MeteorMethodIdentifier.LISTING_STATUS_GET_BY_NAME, ListingStatus.DRAFT),
       image_urls: [
         "https://cdn.pixabay.com/photo/2018/08/04/11/30/draw-3583548_1280.png",
         "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
@@ -233,7 +232,8 @@ async function tempSeedTaskData(): Promise<void> {
 }
 
   async function tempSeedPropertyStatusData(): Promise<void> {
-    if ((await PropertyStatusCollection.find().countAsync()) != 2){
+    console.log("Seeding Property Status data...");
+    if ((await PropertyStatusCollection.find().countAsync()) == 0){
       PropertyStatusCollection.insertAsync({
         name: PropertyStatus.VACANT
       })

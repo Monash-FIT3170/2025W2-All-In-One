@@ -127,7 +127,21 @@ async function getListingStatusDocumentByName(
   return ListingStatusCollection.findOneAsync({ name: name });
 }
 
+const getListingStatusIdByName = {
+  [MeteorMethodIdentifier.LISTING_STATUS_GET_BY_NAME]: async (
+    name: ListingStatus
+  ): Promise<string> => {
+    const document = await getListingStatusDocumentByName(name);
+    if (!document) {
+      throw new Meteor.Error("not-found", `ListingStatus ${name} not found`);
+    }
+    return document._id;
+  }
+}
+
+
 Meteor.methods({
   ...getListingForProperty,
   ...insertListingDocumentForProperty,
+  ...getListingStatusIdByName,
 });

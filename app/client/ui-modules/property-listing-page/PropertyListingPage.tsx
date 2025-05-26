@@ -48,7 +48,7 @@ export function PropertyListingPage({
 
   useEffect(() => {
     if (!propertyId) {
-      console.error("Property ID is not provided, loading default property");
+      console.log("Property ID is not provided, loading default property");
       dispatch(load("1"));
       return;
     }
