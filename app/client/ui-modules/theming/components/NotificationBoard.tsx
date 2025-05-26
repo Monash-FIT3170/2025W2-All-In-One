@@ -1,6 +1,6 @@
 import React from 'react';
 import { TaskStatus } from '/app/shared/task-status-identifier';
-import { format } from 'date-fns';
+import { parse, format, compareAsc } from "date-fns";
 
 interface Task {
   title: string;
@@ -20,16 +20,11 @@ interface NotificationBoardProps {
 export function NotificationBoard({ open, onClose, tasks }: NotificationBoardProps) {
   if (!open) return null;
 
-  const formatTaskDate = (dateStr: string) => {
-    try {
-      const date = new Date(dateStr);
-      if (isNaN(date.getTime())) {
-        return 'Invalid Date';
-      }
-      return format(date, 'MMM d, h:mm a');
-    } catch (error) {
+  const formatTaskDate = (date: Date): string => {
+    if (!date || isNaN(date.getTime())) {
       return 'Invalid Date';
     }
+    return format(date, 'MMM d, h:mm a');
   };
 
   const getStatusStyle = (status: string) => {
@@ -42,6 +37,38 @@ export function NotificationBoard({ open, onClose, tasks }: NotificationBoardPro
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  const transformedTasks = tasks
+    .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks
+    .map((task) => {
+      try {
+        // Parse the datetime string (assuming DD/MM/YYYY format)
+        const dueDate = parse(task.datetime, "dd/MM/yyyy", new Date());
+
+        // Format the date to match the design
+        const formattedDate = formatTaskDate(dueDate);
+
+        return {
+          ...task,
+          datetime: formattedDate,
+        };
+      } catch (error) {
+        console.error('Error parsing date:', task.datetime);
+        return {
+          ...task,
+          datetime: 'Invalid Date',
+        };
+      }
+    })
+    .sort((a, b) => {
+      try {
+        const dateA = parse(a.datetime, "dd/MM/yyyy", new Date());
+        const dateB = parse(b.datetime, "dd/MM/yyyy", new Date());
+        return compareAsc(dateA, dateB);
+      } catch (error) {
+        return 0;
+      }
+    });
 
   return (
     <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
@@ -56,10 +83,10 @@ export function NotificationBoard({ open, onClose, tasks }: NotificationBoardPro
         </button>
       </div>
       <div className="max-h-96 overflow-y-auto">
-        {tasks.length === 0 ? (
+        {transformedTasks.length === 0 ? (
           <div className="p-4 text-gray-500 text-center">No pending tasks</div>
         ) : (
-          tasks.map((task) => (
+          transformedTasks.map((task) => (
             <div
               key={task.taskId}
               className="px-4 py-3 border-b last:border-b-0 border-gray-100 hover:bg-gray-50 transition"
@@ -74,11 +101,8 @@ export function NotificationBoard({ open, onClose, tasks }: NotificationBoardPro
                   {task.status}
                 </span>
               </div>
-              {task.description && (
-                <div className="text-sm text-gray-600 mb-1">{task.description}</div>
-              )}
               <div className="flex items-center gap-2 text-xs text-gray-500">
-                <span>Due: {formatTaskDate(task.datetime)}</span>
+                <span>Due: {task.datetime}</span>
                 {task.priority && (
                   <>
                     <span>•</span>
