@@ -10,6 +10,7 @@ export enum MeteorMethodIdentifier {
   PROPERTY_INSERT = "properties.insert",
   PROPERTY_LANDLORD_GET_COUNT = "properties.getCountLandlord",
   PROPERTY_LANDLORD_GET_STATUS_COUNTS = "properties.getStatusCountsLandlord",
+  PROPERTY_LANDLORD_GET_TOTAL_INCOME = "properties.getTotalIncomeLandlord",
   LISTING_GET_FOR_PROPERTY = "listings.getForProperty",
   LISTING_INSERT_PROPERTY = "listings.insertProperty",
   LISTING_STATUS_GET_BY_NAME = "listings.getStatusByName", 

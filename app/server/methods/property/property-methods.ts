@@ -66,10 +66,10 @@ const propertyGetStatusCountsLandlordMethod = {
   ): Promise<{ occupied: number; vacant: number }> => {
     // get status IDs for occupied/vacant
     const occupiedStatus = await PropertyStatusCollection.findOneAsync({
-      name: PropertyStatus.OCCUPIED
+      name: PropertyStatus.OCCUPIED,
     });
     const vacantStatus = await PropertyStatusCollection.findOneAsync({
-      name: PropertyStatus.VACANT
+      name: PropertyStatus.VACANT,
     });
 
     if (!occupiedStatus || !vacantStatus) {
@@ -97,15 +97,52 @@ const propertyGetStatusCountsLandlordMethod = {
   },
 };
 
+const propertyGetLandlordTotalIncomeMethod = {
+  [MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_TOTAL_INCOME]: async (
+    landlordId: string
+  ): Promise<{ weekly: number; monthly: number }> => {
+    const properties = await PropertyCollection.find({
+      landlord_id: landlordId,
+    }).fetchAsync();
+    const propertyIds = properties.map((p) => p._id);
+
+    let totalMonthly = 0;
+
+    for (const propertyId of propertyIds) {
+      const latestPrice = await PropertyPriceCollection.findOne(
+        { property_id: propertyId },
+        { sort: { date_set: -1 } } //uses most recent date for rent
+      );
+      if (latestPrice) {
+        totalMonthly += latestPrice.price_per_month;
+      }
+    }
+    // convert monthly calculation to weekly: 12 months / 52 weeks per year
+    const totalWeekly = totalMonthly * (12 / 52);
+
+    return {
+    // round to 2 d.p. 
+      weekly: Math.round(totalWeekly * 100) / 100,
+      monthly: Math.round(totalMonthly * 100) / 100,
+    };
+  },
+};
+
 const propertyGetCountMethod = {
-  [MeteorMethodIdentifier.PROPERTY_GET_COUNT]: async (agentId: string): Promise<number> => {
+  [MeteorMethodIdentifier.PROPERTY_GET_COUNT]: async (
+    agentId: string
+  ): Promise<number> => {
     return await PropertyCollection.find({ agent_id: agentId }).countAsync();
   },
 };
 
 const propertyGetListMethod = {
-  [MeteorMethodIdentifier.PROPERTY_GET_LIST]: async (agentId: string): Promise<ApiProperty[]> => {
-    const properties = await PropertyCollection.find({ agent_id: agentId }).fetchAsync();
+  [MeteorMethodIdentifier.PROPERTY_GET_LIST]: async (
+    agentId: string
+  ): Promise<ApiProperty[]> => {
+    const properties = await PropertyCollection.find({
+      agent_id: agentId,
+    }).fetchAsync();
     return Promise.all(properties.map(mapPropertyDocumentToPropertyDTO));
   },
 };
@@ -280,7 +317,6 @@ async function updatePropertyData(property: PropertyUpdateData): Promise<void> {
 Meteor.methods({
   [MeteorMethodIdentifier.PROPERTY_DATA_UPDATE]: updatePropertyData,
 });
-
 
 Meteor.methods({
   ...propertyGetMethod,
