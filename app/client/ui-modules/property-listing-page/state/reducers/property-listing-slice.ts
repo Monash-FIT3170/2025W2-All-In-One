@@ -172,8 +172,6 @@ export const load = createAsyncThunk(
   }
 );
 
-// Export the actions
-export const {} = propertyListingSlice.actions;
 
 export const selectPropertyListingUiState = (state: RootState) =>
   state.propertyListing;
