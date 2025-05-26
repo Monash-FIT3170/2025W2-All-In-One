@@ -11,7 +11,7 @@ A web-app to optimise the renting process between tenants/landlord and agents.
 * Dylan Hoang - dhoa0009@student.monash.edu / dylanhoang9@gmail.com
 * Ryan Park - rpar0034@student.monash.edu / r.park2801@gmail.com
 * Dylan Lay - dlay0006@student.monash.edu.au / laydylan13@gmail.com
-* Tony Ly - tonyly0009@gmail.com
+* Tony Ly - tlyy0017@student.monash.edu / tonyly0009@gmail.com
 * Sona Hariharan - shar0108@student.monash.edu / sonahariharan067@gmail.com
 * Tristan Nguyen - tngu0294@student.monash.edu / ttristannguyen@gmail.com
 * Bahar Abbas Pour - babb0004@student.monash.edu / b.abbaspour1340@gmail.com
