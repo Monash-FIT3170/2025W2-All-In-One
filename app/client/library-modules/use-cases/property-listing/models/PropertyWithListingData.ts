@@ -1,6 +1,7 @@
 
 export type PropertyWithListingData = {
   propertyId: string;
+  landlordId: string;
   streetnumber: string;
   streetname: string;
   suburb: string;

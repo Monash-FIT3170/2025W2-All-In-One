@@ -9,10 +9,11 @@ import {
   setTasks,
   selectProperties,
   setProperties,
+  fetchLandlordTasks,
 } from "../state/landlord-dashboard-slice";
 
 import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
-import { LandlordTopNavbar } from "../../../navigation-bars/TopNavbar";
+import { RoleTopNavbar } from "../../../navigation-bars/TopNavbar";
 import {
   landlordDashboardLinks,
   settingLinks,
@@ -21,38 +22,18 @@ import {
 export function LandlordDashboard(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
   const dispatch = useAppDispatch();
-  const tasks = useAppSelector(selectTasks);
   const properties = useAppSelector(selectProperties);
 
+  const tasks = useAppSelector(selectTasks);
+  const currentUser = useAppSelector((state) => state.currentUser.authUser);
+
   useEffect(() => {
-    dispatch(
-      setTasks([
-        {
-          title: "Potential Tenant Selectian (Final)",
-          address: "42 Bondi Road",
-          datetime: "May 1, 2024",
-          status: "Upcoming" as const,
-        },
-        {
-          title: "Lease Renewal Discussion",
-          address: "78 Brunswick Street",
-          datetime: "May 15, 2024",
-          status: "Due Soon" as const,
-        },
-        {
-          title: "Agent Meeting - New Property Listing",
-          address: "15 Chapel Street",
-          datetime: "May 18, 2024",
-          status: "Upcoming" as const,
-        },
-        {
-          title: "Review Rental Increase",
-          address: "42 Bondi Road",
-          datetime: "May 22, 2024",
-          status: "Due Soon" as const,
-        },
-      ])
-    );
+    if (currentUser?.userId) {
+      dispatch(fetchLandlordTasks(currentUser.userId));
+    }
+  }, [dispatch, currentUser?.userId]);
+
+  useEffect(() => {
     dispatch(
       setProperties([
         {
@@ -76,7 +57,7 @@ export function LandlordDashboard(): React.JSX.Element {
 
   return (
     <div className="min-h-screen">
-      <LandlordTopNavbar onSideBarOpened={onSideBarOpened} />
+      <RoleTopNavbar onSideBarOpened={onSideBarOpened} />
       <div className="flex">
         <RoleSideNavBar
           isOpen={isSidebarOpen}

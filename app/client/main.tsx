@@ -64,7 +64,7 @@ function AppRoot(): React.JSX.Element {
               <Route path="/signup" element={<AuthTabs initialTab="signup" />} />
               <Route path="/tenant-dashboard" element={<TenantDashboard />} />
               <Route path="/tenant-property" element={<TenantProperty />} />
-              <Route path="/tenant-calendar" element={<TenantCalendar />} />
+              <Route path="/tenant-calender" element={<TenantCalendar />} />
               <Route path="/tenant-maintenance"element={<TenantMaintenance />} />
               <Route path="/tenant-messages" element={<TenantMessages />} />
               <Route path="/tenant-documents" element={<TenantDocument />} />
