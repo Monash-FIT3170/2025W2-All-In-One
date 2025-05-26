@@ -9,8 +9,6 @@ const initialState: GuestLandingPageUiState = {
   isLoading: false,
   properties: [],
   error: null,
-  isSidebarOpen: false,    
-  visibleCount: 3,          
 };
 
 
@@ -36,18 +34,7 @@ export const fetchPropertiesAndListings = createAsyncThunk<
 export const guestLandingPageSlice = createSlice({
   name: "guestLandingPage",
   initialState,
-  reducers: {
-    setSidebarOpen(state, action: PayloadAction<boolean>) {
-      state.isSidebarOpen = action.payload;
-    },
-    updateVisibleCount(state, action: PayloadAction<{ type: "set" | "increment", value: number }>) {
-      if (action.payload.type === "set") {
-        state.visibleCount = action.payload.value;
-      } else if (action.payload.type === "increment") {
-        state.visibleCount += action.payload.value;
-      }
-    }
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchPropertiesAndListings.pending, (state) => {
@@ -64,11 +51,6 @@ export const guestLandingPageSlice = createSlice({
       });
   },
 });
-
-export const {
-  setSidebarOpen,
-  updateVisibleCount
-} = guestLandingPageSlice.actions;
 
 export const selectGuestLandingPageUiState = (state: RootState) => state.guestLandingPage;
 
