@@ -1,9 +1,6 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../store";
-import {
-  apiGetProfileData,
-  apiUpdateProfileData,
-} from "../../library-modules/apis/user/user-role-api";
+
 import {
   resetProfile,
   selectIsEditing,
@@ -11,6 +8,8 @@ import {
   setEditing,
   updateField,
   setProfileData,
+  fetchProfileData,
+  saveProfileData,
 } from "./state/profile-slice";
 import {
   AgentTopNavbar,
@@ -33,6 +32,10 @@ import { VehicleInfoCard } from "./components/VehicleInfoCard";
 import { current } from "@reduxjs/toolkit";
 import { uploadFileHandler } from "../../library-modules/apis/azure/blob-api";
 import { Role } from "/app/shared/user-role-identifier";
+import {
+  getProfileDataById,
+  setProfileDataById,
+} from "../../library-modules/domain-models/user/role-repositories/profile-data-repository";
 
 export function ProfilePage(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
@@ -64,18 +67,9 @@ export function ProfilePage(): React.JSX.Element {
   };
 
   React.useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        if (!currentUser?.profileDataId)
-          throw new Error("User is not logged in");
-
-        const data = await apiGetProfileData(currentUser.profileDataId);
-        dispatch(setProfileData(data)); //Updating redux store
-      } catch (error) {
-        console.error("Failed to retrieve profile:", error);
-      }
-    };
-    loadProfile();
+    if (currentUser?.profileDataId) {
+      dispatch(fetchProfileData(currentUser.profileDataId));
+    }
   }, [currentUser?.profileDataId]);
 
   // NEED TO MAKE A "Local profile" so that u can make multiple changes without saving until the btn is pressed
@@ -86,24 +80,10 @@ export function ProfilePage(): React.JSX.Element {
   }, [isEditing]);
 
   // in handle save, we can add validation for fields and cancel it if fields incorrect
-  const handleSave = async () => {
-    try {
-      // const userId = Meteor.userId();
-      if (!currentUser?.profileDataId) throw new Error("User is not logged in");
-
-      // Send updates to the backend
-      const updatedProfile = await apiUpdateProfileData(
-        currentUser.profileDataId,
-        localProfile
-      );
-      // Update Redux store with the latest data
-      dispatch(setProfileData(updatedProfile));
-      dispatch(setEditing(false));
-    } catch (error) {
-      console.error("Failed to update profile:", error);
-    }
-  };
-
+  const handleSave = () => {
+   if (currentUser?.profileDataId) {
+  dispatch(fetchProfileData(currentUser.profileDataId));
+}
   const roleTopNavbar = (role: Role | undefined) => {
     switch (role) {
       case Role.AGENT:

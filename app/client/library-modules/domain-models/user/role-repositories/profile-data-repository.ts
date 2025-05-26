@@ -1,10 +1,26 @@
-import { apiGetProfileData } from "../../../apis/user/user-role-api";
+import {
+  apiGetProfileData,
+  apiUpdateProfileData,
+} from "../../../apis/user/user-role-api";
 import { ProfileData } from "../ProfileData";
-import { mapApiProfileDataToProfileData } from "./mappers/profile-data-mapper";
+import {
+  mapApiProfileDataToProfileData,
+  mapProfileDataToApiProfileData,
+} from "./mappers/profile-data-mapper";
 
 export async function getProfileDataById(id: string): Promise<ProfileData> {
-    const apiLandlord = await apiGetProfileData(id);
-    const mappedLandlord = mapApiProfileDataToProfileData(apiLandlord);
+  const apiProfileID = await apiGetProfileData(id);
+  const mappedProfile = mapApiProfileDataToProfileData(apiProfileID);
 
-    return mappedLandlord;
+  return mappedProfile;
+}
+
+export async function setProfileDataById(
+  id: string,
+  updatedProfile: ProfileData
+): Promise<ProfileData> {
+  const apiPayload = await mapProfileDataToApiProfileData(updatedProfile);
+  const updatedData = await apiUpdateProfileData(id, apiPayload);
+
+  return mapApiProfileDataToProfileData(updatedData);
 }
