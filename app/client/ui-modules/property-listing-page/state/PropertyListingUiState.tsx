@@ -34,4 +34,5 @@ export type PropertyListingPageUiState = {
   shouldShowLoadingState: boolean;
   landlords: Landlord[];
   isSubmittingDraft: boolean;
+  currentPropertyId?: string;
 };

@@ -9,6 +9,7 @@ import {
   getFormattedTimeStringFromDate,
 } from "/app/client/library-modules/utils/date-utils";
 import { RootState } from "/app/client/store";
+import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
@@ -45,6 +46,7 @@ const initialState: PropertyListingPageUiState = {
   shouldShowLoadingState: true,
   landlords: [],
   isSubmittingDraft: false,
+  currentPropertyId: undefined,
 };
 
 export const loadPropertyList = createAsyncThunk(
@@ -73,6 +75,9 @@ export const propertyListingSlice = createSlice({
   },
   reducers: {},
   extraReducers: (builder) => {
+    builder.addCase(load.pending, (state) => {
+      state.shouldShowLoadingState = true;
+    });
     builder.addCase(load.fulfilled, (state, action) => {
       state.propertyId = action.payload.propertyId;
       state.propertyLandlordId = action.payload.landlordId;
@@ -138,8 +143,9 @@ export const propertyListingSlice = createSlice({
       });
 
 
-    builder.addCase(submitDraftListingAsync.pending, (state) => {
+    builder.addCase(submitDraftListingAsync.pending, (state, action) => {
       state.isSubmittingDraft = true;
+      state.currentPropertyId = action.meta.arg;
     });
     
     builder.addCase(submitDraftListingAsync.fulfilled, (state, action) => {
@@ -150,12 +156,14 @@ export const propertyListingSlice = createSlice({
       state.shouldDisplayReviewTenantButton = true;
       state.shouldDisplayEditListingButton = false;
       state.isSubmittingDraft = false;
+      state.currentPropertyId = action.meta.arg;
     });
     
     builder.addCase(submitDraftListingAsync.rejected, (state, action) => {
       console.error('Failed to submit draft listing:', action.error.message);
       state.isSubmittingDraft = false;
       alert(`Failed to update listing: ${action.error.message}`);
+      state.currentPropertyId = action.meta.arg;
     });
   },
 });
@@ -169,32 +177,42 @@ function getPropertyPriceDisplayString(price: number): string {
 }
 
 function getListingStatusDisplayString(status: string): string {
-  switch (status.toLowerCase()) {
-    case "draft":
+  const lowerStatus = status.toLowerCase();
+  switch (lowerStatus) {
+    case ListingStatus.DRAFT.toLowerCase():
       return "DRAFT LISTING";
     case "listed":
       return "CURRENT LISTING";
+    case ListingStatus.LISTED.toLowerCase():
+      return "LISTED";
+    case ListingStatus.TENANT_SELECTION.toLowerCase():
+      return "TENANT SELECTION";
+    case ListingStatus.TENANT_APPROVAL.toLowerCase():
+      return "TENANT APPROVAL";
     default:
-      return "Unknown Status";
+      return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : "Unknown Status";
   }
 }
 
 function getPropertyStatusPillVariant(
   status: string
 ): PropertyStatusPillVariant {
-  switch (status.toLowerCase()) {
-    case "vacant":
-      return PropertyStatusPillVariant.VACANT;
-    default:
-      return PropertyStatusPillVariant.VACANT;
+  const lowerStatus = status.toLowerCase();
+  if (lowerStatus === "vacant") {
+    return PropertyStatusPillVariant.VACANT;
   }
+  return PropertyStatusPillVariant.VACANT; 
 }
 
 function getListingStatusPillVariant(status: string): ListingStatusPillVariant {
-  switch (status.toLowerCase()) {
-    case "draft":
+  const lowerStatus = status.toLowerCase();
+  switch (lowerStatus) {
+    case ListingStatus.DRAFT.toLowerCase():
       return ListingStatusPillVariant.DRAFT;
     case "listed":
+    case ListingStatus.LISTED.toLowerCase():
+    case ListingStatus.TENANT_SELECTION.toLowerCase():
+    case ListingStatus.TENANT_APPROVAL.toLowerCase():
       return ListingStatusPillVariant.CURRENT;
     default:
       return ListingStatusPillVariant.DRAFT;

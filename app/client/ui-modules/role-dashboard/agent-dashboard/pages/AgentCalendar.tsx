@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
-import { RoleTopNavbar } from "../../../navigation-bars/TopNavbar";
-import {
-  agentDashboardLinks,
-  settingLinks,
-} from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
 import {
   fetchAgentTasks,
   selectTasks,
@@ -41,14 +35,7 @@ export function AgentCalendar(): React.JSX.Element {
 
   return (
     <div className="min-h-screen">
-      <RoleTopNavbar onSideBarOpened={onSideBarOpened} />
       <div className="flex">
-        <RoleSideNavBar
-          isOpen={isSidebarOpen}
-          onClose={() => onSideBarOpened(false)}
-          dashboardLinks={agentDashboardLinks}
-          settingsLinks={settingLinks}
-        />
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-bold mb-6">Agent Calendar</h1>
           <div className="flex gap-6">

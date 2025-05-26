@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PropertyFeatures } from "./components/PropertyFeatures";
 import { ListingPropertyDetails } from "./components/ListingPropertyDetails";
 import {
@@ -32,8 +32,8 @@ import {
   selectPropertyListingUiState,
   submitDraftListingAsync,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
+import { useSearchParams } from "react-router";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
-import { TopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
 import EditDraftListingModal from "./components/EditDraftListingModal";
 import { EditDraftListingButton } from "./components/EditDraftListingButton";
 import { PropertyForm } from "../property-form-agent/components/PropertyForm";
@@ -53,15 +53,18 @@ export function PropertyListingPage({
   const state: PropertyListingPageUiState = useSelector(
     selectPropertyListingUiState
   );
+  const [searchParams] = useSearchParams();
+  const propertyIdFromUrl = searchParams.get("propertyId");
 
   useEffect(() => {
-    dispatch(load("1"));
+    if (propertyIdFromUrl) {
+      dispatch(load(propertyIdFromUrl));
+    }
   }, []);
 
   if (state.shouldShowLoadingState) {
     return (
       <>
-        <TopNavbar onSideBarOpened={() => {}} />
         <ListingPageContentLoadingSkeleton
           className={twMerge("p-5", className)}
         />
@@ -70,7 +73,6 @@ export function PropertyListingPage({
   } else {
     return (
       <>
-        <TopNavbar onSideBarOpened={() => {}} />
         <ListingPageContent
           streetNumber={state.streetNumber}
           street={state.street}

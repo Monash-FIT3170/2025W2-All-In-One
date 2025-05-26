@@ -11,14 +11,7 @@ import {
   fetchProfileData,
   saveProfileData,
 } from "./state/profile-slice";
-import { RoleTopNavbar } from "../navigation-bars/TopNavbar";
-import { RoleSideNavBar } from "../navigation-bars/side-nav-bars/SideNavbar";
-import {
-  agentDashboardLinks,
-  landlordDashboardLinks,
-  settingLinks,
-  tenantDashboardLinks,
-} from "../navigation-bars/side-nav-bars/side-nav-link-definitions";
+
 import { EditableAvatar } from "./components/EditableAvatar";
 import { Button } from "../theming-shadcn/Button";
 import { PersonalInfoCard } from "./components/PersonalInfoCard";
@@ -30,8 +23,6 @@ import { uploadFileHandler } from "../../library-modules/apis/azure/blob-api";
 import { Role } from "/app/shared/user-role-identifier";
 
 export function ProfilePage(): React.JSX.Element {
-  const [isSidebarOpen, onSideBarOpened] = React.useState(false);
-
   const dispatch = useAppDispatch();
   const profile = useAppSelector(selectProfileData);
   const isEditing = useAppSelector(selectIsEditing);
@@ -83,20 +74,6 @@ export function ProfilePage(): React.JSX.Element {
     }
   };
 
-  const roleLinks = (role: Role | undefined) => {
-    switch (role) {
-      case Role.AGENT:
-        return agentDashboardLinks;
-      case Role.LANDLORD:
-        return landlordDashboardLinks;
-      case Role.TENANT:
-        return tenantDashboardLinks;
-      // fallback case
-      default:
-        return agentDashboardLinks;
-    }
-  };
-
   // used for printing role out on screen
   const capitalize_first_letter = (str?: string) =>
     str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "";
@@ -110,16 +87,7 @@ export function ProfilePage(): React.JSX.Element {
 
   return (
     <div className="min-h-screen">
-      <RoleTopNavbar onSideBarOpened={onSideBarOpened} />{" "}
-      {/*TODO: add switch statements to change nav bars based on users role i.e agent  */}
       <div className="flex">
-        <RoleSideNavBar
-          isOpen={isSidebarOpen}
-          onClose={() => onSideBarOpened(false)}
-          dashboardLinks={roleLinks(userRole)}
-          settingsLinks={settingLinks}
-        />
-
         <div className="max-w-screen-xl mx-auto px-6 sm:px-8">
           <div className="flex justify-between items-center">
             <div className="flex items-start gap-4">
