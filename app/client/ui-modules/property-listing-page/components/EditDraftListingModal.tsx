@@ -10,9 +10,8 @@ import {
 } from "../../theming/components/ThemedButton";
 import React from "react";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
-import { getPropertyStatusId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
-import { apiUpdateProperty } from "/app/client/library-modules/apis/property/property-api";
+import { apiUpdatePropertyData } from "/app/client/library-modules/apis/property/property-api";
 import { useAppDispatch } from "/app/client/store";
 import { load } from "../state/reducers/property-listing-slice";
 import { PropertyFormMode } from "../../property-form-agent/enum/PropertyFormMode";
@@ -48,7 +47,6 @@ export default function EditDraftListingModal(
       suburb: "Clayton",
       province: values.state,
       postcode: values.postal_code,
-      propertyStatus: PropertyStatus.VACANT,
       description: values.description,
       summaryDescription:
         "Modern apartment with spacious living areas and a beautiful garden.",
@@ -59,12 +57,10 @@ export default function EditDraftListingModal(
       type: values.property_type,
       area: values.space,
       pricePerMonth: 0, // TODO: Replace with actual value if available
-      agentId: "", // TODO: Replace with actual value if available
       landlordId: values.landlord,
-      tenantId: "", // TODO: Replace with actual value if available
     };
 
-    const prop = await apiUpdateProperty(updatedProperty);
+    const prop = await apiUpdatePropertyData(updatedProperty);
 
     // Refresh the page
     dispatch(load(props.propertyId));

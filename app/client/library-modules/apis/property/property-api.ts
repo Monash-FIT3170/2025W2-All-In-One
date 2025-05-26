@@ -18,6 +18,6 @@ export async function apiInsertProperty(property: PropertyInsertData): Promise<s
   return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_INSERT, property);
 }
 
-export async function apiUpdateProperty(updatedProperty: Property): Promise<string> {
-  return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_UPDATE, updatedProperty);
+export async function apiUpdatePropertyData<T>(updatedProperty: T): Promise<string> {
+  return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_DATA_UPDATE, updatedProperty);
 }

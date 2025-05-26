@@ -206,7 +206,7 @@ const propertyInsertMethod = {
 }
 }
 
-async function updateProperty(property: ApiProperty): Promise<void> {
+async function updatePropertyData(property: ApiProperty): Promise<void> {
   await PropertyCollection.updateAsync(property.propertyId, {
     $set: {
       streetnumber: property.streetnumber,
@@ -228,7 +228,7 @@ async function updateProperty(property: ApiProperty): Promise<void> {
 }
 
 Meteor.methods({
-  [MeteorMethodIdentifier.PROPERTY_UPDATE]: updateProperty,
+  [MeteorMethodIdentifier.PROPERTY_DATA_UPDATE]: updatePropertyData,
 });
 
 
@@ -237,5 +237,5 @@ Meteor.methods({
   ...propertyGetCountMethod,
   ...propertyGetListMethod,
   ...propertyInsertMethod,
-  ...updateProperty,
+  ...updatePropertyData,
 });
