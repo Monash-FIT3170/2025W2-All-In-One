@@ -17,8 +17,6 @@ import {
   selectProperties,
   selectTasks,
 } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
-import { TaskStatus } from "/app/shared/task-status-identifier";
-
 interface TopNavbarProps {
   onSideBarOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -56,15 +54,12 @@ export function TopNavbar({
 export function RoleTopNavbar({
   onSideBarOpened,
 }: TopNavbarProps): React.JSX.Element {
-  const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-  const allTasks = useAppSelector(selectTasks);
   const firstName = currentUser?.firstName || "Unknown";
   const lastName = currentUser?.lastName || "User";
   const [notificationOpen, setNotificationOpen] = useState(false);
-
-  // Filter tasks that are not completed
-  const pendingTasks = allTasks?.filter(task => task.status !== TaskStatus.COMPLETED) ?? [];
+  const tasks = useAppSelector(selectTasks);
+  const dispatch = useAppDispatch();
 
   const getUserRole = () => {
     if (!currentUser) return "Guest";
@@ -82,10 +77,10 @@ export function RoleTopNavbar({
   };
 
   useEffect(() => {
-    if (currentUser?.userAccountId) {
-      dispatch(fetchAgentTasks(currentUser.userAccountId));
-    }
-  }, [dispatch, currentUser?.userAccountId]);
+      if (currentUser?.userAccountId) {
+        dispatch(fetchAgentTasks(currentUser.userAccountId));
+      }
+    }, [dispatch, currentUser?.userAccountId]);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
@@ -106,14 +101,14 @@ export function RoleTopNavbar({
         <div className="flex items-center gap-4">
           <div className="ml-2">
             <BellIcon
-              hasNotifications={pendingTasks.length > 0}
+              hasNotifications={tasks.length > 0}
               className="text-gray-600"
               onClick={handleBellClick}
             />
             <NotificationBoard
               open={notificationOpen}
               onClose={() => setNotificationOpen(false)}
-              tasks={pendingTasks}
+              tasks={tasks}
             />
           </div>
           <ProfileFooter firstName={firstName} lastName={lastName} title={getUserRole()} />
