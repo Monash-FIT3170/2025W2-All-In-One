@@ -29,6 +29,7 @@ import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/T
 import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
 import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
 
+
 Meteor.startup(initialiseReactRoot);
 
 function initialiseReactRoot(): void {

@@ -3,6 +3,7 @@ import { ListingStatusPillVariant } from "/app/client/ui-modules/property-listin
 import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingSummary";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import { getPropertyWithListingDataUseCase } from "/app/client/library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
+import { submitDraftListingUseCase } from "/app/client/library-modules/use-cases/property-listing/SubmitDraftListingUseCase";
 import {
   getFormattedDateStringFromDate,
   getFormattedTimeStringFromDate,
@@ -40,8 +41,11 @@ const initialState: PropertyListingPageUiState = {
   listingStatusPillVariant: ListingStatusPillVariant.DRAFT,
   shouldDisplayListingStatus: true,
   shouldDisplaySubmitDraftButton: true,
+  shouldDisplayReviewTenantButton: false,
+  shouldDisplayEditListingButton: true,
   shouldShowLoadingState: true,
   landlords: [],
+  isSubmittingDraft: false,
   currentPropertyId: undefined,
 };
 
@@ -50,6 +54,14 @@ export const loadPropertyList = createAsyncThunk(
   async (agentId: string) => {
     const properties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, agentId) as ApiProperty[];
     return properties;
+  }
+);
+
+export const submitDraftListingAsync = createAsyncThunk(
+  "propertyListing/submitDraftListing",
+  async (propertyId: string) => {
+    const submitDraftListing = await submitDraftListingUseCase(propertyId);
+    return submitDraftListing;
   }
 );
 
@@ -69,44 +81,52 @@ export const propertyListingSlice = createSlice({
     builder.addCase(load.fulfilled, (state, action) => {
       state.propertyId = action.payload.propertyId;
       state.propertyLandlordId = action.payload.landlordId;
-        state.streetNumber = action.payload.streetnumber;
-        state.street = action.payload.streetname;
-        state.suburb = action.payload.suburb;
-        state.province = action.payload.province;
-        state.postcode = action.payload.postcode;
-        state.summaryDescription = action.payload.summaryDescription;
+      state.propertyId = action.payload.propertyId;
+      state.streetNumber = action.payload.streetnumber;
+      state.street = action.payload.streetname;
+      state.suburb = action.payload.suburb;
+      state.province = action.payload.province;
+      state.postcode = action.payload.postcode;
+      state.summaryDescription = action.payload.summaryDescription;
       state.areaValue = action.payload.area ?? 0;
-        state.propertyStatusText = action.payload.propertyStatus;
-        state.propertyStatusPillVariant = getPropertyStatusPillVariant(
-          action.payload.propertyStatus
-        );
-        state.propertyDescription = action.payload.description;
-        state.propertyFeatures = action.payload.features;
-        state.propertyType = action.payload.type;
-        state.propertyLandArea = action.payload.area
-          ? getPropertyAreaDisplayString(action.payload.area)
-          : "N/A";
-        state.propertyBathrooms = action.payload.bathrooms.toString();
-        state.propertyParkingSpaces = action.payload.parking.toString();
-        state.propertyBedrooms = action.payload.bedrooms.toString();
-        state.propertyPrice = getPropertyPriceDisplayString(
-          action.payload.pricePerMonth
-        );
-        state.inspectionBookingUiStateList = action.payload.inspections.map(
-          (inspection) => ({
-            date: getFormattedDateStringFromDate(inspection.start_time),
-            startingTime: getFormattedTimeStringFromDate(inspection.start_time),
-            endingTime: getFormattedTimeStringFromDate(inspection.end_time),
-          })
-        );
-        state.listingImageUrls = action.payload.image_urls;
-        state.listingStatusText = getListingStatusDisplayString(
-          action.payload.listing_status
-        );
-        state.listingStatusPillVariant = getListingStatusPillVariant(
-          action.payload.listing_status
-        );
-        state.shouldShowLoadingState = false;
+      state.propertyStatusText = action.payload.propertyStatus;
+      state.propertyStatusPillVariant = getPropertyStatusPillVariant(
+        action.payload.propertyStatus
+      );
+      state.propertyDescription = action.payload.description;
+      state.propertyFeatures = action.payload.features;
+      state.propertyType = action.payload.type;
+      state.propertyLandArea = action.payload.area
+        ? getPropertyAreaDisplayString(action.payload.area)
+        : "N/A";
+      state.propertyBathrooms = action.payload.bathrooms.toString();
+      state.propertyParkingSpaces = action.payload.parking.toString();
+      state.propertyBedrooms = action.payload.bedrooms.toString();
+      state.propertyPrice = getPropertyPriceDisplayString(
+        action.payload.pricePerMonth
+      );
+      state.inspectionBookingUiStateList = action.payload.inspections.map(
+        (inspection) => ({
+          date: getFormattedDateStringFromDate(inspection.start_time),
+          startingTime: getFormattedTimeStringFromDate(inspection.start_time),
+          endingTime: getFormattedTimeStringFromDate(inspection.end_time),
+        })
+      );
+      state.listingImageUrls = action.payload.image_urls;
+      state.listingStatusText = getListingStatusDisplayString(
+        action.payload.listing_status
+      );
+      state.listingStatusPillVariant = getListingStatusPillVariant(
+        action.payload.listing_status
+      );
+        
+      // Set button visibility based on listing status
+      const isDraft = action.payload.listing_status.toLowerCase() === "draft";
+      state.shouldDisplaySubmitDraftButton = isDraft;
+      state.shouldDisplayReviewTenantButton = !isDraft;
+      state.shouldDisplayEditListingButton = isDraft;
+      
+      state.shouldShowLoadingState = false;
       state.landlords = action.payload.landlords;
       })
       .addCase(loadPropertyList.pending, (state) => {
@@ -120,7 +140,30 @@ export const propertyListingSlice = createSlice({
       .addCase(loadPropertyList.rejected, (state, action) => {
         state.propertyListLoading = false;
         state.propertyListError = action.error.message || "Failed to load properties";
-        state.currentPropertyId = action.meta.arg; 
+      });
+
+
+    builder.addCase(submitDraftListingAsync.pending, (state, action) => {
+      state.isSubmittingDraft = true;
+      state.currentPropertyId = action.meta.arg;
+    });
+    
+    builder.addCase(submitDraftListingAsync.fulfilled, (state, action) => {
+      console.log('Draft listing submitted successfully:', action.payload);
+      state.listingStatusText = getListingStatusDisplayString("listed");
+      state.listingStatusPillVariant = getListingStatusPillVariant("listed");
+      state.shouldDisplaySubmitDraftButton = false;
+      state.shouldDisplayReviewTenantButton = true;
+      state.shouldDisplayEditListingButton = false;
+      state.isSubmittingDraft = false;
+      state.currentPropertyId = action.meta.arg;
+    });
+    
+    builder.addCase(submitDraftListingAsync.rejected, (state, action) => {
+      console.error('Failed to submit draft listing:', action.error.message);
+      state.isSubmittingDraft = false;
+      alert(`Failed to update listing: ${action.error.message}`);
+      state.currentPropertyId = action.meta.arg;
     });
   },
 });
@@ -138,6 +181,8 @@ function getListingStatusDisplayString(status: string): string {
   switch (lowerStatus) {
     case ListingStatus.DRAFT.toLowerCase():
       return "DRAFT LISTING";
+    case "listed":
+      return "CURRENT LISTING";
     case ListingStatus.LISTED.toLowerCase():
       return "LISTED";
     case ListingStatus.TENANT_SELECTION.toLowerCase():
@@ -164,6 +209,7 @@ function getListingStatusPillVariant(status: string): ListingStatusPillVariant {
   switch (lowerStatus) {
     case ListingStatus.DRAFT.toLowerCase():
       return ListingStatusPillVariant.DRAFT;
+    case "listed":
     case ListingStatus.LISTED.toLowerCase():
     case ListingStatus.TENANT_SELECTION.toLowerCase():
     case ListingStatus.TENANT_APPROVAL.toLowerCase():
@@ -183,6 +229,7 @@ export const load = createAsyncThunk(
     return { ...propertyWithListingData, landlords };
   }
 );
+
 
 export const selectPropertyListingUiState = (state: RootState) =>
   state.propertyListing;

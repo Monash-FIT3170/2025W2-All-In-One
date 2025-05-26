@@ -26,5 +26,6 @@
   LANDLORD_GET = "landlords.getOne",
   LANDLORD_GET_ALL = "landlords.getAll",
   PROPERTY_STATUS_GET = "propertyStatus.getOne",
+  LISTING_SUBMIT_DRAFT = "listing.submitDraft",
   PROPERTY_DATA_UPDATE = "property.updateData"
 }

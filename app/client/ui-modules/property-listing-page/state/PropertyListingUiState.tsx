@@ -29,7 +29,10 @@ export type PropertyListingPageUiState = {
   listingStatusPillVariant: ListingStatusPillVariant;
   shouldDisplayListingStatus: boolean;
   shouldDisplaySubmitDraftButton: boolean;
+  shouldDisplayReviewTenantButton: boolean;
+  shouldDisplayEditListingButton: boolean;
   shouldShowLoadingState: boolean;
   landlords: Landlord[];
+  isSubmittingDraft: boolean;
   currentPropertyId?: string;
 };
