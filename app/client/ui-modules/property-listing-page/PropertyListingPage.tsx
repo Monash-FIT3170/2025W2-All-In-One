@@ -24,7 +24,7 @@ import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonI
 import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
 import { ReviewTenantButton } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantButton";
-import { ReviewTenantModal } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantModal";
+import { ReviewTenantModal } from "../review-tenant-modal/ReviewTenantModal";
 import { useAppDispatch } from "/app/client/store";
 import { useSelector } from "react-redux";
 import {
@@ -407,11 +407,6 @@ function BottomBar({
         {shouldDisplayReviewTenantButton && (
           <ReviewTenantButton onClick={onReviewTenant} />
         )}
-      </div>
-
-      {/* For tenant rental agreement*/}
-      <div className="flex">
-        {/* Space for potential middle buttons */}
       </div>
 
       {/* Right side - for approve contract button*/}
