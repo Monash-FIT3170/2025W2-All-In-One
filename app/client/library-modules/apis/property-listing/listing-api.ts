@@ -17,3 +17,7 @@ export async function apiInsertPropertyListing(propertyId: string,imageUrls: str
   const insertedListing: string = await Meteor.callAsync(MeteorMethodIdentifier.LISTING_INSERT_PROPERTY, data);
   return insertedListing
 }
+
+export async function apiSubmitDraftListing(propertyId: string): Promise<void> {
+  await Meteor.callAsync(MeteorMethodIdentifier.LISTING_SUBMIT_DRAFT, propertyId);
+}
