@@ -16,6 +16,7 @@ import { useAppDispatch } from "/app/client/store";
 import { load } from "../state/reducers/property-listing-slice";
 import { PropertyFormMode } from "../../property-form-agent/enum/PropertyFormMode";
 import { PropertyForm } from "../../property-form-agent/components/PropertyForm";
+import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
 
 interface EditDraftListingModalProps {
   toggle: () => void;
@@ -40,7 +41,7 @@ export default function EditDraftListingModal(
 
     const addressParts = values.address.trim().split(" ");
 
-    const updatedProperty = {
+    const updatedProperty: PropertyUpdateData = {
       propertyId: props.propertyId,
       streetnumber: addressParts[0],
       streetname: addressParts.slice(1).join(" "),
