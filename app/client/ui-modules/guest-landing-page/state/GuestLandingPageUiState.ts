@@ -4,4 +4,6 @@ export type GuestLandingPageUiState = {
   isLoading: boolean;
   properties: PropertyWithListingData[];
   error: string | null;
+  isSidebarOpen: boolean;      
+  visibleCount: number;       
 };
