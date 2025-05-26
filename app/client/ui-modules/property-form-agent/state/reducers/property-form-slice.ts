@@ -3,9 +3,12 @@ import { RootState } from "/app/client/store";
 import { PropertyFormPageUiState } from "../PropertyFormPageUIState";
 import { getAllLandlords } from "/app/client/library-modules/domain-models/user/role-repositories/landlord-repository";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
+import { PropertyFeatureDocument } from "/app/server/database/property/models/PropertyFeatureDocument";
+import { getAllPropertyFeatures } from "/app/client/library-modules/domain-models/property/repositories/feature-respository";
 
 const initialState: PropertyFormPageUiState = {
-  landlords: []
+  landlords: [],
+  features: [],
 };
 
 export const propertyFormSlice = createSlice({
@@ -14,7 +17,8 @@ export const propertyFormSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(load.fulfilled, (state, action) => {
-      state.landlords = action.payload;
+      state.landlords = action.payload.landlords;
+      state.features = action.payload.features;
     });
   },
 });
@@ -23,7 +27,8 @@ export const load = createAsyncThunk(
   "propertyForm/load",
   async () => {
     const landlords: Landlord[] = await getAllLandlords()
-    return landlords;
+    const features: PropertyFeatureDocument[] = await getAllPropertyFeatures();
+    return {landlords, features};
   }
 );
 

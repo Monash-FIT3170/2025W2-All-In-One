@@ -27,10 +27,7 @@ export function PropertyFormPage() {
   const state: PropertyFormPageUiState = useSelector(
     selectPropertyFormUiState
   );
-
-  useEffect(() => {
-    dispatch(load());
-  }, []);
+  const features = state.features;
 
   const onClick = () => {
     console.log("Attempting to return to previous route.");
@@ -67,6 +64,10 @@ export function PropertyFormPage() {
     // console.log(await apiInsertPropertyListing("999",imageUrls)) <- Insert the property_id in place of 999
   };
   
+  useEffect(() => {
+    dispatch(load());
+  }, []);
+
   return (
     <div className="mt-6 ml-10">
       <div className="flex flex-col items-start">
@@ -86,7 +87,7 @@ export function PropertyFormPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-6 py-10 rounded-md space-y-10">
-          <PropertyForm onSubmit={handleSubmit} form={form} landlords={state.landlords} />
+          <PropertyForm onSubmit={handleSubmit} form={form} landlords={state.landlords} features={features} />
       </div>
     </div>
   );

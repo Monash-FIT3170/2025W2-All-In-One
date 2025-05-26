@@ -17,22 +17,17 @@ import { getAllPropertyFeatures } from "/app/client/library-modules/domain-model
 
 export default function FormPropertyDetails({
   form,
+  features,
 }: {
   form: UseFormReturn<FormSchemaType>;
+  features: { _id: string; name: string }[];
 }) {
-  const [featureOptions, setFeatureOptions] = useState<
-    { value: string; label: string }[]
-  >([]);
-
-  useEffect(() => {
-    const fetchFeatures = async () => {
-      const features = await getAllPropertyFeatures();
-      const mapped = features.map((feature) => ({ value: feature._id, label: feature.name }));
-      setFeatureOptions(mapped);
-    };
-    fetchFeatures();
-  }, []);
+  const featureOptions = (features ?? []).map((feature) => ({
+    value: feature._id,
+    label: feature.name,
+  }));
   
+
   return (
     <div className="border border-(--divider-color) w-full p-7 rounded-md mb-3">
       <FormHeading

@@ -17,16 +17,18 @@ export function PropertyForm({
   form,
   onSubmit,
   landlords,
+  features,
 }: {
   form: UseFormReturn<FormSchemaType>;
   onSubmit: (values: FormSchemaType) => void;
   landlords: Landlord[];
+  features: { _id: string; name: string }[];
 }) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormBasicInformation form={form} landlords={landlords}/>
-        <FormPropertyDetails form={form} />
+        <FormPropertyDetails form={form} features={features} />
         <FormPropertyImages form={form} />
         <FormListingOptions form={form} />
         <div className="flex justify-end mt-5">
