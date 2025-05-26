@@ -23,7 +23,7 @@ export const fetchPropertiesAndListings = createAsyncThunk<
 
 
     const propertyDataPromises = listedListings.map((listing) =>
-      getPropertyWithListingDataUseCase(listing.property_id));
+      getPropertyWithListingDataUseCase(listing.apiListing.property_id));
 
     const allResults = await Promise.all(propertyDataPromises);
 
@@ -53,10 +53,5 @@ export const guestLandingPageSlice = createSlice({
 });
 
 export const selectGuestLandingPageUiState = (state: RootState) => state.guestLandingPage;
-
-
-export const selectGuestLandingPageProperties = (state: RootState): PropertyWithListingData[] => {
-  return state.guestLandingPage.properties;
-};
 
 export default guestLandingPageSlice.reducer;
