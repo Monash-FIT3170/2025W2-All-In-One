@@ -5,7 +5,7 @@ import { PropManagerLogoText } from "../theming/components/logo/PropManagerLogoT
 import { Button } from "../theming-shadcn/Button";
 import { BellIcon } from "../theming/icons/BellIcon";
 import { SideBarSliderIcon } from "../theming/icons/SideBarSlider";
-import { useAppSelector } from "/app/client/store";
+import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { ProfileFooter } from "../navigation-bars/side-nav-bars/components/ProfileFooter";
 import { Meteor } from 'meteor/meteor';
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
@@ -17,6 +17,8 @@ import {
   selectProperties,
   selectTasks,
 } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
+import { TaskStatus } from "/app/shared/task-status-identifier";
+
 interface TopNavbarProps {
   onSideBarOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -54,10 +56,15 @@ export function TopNavbar({
 export function RoleTopNavbar({
   onSideBarOpened,
 }: TopNavbarProps): React.JSX.Element {
+  const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const allTasks = useAppSelector(selectTasks);
   const firstName = currentUser?.firstName || "Unknown";
   const lastName = currentUser?.lastName || "User";
   const [notificationOpen, setNotificationOpen] = useState(false);
+
+  // Filter tasks that are not completed
+  const pendingTasks = allTasks?.filter(task => task.status !== TaskStatus.COMPLETED) ?? [];
 
   const getUserRole = () => {
     if (!currentUser) return "Guest";
@@ -68,17 +75,17 @@ export function RoleTopNavbar({
   };
 
   const handleBellClick = async () => {
-    if (!notificationOpen & currentUser?.userAccountId) {
+    if (!notificationOpen && currentUser?.userAccountId) {
       dispatch(fetchAgentTasks(currentUser.userAccountId));
     }
     setNotificationOpen((prev) => !prev);
   };
 
   useEffect(() => {
-      if (currentUser?.userAccountId) {
-        dispatch(fetchAgentTasks(currentUser.userAccountId));
-      }
-    }, [dispatch, currentUser?.userAccountId]);
+    if (currentUser?.userAccountId) {
+      dispatch(fetchAgentTasks(currentUser.userAccountId));
+    }
+  }, [dispatch, currentUser?.userAccountId]);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
@@ -99,9 +106,14 @@ export function RoleTopNavbar({
         <div className="flex items-center gap-4">
           <div className="ml-2">
             <BellIcon
-              hasNotifications={true}
+              hasNotifications={pendingTasks.length > 0}
               className="text-gray-600"
-              onClick={() => console.log("Notification clicked")}
+              onClick={handleBellClick}
+            />
+            <NotificationBoard
+              open={notificationOpen}
+              onClose={() => setNotificationOpen(false)}
+              tasks={pendingTasks}
             />
           </div>
           <ProfileFooter firstName={firstName} lastName={lastName} title={getUserRole()} />
