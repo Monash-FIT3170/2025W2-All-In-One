@@ -39,11 +39,11 @@ const multiSelectVariants = cva(
     variants: {
       variant: {
         default:
-          "border-foreground/10 text-foreground bg-card hover:bg-card/80",
+          "bg-card hover:bg-card/80",
         secondary:
-          "border-foreground/10 bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "hover:bg-secondary/80",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+          "hover:bg-destructive/80",
         inverted: "inverted",
       },
     },
@@ -228,44 +228,44 @@ export const MultiSelect = React.forwardRef<
                           <IconComponent className="h-4 w-4 mr-2" />
                         )}
                         {option?.label}
-                        <XCircle
+                        {/* <XCircle
                           className="ml-2 h-4 w-4 cursor-pointer pointer-events-auto"
                           onClick={(event) => {
                             event.stopPropagation();
                             toggleOption(value);
                           }}
-                        />
+                        /> */}
                       </Badge>
                     );
                   })}
                   {selectedValues.length > maxCount && (
                     <Badge
                       className={twMerge(
-                        "bg-transparent text-black border-foreground/1 hover:bg-transparent",
+                        "border border-black text-black",
                         isAnimating ? "animate-bounce" : "",
                         multiSelectVariants({ variant })
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >
                       {`+ ${selectedValues.length - maxCount} more`}
-                      <XCircle
-                        className="ml-2 h-4 w-4 cursor-pointer"
+                      {/* <XCircle
+                        className="ml-2 h-4 w-4 cursor-pointer pointer-events-auto"
                         onClick={(event) => {
                           event.stopPropagation();
                           clearExtraOptions();
                         }}
-                      />
+                      /> */}
                     </Badge>
                   )}
                 </div>
                 <div className="flex items-center justify-between">
-                  <XIcon
+                  {/* <XIcon
                     className="h-4 mx-2 cursor-pointer text-black"
                     onClick={(event) => {
                       event.stopPropagation();
                       handleClear();
                     }}
-                  />
+                  /> */}
                   <Separator
                     orientation="vertical"
                     className="flex min-h-6 h-full"
