@@ -94,19 +94,19 @@ function TenantDashboard() {
           />
           <div className="flex-1 p-6">
             <DashboardCards rentAmount={propertyDetails?.pricePerMonth} />
-            <div className=" grid grid-cols-1 md:grid-cols-3 gap-6 px-6">
+            <div className=" grid grid-cols-1 md:grid-cols-2 gap-6 px-6">
               <div className="mt-5">
                 <UpcomingTasks tasks={tasks ?? []} />
               </div>
 
-              <div className="mt-5">
+              {/* <div className="mt-5">
                 <PaymentHistory
                   payments={dummyPayments}
                   onViewAllClick={() =>
                     console.log("Navigate to payment history page")
                   }
                 />
-              </div>
+              </div> */}
 
               <div className="mt-5">
                 {propertyLoading ? (
