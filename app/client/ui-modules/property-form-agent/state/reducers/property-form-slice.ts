@@ -9,6 +9,7 @@ import { getAllPropertyFeatures } from "/app/client/library-modules/domain-model
 const initialState: PropertyFormPageUiState = {
   landlords: [],
   features: [],
+  featureOptions: [],
 };
 
 export const propertyFormSlice = createSlice({
@@ -19,6 +20,10 @@ export const propertyFormSlice = createSlice({
     builder.addCase(load.fulfilled, (state, action) => {
       state.landlords = action.payload.landlords;
       state.features = action.payload.features;
+      state.featureOptions = action.payload.features.map((feature) => ({
+        value: feature._id,
+        label: feature.name,
+      }));
     });
   },
 });
