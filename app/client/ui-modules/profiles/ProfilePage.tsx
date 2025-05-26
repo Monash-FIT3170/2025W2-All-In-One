@@ -32,10 +32,6 @@ import { VehicleInfoCard } from "./components/VehicleInfoCard";
 import { current } from "@reduxjs/toolkit";
 import { uploadFileHandler } from "../../library-modules/apis/azure/blob-api";
 import { Role } from "/app/shared/user-role-identifier";
-import {
-  getProfileDataById,
-  setProfileDataById,
-} from "../../library-modules/domain-models/user/role-repositories/profile-data-repository";
 
 export function ProfilePage(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
@@ -81,9 +77,15 @@ export function ProfilePage(): React.JSX.Element {
 
   // in handle save, we can add validation for fields and cancel it if fields incorrect
   const handleSave = () => {
-   if (currentUser?.profileDataId) {
-  dispatch(fetchProfileData(currentUser.profileDataId));
-}
+    if (currentUser?.profileDataId) {
+      dispatch(
+        saveProfileData({
+          id: currentUser.profileDataId,
+          profile: localProfile,
+        })
+      );
+    }
+  };
   const roleTopNavbar = (role: Role | undefined) => {
     switch (role) {
       case Role.AGENT:
