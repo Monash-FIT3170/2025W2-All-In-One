@@ -79,7 +79,7 @@ export function PropertyFormPage() {
     const imageUrls: string[] = uploadReturnValues.success.map((uploadResult) => {return uploadResult.url})
     await apiInsertPropertyListing(propertyId,imageUrls)
 
-    navigator(NavigationPath.PropertyListing, { state: { propertyId } });
+    navigator(`${NavigationPath.PropertyListing}?propertyId=${propertyId}`)
   };
   
   return (
