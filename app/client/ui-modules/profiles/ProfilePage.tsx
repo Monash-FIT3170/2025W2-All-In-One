@@ -21,6 +21,7 @@ import { VehicleInfoCard } from "./components/VehicleInfoCard";
 import { current } from "@reduxjs/toolkit";
 import { uploadFileHandler } from "../../library-modules/apis/azure/blob-api";
 import { Role } from "/app/shared/user-role-identifier";
+import { setCurrentProfileData } from "../user-authentication/state/reducers/current-user-slice";
 
 export function ProfilePage(): React.JSX.Element {
   const dispatch = useAppDispatch();
@@ -63,14 +64,15 @@ export function ProfilePage(): React.JSX.Element {
   }, [isEditing]);
 
   // in handle save, we can add validation for fields and cancel it if fields incorrect
-  const handleSave = () => {
+  const handleSave = async () => {
     if (currentUser?.profileDataId) {
-      dispatch(
+      const updated = await dispatch(
         saveProfileData({
           id: currentUser.profileDataId,
           profile: localProfile,
         })
-      );
+      ).unwrap();
+      dispatch(setCurrentProfileData(updated));
     }
   };
 
