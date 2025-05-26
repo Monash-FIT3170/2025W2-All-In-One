@@ -14,6 +14,7 @@ const tenantInsertMethod = {
   ): Promise<string> => {
     const newTenant: Mongo.OptionalId<TenantDocument> = {
       ...data,
+      task_ids: data.task_ids || [], // Ensure task_ids is initialized
       createdAt: new Date(),
     };
 

@@ -11,14 +11,19 @@ import { RootState } from "/app/client/store";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
+import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
+import { getAllLandlords } from "/app/client/library-modules/domain-models/user/role-repositories/landlord-repository";
 
 const initialState: PropertyListingPageUiState = {
+  propertyId: "",
+  propertyLandlordId: "",
   streetNumber: "",
   street: "",
   suburb: "",
   province: "",
   postcode: "",
   summaryDescription: "",
+  areaValue: 0,
   propertyStatusText: "",
   propertyStatusPillVariant: PropertyStatusPillVariant.VACANT,
   propertyDescription: "",
@@ -36,6 +41,7 @@ const initialState: PropertyListingPageUiState = {
   shouldDisplayListingStatus: true,
   shouldDisplaySubmitDraftButton: true,
   shouldShowLoadingState: true,
+  landlords: [],
   currentPropertyId: undefined,
 };
 
@@ -61,12 +67,15 @@ export const propertyListingSlice = createSlice({
       state.shouldShowLoadingState = true;
     });
     builder.addCase(load.fulfilled, (state, action) => {
+      state.propertyId = action.payload.propertyId;
+      state.propertyLandlordId = action.payload.landlordId;
         state.streetNumber = action.payload.streetnumber;
         state.street = action.payload.streetname;
         state.suburb = action.payload.suburb;
         state.province = action.payload.province;
         state.postcode = action.payload.postcode;
         state.summaryDescription = action.payload.summaryDescription;
+      state.areaValue = action.payload.area ?? 0;
         state.propertyStatusText = action.payload.propertyStatus;
         state.propertyStatusPillVariant = getPropertyStatusPillVariant(
           action.payload.propertyStatus
@@ -98,6 +107,7 @@ export const propertyListingSlice = createSlice({
           action.payload.listing_status
         );
         state.shouldShowLoadingState = false;
+      state.landlords = action.payload.landlords;
       })
       .addCase(loadPropertyList.pending, (state) => {
         state.propertyListLoading = true;
@@ -169,7 +179,8 @@ export const load = createAsyncThunk(
     const propertyWithListingData = await getPropertyWithListingDataUseCase(
       propertyId
     );
-    return propertyWithListingData;
+    const landlords: Landlord[] = await getAllLandlords();
+    return { ...propertyWithListingData, landlords };
   }
 );
 

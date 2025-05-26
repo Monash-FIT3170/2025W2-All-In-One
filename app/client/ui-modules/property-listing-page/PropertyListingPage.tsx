@@ -31,9 +31,17 @@ import {
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { useSearchParams } from "react-router";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
-import { RoleTopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
+import { TopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
+import EditDraftListingModal from "./components/EditDraftListingModal";
+import { EditDraftListingButton } from "./components/EditDraftListingButton";
+import { PropertyForm } from "../property-form-agent/components/PropertyForm";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  formSchema,
+  FormSchemaType,
+} from "/app/client/ui-modules/property-form-agent/components/FormSchema";
 
-// TODO: To re-add edit draft listing modal
 export function PropertyListingPage({
   className = "",
 }: {
@@ -55,14 +63,16 @@ export function PropertyListingPage({
   if (state.shouldShowLoadingState) {
     return (
       <>
-        <RoleTopNavbar onSideBarOpened={() => {}} />
-        <ListingPageContentLoadingSkeleton className={twMerge("p-5", className)} />
+        <TopNavbar onSideBarOpened={() => {}} />
+        <ListingPageContentLoadingSkeleton
+          className={twMerge("p-5", className)}
+        />
       </>
     );
   } else {
     return (
       <>
-        <RoleTopNavbar onSideBarOpened={() => {}} />
+        <TopNavbar onSideBarOpened={() => {}} />
         <ListingPageContent
           streetNumber={state.streetNumber}
           street={state.street}
@@ -367,7 +377,8 @@ function BottomBar({
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={twMerge("flex", className)}>
+    <div className={twMerge("flex items-center gap-2", className)}>
+      <ListingModalEditor />
       {shouldDisplaySubmitDraftButton && (
         <SubmitDraftListingButton
           onClick={onSubmitDraftListing}
@@ -375,5 +386,48 @@ function BottomBar({
         />
       )}
     </div>
+  );
+}
+
+function ListingModalEditor({
+  className = "",
+}: {
+  className?: string;
+}): React.JSX.Element {
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
+  const state: PropertyListingPageUiState = useSelector(
+    selectPropertyListingUiState
+  );
+
+  const listingInfo: FormSchemaType = {
+    landlord: state.propertyLandlordId,
+    property_type: state.propertyType.toLowerCase(), // Ensure property type matches dropdown options (house or apartment)
+    address: `${state.streetNumber} ${state.street}`,
+    city: state.suburb,
+    state: state.province,
+    postal_code: state.postcode,
+    apartment_number: "",
+    bedroom_number: Number(state.propertyBedrooms),
+    bathroom_number: Number(state.propertyBathrooms),
+    space:  Number(state.areaValue),
+    description: state.propertyDescription,
+    images: [],
+    available_dates: new Date(),
+    lease_term: "12_months",
+    show_contact_boolean: true,
+  };
+
+  return (
+    <>
+      <EditDraftListingButton onClick={toggleModal} />
+      <EditDraftListingModal
+        isOpen={isModalOpen}
+        toggle={toggleModal}
+        propertyForm={listingInfo}
+        landlords={state.landlords}
+        propertyId={state.propertyId}
+      />
+    </>
   );
 }

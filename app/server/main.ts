@@ -41,6 +41,7 @@ Meteor.startup(async () => {
   await tempSeedUserAndRoleData();
   await tempSeedPropertyData();
   await tempSeedTaskData();
+  // await tempSeedPropertyStatusData();
   await permSeedListingStatusData();
   await seedListedProperties(globalAgent, globalLandlord, globalTenant);
 });
@@ -283,8 +284,15 @@ async function seedListedProperties(
   const propertyStatusVacantId = "1"; 
   const defaultFeatureIds = ["1", "2"]; 
 
-  for (let i = 4; i <= 13; i++) { // Start from 4 to avoid conflict with IDs 1, 2, 3 from tempSeedPropertyData
+  for (let i = 4; i <= 13; i++) { 
+
     const propertyId = i.toString();
+
+    const existingProperty = await PropertyCollection.findOneAsync({ _id: propertyId });
+    if (existingProperty) {
+      console.log(`[Seed] Skipped inserting existing property in PropertyCollection: ${propertyId}`);
+      continue;
+    }
     await PropertyCollection.insertAsync({
       _id: propertyId,
       streetnumber: `${i * 10}`,
@@ -332,9 +340,10 @@ async function seedListedProperties(
 
 // This function is used to seed the database with initial task data
 async function tempSeedTaskData(): Promise<void> {
+  console.log("Seeding property data...");
   if ((await TaskCollection.find().countAsync()) === 0) {
     // Insert tasks into the TaskCollection
-    await TaskCollection.insertAsync({
+    TaskCollection.insertAsync({
       _id: "1",
       name: "Initial listing meeting",
       taskStatus: TaskStatus.NOTSTARTED,
@@ -344,9 +353,10 @@ async function tempSeedTaskData(): Promise<void> {
         "Meet with the client to discuss the property listing process and gather necessary information.",
       priority: "High",
     });
-    await TaskCollection.insertAsync({
+
+    TaskCollection.insertAsync({
       _id: "2",
-      name: "Follow-up with client",
+      name: "Submit Rental Application",
       taskStatus: TaskStatus.INPROGRESS,
       createdDate: new Date("2025-04-20T10:00:00Z"),
       dueDate: new Date("2025-05-27T10:00:00Z"),

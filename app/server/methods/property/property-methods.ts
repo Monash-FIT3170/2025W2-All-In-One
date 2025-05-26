@@ -20,6 +20,7 @@ import { LandlordCollection } from "../../database/user/user-collections";
 import { TenantCollection } from "../../database/user/user-collections";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
+import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
 
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
@@ -263,6 +264,32 @@ const propertyInsertMethod = {
   },
 };
 
+async function updatePropertyData(property: PropertyUpdateData): Promise<void> {
+  await PropertyCollection.updateAsync(property.propertyId, {
+    $set: {
+      streetnumber: property.streetnumber,
+      streetname: property.streetname,
+      suburb: property.suburb,
+      province: property.province,
+      postcode: property.postcode,
+      description: property.description,
+      summary_description: property.summaryDescription,
+      bathrooms: property.bathrooms,
+      bedrooms: property.bedrooms,
+      parking: property.parking,
+      features: property.features,
+      type: property.type,
+      area: property.area,
+      landlord_id: property.landlordId,
+    },
+  });
+}
+
+Meteor.methods({
+  [MeteorMethodIdentifier.PROPERTY_DATA_UPDATE]: updatePropertyData,
+});
+
+
 Meteor.methods({
   ...propertyGetMethod,
   ...propertyInsertMethod,
@@ -271,5 +298,6 @@ Meteor.methods({
   ...propertyGetCountMethod,
   ...propertyGetListMethod,
   ...propertyInsertMethod,
+  ...updatePropertyData,,
   ...propertyGetAllMethod
 });
