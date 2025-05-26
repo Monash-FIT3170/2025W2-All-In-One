@@ -24,10 +24,6 @@ export function UpcomingTasks({
 }: UpcomingTasksProps): React.JSX.Element {
   console.log(tasks);
 
-  // Get current date at midnight UTC
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-
   // Transform tasks and sort by date
   const transformedTasks = tasks
     .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks
@@ -35,25 +31,12 @@ export function UpcomingTasks({
       // Parse the datetime string (assuming DD/MM/YYYY format)
       const dueDate = parse(task.datetime, "dd/MM/yyyy", new Date());
 
-      let status: Task["status"];
-      if (dueDate < now) {
-        status = "Overdue";
-      } else if (dueDate.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000) {
-        status = "Due Soon";
-      } else {
-        status = "Upcoming";
-      }
-
       // Format the date to match the design
       const formattedDate = formatTaskDate(dueDate);
 
       return {
-        title: task.title,
+        ...task,
         datetime: formattedDate,
-        status,
-        description: task.description,
-        priority: task.priority,
-        taskId: task.taskId,
       };
     })
     .sort((a, b) => {
@@ -61,6 +44,8 @@ export function UpcomingTasks({
       const dateB = parse(b.datetime, "dd/MM/yyyy", new Date());
       return compareAsc(dateA, dateB);
     });
+
+  console.log(transformedTasks);
 
   return (
     <CardWidget
@@ -103,13 +88,11 @@ function formatTaskDate(date: Date): string {
 
 function TaskItem({ task }: { task: Task }): React.JSX.Element {
   const getStatusStyle = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "upcoming":
+    switch (status) {
+      case TaskStatus.NOTSTARTED:
         return "bg-blue-100 text-blue-800";
-      case "due soon":
-        return "bg-yellow-50 text-yellow-800";
-      case "overdue":
-        return "bg-red-100 text-red-800";
+      case TaskStatus.INPROGRESS:
+        return "bg-yellow-100 text-yellow-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
