@@ -7,7 +7,7 @@ import { FilterType } from './enums/FilterType';
 import { ModalHeader } from './components/ModalHeader';
 import { FilterTabs } from './components/FilterTabs';
 import { ModalContent } from './components/ModalContent';
-import { ModalFooter } from './components/ModalFooter';
+import { ModalDone } from './components/ModalDone';
 
 export function ReviewTenantModal({
   isOpen,
@@ -120,7 +120,7 @@ export function ReviewTenantModal({
           onSendToLandlord={onSendToLandlord}
         />
         
-        <ModalFooter onClose={onClose} />
+        <ModalDone onClose={onClose} />
       </div>
     </div>
   );
