@@ -29,4 +29,5 @@ export enum MeteorMethodIdentifier {
   PROFILE_GET = "profileData.getOne",
   PROFILE_EDIT = "profileData.edit",
   PROFILE_INSERT = "profileData.insert",
+  LISTING_SUBMIT_DRAFT = "listing.submitDraft",
 }
