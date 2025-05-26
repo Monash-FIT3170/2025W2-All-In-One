@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { CardWidget } from "./CardWidget";
 import { Button } from "../../theming-shadcn/Button";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { TaskStatus } from "/app/shared/task-status-identifier";
+import { parse, format, isToday, isTomorrow, compareAsc } from "date-fns";
 
 interface Task {
   title: string;
@@ -19,18 +18,6 @@ interface UpcomingTasksProps {
   className?: string;
 }
 
-// Helper function to parse date in DD/MM/YYYY format
-function parseDateString(dateStr: string): Date {
-  // Check if the date is in DD/MM/YYYY format
-  const ddmmyyyyMatch = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (ddmmyyyyMatch) {
-    const [_, day, month, year] = ddmmyyyyMatch;
-    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-  }
-  // If not in DD/MM/YYYY format, try standard date parsing
-  return new Date(dateStr);
-}
-
 export function UpcomingTasks({
   tasks,
   className = "",
@@ -39,17 +26,17 @@ export function UpcomingTasks({
 
   // Get current date at midnight UTC
   const now = new Date();
-  now.setUTCHours(0, 0, 0, 0);
+  now.setHours(0, 0, 0, 0);
 
   // Transform tasks and sort by date
   const transformedTasks = tasks
     .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks
     .map((task) => {
-      // Parse the datetime string using our custom parser
-      const dueDate = parseDateString(task.datetime);
+      // Parse the datetime string (assuming DD/MM/YYYY format)
+      const dueDate = parse(task.datetime, "dd/MM/yyyy", new Date());
 
       let status: Task["status"];
-      if (dueDate.getTime() < now.getTime()) {
+      if (dueDate < now) {
         status = "Overdue";
       } else if (dueDate.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000) {
         status = "Due Soon";
@@ -57,8 +44,8 @@ export function UpcomingTasks({
         status = "Upcoming";
       }
 
-      // Format the date to match the screenshot
-      const formattedDate = formatDate(dueDate);
+      // Format the date to match the design
+      const formattedDate = formatTaskDate(dueDate);
 
       return {
         title: task.title,
@@ -70,11 +57,10 @@ export function UpcomingTasks({
       };
     })
     .sort((a, b) => {
-      const dateA = parseDateString(a.datetime);
-      const dateB = parseDateString(b.datetime);
-      return dateA.getTime() - dateB.getTime();
+      const dateA = parse(a.datetime, "dd/MM/yyyy", new Date());
+      const dateB = parse(b.datetime, "dd/MM/yyyy", new Date());
+      return compareAsc(dateA, dateB);
     });
-  console.log(transformedTasks);
 
   return (
     <CardWidget
@@ -101,34 +87,18 @@ export function UpcomingTasks({
   );
 }
 
-// Helper function to format date like "April 1, 11:59 PM" or "Tomorrow, 10:00 AM" or "Mar 28, 3:30 PM"
-function formatDate(date: Date): string {
-  const now = new Date();
-  const tomorrow = new Date(now);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  // Check if the date is invalid
-  if (isNaN(date.getTime())) {
+// Helper function to format date using date-fns
+function formatTaskDate(date: Date): string {
+  if (!date || isNaN(date.getTime())) {
     return "Invalid Date";
   }
 
-  // Check if it's tomorrow
-  if (date.toDateString() === tomorrow.toDateString()) {
-    return `Tomorrow, ${date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-    })}`;
+  if (isTomorrow(date)) {
+    return `Tomorrow, ${format(date, "h:mm a")}`;
   }
 
-  // For dates in the current year
-  const options: Intl.DateTimeFormatOptions = {
-    month: date.getMonth() === now.getMonth() ? "long" : "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  };
-
-  return date.toLocaleString("en-US", options);
+  // Format as "MMM d, h:mm a" (e.g., "May 19, 2:30 PM")
+  return format(date, "MMM d, h:mm a");
 }
 
 function TaskItem({ task }: { task: Task }): React.JSX.Element {
@@ -161,11 +131,11 @@ function TaskItem({ task }: { task: Task }): React.JSX.Element {
         {task.description && (
           <p className="text-gray-600 text-sm">{task.description}</p>
         )}
-        <div className="flex items-center gap-2 text-gray-500">
+        <div className="flex items-center gap-2 text-gray-600">
           <span className="text-base">{task.datetime}</span>
           {task.priority && (
             <>
-              <span>•</span>
+              <span className="text-gray-400">•</span>
               <span>Priority: {task.priority}</span>
             </>
           )}
