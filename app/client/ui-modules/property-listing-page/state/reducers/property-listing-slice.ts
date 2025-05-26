@@ -9,6 +9,8 @@ import {
 } from "/app/client/library-modules/utils/date-utils";
 import { RootState } from "/app/client/store";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 
 const initialState: PropertyListingPageUiState = {
   streetNumber: "",
@@ -37,53 +39,78 @@ const initialState: PropertyListingPageUiState = {
   currentPropertyId: undefined,
 };
 
+export const loadPropertyList = createAsyncThunk(
+  "propertyListing/loadPropertyList",
+  async (agentId: string) => {
+    const properties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, agentId) as ApiProperty[];
+    return properties;
+  }
+);
+
 export const propertyListingSlice = createSlice({
   name: "propertyListing",
-  initialState: initialState,
+  initialState: {
+    ...initialState,
+    propertyList: [] as ApiProperty[],
+    propertyListLoading: false,
+    propertyListError: null as string | null,
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(load.pending, (state) => {
       state.shouldShowLoadingState = true;
     });
     builder.addCase(load.fulfilled, (state, action) => {
-      state.streetNumber = action.payload.streetnumber;
-      state.street = action.payload.streetname;
-      state.suburb = action.payload.suburb;
-      state.province = action.payload.province;
-      state.postcode = action.payload.postcode;
-      state.summaryDescription = action.payload.summaryDescription;
-      state.propertyStatusText = action.payload.propertyStatus;
-      state.propertyStatusPillVariant = getPropertyStatusPillVariant(
-        action.payload.propertyStatus
-      );
-      state.propertyDescription = action.payload.description;
-      state.propertyFeatures = action.payload.features;
-      state.propertyType = action.payload.type;
-      state.propertyLandArea = action.payload.area
-        ? getPropertyAreaDisplayString(action.payload.area)
-        : "N/A";
-      state.propertyBathrooms = action.payload.bathrooms.toString();
-      state.propertyParkingSpaces = action.payload.parking.toString();
-      state.propertyBedrooms = action.payload.bedrooms.toString();
-      state.propertyPrice = getPropertyPriceDisplayString(
-        action.payload.pricePerMonth
-      );
-      state.inspectionBookingUiStateList = action.payload.inspections.map(
-        (inspection) => ({
-          date: getFormattedDateStringFromDate(inspection.start_time),
-          startingTime: getFormattedTimeStringFromDate(inspection.start_time),
-          endingTime: getFormattedTimeStringFromDate(inspection.end_time),
-        })
-      );
-      state.listingImageUrls = action.payload.image_urls;
-      state.listingStatusText = getListingStatusDisplayString(
-        action.payload.listing_status
-      );
-      state.listingStatusPillVariant = getListingStatusPillVariant(
-        action.payload.listing_status
-      );
-      state.shouldShowLoadingState = false;
-      state.currentPropertyId = action.meta.arg; 
+        state.streetNumber = action.payload.streetnumber;
+        state.street = action.payload.streetname;
+        state.suburb = action.payload.suburb;
+        state.province = action.payload.province;
+        state.postcode = action.payload.postcode;
+        state.summaryDescription = action.payload.summaryDescription;
+        state.propertyStatusText = action.payload.propertyStatus;
+        state.propertyStatusPillVariant = getPropertyStatusPillVariant(
+          action.payload.propertyStatus
+        );
+        state.propertyDescription = action.payload.description;
+        state.propertyFeatures = action.payload.features;
+        state.propertyType = action.payload.type;
+        state.propertyLandArea = action.payload.area
+          ? getPropertyAreaDisplayString(action.payload.area)
+          : "N/A";
+        state.propertyBathrooms = action.payload.bathrooms.toString();
+        state.propertyParkingSpaces = action.payload.parking.toString();
+        state.propertyBedrooms = action.payload.bedrooms.toString();
+        state.propertyPrice = getPropertyPriceDisplayString(
+          action.payload.pricePerMonth
+        );
+        state.inspectionBookingUiStateList = action.payload.inspections.map(
+          (inspection) => ({
+            date: getFormattedDateStringFromDate(inspection.start_time),
+            startingTime: getFormattedTimeStringFromDate(inspection.start_time),
+            endingTime: getFormattedTimeStringFromDate(inspection.end_time),
+          })
+        );
+        state.listingImageUrls = action.payload.image_urls;
+        state.listingStatusText = getListingStatusDisplayString(
+          action.payload.listing_status
+        );
+        state.listingStatusPillVariant = getListingStatusPillVariant(
+          action.payload.listing_status
+        );
+        state.shouldShowLoadingState = false;
+      })
+      .addCase(loadPropertyList.pending, (state) => {
+        state.propertyListLoading = true;
+        state.propertyListError = null;
+      })
+      .addCase(loadPropertyList.fulfilled, (state, action) => {
+        state.propertyList = action.payload;
+        state.propertyListLoading = false;
+      })
+      .addCase(loadPropertyList.rejected, (state, action) => {
+        state.propertyListLoading = false;
+        state.propertyListError = action.error.message || "Failed to load properties";
+        state.currentPropertyId = action.meta.arg; 
     });
   },
 });
@@ -148,3 +175,7 @@ export const load = createAsyncThunk(
 
 export const selectPropertyListingUiState = (state: RootState) =>
   state.propertyListing;
+
+export const selectPropertyList = (state: RootState) => state.propertyListing.propertyList;
+export const selectPropertyListLoading = (state: RootState) => state.propertyListing.propertyListLoading;
+export const selectPropertyListError = (state: RootState) => state.propertyListing.propertyListError;

@@ -1,5 +1,5 @@
 import React from "react";
-import { TenantTopNavbar } from "../../../navigation-bars/TopNavbar";
+import { RoleTopNavbar } from "../../../navigation-bars/TopNavbar";
 import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
 import {
   settingLinks,
@@ -10,7 +10,7 @@ function TenantProperty() {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false);
   return (
     <div className="min-h-screen">
-      <TenantTopNavbar onSideBarOpened={onSideBarOpened} />
+      <RoleTopNavbar onSideBarOpened={onSideBarOpened} />
       <div className="flex">
         <RoleSideNavBar
           isOpen={isSidebarOpen}

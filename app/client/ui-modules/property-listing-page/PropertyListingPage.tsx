@@ -31,7 +31,7 @@ import {
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { useSearchParams } from "react-router";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
-import { AgentTopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
+import { RoleTopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
 
 // TODO: To re-add edit draft listing modal
 export function PropertyListingPage({
@@ -55,14 +55,14 @@ export function PropertyListingPage({
   if (state.shouldShowLoadingState) {
     return (
       <>
-        <AgentTopNavbar onSideBarOpened={() => {}} />
+        <RoleTopNavbar onSideBarOpened={() => {}} />
         <ListingPageContentLoadingSkeleton className={twMerge("p-5", className)} />
       </>
     );
   } else {
     return (
       <>
-        <AgentTopNavbar onSideBarOpened={() => {}} />
+        <RoleTopNavbar onSideBarOpened={() => {}} />
         <ListingPageContent
           streetNumber={state.streetNumber}
           street={state.street}
