@@ -149,7 +149,7 @@ async function tempSeedPropertyData(): Promise<void> {
       suburb: "Springfield",
       province: "IL",
       postcode: "62704",
-      property_status_id: PropertyStatus.VACANT,
+      property_status_id: "1",
       description:
         "Modern apartment with spacious living areas and a beautiful garden. Recently renovated with new appliances and fixtures throughout. The property features an open-plan kitchen and dining area that flows onto a private balcony with city views. The master bedroom includes an ensuite bathroom and built-in wardrobes, while the second bedroom is generously sized and located near the main bathroom.",
       summary_description:

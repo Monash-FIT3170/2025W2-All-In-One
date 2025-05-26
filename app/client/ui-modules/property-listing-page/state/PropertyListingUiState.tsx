@@ -3,6 +3,7 @@ import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listi
 import { InspectionBookingListUiState } from "/app/client/ui-modules/property-listing-page/components/PropertyInspections";
 
 export type PropertyListingPageUiState = {
+  propertyId: string;
   streetNumber: string;
   street: string;
   suburb: string;
@@ -27,4 +28,5 @@ export type PropertyListingPageUiState = {
   shouldDisplaySubmitDraftButton: boolean;
   shouldDisplayReviewTenantButton: boolean;
   shouldShowLoadingState: boolean;
+  isSubmittingDraft: boolean;
 };
