@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { setTasks, selectTasks } from "../state/agent-dashboard-slice";
 import {
   fetchAgentTasks,
   selectTasks,
