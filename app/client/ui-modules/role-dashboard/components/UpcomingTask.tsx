@@ -22,8 +22,6 @@ export function UpcomingTasks({
   tasks,
   className = "",
 }: UpcomingTasksProps): React.JSX.Element {
-  console.log(tasks);
-
   // Transform tasks and sort by date
   const transformedTasks = tasks
     .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks
@@ -44,8 +42,6 @@ export function UpcomingTasks({
       const dateB = parse(b.datetime, "dd/MM/yyyy", new Date());
       return compareAsc(dateA, dateB);
     });
-
-  console.log(transformedTasks);
 
   return (
     <CardWidget

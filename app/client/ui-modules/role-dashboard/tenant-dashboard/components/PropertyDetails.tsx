@@ -17,7 +17,7 @@ interface PropertyDetailsProps {
     apt?: string;
   };
   propertyType: string;
-  squareFootage: number;
+  squareFootage?: number;
   bedrooms: number;
   bathrooms: number;
   features: PropertyFeature[];
@@ -90,7 +90,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({
 
         <div>
           <h3 className="text-gray-500 font-medium">Square Footage</h3>
-          <p className="text-xl font-bold">{squareFootage} sq ft</p>
+          <p className="text-xl font-bold">{squareFootage ? `${squareFootage} sq ft` : 'N/A'}</p>
         </div>
 
         <div>
