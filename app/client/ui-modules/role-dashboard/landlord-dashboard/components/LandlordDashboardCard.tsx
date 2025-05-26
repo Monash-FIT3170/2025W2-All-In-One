@@ -12,6 +12,10 @@ export function LandlordDashboardCards() {
     occupied: number;
     vacant: number;
   } | null>(null);
+  const [income, setIncome] = useState<{
+    weekly: number;
+    monthly: number;
+  } | null>(null);
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
 
   useEffect(() => {
@@ -54,6 +58,29 @@ export function LandlordDashboardCards() {
     };
 
     getStatusCounts();
+
+    const getIncome = async () => {
+      if (
+        currentUser &&
+        "landlordId" in currentUser &&
+        currentUser.landlordId
+      ) {
+        try {
+          const result = await Meteor.callAsync(
+            MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_TOTAL_INCOME,
+            currentUser.landlordId
+          );
+          setIncome(result);
+        } catch (error) {
+          console.error(
+            "Error fetching monthly/weekly income for landlord:",
+            error
+          );
+        }
+      }
+    };
+
+    getIncome();
   }, [currentUser]);
 
   return (
@@ -69,8 +96,8 @@ export function LandlordDashboardCards() {
       />
       <CardWidget
         title="Total Income"
-        value="$1850/week"
-        subtitle="$7400/month"
+        value= {income ? `$${income.weekly}/week` : "Loading..."}
+        subtitle={income ? `$${income.monthly}/month` : "Loading..."}
       />
       <CardWidget title="Occupancy Rate" value="67%">
         <Progress value={67} className="mt-2" />
