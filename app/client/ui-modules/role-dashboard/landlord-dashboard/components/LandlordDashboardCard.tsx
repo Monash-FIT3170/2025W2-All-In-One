@@ -16,6 +16,7 @@ export function LandlordDashboardCards() {
     weekly: number;
     monthly: number;
   } | null>(null);
+  const [occupancyRate, setOccupancyRate] = useState<number | null>(null);
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
 
   useEffect(() => {
@@ -81,6 +82,26 @@ export function LandlordDashboardCards() {
     };
 
     getIncome();
+
+    const getOccupancyRate = async () => {
+      if (
+        currentUser &&
+        "landlordId" in currentUser &&
+        currentUser.landlordId
+      ) {
+        try {
+          const rate = await Meteor.callAsync(
+            MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_OCCUPANCY_RATE,
+            currentUser.landlordId
+          );
+          setOccupancyRate(rate);
+        } catch (error) {
+          console.error("Error fetching occupancy rate for landlord:", error);
+        }
+      }
+    };
+
+    getOccupancyRate();
   }, [currentUser]);
 
   return (
@@ -96,11 +117,16 @@ export function LandlordDashboardCards() {
       />
       <CardWidget
         title="Total Income"
-        value= {income ? `$${income.weekly}/week` : "Loading..."}
+        value={income ? `$${income.weekly}/week` : "Loading..."}
         subtitle={income ? `$${income.monthly}/month` : "Loading..."}
       />
-      <CardWidget title="Occupancy Rate" value="67%">
-        <Progress value={67} className="mt-2" />
+      <CardWidget
+        title="Occupancy Rate"
+        value={occupancyRate !== null ? `${occupancyRate}%` : "Loading..."}
+      >
+        {occupancyRate !== null && (
+          <Progress value={occupancyRate} className="mt-2" />
+        )}
       </CardWidget>
       <CardWidget
         title="Property Value"
