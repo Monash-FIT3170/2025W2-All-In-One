@@ -18,12 +18,16 @@ import { Input } from "../../theming-shadcn/Input";
 import { UseFormReturn } from "react-hook-form";
 import { FormSchemaType } from "./FormSchema";
 import { FormHeading } from "./FormHeading";
+import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 
 export default function FormBasicInformation({
   form,
+  landlords,
 }: {
   form: UseFormReturn<FormSchemaType>;
+  landlords: Landlord[];
 }) {
+
   return (
     <div className="border border-(--divider-color) w-full p-7 rounded-md mb-3">
       <FormHeading
@@ -36,18 +40,18 @@ export default function FormBasicInformation({
         render={({ field }) => (
           <FormItem>
             <FormLabel>Select Landlord</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a landlord" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="bg-white">
-                <SelectItem value="Dylan Hoang">Dylan Hoang</SelectItem>
-                <SelectItem value="Marcus Bontempelli">
-                  Marcus Bontempelli
-                </SelectItem>
-                <SelectItem value="Nick Daicos">Nick Daicos</SelectItem>
+              <SelectContent side="bottom" position="popper" className="z-[9999] bg-white">
+                {landlords.map((landlord) => (
+                  <SelectItem key={landlord.landlordId} value={landlord.landlordId}>
+                    {landlord.firstName} {landlord.lastName}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <FormMessage />
@@ -61,13 +65,13 @@ export default function FormBasicInformation({
         render={({ field }) => (
           <FormItem className="py-2">
             <FormLabel>Property Type</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select property type" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="bg-white">
+              <SelectContent side="bottom" position="popper" className="z-[9999] bg-white">
                 <SelectItem value="house">House</SelectItem>
                 <SelectItem value="apartment">Apartment</SelectItem>
               </SelectContent>
@@ -167,35 +171,6 @@ export default function FormBasicInformation({
           />
         </div>
       </div>
-
-      <FormField
-        control={form.control}
-        name="monthly_rent"
-        render={({ field }) => (
-          <FormItem className="py-2">
-            <FormLabel>Monthly Rent</FormLabel>
-            <FormControl>
-              <Input placeholder="2500" type="number" {...field} />
-            </FormControl>
-
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="bond"
-        render={({ field }) => (
-          <FormItem className="py-2">
-            <FormLabel>Bond / Security Deposit</FormLabel>
-            <FormControl>
-              <Input placeholder="2500" type="number" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
     </div>
   );
 }

@@ -19,6 +19,9 @@ import { TenantDocument } from "../../database/user/models/role-models/TenantDoc
 import { AgentCollection } from "../../database/user/user-collections";
 import { LandlordCollection } from "../../database/user/user-collections";
 import { TenantCollection } from "../../database/user/user-collections";
+import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
+import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
+import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
 
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
@@ -46,6 +49,67 @@ const propertyGetMethod = {
     return propertyDTO;
   },
 };
+
+const propertyGetCountLandlordMethod = {
+  [MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_COUNT]: async (
+    landlordId: string
+  ): Promise<number> => {
+    return await PropertyCollection.find({
+      landlord_id: landlordId,
+    }).countAsync();
+  },
+};
+
+const propertyGetStatusCountsLandlordMethod = {
+  [MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_STATUS_COUNTS]: async (
+    landlordId: string
+  ): Promise<{ occupied: number; vacant: number }> => {
+    // get status IDs for occupied/vacant
+    const occupiedStatus = await PropertyStatusCollection.findOneAsync({
+      name: PropertyStatus.OCCUPIED
+    });
+    const vacantStatus = await PropertyStatusCollection.findOneAsync({
+      name: PropertyStatus.VACANT
+    });
+
+    if (!occupiedStatus || !vacantStatus) {
+      throw new Meteor.Error(
+        "status-not-found",
+        "Could not find occupied or vacant status IDs"
+      );
+    }
+
+    // count properties of each status
+    const occupiedCount = await PropertyCollection.find({
+      landlord_id: landlordId,
+      property_status_id: occupiedStatus._id,
+    }).countAsync();
+
+    const vacantCount = await PropertyCollection.find({
+      landlord_id: landlordId,
+      property_status_id: vacantStatus._id,
+    }).countAsync();
+
+    return {
+      occupied: occupiedCount,
+      vacant: vacantCount,
+    };
+  },
+};
+
+const propertyGetCountMethod = {
+  [MeteorMethodIdentifier.PROPERTY_GET_COUNT]: async (agentId: string): Promise<number> => {
+    return await PropertyCollection.find({ agent_id: agentId }).countAsync();
+  },
+};
+
+const propertyGetListMethod = {
+  [MeteorMethodIdentifier.PROPERTY_GET_LIST]: async (agentId: string): Promise<ApiProperty[]> => {
+    const properties = await PropertyCollection.find({ agent_id: agentId }).fetchAsync();
+    return Promise.all(properties.map(mapPropertyDocumentToPropertyDTO));
+  },
+};
+
 // This method is used to map a property document to an ApiProperty DTO.
 // This function transforms a PropertyDocument (raw database document) into an ApiProperty (structured DTO) for client use. It performs the following steps:
 // 1. Fetches the property status document by its ID
@@ -78,12 +142,12 @@ async function mapPropertyDocumentToPropertyDTO(
     ? await getTenantDocumentById(property.tenant_id)
     : null; // Handle missing tenant_id gracefully
 
-    if (!AgentDocument) {
-      console.warn(`Agent for Property id ${property._id} not found.`);
-    }
-    if (!LandlordDocument) {
-      console.warn(`Landlord for Property id ${property._id} not found.`);
-    }
+  if (!AgentDocument) {
+    console.warn(`Agent for Property id ${property._id} not found.`);
+  }
+  if (!LandlordDocument) {
+    console.warn(`Landlord for Property id ${property._id} not found.`);
+  }
 
   //Check if I need this, as I we don't necessarily need a tenant for a property
   if (!TenantDocument) {
@@ -125,9 +189,9 @@ async function mapPropertyDocumentToPropertyDTO(
     features: propertyFeaturesDocuments.map((doc) => doc.name),
     type: property.type,
     area: property.area,
-    agentId: AgentDocument ? AgentDocument._id : '', // Always string
-    landlordId: LandlordDocument ? LandlordDocument._id : '', // Always string
-    tenantId: TenantDocument ? TenantDocument._id : '', // Always string
+    agentId: AgentDocument ? AgentDocument._id : "", // Always string
+    landlordId: LandlordDocument ? LandlordDocument._id : "", // Always string
+    tenantId: TenantDocument ? TenantDocument._id : "", // Always string
   };
 }
 
@@ -176,6 +240,55 @@ async function getTenantDocumentById(
   return await TenantCollection.findOneAsync(id);
 }
 
+const propertyInsertMethod = {
+  [MeteorMethodIdentifier.PROPERTY_INSERT]: async (
+    data: PropertyInsertData
+  ): Promise<string> => {
+    try {
+      const propertyId = await PropertyCollection.insertAsync({
+        ...data,
+      });
+      return propertyId;
+    } catch (error) {
+      console.error("Failed to insert property:", error);
+      throw meteorWrappedInvalidDataError(error as InvalidDataError);
+    }
+  },
+};
+
+async function updatePropertyData(property: PropertyUpdateData): Promise<void> {
+  await PropertyCollection.updateAsync(property.propertyId, {
+    $set: {
+      streetnumber: property.streetnumber,
+      streetname: property.streetname,
+      suburb: property.suburb,
+      province: property.province,
+      postcode: property.postcode,
+      description: property.description,
+      summary_description: property.summaryDescription,
+      bathrooms: property.bathrooms,
+      bedrooms: property.bedrooms,
+      parking: property.parking,
+      features: property.features,
+      type: property.type,
+      area: property.area,
+      landlord_id: property.landlordId,
+    },
+  });
+}
+
+Meteor.methods({
+  [MeteorMethodIdentifier.PROPERTY_DATA_UPDATE]: updatePropertyData,
+});
+
+
 Meteor.methods({
   ...propertyGetMethod,
+  ...propertyInsertMethod,
+  ...propertyGetCountLandlordMethod,
+  ...propertyGetStatusCountsLandlordMethod,
+  ...propertyGetCountMethod,
+  ...propertyGetListMethod,
+  ...propertyInsertMethod,
+  ...updatePropertyData,
 });

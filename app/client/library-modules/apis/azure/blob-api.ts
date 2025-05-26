@@ -1,4 +1,4 @@
-import { UploadResult, UploadResults, FileInfo,isValidBlobContentType, BlobNamePrefix } from '/app/shared/azure/blob-models'
+import {UploadResults, FileInfo,isValidBlobContentType, BlobNamePrefix, UploadResult } from '/app/shared/azure/blob-models'
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 export async function uploadFileHandler(blob: Blob, blobName: string): Promise<UploadResult>{

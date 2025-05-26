@@ -27,6 +27,12 @@ const agentInsertMethod = {
 
 // -- GET AGENT --
 const agentGetMethod = {
+  [MeteorMethodIdentifier.AGENT_GET]: async (
+    userId: string
+  ): Promise<ApiAgent> => {
+    const agentDoc = await AgentCollection.findOneAsync({
+      userAccountId: userId,
+    });
     [MeteorMethodIdentifier.AGENT_GET]: async (
         userId: string
     ): Promise<ApiAgent> => {

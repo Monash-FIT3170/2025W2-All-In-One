@@ -11,11 +11,7 @@ import {
   fetchProfileData,
   saveProfileData,
 } from "./state/profile-slice";
-import {
-  AgentTopNavbar,
-  LandlordTopNavbar,
-  TenantTopNavbar,
-} from "../navigation-bars/TopNavbar";
+import { RoleTopNavbar } from "../navigation-bars/TopNavbar";
 import { RoleSideNavBar } from "../navigation-bars/side-nav-bars/SideNavbar";
 import {
   agentDashboardLinks,
@@ -86,19 +82,6 @@ export function ProfilePage(): React.JSX.Element {
       );
     }
   };
-  const roleTopNavbar = (role: Role | undefined) => {
-    switch (role) {
-      case Role.AGENT:
-        return <AgentTopNavbar onSideBarOpened={onSideBarOpened} />;
-      case Role.LANDLORD:
-        return <LandlordTopNavbar onSideBarOpened={onSideBarOpened} />;
-      case Role.TENANT:
-        return <TenantTopNavbar onSideBarOpened={onSideBarOpened} />;
-      // fallback case
-      default:
-        return <AgentTopNavbar onSideBarOpened={onSideBarOpened} />;
-    }
-  };
 
   const roleLinks = (role: Role | undefined) => {
     switch (role) {
@@ -127,7 +110,7 @@ export function ProfilePage(): React.JSX.Element {
 
   return (
     <div className="min-h-screen">
-      {roleTopNavbar(userRole)}
+      <RoleTopNavbar onSideBarOpened={onSideBarOpened} />{" "}
       {/*TODO: add switch statements to change nav bars based on users role i.e agent  */}
       <div className="flex">
         <RoleSideNavBar
@@ -147,10 +130,11 @@ export function ProfilePage(): React.JSX.Element {
                   const blobName = `${Date.now()}-${file.name}`; // gives it the time of creation for uniqueness (not sure if needed)
 
                   const uploadedImage = await uploadFileHandler(file, blobName);
-                  const imageUrl = uploadedImage.url ?? tempProfileImage;
 
-                  if (!imageUrl)
+                  if (!uploadedImage.success)
                     throw new Error("Upload failed or no URL returned");
+
+                  const imageUrl = uploadedImage.url ?? tempProfileImage;
 
                   setLocalProfile((prev) => ({
                     ...prev,

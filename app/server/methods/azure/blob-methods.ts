@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { getContainerClient, uploadFile,  } from './blob-storage-service';
-import { BlobContentType, BlobNamePrefix, FileInfo, UploadResult, UploadResults } from '/app/shared/azure/blob-models'
+import { BlobContentType, BlobNamePrefix, FileInfo, UploadResults, UploadResult } from '/app/shared/azure/blob-models'
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 
 const blobUploadFileMethod = {

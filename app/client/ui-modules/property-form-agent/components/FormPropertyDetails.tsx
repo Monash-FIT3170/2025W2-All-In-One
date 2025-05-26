@@ -1,8 +1,7 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -13,12 +12,22 @@ import { Textarea } from "../../theming-shadcn/Textarea";
 import { FormSchemaType } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
+import { MultiSelect } from "../../theming-shadcn/Multiselect";
+
+const frameworksList = [
+  { value: "react", label: "React"},
+  { value: "angular", label: "Angular"},
+  { value: "vue", label: "Vue"},
+  { value: "svelte", label: "Svelte"},
+  { value: "ember", label: "Ember"},
+];
 
 export default function FormPropertyDetails({
   form,
 }: {
   form: UseFormReturn<FormSchemaType>;
 }) {
+  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>(["react", "angular"]);
   return (
     <div className="border border-(--divider-color) w-full p-7 rounded-md mb-3">
       <FormHeading
@@ -96,26 +105,27 @@ export default function FormPropertyDetails({
         )}
       />
 
-      <FormField
-        control={form.control}
-        name="amenities"
-        render={({ field }) => (
-          <FormItem className="py-2">
-            <FormLabel>Amenities</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="Enter property amenities (e.g. Air Conditioning, Heating, Washer/Dryer, etc.)"
-                className="resize-none"
-                {...field}
-              />
-            </FormControl>
-            <FormDescription className="text-(--body-secondary-color)">
-              Separate amenities with commas or new lines
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
+        {/* FEATURES */}
+      <div className="p-4 max-w-xl">
+      <h1 className="text-2xl font-bold mb-4">Multi-Select Component</h1>
+      <MultiSelect
+        options={frameworksList}
+        onValueChange={setSelectedFrameworks}
+        defaultValue={selectedFrameworks}
+        placeholder="Select frameworks"
+        variant="inverted"
+        animation={2}
+        maxCount={3}
       />
+      <div className="mt-4">
+        <h2 className="text-xl font-semibold">Selected Frameworks:</h2>
+        <ul className="list-disc list-inside">
+          {selectedFrameworks.map((framework) => (
+            <li key={framework}>{framework}</li>
+          ))}
+        </ul>
+      </div>
+      </div>
     </div>
   );
 }
