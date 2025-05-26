@@ -32,7 +32,6 @@ import {
   selectPropertyListingUiState,
   submitDraftListingAsync,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
-import { useSearchParams } from "react-router";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import EditDraftListingModal from "./components/EditDraftListingModal";
 import { EditDraftListingButton } from "./components/EditDraftListingButton";
@@ -43,23 +42,32 @@ import {
   formSchema,
   FormSchemaType,
 } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
+import { useSearchParams } from "react-router";
 
 export function PropertyListingPage({
   className = "",
 }: {
   className?: string;
 }): React.JSX.Element {
+  const [searchParams] = useSearchParams();
+  const propertyId = searchParams.get("propertyId");
   const dispatch = useAppDispatch();
   const state: PropertyListingPageUiState = useSelector(
     selectPropertyListingUiState
   );
-  const [searchParams] = useSearchParams();
   const propertyIdFromUrl = searchParams.get("propertyId");
 
   useEffect(() => {
     if (propertyIdFromUrl) {
       dispatch(load(propertyIdFromUrl));
     }
+    if (!propertyId) {
+      console.log("Property ID is not provided, loading default property");
+      dispatch(load("1"));
+      return;
+    }
+    console.log(`Loading property with ID: ${propertyId}`);
+    dispatch(load(propertyId));
   }, []);
 
   if (state.shouldShowLoadingState) {
@@ -96,7 +104,9 @@ export function PropertyListingPage({
           listingStatusPillVariant={state.listingStatusPillVariant}
           shouldDisplayListingStatus={state.shouldDisplayListingStatus}
           shouldDisplaySubmitDraftButton={state.shouldDisplaySubmitDraftButton}
-          shouldDisplayReviewTenantButton={state.shouldDisplayReviewTenantButton}
+          shouldDisplayReviewTenantButton={
+            state.shouldDisplayReviewTenantButton
+          }
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
           onBack={() => {
             console.log("back button pressed");
@@ -228,7 +238,7 @@ function ListingPageContent({
         onSubmitDraftListing={onSubmitDraftListing}
         onReviewTenant={() => setIsReviewTenantModalOpen(true)}
       />
-      
+
       <ReviewTenantModal
         isOpen={isReviewTenantModalOpen}
         onClose={() => setIsReviewTenantModalOpen(false)}
@@ -239,10 +249,14 @@ function ListingPageContent({
           console.log(`Progressed application ${applicationId}`);
         }}
         onBackgroundPass={(applicationId: string) => {
-          console.log(`Background check passed for application ${applicationId}`);
+          console.log(
+            `Background check passed for application ${applicationId}`
+          );
         }}
         onBackgroundFail={(applicationId: string) => {
-          console.log(`Background check failed for application ${applicationId}`);
+          console.log(
+            `Background check failed for application ${applicationId}`
+          );
         }}
         onSendToLandlord={(applicationId: string) => {
           console.log(`Sent application ${applicationId} to landlord`);
@@ -419,7 +433,12 @@ function BottomBar({
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={twMerge("flex justify-between items-center items-center gap-2", className)}>
+    <div
+      className={twMerge(
+        "flex justify-between items-center items-center gap-2",
+        className
+      )}
+    >
       {/* Left side - Review Tenant Button */}
       <div className="flex">
         {shouldDisplayReviewTenantButton && (
@@ -458,7 +477,7 @@ function ListingModalEditor({
     apartment_number: "",
     bedroom_number: Number(state.propertyBedrooms),
     bathroom_number: Number(state.propertyBathrooms),
-    space:  Number(state.areaValue),
+    space: Number(state.areaValue),
     description: state.propertyDescription,
     images: [],
     available_dates: new Date(),

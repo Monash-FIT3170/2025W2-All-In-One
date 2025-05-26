@@ -5,7 +5,7 @@ export type ListingInsertData = {
   inspection_ids: string[];
 }
 
-export type IncompleteListingInsertData = {
+export type ApiInsertListingPayload = {
   property_id: string;
   image_urls: string[];
   inspection_ids: string[]; 

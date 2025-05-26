@@ -128,46 +128,6 @@ async function tempSeedUserAndRoleData(): Promise<void> {
   }
 }
 
-// This function is used to seed the database with initial task data
-async function tempSeedTaskData(): Promise<void> {
-  if ((await TaskCollection.find().countAsync()) === 0) {
-    TaskStatusCollection.insertAsync({
-      _id: "1",
-      name: "Not Started",
-    });
-
-    TaskStatusCollection.insertAsync({
-      _id: "2",
-      name: "In Progress",
-    });
-
-    TaskStatusCollection.insertAsync({
-      _id: "3",
-      name: "Completed",
-    });
-
-    TaskCollection.insertAsync({
-      _id: "1",
-      name: "Initial listing meeting",
-      taskStatus: TaskStatus.NOTSTARTED,
-      createdDate: new Date("2025-04-12T10:00:00Z"),
-      dueDate: new Date("2025-04-19T10:00:00Z"),
-      description:
-        "Meet with the client to discuss the property listing process and gather necessary information.",
-      priority: "High",
-    });
-    TaskCollection.insertAsync({
-      _id: "2",
-      name: "Follow-up with client",
-      taskStatus: TaskStatus.INPROGRESS,
-      createdDate: new Date("2025-04-20T10:00:00Z"),
-      dueDate: new Date("2025-04-27T10:00:00Z"),
-      description:
-        "Check in with the client to provide updates and address any questions.",
-      priority: "Medium",
-    });
-  }
-}
 async function tempSeedProfileData(): Promise<void> {
   if ((await ProfileCollection.find().countAsync()) === 0) {
     ProfileCollection.insertAsync({
@@ -413,6 +373,99 @@ async function seedListedProperties(
       inspection_ids: ["1", "2", "3", "4"],
     });
     console.log(`[Seed] Created listed property: ${propertyId}`);
+  }
+}
+
+// This function is used to seed the database with initial task data
+async function tempSeedTaskData(): Promise<void> {
+  console.log("Seeding property data...");
+  if ((await TaskCollection.find().countAsync()) === 0) {
+    // Insert tasks into the TaskCollection
+    TaskCollection.insertAsync({
+      _id: "1",
+      name: "Initial listing meeting",
+      taskStatus: TaskStatus.NOTSTARTED,
+      createdDate: new Date("2025-04-12T10:00:00Z"),
+      dueDate: new Date("2025-05-19T10:00:00Z"),
+      description:
+        "Meet with the client to discuss the property listing process and gather necessary information.",
+      priority: "High",
+    });
+
+    TaskCollection.insertAsync({
+      _id: "2",
+      name: "Submit Rental Application",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
+      description:
+        "Check in with the client to provide updates and address any questions.",
+      priority: "Medium",
+    });
+    await TaskCollection.insertAsync({
+      _id: "3",
+      name: "Select a tenant",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-28T10:00:00Z"),
+      description: "Review the list of agent approved candidates and pick one.",
+      priority: "Medium",
+    });
+    await TaskCollection.insertAsync({
+      _id: "4",
+      name: "Follow-up with client",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
+      description: "Attend a property listing meeting with agent.",
+      priority: "Medium",
+    });
+    await TaskCollection.insertAsync({
+      _id: "5",
+      name: "Property annual inspection",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
+      description: "Attend the annual inspection.",
+      priority: "Medium",
+    });
+    await TaskCollection.insertAsync({
+      _id: "6",
+      name: "Sign rental agreement",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
+      description:
+        "Sign the rental agreement which has had the rent increased by 5%.",
+      priority: "Medium",
+    });
+
+    console.log("Tasks seeded successfully.");
+  }
+
+  // Update the task_ids field for Agent, Tenant, and Landlord
+  if (globalAgent) {
+    await AgentCollection.updateAsync(
+      { _id: globalAgent.agentId }, // Find the agent by ID
+      { $set: { task_ids: ["1", "2"] } } // Assign task IDs
+    );
+    console.log("Assigned tasks to Agent:", globalAgent.agentId);
+  }
+
+  if (globalTenant) {
+    await TenantCollection.updateAsync(
+      { _id: globalTenant.tenantId }, // Find the tenant by ID
+      { $set: { task_ids: ["5", "6"] } } // Assign task IDs
+    );
+    console.log("Assigned tasks to Tenant:", globalTenant.tenantId);
+  }
+
+  if (globalLandlord) {
+    await LandlordCollection.updateAsync(
+      { _id: globalLandlord.landlordId }, // Find the landlord by ID
+      { $set: { task_ids: ["3", "4"] } } // Assign task IDs
+    );
+    console.log("Assigned tasks to Landlord:", globalLandlord.landlordId);
   }
 }
 
