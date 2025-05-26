@@ -1,22 +1,41 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "../../../theming-shadcn/Button";
 import { CardWidget } from "../../components/CardWidget";
- 
+import { useAppSelector, useAppDispatch } from "../../../../store";
+import { loadPropertyList, selectPropertyList, selectPropertyListLoading, selectPropertyListError } from "../../../property-listing-page/state/reducers/property-listing-slice";
+import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
+
 interface Property {
   address: string;
-  status: "Closed" | "Maintenance" | "Draft" | "Listed"
+  status: PropertyStatus;
   rent: number;
 }
 
 interface PropertyOverviewProps {
-  properties: Property[];
   className?: string;
 }
 
 export function PropertyOverview({
-  properties,
   className = "",
 }: PropertyOverviewProps): React.JSX.Element {
+  const dispatch = useAppDispatch();
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const properties = useAppSelector(selectPropertyList);
+  const isLoading = useAppSelector(selectPropertyListLoading);
+  const error = useAppSelector(selectPropertyListError);
+
+  useEffect(() => {
+    if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
+      dispatch(loadPropertyList(currentUser.agentId));
+    }
+  }, [currentUser, dispatch]);
+
+  const mappedProperties: Property[] = properties.map((property) => ({
+    address: `${property.streetnumber} ${property.streetname}`,
+    status: property.propertyStatus as PropertyStatus,
+    rent: property.pricePerMonth,
+  }));
+
   return (
     <CardWidget
       title="Property Overview"
@@ -33,42 +52,49 @@ export function PropertyOverview({
       }
     >
       <div className="mt-2">
-
-        <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Address</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Status</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Rent</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {properties.map((property, index) => (
-                <tr key={index} className="transition-colors hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm">{property.address}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      property.status === "Closed" ? "bg-gray-100 text-gray-800" :
-                      property.status === "Draft" ? "bg-yellow-100 text-yellow-800" :
-                      property.status === "Listed" ? "bg-green-100 text-green-800" :
-                      property.status === "Maintenance" ? "bg-blue-100 text-blue-800" :
-                      "bg-red-100 text-red-800"
-                    }`}>
-                      {property.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm">${property.rent.toLocaleString()}</td>
+        {isLoading ? (
+          <div className="text-center py-4">Loading properties...</div>
+        ) : error ? (
+          <div className="text-center py-4 text-red-500">{error}</div>
+        ) : (
+          <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Address</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Status</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Rent</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {mappedProperties.map((property, index) => (
+                  <tr key={index} className="transition-colors hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm">{property.address}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        property.status === PropertyStatus.CLOSED ? "bg-gray-100 text-gray-800" :
+                        property.status === PropertyStatus.DRAFT ? "bg-purple-100 text-purple-800" :
+                        property.status === PropertyStatus.LISTED ? "bg-blue-100 text-blue-800" :
+                        property.status === PropertyStatus.UNDER_MAINTENANCE ? "bg-yellow-100 text-yellow-800" :
+                        property.status === PropertyStatus.VACANT ? "bg-red-100 text-red-800" :
+                        property.status === PropertyStatus.OCCUPIED ? "bg-green-100 text-green-800" :
+                        "bg-grey-100 text-grey-800"
+                      }`}>
+                        {property.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm">${property.rent.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <div className="mt-4">
-      <Button variant="ghost" className="w-full">
-        View All Properties
+        <Button variant="ghost" className="w-full">
+          View All Properties
         </Button>
       </div>
     </CardWidget>

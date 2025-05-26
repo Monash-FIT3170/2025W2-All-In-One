@@ -3,19 +3,28 @@ import { ListingStatusPillVariant } from "/app/client/ui-modules/property-listin
 import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingSummary";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import { getPropertyWithListingDataUseCase } from "/app/client/library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
+import { submitDraftListingUseCase } from "/app/client/library-modules/use-cases/property-listing/SubmitDraftListingUseCase";
 import {
   getFormattedDateStringFromDate,
   getFormattedTimeStringFromDate,
 } from "/app/client/library-modules/utils/date-utils";
 import { RootState } from "/app/client/store";
+import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
+import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
+import { getAllLandlords } from "/app/client/library-modules/domain-models/user/role-repositories/landlord-repository";
 
 const initialState: PropertyListingPageUiState = {
+  propertyId: "",
+  propertyLandlordId: "",
   streetNumber: "",
   street: "",
   suburb: "",
   province: "",
   postcode: "",
   summaryDescription: "",
+  areaValue: 0,
   propertyStatusText: "",
   propertyStatusPillVariant: PropertyStatusPillVariant.VACANT,
   propertyDescription: "",
@@ -32,21 +41,54 @@ const initialState: PropertyListingPageUiState = {
   listingStatusPillVariant: ListingStatusPillVariant.DRAFT,
   shouldDisplayListingStatus: true,
   shouldDisplaySubmitDraftButton: true,
+  shouldDisplayReviewTenantButton: false,
+  shouldDisplayEditListingButton: true,
   shouldShowLoadingState: true,
+  landlords: [],
+  isSubmittingDraft: false,
+  currentPropertyId: undefined,
 };
+
+export const loadPropertyList = createAsyncThunk(
+  "propertyListing/loadPropertyList",
+  async (agentId: string) => {
+    const properties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, agentId) as ApiProperty[];
+    return properties;
+  }
+);
+
+export const submitDraftListingAsync = createAsyncThunk(
+  "propertyListing/submitDraftListing",
+  async (propertyId: string) => {
+    const submitDraftListing = await submitDraftListingUseCase(propertyId);
+    return submitDraftListing;
+  }
+);
 
 export const propertyListingSlice = createSlice({
   name: "propertyListing",
-  initialState: initialState,
+  initialState: {
+    ...initialState,
+    propertyList: [] as ApiProperty[],
+    propertyListLoading: false,
+    propertyListError: null as string | null,
+  },
   reducers: {},
   extraReducers: (builder) => {
+    builder.addCase(load.pending, (state) => {
+      state.shouldShowLoadingState = true;
+    });
     builder.addCase(load.fulfilled, (state, action) => {
+      state.propertyId = action.payload.propertyId;
+      state.propertyLandlordId = action.payload.landlordId;
+      state.propertyId = action.payload.propertyId;
       state.streetNumber = action.payload.streetnumber;
       state.street = action.payload.streetname;
       state.suburb = action.payload.suburb;
       state.province = action.payload.province;
       state.postcode = action.payload.postcode;
       state.summaryDescription = action.payload.summaryDescription;
+      state.areaValue = action.payload.area ?? 0;
       state.propertyStatusText = action.payload.propertyStatus;
       state.propertyStatusPillVariant = getPropertyStatusPillVariant(
         action.payload.propertyStatus
@@ -77,7 +119,51 @@ export const propertyListingSlice = createSlice({
       state.listingStatusPillVariant = getListingStatusPillVariant(
         action.payload.listing_status
       );
+        
+      // Set button visibility based on listing status
+      const isDraft = action.payload.listing_status.toLowerCase() === "draft";
+      state.shouldDisplaySubmitDraftButton = isDraft;
+      state.shouldDisplayReviewTenantButton = !isDraft;
+      state.shouldDisplayEditListingButton = isDraft;
+      
       state.shouldShowLoadingState = false;
+      state.landlords = action.payload.landlords;
+      })
+      .addCase(loadPropertyList.pending, (state) => {
+        state.propertyListLoading = true;
+        state.propertyListError = null;
+      })
+      .addCase(loadPropertyList.fulfilled, (state, action) => {
+        state.propertyList = action.payload;
+        state.propertyListLoading = false;
+      })
+      .addCase(loadPropertyList.rejected, (state, action) => {
+        state.propertyListLoading = false;
+        state.propertyListError = action.error.message || "Failed to load properties";
+      });
+
+
+    builder.addCase(submitDraftListingAsync.pending, (state, action) => {
+      state.isSubmittingDraft = true;
+      state.currentPropertyId = action.meta.arg;
+    });
+    
+    builder.addCase(submitDraftListingAsync.fulfilled, (state, action) => {
+      console.log('Draft listing submitted successfully:', action.payload);
+      state.listingStatusText = getListingStatusDisplayString("listed");
+      state.listingStatusPillVariant = getListingStatusPillVariant("listed");
+      state.shouldDisplaySubmitDraftButton = false;
+      state.shouldDisplayReviewTenantButton = true;
+      state.shouldDisplayEditListingButton = false;
+      state.isSubmittingDraft = false;
+      state.currentPropertyId = action.meta.arg;
+    });
+    
+    builder.addCase(submitDraftListingAsync.rejected, (state, action) => {
+      console.error('Failed to submit draft listing:', action.error.message);
+      state.isSubmittingDraft = false;
+      alert(`Failed to update listing: ${action.error.message}`);
+      state.currentPropertyId = action.meta.arg;
     });
   },
 });
@@ -91,30 +177,42 @@ function getPropertyPriceDisplayString(price: number): string {
 }
 
 function getListingStatusDisplayString(status: string): string {
-  switch (status.toLowerCase()) {
-    case "draft":
+  const lowerStatus = status.toLowerCase();
+  switch (lowerStatus) {
+    case ListingStatus.DRAFT.toLowerCase():
       return "DRAFT LISTING";
+    case "listed":
+      return "CURRENT LISTING";
+    case ListingStatus.LISTED.toLowerCase():
+      return "LISTED";
+    case ListingStatus.TENANT_SELECTION.toLowerCase():
+      return "TENANT SELECTION";
+    case ListingStatus.TENANT_APPROVAL.toLowerCase():
+      return "TENANT APPROVAL";
     default:
-      return "Unknown Status";
+      return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : "Unknown Status";
   }
 }
 
 function getPropertyStatusPillVariant(
   status: string
 ): PropertyStatusPillVariant {
-  switch (status.toLowerCase()) {
-    case "vacant":
-      return PropertyStatusPillVariant.VACANT;
-    default:
-      return PropertyStatusPillVariant.VACANT;
+  const lowerStatus = status.toLowerCase();
+  if (lowerStatus === "vacant") {
+    return PropertyStatusPillVariant.VACANT;
   }
+  return PropertyStatusPillVariant.VACANT; 
 }
 
 function getListingStatusPillVariant(status: string): ListingStatusPillVariant {
-  switch (status.toLowerCase()) {
-    case "draft":
+  const lowerStatus = status.toLowerCase();
+  switch (lowerStatus) {
+    case ListingStatus.DRAFT.toLowerCase():
       return ListingStatusPillVariant.DRAFT;
-    case "current":
+    case "listed":
+    case ListingStatus.LISTED.toLowerCase():
+    case ListingStatus.TENANT_SELECTION.toLowerCase():
+    case ListingStatus.TENANT_APPROVAL.toLowerCase():
       return ListingStatusPillVariant.CURRENT;
     default:
       return ListingStatusPillVariant.DRAFT;
@@ -127,9 +225,15 @@ export const load = createAsyncThunk(
     const propertyWithListingData = await getPropertyWithListingDataUseCase(
       propertyId
     );
-    return propertyWithListingData;
+    const landlords: Landlord[] = await getAllLandlords();
+    return { ...propertyWithListingData, landlords };
   }
 );
 
+
 export const selectPropertyListingUiState = (state: RootState) =>
   state.propertyListing;
+
+export const selectPropertyList = (state: RootState) => state.propertyListing.propertyList;
+export const selectPropertyListLoading = (state: RootState) => state.propertyListing.propertyListLoading;
+export const selectPropertyListError = (state: RootState) => state.propertyListing.propertyListError;

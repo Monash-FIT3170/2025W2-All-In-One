@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
 import { Container, createRoot } from "react-dom/client";
 import { Meteor } from "meteor/meteor";
-import { GuestLandingPage } from "./ui-modules/guest-landing-page/GuestLandingPage";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { Provider } from "react-redux";
-import { store, useAppDispatch, useAppSelector } from "./store";
+import { store, useAppDispatch } from "./store";
 import { DefaultTheme } from "./ui-modules/theming/themes/DefaultTheme";
+
+import { GuestLandingPage } from "./ui-modules/guest-landing-page/GuestLandingPage";
 import { AgentDashboard } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentDashboard";
 import { AgentCalendar } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentCalendar";
 import { AgentMessage } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentMessage";
@@ -16,6 +17,8 @@ import { LandlordCalendar } from "./ui-modules/role-dashboard/landlord-dashboard
 import { LandlordTask } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordTask";
 import { LandlordProperty } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordProperty";
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottomNavbar";
+import { TopNavbar } from "./ui-modules/navigation-bars/TopNavbar";
+import { RoleSideNavBar } from "./ui-modules/navigation-bars/side-nav-bars/SideNavbar";
 import { PropertyListingPage } from "/app/client/ui-modules/property-listing-page/PropertyListingPage";
 import { SettingsPage } from "./ui-modules/settings-page/SettingsPage";
 import { PropertyFormPage } from "./ui-modules/property-form-agent/PropertyFormPage";
@@ -28,8 +31,6 @@ import TenantMessages from "./ui-modules/role-dashboard/tenant-dashboard/pages/T
 import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDocument";
 import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
 import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
-import { TopNavbar } from "./ui-modules/navigation-bars/TopNavbar";
-import { RoleSideNavBar } from "./ui-modules/navigation-bars/side-nav-bars/SideNavbar";
 import { loadCurrentUser } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
 
 Meteor.startup(initialiseReactRoot);
@@ -39,8 +40,6 @@ function initialiseReactRoot(): void {
   const root = createRoot(container);
 
   root.render(
-    // Wrap the entire app with Redux Provider at the root level
-    // to ensure global state (including current user data) is accessible across all components
     <React.StrictMode>
       <Provider store={store}>
         <AppRoot />
@@ -50,13 +49,9 @@ function initialiseReactRoot(): void {
 }
 
 function AppRoot(): React.JSX.Element {
-  // Global sidebar open/close state, lifted to the top level
-  // so the sidebar can be consistently controlled across all pages and components
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const dispatch = useAppDispatch();
 
-  // On app load, restore the logged-in user into Redux state
-  // to prevent losing session data on page refresh or reload
   useEffect(() => {
     const userId = Meteor.userId();
     if (userId) {
@@ -68,10 +63,7 @@ function AppRoot(): React.JSX.Element {
     <DefaultTheme>
       <BrowserRouter>
         <TopNavbar onSideBarOpened={setIsSidebarOpen} />
-        <RoleSideNavBar
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-        />
+        <RoleSideNavBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         <Routes>
           <Route path="/" element={<GuestLandingPage />} />
           <Route path="/agent-dashboard" element={<AgentDashboard />} />
@@ -83,22 +75,19 @@ function AppRoot(): React.JSX.Element {
           <Route path="/landlord-properties" element={<LandlordProperty />} />
           <Route path="/landlord-calendar" element={<LandlordCalendar />} />
           <Route path="/landlord-tasks" element={<LandlordTask />} />
-          <Route path="/test" element={<PropertyListingPage />} />
+          <Route path="/property-listing" element={<PropertyListingPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/propertyform" element={<PropertyFormPage />} />
           <Route path="/signin" element={<AuthTabs initialTab="signin" />} />
-          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/signup" element={<AuthTabs initialTab="signup" />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/tenant-dashboard" element={<TenantDashboard />} />
           <Route path="/tenant-property" element={<TenantProperty />} />
           <Route path="/tenant-calendar" element={<TenantCalendar />} />
           <Route path="/tenant-maintenance" element={<TenantMaintenance />} />
           <Route path="/tenant-messages" element={<TenantMessages />} />
           <Route path="/tenant-documents" element={<TenantDocument />} />
-          <Route
-            path="/tenant-search-properties"
-            element={<TenantSearchProperties />}
-          />
+          <Route path="/tenant-search-properties" element={<TenantSearchProperties />} />
         </Routes>
         <BottomNavbar />
       </BrowserRouter>
