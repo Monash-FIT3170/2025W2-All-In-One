@@ -1,5 +1,6 @@
 // components/PropertyDetails.tsx
 import React from "react";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 interface PropertyFeature {
   id: string;

@@ -11,6 +11,7 @@ type RegisterPayload = {
   lastName: string;
   accountType: Role;
   agentCode?: string;
+  task_ids?: string[];
 };
 
 
@@ -40,6 +41,7 @@ function validatePayload(data: RegisterPayload) {
     lastName: String,
     accountType: Match.OneOf(...Object.values(Role)),
     agentCode: Match.Maybe(String),
+    task_ids: Match.Maybe([String]),
   });
 
   if (data.password.length < 8) {
@@ -95,7 +97,10 @@ async function createRoleSpecificRecord(userId: string, data: RegisterPayload): 
       });
       break;
     case Role.TENANT:
-      await Meteor.callAsync(MeteorMethodIdentifier.TENANT_INSERT, common);
+      await Meteor.callAsync(MeteorMethodIdentifier.TENANT_INSERT, {
+        ...common,
+        task_ids: data.task_ids || [],
+      });
       break;
     case Role.LANDLORD:
       await Meteor.callAsync(MeteorMethodIdentifier.LANDLORD_INSERT, common);
