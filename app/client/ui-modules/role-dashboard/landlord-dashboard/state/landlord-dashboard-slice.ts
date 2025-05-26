@@ -4,16 +4,16 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 interface LandlordDashboardState {
   isLoading: boolean;
+  properties: Property[];
   tasks: Array<{
     title: string;
-    address: string;
+    address?: string;
     datetime: string;
     status: string;
     description?: string;
     priority?: string;
     taskId?: string;
   }>;
-  properties: Property[];
   error: string | null;
 }
 
@@ -24,31 +24,28 @@ const initialState: LandlordDashboardState = {
   error: null,
 };
 
-interface Property {
-  address: string;
-  status: "Occupied" | "Vacant";
-  rent: number;
-}
-
-
 export const fetchLandlordTasks = createAsyncThunk(
-  "landlordLandlordDashboard/fetchTasks", async (userId: string) =>{
-    //get the tenant data which has the task IDs
+  "landlordDashboard/fetchLandlordTasks",
+  async (userId: string) => {
+    // First, get the landlord data which includes task IDs
     const landlordResponse = await Meteor.callAsync(
-      MeteorMethodIdentifier.LANDLORD_GET, userId
+      MeteorMethodIdentifier.LANDLORD_GET,
+      userId
     );
-    // console.log(tenantResponse)
 
-    //fetch task details for each task Id
+    // Fetch task details for each task ID
     const taskDetails = [];
-    if (landlordResponse.tasks && landlordResponse.tasks.length > 0){
-      for (const taskId of landlordResponse.tasks){
-        try{
-          //fetch task detail using TASK_GET method
+    if (landlordResponse.tasks && landlordResponse.tasks.length > 0) {
+      for (const taskId of landlordResponse.tasks) {
+        try {
+          // Fetch task details using the TASK_GET method
           const taskData = await Meteor.callAsync(
-            MeteorMethodIdentifier.TASK_GET, taskId
+            MeteorMethodIdentifier.TASK_GET,
+            taskId
           );
-          if (taskData){
+
+          if (taskData) {
+            // Format the task data for display
             taskDetails.push({
               title: taskData.name,
               description: taskData.description,
@@ -58,18 +55,24 @@ export const fetchLandlordTasks = createAsyncThunk(
               taskId: taskData.taskId
             });
           }
-        } catch (error){
+        } catch (error) {
           console.error(`Error fetching task ${taskId}:`, error);
         }
-        }
       }
-    
+    }
+
     return {
-        ...landlordResponse,
+      ...landlordResponse,
       taskDetails: taskDetails,
     };
-    }
+  }
 );
+
+interface Property {
+  address: string;
+  status: "Occupied" | "Vacant";
+  rent: number;
+}
 
 export const landlordDashboardSlice = createSlice({
   name: "landlordDashboard",
@@ -109,5 +112,6 @@ export const { setLoading, setTasks, setProperties, setError } = landlordDashboa
 export const selectLandlordDashboard = (state: RootState) => state.landlordDashboard;
 export const selectTasks = (state: RootState) => state.landlordDashboard.tasks;
 export const selectProperties = (state: RootState) => state.landlordDashboard.properties;
-
+export const selectLoading = (state: RootState) =>
+  state.landlordDashboard.isLoading;
 export default landlordDashboardSlice.reducer;

@@ -7,15 +7,14 @@ import {
   fetchAgentTasks,
   selectProperties,
   selectTasks,
-  setProperties,
-  setTasks,
 } from "../state/agent-dashboard-slice";
 import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
-import { AgentTopNavbar } from "../../../navigation-bars/TopNavbar";
+import { RoleTopNavbar } from "../../../navigation-bars/TopNavbar";
 import {
   agentDashboardLinks,
   settingLinks,
 } from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
+import { setProperties } from "../../landlord-dashboard/state/landlord-dashboard-slice";
 
 export function AgentDashboard(): React.JSX.Element {
   const [isSidebarOpen, onSideBarOpened] = React.useState(false); // is used to manage the state of the sidebar (open or closed).
@@ -37,22 +36,22 @@ export function AgentDashboard(): React.JSX.Element {
       setProperties([
         {
           address: "123 Main St",
-          status: "Closed",
+          status: "Occupied",
           rent: 1500,
         },
         {
           address: "456 Oak Ave",
-          status: "Draft",
+          status: "Vacant",
           rent: 2200,
         },
         {
           address: "789 Pine Rd",
-          status: "Closed",
+          status: "Vacant",
           rent: 1800,
         },
         {
           address: "101 Cedar Ln",
-          status: "Maintenance",
+          status: "Occupied",
           rent: 1950,
         },
       ])
@@ -78,7 +77,7 @@ export function AgentDashboard(): React.JSX.Element {
 
   return (
     <div className="min-h-screen">
-      <AgentTopNavbar onSideBarOpened={onSideBarOpened} />
+      <RoleTopNavbar onSideBarOpened={onSideBarOpened} />
       <div className="flex">
         <RoleSideNavBar
           isOpen={isSidebarOpen}
@@ -90,9 +89,7 @@ export function AgentDashboard(): React.JSX.Element {
           <h1 className="text-2xl font-bold mb-6">Agent Dashboard</h1>
           <DashboardCards />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <UpcomingTasks tasks={tasks} />{" "}
-            {/* Display a list of upcoming tasks using tasks data from the redux store. */}
-            <PropertyOverview properties={properties} />
+            <UpcomingTasks tasks={tasks} /> <PropertyOverview />
           </div>
         </div>
       </div>

@@ -6,8 +6,6 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { ApiTenant } from "../../../../shared/api-models/user/api-roles/ApiTenant";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
-import { TaskDocument } from "/app/server/database/task/models/TaskDocument";
-import { TaskCollection } from "/app/server/database/task/task-collections";
 
 // -- INSERT TENANT --
 const tenantInsertMethod = {
@@ -37,24 +35,18 @@ const tenantGetMethod = {
         new InvalidDataError(`Tenant with user ID ${userId} not found.`)
       );
     }
-
-    return mapTenantDocumentToDTO(tenantDoc);
+    return {
+      tenantId: tenantDoc._id!,
+      userAccountId: tenantDoc.userAccountId,
+      tasks: tenantDoc.task_ids,
+      firstName: tenantDoc.firstName,
+      lastName: tenantDoc.lastName,
+      email: tenantDoc.email,
+      createdAt: tenantDoc.createdAt,
+    };
   },
 };
 
-async function mapTenantDocumentToDTO(
-  tenant: TenantDocument
-): Promise<ApiTenant> {
-  return {
-    tenantId: tenant._id!,
-    userAccountId: tenant.userAccountId,
-    tasks: tenant.task_ids,
-    firstName: tenant.firstName,
-    lastName: tenant.lastName,
-    email: tenant.email,
-    createdAt: tenant.createdAt,
-  };
-}
 
 Meteor.methods({
   ...tenantInsertMethod,

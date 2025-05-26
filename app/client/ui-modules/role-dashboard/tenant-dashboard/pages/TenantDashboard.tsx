@@ -9,7 +9,7 @@ import {
   selectTasks,
 } from "../../tenant-dashboard/state/tenant-dashboard-slice";
 import DashboardCards from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/DashboardCards";
-import { TenantTopNavbar } from "../../../navigation-bars/TopNavbar";
+import { RoleTopNavbar } from "../../../navigation-bars/TopNavbar";
 import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
 import {
   tenantDashboardLinks,
@@ -79,7 +79,7 @@ function TenantDashboard() {
   return (
     <div className="flex flex-row min-h-screen">
       <div className="flex-1">
-        <TenantTopNavbar onSideBarOpened={onSideBarOpened} />
+        <RoleTopNavbar onSideBarOpened={onSideBarOpened} />
 
         <div className="flex">
           <RoleSideNavBar
