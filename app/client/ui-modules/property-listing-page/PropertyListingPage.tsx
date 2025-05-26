@@ -50,7 +50,7 @@ export function PropertyListingPage({
     if (propertyIdFromUrl) {
       dispatch(load(propertyIdFromUrl));
     }
-  }, [dispatch, propertyIdFromUrl]);
+  }, []);
 
   if (state.shouldShowLoadingState) {
     return (

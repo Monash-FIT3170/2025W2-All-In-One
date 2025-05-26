@@ -8,6 +8,12 @@ export async function apiGetListingForProperty(propertyId: string): Promise<ApiL
   return fetchedListing
 }
 
+export async function apiGetAllListedListings(): Promise<ApiListing[]> {
+  const fetchedListings: ApiListing[] = await Meteor.callAsync(MeteorMethodIdentifier.LISTING_GET_ALL_LISTED);
+
+  return fetchedListings;
+}
+
 export async function apiInsertPropertyListing(propertyId: string,imageUrls: string[]){
   const data: IncompleteListingInsertData = {
     property_id : propertyId,

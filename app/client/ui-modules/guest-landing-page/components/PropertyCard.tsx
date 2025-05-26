@@ -1,11 +1,9 @@
 import React from "react";
 import { BedDouble, Bath, DoorOpen, CalendarDays } from "lucide-react";
 import { CardWidget } from "../../role-dashboard/components/CardWidget";
-import { ApiProperty } from "../../../../shared/api-models/property/ApiProperty";
 import { useNavigate } from "react-router";
 import { getFormattedDateStringFromDate } from "../../../library-modules/utils/date-utils";
-import { ApiListing } from "../../../../shared/api-models/property-listing/ApiListing";
-
+import { PropertyWithListingData } from "../../../library-modules/use-cases/property-listing/models/PropertyWithListingData";
 
 function getNextInspectionDateString(inspections?: { start_time: Date }[]): string { 
     if (!inspections || inspections.length === 0) {
@@ -23,12 +21,7 @@ function getNextInspectionDateString(inspections?: { start_time: Date }[]): stri
     return getFormattedDateStringFromDate(futureInspections[0].start_time);
 }
 
-
-export type PropertyCardData = ApiProperty & {
-    listing: ApiListing;
-};
-
-export function PropertyCard(props: PropertyCardData) {
+export function PropertyCard(props: PropertyWithListingData) {
     const {
         propertyId,
         streetnumber,
@@ -39,16 +32,17 @@ export function PropertyCard(props: PropertyCardData) {
         propertyStatus, 
         bathrooms,
         bedrooms,
-        listing,
+        image_urls,
+        inspections,
     } = props;
 
     const address = `${streetnumber} ${streetname}`;
     const weeklyPrice = ((pricePerMonth) / 4).toFixed(0);
     const navigate = useNavigate();
 
-    const displayImageUrl = listing.image_urls?.[0];
+    const displayImageUrl = image_urls?.[0];
 
-    const nextInspectionDate = getNextInspectionDateString(listing.inspections);
+    const nextInspectionDate = getNextInspectionDateString(inspections);
 
     const handleClick = () => {
         if (propertyId) {            

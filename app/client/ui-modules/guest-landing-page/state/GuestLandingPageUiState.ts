@@ -1,13 +1,7 @@
-import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
-import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
-
-
-export type PropertyWithListing = ApiProperty & {
-  listing: ApiListing;
-};
+import { PropertyWithListingData } from "/app/client/library-modules/use-cases/property-listing/models/PropertyWithListingData";
 
 export type GuestLandingPageUiState = {
   isLoading: boolean;
-  properties: PropertyWithListing[];
+  properties: PropertyWithListingData[];
   error: string | null;
 };

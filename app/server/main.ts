@@ -191,61 +191,68 @@ async function tempSeedPropertyData(): Promise<void> {
       inspection_ids: ["1", "2"],
     });
 
-    // Seed 10 additional properties with "Listed" status
-    const listedStatusId = "2"; 
-    const propertyStatusVacantId = "1"; // Corresponds to "Vacant"
-    const defaultFeatureIds = ["1", "2"]; // Default features
-
-    for (let i = 2; i <= 11; i++) {
-      const propertyId = i.toString();
-      await PropertyCollection.insertAsync({
-        _id: propertyId,
-        streetnumber: `${i * 10}`,
-        streetname: "Central Street",
-        suburb: ["Clayton", "Frankston", "Cranbourne", "Mexico"][i % 4],
-        province: "NY",
-        postcode: `${10000 + i}`,
-        property_status_id: propertyStatusVacantId,
-        description:
-          `Spacious ${ (i % 3) + 2}-bedroom property in a prime location. Features modern amenities and excellent transport links. ` +
-          `Ideal for families or professionals looking for comfort and convenience. Property includes a well-maintained garden and off-street parking.`,
-        summary_description: `Beautiful ${ (i % 3) + 2}-bed property in ${["Clayton", "Frankston", "Cranbourne", "Mexico"][i % 4]}.`,
-        bathrooms: (i % 2) + 1,
-        bedrooms: (i % 3) + 2,
-        parking: (i % 2) + 1,
-        property_feature_ids: defaultFeatureIds,
-        type: (i % 2 === 0) ? "Apartment" : "Townhouse",
-        area: 300 + i * 20,
-        agent_id: globalAgent?.agentId,
-        landlord_id: globalLandlord?.landlordId,
-        tenant_id: globalTenant.tenantId
-      });
-
-      await PropertyPriceCollection.insertAsync({
-        property_id: propertyId,
-        price_per_month: 1200 + i * 100,
-        date_set: new Date(),
-      });
-
-      
-  
-      const imageUrls = [
-        "https://cdn.pixabay.com/photo/2018/08/04/11/30/draw-3583548_1280.png",
-        "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
-        "https://cdn.pixabay.com/photo/2024/05/26/10/15/bird-8788491_1280.jpg",
-      ];
-
-
-      await ListingCollection.insertAsync({
-        property_id: propertyId,
-        listing_status_id: listedStatusId, // "Listed"
-        image_urls: imageUrls,
-        inspection_ids: ["1","2","3"],
-      });
-      console.log(`[Seed] Created listed property: ${propertyId}`);
-    }
+    await seedListedProperties(globalAgent, globalLandlord, globalTenant);
   }
 }
+
+
+
+async function seedListedProperties(
+  agent: ApiAgent,
+  landlord: ApiLandlord,
+  tenant: ApiTenant
+): Promise<void> {
+  const listedStatusId = "2";
+  const propertyStatusVacantId = "1"; 
+  const defaultFeatureIds = ["1", "2"]; 
+
+  for (let i = 2; i <= 11; i++) {
+    const propertyId = i.toString();
+    await PropertyCollection.insertAsync({
+      _id: propertyId,
+      streetnumber: `${i * 10}`,
+      streetname: "Central Street",
+      suburb: ["Clayton", "Frankston", "Cranbourne", "Mexico"][i % 4],
+      province: "NY",
+      postcode: `${10000 + i}`,
+      property_status_id: propertyStatusVacantId,
+      description:
+        `Spacious ${(i % 3) + 2}-bedroom property in a prime location. Features modern amenities and excellent transport links. ` +
+        `Ideal for families or professionals looking for comfort and convenience. Property includes a well-maintained garden and off-street parking.`,
+      summary_description: `Beautiful ${(i % 3) + 2}-bed property in ${["Clayton", "Frankston", "Cranbourne", "Mexico"][i % 4]}.`,
+      bathrooms: (i % 2) + 1,
+      bedrooms: (i % 3) + 2,
+      parking: (i % 2) + 1,
+      property_feature_ids: defaultFeatureIds,
+      type: i % 2 === 0 ? "Apartment" : "Townhouse",
+      area: 300 + i * 20,
+      agent_id: agent?.agentId,
+      landlord_id: landlord?.landlordId,
+      tenant_id: tenant.tenantId,
+    });
+
+    await PropertyPriceCollection.insertAsync({
+      property_id: propertyId,
+      price_per_month: 1200 + i * 100,
+      date_set: new Date(),
+    });
+
+    const imageUrls = [
+      "https://cdn.pixabay.com/photo/2018/08/04/11/30/draw-3583548_1280.png",
+      "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
+      "https://cdn.pixabay.com/photo/2024/05/26/10/15/bird-8788491_1280.jpg",
+    ];
+
+    await ListingCollection.insertAsync({
+      property_id: propertyId,
+      listing_status_id: listedStatusId, // "Listed"
+      image_urls: imageUrls,
+      inspection_ids: ["1", "2", "3"],
+    });
+    console.log(`[Seed] Created listed property: ${propertyId}`);
+  }
+}
+
 async function tempSeedTaskData(): Promise<void> {
   if ((await TaskCollection.find().countAsync()) === 0) {
     await TaskStatusCollection.insertAsync({
@@ -286,16 +293,16 @@ async function tempSeedTaskData(): Promise<void> {
   }
 }
 
-  async function tempSeedPropertyStatusData(): Promise<void> {
-    if ((await PropertyStatusCollection.find().countAsync()) != 2){
-      PropertyStatusCollection.insertAsync({
-        name: PropertyStatus.VACANT
-      })
-      PropertyStatusCollection.insertAsync({
-        name:PropertyStatus.OCCUPIED
-      })
-    }
+async function tempSeedPropertyStatusData(): Promise<void> {
+  if ((await PropertyStatusCollection.find().countAsync()) != 2) {
+    PropertyStatusCollection.insertAsync({
+      name: PropertyStatus.VACANT,
+    });
+    PropertyStatusCollection.insertAsync({
+      name: PropertyStatus.OCCUPIED,
+    });
   }
+}
 
 async function permSeedListingStatusData(): Promise<void> {
   if ((await ListingStatusCollection.find().countAsync()) === 0) {

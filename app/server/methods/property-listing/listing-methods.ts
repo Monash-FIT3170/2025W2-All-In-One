@@ -37,6 +37,42 @@ const getListingForProperty = {
   },
 };
 
+const getAllListedListings = {
+  [MeteorMethodIdentifier.LISTING_GET_ALL_LISTED]: async (): Promise<ApiListing[]> => {
+    const listedStatus = ListingStatus.LISTED;
+
+    const listedStatusDocument = await getListingStatusDocumentByName(listedStatus);
+
+    if (!listedStatusDocument) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(
+          `Listing status '${listedStatus}' not found in the database.`
+        )
+      );
+    }
+
+    const listingDocuments = await getListingDocumentsByStatus(listedStatusDocument._id);
+
+    if (listingDocuments.length === 0) {
+      return [];
+    }
+    try {
+      const apiListings = await Promise.all(
+        listingDocuments.map(doc => mapListingDocumentToListingDTO(doc))
+      );
+      return apiListings;
+    } catch (error) {
+      throw meteorWrappedInvalidDataError(error instanceof Error ? error : new Error(String(error)));
+    }
+  },
+};
+
+async function getListingDocumentsByStatus(statusId: string): Promise<ListingDocument[]> {
+  return ListingCollection.find({
+    listing_status_id: statusId,
+  }).fetchAsync();
+}
+
 async function mapListingDocumentToListingDTO(
   listing: ListingDocument
 ): Promise<ApiListing> {
@@ -117,4 +153,5 @@ async function getListingStatusDocumentByName(name: ListingStatus): Promise<List
 Meteor.methods({
   ...getListingForProperty,
   ...insertListingDocumentForProperty,
+  ...getAllListedListings
 });

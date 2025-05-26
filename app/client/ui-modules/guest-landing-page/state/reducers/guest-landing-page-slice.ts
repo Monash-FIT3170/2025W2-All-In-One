@@ -1,11 +1,9 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "/app/client/store";
-import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing"; 
-import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
-import { apiGetListingForProperty } from "../../../../library-modules/apis/property-listing/listing-api";
 import { GuestLandingPageUiState } from "../GuestLandingPageUiState"; 
+import { PropertyWithListingData } from "/app/client/library-modules/use-cases/property-listing/models/PropertyWithListingData";
+import { getPropertyWithListingDataUseCase } from "/app/client/library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
+import { getAllListedListings } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
 
 const initialState: GuestLandingPageUiState = {
   isLoading: false,
@@ -13,32 +11,23 @@ const initialState: GuestLandingPageUiState = {
   error: null,
 };
 
-import { PropertyWithListing } from "../GuestLandingPageUiState";
 
 export const fetchPropertiesAndListings = createAsyncThunk<
-  PropertyWithListing[],
+  PropertyWithListingData[],
   void,
   { state: RootState }
 >(
   "guestLandingPage/fetchPropertiesAndListings",
   async () => {
-    const baseProperties: ApiProperty[] = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_ALL);
+    const listedListings = await getAllListedListings();
 
 
-    const propertiesWithPotentialListings: (ApiProperty & { listing: ApiListing | null })[] = await Promise.all(
-      baseProperties.map(async (property) => {
-        const listing = await apiGetListingForProperty(property.propertyId);
-        return { ...property, listing: listing };
-      })
-    );
-    
-    const propertiesWithListedStatus: PropertyWithListing[] = propertiesWithPotentialListings
-      .filter((property): property is ApiProperty & { listing: ApiListing } => {
-        return property.listing != null && property.listing.listing_status === ListingStatus.LISTED;
-      })
-      .map(property => ({ ...property, listing: property.listing! }));
+    const propertyDataPromises = listedListings.map((listing) =>
+      getPropertyWithListingDataUseCase(listing.property_id));
 
-    return propertiesWithListedStatus;
+    const allResults = await Promise.all(propertyDataPromises);
+
+    return allResults
   }
 );
 
@@ -52,7 +41,7 @@ export const guestLandingPageSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(fetchPropertiesAndListings.fulfilled, (state, action: PayloadAction<PropertyWithListing[]>) => { // Changed PayloadAction type
+      .addCase(fetchPropertiesAndListings.fulfilled, (state, action: PayloadAction<PropertyWithListingData[]>) => {
         state.isLoading = false;
         state.properties = action.payload;
       })
@@ -66,7 +55,7 @@ export const guestLandingPageSlice = createSlice({
 export const selectGuestLandingPageUiState = (state: RootState) => state.guestLandingPage;
 
 
-export const selectGuestLandingPageProperties = (state: RootState): PropertyWithListing[] => {
+export const selectGuestLandingPageProperties = (state: RootState): PropertyWithListingData[] => {
   return state.guestLandingPage.properties;
 };
 
