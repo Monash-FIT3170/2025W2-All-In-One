@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FormControl,
   FormField,
@@ -14,20 +14,13 @@ import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
 import { MultiSelect } from "../../theming-shadcn/Multiselect";
 
-const frameworksList = [
-  { value: "react", label: "React"},
-  { value: "angular", label: "Angular"},
-  { value: "vue", label: "Vue"},
-  { value: "svelte", label: "Svelte"},
-  { value: "ember", label: "Ember"},
-];
-
 export default function FormPropertyDetails({
   form,
+  features,
 }: {
   form: UseFormReturn<FormSchemaType>;
+  features: { value: string; label: string }[];
 }) {
-  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>(["react", "angular"]);
   return (
     <div className="border border-(--divider-color) w-full p-7 rounded-md mb-3">
       <FormHeading
@@ -105,27 +98,28 @@ export default function FormPropertyDetails({
         )}
       />
 
-        {/* FEATURES */}
-      <div className="p-4 max-w-xl">
-      <h1 className="text-2xl font-bold mb-4">Multi-Select Component</h1>
-      <MultiSelect
-        options={frameworksList}
-        onValueChange={setSelectedFrameworks}
-        defaultValue={selectedFrameworks}
-        placeholder="Select frameworks"
-        variant="inverted"
-        animation={2}
-        maxCount={3}
+      <FormField
+        control={form.control}
+        name="property_feature_ids"
+        render={() => (
+          <FormItem className="py-4 max-w-xl">
+            <FormLabel>Property Features</FormLabel>
+            <FormControl>
+              <MultiSelect
+                options={features}
+                onValueChange={(values) =>
+                  form.setValue("property_feature_ids", values)
+                }
+                defaultValue={form.getValues("property_feature_ids") || []}
+                placeholder="Select features"
+                animation={2}
+                maxCount={5}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
       />
-      <div className="mt-4">
-        <h2 className="text-xl font-semibold">Selected Frameworks:</h2>
-        <ul className="list-disc list-inside">
-          {selectedFrameworks.map((framework) => (
-            <li key={framework}>{framework}</li>
-          ))}
-        </ul>
-      </div>
-      </div>
     </div>
-  );
-}
+)};
+

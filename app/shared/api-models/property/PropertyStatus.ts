@@ -1,4 +1,8 @@
 export enum PropertyStatus {
-  VACANT = "Vacant",
-  OCCUPIED = "Occupied",
+  VACANT = "VACANT",
+  OCCUPIED = "OCCUPIED",
+  UNDER_MAINTENANCE = "UNDER_MAINTENANCE",
+  CLOSED = "CLOSED",
+  DRAFT = "DRAFT",
+  LISTED = "LISTED",
 }

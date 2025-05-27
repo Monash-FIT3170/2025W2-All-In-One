@@ -1,4 +1,3 @@
-
 export type ApiProperty = {
   propertyId: string;
   streetnumber: string;

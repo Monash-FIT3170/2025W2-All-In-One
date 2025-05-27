@@ -4,9 +4,8 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon } from "lucide-react";
-import { PropertyForm } from "./components/PropertyForm";
 import { formSchema, FormSchemaType } from "./components/FormSchema";
-import { formDefaultValues } from "./components/PropertyForm";
+import { formDefaultValues, PropertyForm } from "./components/PropertyForm";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { useAppDispatch } from "../../store";
 import { PropertyFormPageUiState } from "./state/PropertyFormPageUIState";
@@ -19,7 +18,8 @@ import { BlobNamePrefix, UploadResults } from "/app/shared/azure/blob-models";
 import { apiInsertPropertyListing } from "../../library-modules/apis/property-listing/listing-api";
 import { useNavigate } from "react-router";
 import { apiPropertyInsertPrice } from "../../library-modules/apis/property-price/price-api";
-import { NavigationPath } from "../../navigation";
+import { NavigationPath } from "../../navigation";import { PropertyFormMode } from "./enum/PropertyFormMode";
+
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
@@ -40,21 +40,20 @@ export function PropertyFormPage() {
   };
 
   const handleSubmit = async (values: FormSchemaType) => {
-    const addressParts = values.address.trim().split(" ");
   
     const insertDoc: PropertyInsertData = {
-      streetnumber: addressParts[0],
-      streetname: addressParts.slice(1).join(" "),
+      streetnumber: values.address_number,
+      streetname: values.address,
       suburb: values.city,
       province: values.state,
       postcode: values.postal_code,
       property_status_id: await getPropertyStatusId(PropertyStatus.VACANT),
       description: values.description,
-      summary_description: values.description.slice(0, 60), // takes first 60 characters?? not sure what summary description is
+      summary_description: values.description.slice(0, 60),
       bathrooms: values.bathroom_number,
       bedrooms: values.bedroom_number,
       parking: 0, // not collected yet
-      property_feature_ids: [], // Currently accepting id: not the actual name.
+      property_feature_ids: values.property_feature_ids,
       type: values.property_type,
       area: values.space,
       agent_id: "", // not collected yet
@@ -82,6 +81,10 @@ export function PropertyFormPage() {
     navigator(`${NavigationPath.PropertyListing}?propertyId=${propertyId}`)
   };
   
+  useEffect(() => {
+    dispatch(load());
+  }, []);
+
   return (
     <div className="mt-6 ml-10">
       <div className="flex flex-col items-start">
@@ -101,7 +104,7 @@ export function PropertyFormPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-6 py-10 rounded-md space-y-10">
-          <PropertyForm onSubmit={handleSubmit} form={form} landlords={state.landlords} />
+          <PropertyForm onSubmit={handleSubmit} form={form} landlords={state.landlords} features={state.featureOptions} mode={PropertyFormMode.CREATE} />
       </div>
     </div>
   );

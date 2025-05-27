@@ -7,7 +7,7 @@ import {
   setEditing,
   updateField,
 } from "./state/profile-slice";
-import { AgentTopNavbar } from "../navigation-bars/TopNavbar";
+import { RoleTopNavbar } from "../navigation-bars/TopNavbar";
 import { RoleSideNavBar } from "../navigation-bars/side-nav-bars/SideNavbar";
 import {
   agentDashboardLinks,
@@ -58,7 +58,7 @@ export function ProfilePage(): React.JSX.Element {
 
   return (
     <div className="min-h-screen">
-      <AgentTopNavbar onSideBarOpened={onSideBarOpened} />{" "}
+      <RoleTopNavbar onSideBarOpened={onSideBarOpened} />{" "}
       {/*TODO: add switch statements to change nav bars based on users role i.e agent  */}
       <div className="flex">
         <RoleSideNavBar
