@@ -35,7 +35,7 @@ export function PropertyFormPage() {
   const dispatch = useAppDispatch();
   const state: PropertyFormPageUiState = useSelector(selectPropertyFormUiState);
   const navigator = useNavigate();
-
+  // console.log(state.landlords);
   useEffect(() => {
     dispatch(load());
   }, []);

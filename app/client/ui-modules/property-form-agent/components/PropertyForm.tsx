@@ -21,7 +21,7 @@ export function PropertyForm({
 }: {
   form: UseFormReturn<FormSchemaType>;
   onSubmit: (values: FormSchemaType) => void;
-  landlords: Landlord[];
+  landlords: (Landlord & { firstName: string; lastName: string })[];
   mode: PropertyFormMode;
 }) {
   return (

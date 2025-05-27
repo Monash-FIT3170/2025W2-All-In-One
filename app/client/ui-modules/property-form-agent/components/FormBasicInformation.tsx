@@ -25,9 +25,8 @@ export default function FormBasicInformation({
   landlords,
 }: {
   form: UseFormReturn<FormSchemaType>;
-  landlords: Landlord[];
+  landlords: (Landlord & { firstName: string; lastName: string })[];
 }) {
-
   return (
     <div className="border border-(--divider-color) w-full p-7 rounded-md mb-3">
       <FormHeading
@@ -46,9 +45,16 @@ export default function FormBasicInformation({
                   <SelectValue placeholder="Select a landlord" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent side="bottom" position="popper" className="z-[9999] bg-white">
+              <SelectContent
+                side="bottom"
+                position="popper"
+                className="z-[9999] bg-white"
+              >
                 {landlords.map((landlord) => (
-                  <SelectItem key={landlord.landlordId} value={landlord.landlordId}>
+                  <SelectItem
+                    key={landlord.landlordId}
+                    value={landlord.landlordId}
+                  >
                     {landlord.firstName} {landlord.lastName}
                   </SelectItem>
                 ))}
@@ -71,7 +77,11 @@ export default function FormBasicInformation({
                   <SelectValue placeholder="Select property type" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent side="bottom" position="popper" className="z-[9999] bg-white">
+              <SelectContent
+                side="bottom"
+                position="popper"
+                className="z-[9999] bg-white"
+              >
                 <SelectItem value="house">House</SelectItem>
                 <SelectItem value="apartment">Apartment</SelectItem>
               </SelectContent>
