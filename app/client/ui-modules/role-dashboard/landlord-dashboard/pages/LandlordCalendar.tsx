@@ -12,7 +12,6 @@ export function LandlordCalendar(): React.JSX.Element {
   const tasks = useAppSelector(selectTasks); // Retrieve tasks from Redux store
   const loading = useAppSelector(selectLoading);
   const currentUser = useAppSelector((state) => state.currentUser.authUser); // Get the authenticated user
-  const [isSidebarOpen, onSideBarOpened] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
 

@@ -1,7 +1,6 @@
 import React from "react";
 
 function TenantMaintenance() {
-  const [isSidebarOpen, onSideBarOpened] = React.useState(false);
   return (
     <div className="min-h-screen">
       <div className="flex">

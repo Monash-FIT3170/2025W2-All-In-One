@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router";
 import { Button } from "../theming-shadcn/Button";
 import { Input } from "../theming-shadcn/Input";
-import { agentLinks } from "../navigation-bars/side-nav-bars/side-nav-link-definitions";
 import {
   selectSettingsPageUiState,
   setTextNotificationsEnabled,
@@ -40,7 +39,6 @@ function SettingsPageBase({
   SettingsPageUiState: SettingsPageUiStateType;
   onToggleChange: (checked: boolean) => void;
 }): React.JSX.Element {
-  const [isSidebarOpen, onSideBarOpened] = React.useState(false);
 
   if (SettingsPageUiState.isLoading) {
     return <div>Loading...</div>;

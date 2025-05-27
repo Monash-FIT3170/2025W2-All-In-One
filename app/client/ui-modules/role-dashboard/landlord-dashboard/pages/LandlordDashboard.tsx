@@ -13,7 +13,6 @@ import {
 } from "../state/landlord-dashboard-slice";
 
 export function LandlordDashboard(): React.JSX.Element {
-  const [isSidebarOpen, onSideBarOpened] = React.useState(false);
   const dispatch = useAppDispatch();
   const properties = useAppSelector(selectProperties);
 

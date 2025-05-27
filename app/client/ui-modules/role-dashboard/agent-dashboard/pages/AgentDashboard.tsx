@@ -8,14 +8,9 @@ import {
   selectProperties,
   selectTasks,
 } from "../state/agent-dashboard-slice";
-import {
-  agentDashboardLinks,
-  settingLinks,
-} from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
 import { setProperties } from "../../landlord-dashboard/state/landlord-dashboard-slice";
 
 export function AgentDashboard(): React.JSX.Element {
-  const [isSidebarOpen, onSideBarOpened] = React.useState(false); // is used to manage the state of the sidebar (open or closed).
   const dispatch = useAppDispatch(); // is used to dispatch actions to the Redux store.
   const properties = useAppSelector(selectProperties); // is used to retrieve data from the Redux store.
   const tasks = useAppSelector(selectTasks);
