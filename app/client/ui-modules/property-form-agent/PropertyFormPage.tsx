@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { NavigationPath } from "../../navigation";
 import { PropertyFormMode } from "./enum/PropertyFormMode";
+import { unwrapResult } from "@reduxjs/toolkit";
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
@@ -31,10 +32,18 @@ export function PropertyFormPage() {
   const onClick = () => {
     console.log("Attempting to return to previous route.");
   };
+  const navigate = (propertyId: string) =>{ 
+    navigator(`${NavigationPath.PropertyListing}?propertyId=${propertyId}`);
+  }
 
   const handleSubmit = async (values: FormSchemaType) => {
-    dispatch(submitForm(values));
-    navigator(`${NavigationPath.PropertyListing}?propertyId=${state.propertyId}`)
+    const resultAction = await dispatch(submitForm(values))
+    const propertyId = unwrapResult(resultAction).propertyId;
+    if (propertyId) {
+      navigate(propertyId);
+    }
+    console.log("Form submitted successfully:", values);
+
 };
   
   return (

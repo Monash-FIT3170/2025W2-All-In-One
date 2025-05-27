@@ -196,9 +196,7 @@ const insertDraftListingDocumentForProperty = {
     data: ApiInsertListingPayload,
     status: ListingStatus
   ): Promise<string> => {
-    const listingStatus = await getListingStatusDocumentByName(
-      status
-    );
+    const listingStatus = await getListingStatusDocumentByName(status);
     if (!listingStatus) {
       throw new Meteor.Error(
         `ListingStatus ${ListingStatus.DRAFT} does not exist`
@@ -237,6 +235,6 @@ Meteor.methods({
   ...getListingForProperty,
   ...insertDraftListingDocumentForProperty,
   ...getListingStatusIdByName,
-  ...submitDraftListing, 
-  ...getAllListedListings
+  ...submitDraftListing,
+  ...getAllListedListings,
 });

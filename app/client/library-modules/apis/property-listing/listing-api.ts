@@ -25,7 +25,7 @@ export async function apiGetAllListedListings(): Promise<ApiListing[]> {
 export async function apiInsertPropertyListing(
   propertyId: string,
   imageUrls: string[],
-  status: ListingStatus,
+  status: ListingStatus
 ) {
   const data: ApiInsertListingPayload = {
     property_id: propertyId,
@@ -46,7 +46,10 @@ export async function apiGetListingStatusByName(name: string): Promise<string> {
     name
   );
   return listingStatusId;
-}   
+}
 export async function apiSubmitDraftListing(propertyId: string): Promise<void> {
-  await Meteor.callAsync(MeteorMethodIdentifier.LISTING_SUBMIT_DRAFT, propertyId);
+  await Meteor.callAsync(
+    MeteorMethodIdentifier.LISTING_SUBMIT_DRAFT,
+    propertyId
+  );
 }

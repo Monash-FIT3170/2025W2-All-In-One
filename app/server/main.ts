@@ -15,6 +15,7 @@ import {
   ListingStatusCollection,
 } from "/app/server/database/property-listing/listing-collections";
 import "/app/server/methods/property-status/property-status-methods";
+import "/app/server/methods/property-price/property-price-methods";
 import "./methods/user/user.register";
 import "./methods/user/profile-data-methods";
 import "./methods/user/user-account-methods";
@@ -23,9 +24,8 @@ import "./methods/user/role-methods/tenant-methods";
 import "./methods/user/role-methods/landlord-methods";
 import {
   TaskCollection,
-  TaskStatusCollection,
 } from "/app/server/database/task/task-collections";
-import { AgentCollection } from "/app/server/database/user/user-collections";
+import { AgentCollection, UserAccountCollection } from "/app/server/database/user/user-collections";
 import { TenantCollection } from "./database/user/user-collections";
 import { Role } from "../shared/user-role-identifier";
 import { TaskStatus } from "../shared/task-status-identifier";
@@ -153,7 +153,6 @@ async function tempSeedProfileData(): Promise<void> {
       carPlate: "DXW003",
     });
   }
-  console.log("Seeding property data...");
   if ((await PropertyCollection.find().countAsync()) === 0) {
     console.log("Seeding Property Data")
     // Seed property statuses first
@@ -711,6 +710,11 @@ async function permSeedListingStatusData(): Promise<void> {
 async function removeAllCollections(): Promise<void> {
   console.log("Removing all collections...");
   await Meteor.users.removeAsync({});
+  await AgentCollection.removeAsync({});
+  await LandlordCollection.removeAsync({});
+  await TenantCollection.removeAsync({});
+  await ProfileCollection.removeAsync({});
+  await UserAccountCollection.removeAsync({});
   await PropertyCollection.removeAsync({});
   await PropertyFeatureCollection.removeAsync({});
   await PropertyPriceCollection.removeAsync({});
@@ -718,7 +722,7 @@ async function removeAllCollections(): Promise<void> {
   await InspectionCollection.removeAsync({});
   await ListingCollection.removeAsync({});
   await ListingStatusCollection.removeAsync({});
-  await TaskCollection.removeAsync({});
+  await TaskCollection.removeAsync({})
 }
 async function permSeedPropertyFeaturesData(): Promise<void> {
   const features = [

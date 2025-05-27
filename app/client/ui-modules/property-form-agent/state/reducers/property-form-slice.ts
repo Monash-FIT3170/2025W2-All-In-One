@@ -9,7 +9,10 @@ import { PropertyFeatureDocument } from "/app/server/database/property/models/Pr
 import { getAllPropertyFeatures } from "/app/client/library-modules/domain-models/property/repositories/feature-respository";
 import { insertProperty } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { BlobNamePrefix, UploadResults } from "/app/shared/azure/blob-models";
-import { getImageUrlsFromUploadResults, uploadFilesHandler } from "/app/client/library-modules/apis/azure/blob-api";
+import {
+  getImageUrlsFromUploadResults,
+  uploadFilesHandler,
+} from "/app/client/library-modules/apis/azure/blob-api";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 import { insertPropertyListing } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
 import { insertPropertyPrice } from "/app/client/library-modules/domain-models/property-price/property-price-repository";
@@ -36,7 +39,7 @@ export const propertyFormSlice = createSlice({
         label: feature.name,
       }));
     });
-    builder.addCase(submitForm.fulfilled, (state,action) => {
+    builder.addCase(submitForm.fulfilled, (state, action) => {
       state.propertyId = action.payload.propertyId;
     });
   },
@@ -61,18 +64,22 @@ export const load = createAsyncThunk("propertyForm/load", async () => {
 
 export const submitForm = createAsyncThunk(
   "propertyForm/insertProperty",
-  async(propertyFormData: FormSchemaType) => {
-    const { propertyInsertData, monthly_rent, images } = await mapFormSchemaToPropertyInsertData(propertyFormData);
+  async (propertyFormData: FormSchemaType) => {
+    const { propertyInsertData, monthly_rent, images } =
+      await mapFormSchemaToPropertyInsertData(propertyFormData);
 
     const propertyId = await insertProperty(propertyInsertData);
     await insertPropertyPrice(propertyId, monthly_rent);
-    
-    const uploadResults: UploadResults = await uploadFilesHandler(images,BlobNamePrefix.PROPERTY)
-    const imageUrls = getImageUrlsFromUploadResults(uploadResults)
-    await insertPropertyListing(propertyId,imageUrls,ListingStatus.DRAFT)
-    return {propertyId};
+
+    const uploadResults: UploadResults = await uploadFilesHandler(
+      images,
+      BlobNamePrefix.PROPERTY
+    );
+    const imageUrls = getImageUrlsFromUploadResults(uploadResults);
+    await insertPropertyListing(propertyId, imageUrls, ListingStatus.DRAFT);
+    return { propertyId };
   }
-)
+);
 
 export const selectPropertyFormUiState = (state: RootState) =>
   state.propertyForm;
