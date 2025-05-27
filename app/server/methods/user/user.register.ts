@@ -106,7 +106,6 @@ async function createRoleSpecificRecord(
       email: data.email,
     }
   );
-
   const common = {
     userAccountId: userId,
     profileDataId: profileDataId,

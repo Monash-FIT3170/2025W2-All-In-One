@@ -22,7 +22,6 @@ export const propertyFormSlice = createSlice({
 
 export const load = createAsyncThunk("propertyForm/load", async () => {
   const landlords: Landlord[] = await getAllLandlords();
-  console.log(landlords);
   const landlordsWithProfileData = await Promise.all(
     landlords.map(async (landlord) => {
       const profile = await getProfileDataById(landlord.profileDataId);

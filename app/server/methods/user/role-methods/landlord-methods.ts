@@ -43,6 +43,14 @@ const landlordGetMethod = {
   },
 };
 
+const landlordGetAllMethod = {
+  [MeteorMethodIdentifier.LANDLORD_GET_ALL]: async (): Promise<
+    ApiLandlord[]
+  > => {
+    const landlords = await LandlordCollection.find({}).fetchAsync();
+    return await Promise.all(landlords.map(mapLandlordDocumentToDTO));
+  },
+};
 async function mapLandlordDocumentToDTO(
   landlord: LandlordDocument
 ): Promise<ApiLandlord> {
@@ -71,4 +79,5 @@ async function getTaskDocumentsMatchingIds(
 Meteor.methods({
   ...landlordInsertMethod,
   ...landlordGetMethod,
+  ...landlordGetAllMethod,
 });
