@@ -81,8 +81,6 @@ export const fetchTenantProperty = createAsyncThunk(
         userId
       );
 
-      
-
       if (!tenantResponse?.tenantId) {
         throw new Error("Tenant ID not found in response");
       }

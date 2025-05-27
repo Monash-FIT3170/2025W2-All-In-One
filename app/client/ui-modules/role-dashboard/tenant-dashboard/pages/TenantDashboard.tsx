@@ -33,31 +33,6 @@ function TenantDashboard() {
     }
   }, [dispatch, currentUser?.userId]);
 
-  // Dummy data for payment history
-  const dummyPayments = [
-    {
-      id: "1",
-      month: "March Rent",
-      amount: 1500,
-      paidOn: "Mar 1, 2025",
-      status: "paid" as const,
-    },
-    {
-      id: "2",
-      month: "February Rent",
-      amount: 1500,
-      paidOn: "Feb 1, 2025",
-      status: "paid" as const,
-    },
-    {
-      id: "3",
-      month: "January Rent",
-      amount: 1500,
-      paidOn: "Jan 1, 2025",
-      status: "paid" as const,
-    },
-  ];
-
   // Transform API property data to match PropertyDetails component props
   const transformedPropertyDetails = React.useMemo(() => {
     if (!propertyDetails) return null;
