@@ -81,10 +81,6 @@ export function PropertyFormPage() {
     navigator(`${NavigationPath.PropertyListing}?propertyId=${propertyId}`)
   };
   
-  useEffect(() => {
-    dispatch(load());
-  }, []);
-
   return (
     <div className="mt-6 ml-10">
       <div className="flex flex-col items-start">

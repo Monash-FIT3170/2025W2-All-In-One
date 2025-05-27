@@ -465,12 +465,16 @@ function ListingModalEditor({
     apartment_number: "",
     bedroom_number: Number(state.propertyBedrooms),
     bathroom_number: Number(state.propertyBathrooms),
-    space:  Number(state.areaValue),
+    space: Number(state.areaValue),
     description: state.propertyDescription,
     images: [],
     available_dates: new Date(),
     lease_term: "12_months",
     show_contact_boolean: true,
+    suburb: state.suburb,
+    address_number: state.streetNumber,
+    monthly_rent: Number(state.propertyPrice),
+    property_feature_ids: state.propertyFeatures
   };
 
   return (

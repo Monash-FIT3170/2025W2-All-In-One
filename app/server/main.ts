@@ -47,6 +47,7 @@ Meteor.startup(async () => {
   await permSeedPropertyFeaturesData();
   await tempSeedPropertyData();
   await tempSeedTaskData();
+  await seedListedProperties(globalAgent, globalLandlord, globalTenant);
 });
 
 async function tempSeedUserAndRoleData(): Promise<void> {
