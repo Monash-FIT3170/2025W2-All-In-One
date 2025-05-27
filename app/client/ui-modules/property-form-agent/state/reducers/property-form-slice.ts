@@ -3,6 +3,8 @@ import { RootState } from "/app/client/store";
 import { PropertyFormPageUiState } from "../PropertyFormPageUIState";
 import { getAllLandlords } from "/app/client/library-modules/domain-models/user/role-repositories/landlord-repository";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
+import { getProfileDataById } from "/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository";
+
 import { PropertyFeatureDocument } from "/app/server/database/property/models/PropertyFeatureDocument";
 import { getAllPropertyFeatures } from "/app/client/library-modules/domain-models/property/repositories/feature-respository";
 
@@ -18,7 +20,7 @@ export const propertyFormSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(load.fulfilled, (state, action) => {
-      state.landlords = action.payload.landlords;
+      state.landlords = action.payload.landlordsWithProfileData;
       state.features = action.payload.features;
       state.featureOptions = action.payload.features.map((feature) => ({
         value: feature._id,
@@ -28,14 +30,22 @@ export const propertyFormSlice = createSlice({
   },
 });
 
-export const load = createAsyncThunk(
-  "propertyForm/load",
-  async () => {
-    const landlords: Landlord[] = await getAllLandlords()
-    const features: PropertyFeatureDocument[] = await getAllPropertyFeatures();
-    return {landlords, features};
-  }
-);
+export const load = createAsyncThunk("propertyForm/load", async () => {
+  const landlords: Landlord[] = await getAllLandlords();
+  const features: PropertyFeatureDocument[] = await getAllPropertyFeatures();
+  const landlordsWithProfileData = await Promise.all(
+    landlords.map(async (landlord) => {
+      const profile = await getProfileDataById(landlord.profileDataId);
+
+      return {
+        ...landlord,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+      };
+    })
+  );
+  return { landlordsWithProfileData, features };
+});
 
 export const selectPropertyFormUiState = (state: RootState) =>
   state.propertyForm;

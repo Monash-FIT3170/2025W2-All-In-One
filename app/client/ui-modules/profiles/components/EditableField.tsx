@@ -23,7 +23,7 @@ export function EditableField({
       </label>
 
       <Input
-        value={value}
+        value={value ?? ""}
         type={type}
         onChange={(e) => onChange(e.target.value)}
         readOnly={!editing}

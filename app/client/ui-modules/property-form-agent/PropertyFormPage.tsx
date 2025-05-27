@@ -9,14 +9,23 @@ import { formDefaultValues, PropertyForm } from "./components/PropertyForm";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { useAppDispatch } from "../../store";
 import { PropertyFormPageUiState } from "./state/PropertyFormPageUIState";
-import { load, selectPropertyFormUiState } from "./state/reducers/property-form-slice";
+import {
+  load,
+  selectPropertyFormUiState,
+} from "./state/reducers/property-form-slice";
 import { useSelector } from "react-redux";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
-import { getPropertyStatusId, insertProperty} from "../../library-modules/domain-models/property/repositories/property-repository";
+import {
+  getPropertyStatusId,
+  insertProperty,
+} from "../../library-modules/domain-models/property/repositories/property-repository";
 import { uploadFilesHandler } from "../../library-modules/apis/azure/blob-api";
 import { BlobNamePrefix, UploadResults } from "/app/shared/azure/blob-models";
 import { apiInsertPropertyListing } from "../../library-modules/apis/property-listing/listing-api";
 import { PropertyFormMode } from "./enum/PropertyFormMode";
+import { useNavigate } from "react-router";
+import { apiPropertyInsertPrice } from "../../library-modules/apis/property-price/price-api";
+import { NavigationPath } from "../../navigation";
 
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
@@ -24,16 +33,18 @@ export function PropertyFormPage() {
     defaultValues: formDefaultValues,
   });
   const dispatch = useAppDispatch();
-  const state: PropertyFormPageUiState = useSelector(
-    selectPropertyFormUiState
-  );
+  const state: PropertyFormPageUiState = useSelector(selectPropertyFormUiState);
+  const navigator = useNavigate();
+  // console.log(state.landlords);
+  useEffect(() => {
+    dispatch(load());
+  }, []);
 
   const onClick = () => {
     console.log("Attempting to return to previous route.");
   };
 
   const handleSubmit = async (values: FormSchemaType) => {
-  
     const insertDoc: PropertyInsertData = {
       streetnumber: values.address_number,
       streetname: values.address,
@@ -53,16 +64,34 @@ export function PropertyFormPage() {
       landlord_id: values.landlord,
       tenant_id: "", // not collected yet
     };
-  
+    console.log("Insert Document:", insertDoc);
     const propertyId = await insertProperty(insertDoc);
     console.log("Property inserted with ID:", propertyId);
 
-    // const uploadReturnValues: UploadResults = await uploadFilesHandler(values.images,BlobNamePrefix.PROPERTY)
-    // console.log(uploadReturnValues)
-    // const imageUrls: string[] = uploadReturnValues.success.map((uploadResult) => {return uploadResult.url})
-    // console.log(await apiInsertPropertyListing("999",imageUrls)) <- Insert the property_id in place of 999
+    await apiPropertyInsertPrice(propertyId, 1500);
+    console.log("Property price inserted for ID:", propertyId);
+
+    const uploadReturnValues: UploadResults = await uploadFilesHandler(
+      values.images,
+      BlobNamePrefix.PROPERTY
+    );
+
+    if (uploadReturnValues.failed.length > 0) {
+      console.error("Failed to upload some images:", uploadReturnValues.failed);
+      throw new Meteor.Error(`Image upload failed. Please try again.`);
+      return;
+    }
+
+    const imageUrls: string[] = uploadReturnValues.success.map(
+      (uploadResult) => {
+        return uploadResult.url;
+      }
+    );
+    await apiInsertPropertyListing(propertyId, imageUrls);
+
+    navigator(`${NavigationPath.PropertyListing}?propertyId=${propertyId}`);
   };
-  
+
   useEffect(() => {
     dispatch(load());
   }, []);
@@ -86,7 +115,13 @@ export function PropertyFormPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-6 py-10 rounded-md space-y-10">
-          <PropertyForm onSubmit={handleSubmit} form={form} landlords={state.landlords} features={state.featureOptions} mode={PropertyFormMode.CREATE} />
+        <PropertyForm
+          onSubmit={handleSubmit}
+          form={form}
+          landlords={state.landlords}
+          features={state.featureOptions}
+          mode={PropertyFormMode.CREATE}
+        />
       </div>
     </div>
   );
