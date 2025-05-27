@@ -6,36 +6,25 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon } from "lucide-react";
 import { formSchema, FormSchemaType } from "./components/FormSchema";
 import { formDefaultValues, PropertyForm } from "./components/PropertyForm";
-import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { useAppDispatch } from "../../store";
 import { PropertyFormPageUiState } from "./state/PropertyFormPageUIState";
-import {
-  load,
-  selectPropertyFormUiState,
-} from "./state/reducers/property-form-slice";
+import { load, selectPropertyFormUiState, submitForm } from "./state/reducers/property-form-slice";
 import { useSelector } from "react-redux";
-import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
-import {
-  getPropertyStatusId,
-  insertProperty,
-} from "../../library-modules/domain-models/property/repositories/property-repository";
-import { uploadFilesHandler } from "../../library-modules/apis/azure/blob-api";
-import { BlobNamePrefix, UploadResults } from "/app/shared/azure/blob-models";
-import { apiInsertPropertyListing } from "../../library-modules/apis/property-listing/listing-api";
-import { PropertyFormMode } from "./enum/PropertyFormMode";
 import { useNavigate } from "react-router";
-import { apiPropertyInsertPrice } from "../../library-modules/apis/property-price/price-api";
 import { NavigationPath } from "../../navigation";
-
+import { PropertyFormMode } from "./enum/PropertyFormMode";
+import { unwrapResult } from "@reduxjs/toolkit";
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: formDefaultValues,
   });
   const dispatch = useAppDispatch();
-  const state: PropertyFormPageUiState = useSelector(selectPropertyFormUiState);
+  const state: PropertyFormPageUiState = useSelector(
+    selectPropertyFormUiState
+  );
   const navigator = useNavigate();
-  // console.log(state.landlords);
+
   useEffect(() => {
     dispatch(load());
   }, []);
@@ -43,59 +32,19 @@ export function PropertyFormPage() {
   const onClick = () => {
     console.log("Attempting to return to previous route.");
   };
+  const navigate = (propertyId: string) =>{ 
+    navigator(`${NavigationPath.PropertyListing}?propertyId=${propertyId}`);
+  }
 
   const handleSubmit = async (values: FormSchemaType) => {
-    const insertDoc: PropertyInsertData = {
-      streetnumber: values.address_number,
-      streetname: values.address,
-      suburb: values.city,
-      province: values.state,
-      postcode: values.postal_code,
-      property_status_id: await getPropertyStatusId(PropertyStatus.VACANT),
-      description: values.description,
-      summary_description: values.description.slice(0, 60),
-      bathrooms: values.bathroom_number,
-      bedrooms: values.bedroom_number,
-      parking: 0, // not collected yet
-      property_feature_ids: values.property_feature_ids,
-      type: values.property_type,
-      area: values.space,
-      agent_id: "", // not collected yet
-      landlord_id: values.landlord,
-      tenant_id: "", // not collected yet
-    };
-    console.log("Insert Document:", insertDoc);
-    const propertyId = await insertProperty(insertDoc);
-    console.log("Property inserted with ID:", propertyId);
-
-    await apiPropertyInsertPrice(propertyId, 1500);
-    console.log("Property price inserted for ID:", propertyId);
-
-    const uploadReturnValues: UploadResults = await uploadFilesHandler(
-      values.images,
-      BlobNamePrefix.PROPERTY
-    );
-
-    if (uploadReturnValues.failed.length > 0) {
-      console.error("Failed to upload some images:", uploadReturnValues.failed);
-      throw new Meteor.Error(`Image upload failed. Please try again.`);
-      return;
+    const resultAction = await dispatch(submitForm(values))
+    const propertyId = unwrapResult(resultAction).propertyId;
+    if (propertyId) {
+      navigate(propertyId);
     }
 
-    const imageUrls: string[] = uploadReturnValues.success.map(
-      (uploadResult) => {
-        return uploadResult.url;
-      }
-    );
-    await apiInsertPropertyListing(propertyId, imageUrls);
-
-    navigator(`${NavigationPath.PropertyListing}?propertyId=${propertyId}`);
-  };
-
-  useEffect(() => {
-    dispatch(load());
-  }, []);
-
+};
+  
   return (
     <div className="mt-6 ml-10">
       <div className="flex flex-col items-start">

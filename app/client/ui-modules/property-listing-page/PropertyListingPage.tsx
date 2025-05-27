@@ -33,6 +33,8 @@ import {
   submitDraftListingAsync,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
+import { TopNavbar } from "/app/client/ui-modules/navigation-bars/TopNavbar";
+import { useSearchParams } from "react-router";
 import EditDraftListingModal from "./components/EditDraftListingModal";
 import { EditDraftListingButton } from "./components/EditDraftListingButton";
 import { PropertyForm } from "../property-form-agent/components/PropertyForm";
@@ -42,7 +44,6 @@ import {
   formSchema,
   FormSchemaType,
 } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
-import { useSearchParams } from "react-router";
 
 export function PropertyListingPage({
   className = "",
@@ -55,12 +56,8 @@ export function PropertyListingPage({
   const state: PropertyListingPageUiState = useSelector(
     selectPropertyListingUiState
   );
-  const propertyIdFromUrl = searchParams.get("propertyId");
 
   useEffect(() => {
-    if (propertyIdFromUrl) {
-      dispatch(load(propertyIdFromUrl));
-    }
     if (!propertyId) {
       console.log("Property ID is not provided, loading default property");
       dispatch(load("1"));
@@ -483,6 +480,10 @@ function ListingModalEditor({
     available_dates: new Date(),
     lease_term: "12_months",
     show_contact_boolean: true,
+    suburb: state.suburb,
+    address_number: state.streetNumber,
+    monthly_rent: Number(state.propertyPrice),
+    property_feature_ids: state.propertyFeatures
   };
 
   return (
