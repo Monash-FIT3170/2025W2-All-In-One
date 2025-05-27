@@ -23,16 +23,14 @@ interface RoleSideNavBarProps {
   onClose: () => void;
 }
 
-export function RoleSideNavBar({
-  isOpen,
-  onClose,
-}: RoleSideNavBarProps) {
+export function RoleSideNavBar({ isOpen, onClose }: RoleSideNavBarProps) {
   const navigate = useNavigate();
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const authUser = useAppSelector((state) => state.currentUser.authUser);
+  const profileData = useAppSelector((state) => state.currentUser.profileData);
 
-  const firstName = currentUser?.firstName || "Unknown";
-  const lastName = currentUser?.lastName || "User";
+  const firstName = profileData?.firstName || "Unknown";
+  const lastName = profileData?.lastName || "User";
   const title = authUser?.role || "User";
 
   let dashboardLinks: NavLinkItem[] = [];
