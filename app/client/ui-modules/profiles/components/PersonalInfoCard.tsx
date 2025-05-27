@@ -41,6 +41,7 @@ export function PersonalInfoCard({ profile, isEditing, onChange }: Props) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {fields.map(({ label, key, type }) => (
           <EditableField
+            key={key}
             label={label}
             value={profile[key]}
             editing={isEditing}

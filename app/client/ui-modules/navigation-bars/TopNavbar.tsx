@@ -32,6 +32,7 @@ export function TopNavbar({
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const profileData = useAppSelector((state) => state.currentUser.profileData);
   const authUser = useAppSelector((state) => state.currentUser.authUser);
 
   const agentTasks = useAppSelector(selectAgentTasks);
@@ -99,7 +100,7 @@ export function TopNavbar({
 
         {/* Right section: auth-based content */}
         <div className="flex items-center gap-4">
-          {currentUser && authUser ? (
+          {currentUser && profileData && authUser ? (
             <>
               <BellIcon
                 hasNotifications={true}
@@ -116,8 +117,8 @@ export function TopNavbar({
               </div>
               <div className="cursor-pointer" onClick={handleGoProfile}>
                 <ProfileFooter
-                  firstName={currentUser.firstName}
-                  lastName={currentUser.lastName}
+                  firstName={profileData.firstName}
+                  lastName={profileData.lastName}
                   title={authUser.role || "User"}
                 />
               </div>

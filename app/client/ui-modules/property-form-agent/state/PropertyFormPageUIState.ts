@@ -2,7 +2,7 @@ import { Landlord } from "/app/client/library-modules/domain-models/user/Landlor
 import { PropertyFeatureDocument } from "/app/server/database/property/models/PropertyFeatureDocument";
 
 export type PropertyFormPageUiState = {
-  landlords: Landlord[],
-  features: PropertyFeatureDocument[],
+  landlords: (Landlord & { firstName: string; lastName: string })[];
+  features: PropertyFeatureDocument[];
   featureOptions: { value: string; label: string }[];
 };

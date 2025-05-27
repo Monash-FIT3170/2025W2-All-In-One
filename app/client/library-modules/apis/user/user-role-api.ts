@@ -3,6 +3,7 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { ApiAgent } from "/app/shared/api-models/user/api-roles/ApiAgent";
 import { ApiTenant } from "/app/shared/api-models/user/api-roles/ApiTenant";
 import { ApiLandlord } from "/app/shared/api-models/user/api-roles/ApiLandlord";
+import { ApiProfileData } from "/app/shared/api-models/user/api-roles/ApiProfileData";
 
 export async function apiGetAgent(userId: string): Promise<ApiAgent> {
   return await Meteor.callAsync(MeteorMethodIdentifier.AGENT_GET, userId);
@@ -17,5 +18,22 @@ export async function apiGetLandlord(userId: string): Promise<ApiLandlord> {
 }
 
 export async function apiGetAllLandlords(): Promise<ApiLandlord[]> {
-  return await Meteor.callAsync(MeteorMethodIdentifier.LANDLORD_GET_ALL)
+  return await Meteor.callAsync(MeteorMethodIdentifier.LANDLORD_GET_ALL);
+}
+
+export async function apiGetProfileData(
+  profileId: string
+): Promise<ApiProfileData> {
+  return await Meteor.callAsync(MeteorMethodIdentifier.PROFILE_GET, profileId);
+}
+
+export async function apiUpdateProfileData(
+  profileId: string,
+  updatedData: Partial<ApiProfileData>
+): Promise<ApiProfileData> {
+  return await Meteor.callAsync(
+    MeteorMethodIdentifier.PROFILE_EDIT,
+    profileId,
+    updatedData
+  );
 }
