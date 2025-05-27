@@ -108,7 +108,7 @@ const propertyGetLandlordTotalIncomeMethod = {
     if (!occupiedStatus) {
       throw new Meteor.Error(
         "status-not-found",
-        "Could not find occupied status IDs"
+        "Could not find occupied status ID"
       );
     }
     const occupiedProperties = await PropertyCollection.find({
@@ -116,12 +116,11 @@ const propertyGetLandlordTotalIncomeMethod = {
       property_status_id: occupiedStatus._id,
     }).fetchAsync();
 
-    const propertyIds = occupiedProperties.map((p) => p._id);
     let totalMonthly = 0;
 
-    for (const propertyId of propertyIds) {
+    for (const property of occupiedProperties) {
       const latestPrice = await PropertyPriceCollection.findOneAsync(
-        { property_id: propertyId },
+        { property_id: property._id },
         { sort: { date_set: -1 } } //uses most recent date for rent
       );
       if (latestPrice) {
@@ -146,19 +145,73 @@ const propertyGetLandlordOccupancyRateMethod = {
     const occupiedStatus = await PropertyStatusCollection.findOneAsync({
       name: PropertyStatus.OCCUPIED,
     });
+    if (!occupiedStatus) {
+      throw new Meteor.Error(
+        "status-not-found",
+        "Could not find occupied status ID"
+      );
+    }
 
     const properties = await PropertyCollection.find({
       landlord_id: landlordId,
     }).fetchAsync();
 
-    const total = properties.length;
+    const totalProperties = properties.length;
 
-    const occupied = properties.filter(
-      (p) => p.property_status_id === occupiedStatus?._id
-    ).length;
+    const occupiedCount = await PropertyCollection.find({
+      landlord_id: landlordId,
+      property_status_id: occupiedStatus._id,
+    }).countAsync();
 
-    const occupancyRate = total > 0 ? (occupied / total) * 100 : 0;
+    const occupancyRate =
+      totalProperties > 0 ? (occupiedCount / totalProperties) * 100 : 0;
     return Math.round(occupancyRate);
+  },
+};
+
+const propertyGetLandlordAverageRent = {
+  [MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_AVERAGE_RENT]: async (
+    landlordId: string
+  ): Promise<{ occupiedCount: number; rent:number }> => {
+    const occupiedStatus = await PropertyStatusCollection.findOneAsync({
+      name: PropertyStatus.OCCUPIED,
+    });
+
+    if (!occupiedStatus) {
+      throw new Meteor.Error(
+        "status-not-found",
+        "Could not find occupied status ID"
+      );
+    }
+
+    const occupiedProperties = await PropertyCollection.find({
+      landlord_id: landlordId,
+      property_status_id: occupiedStatus._id,
+    }).fetchAsync();
+
+    let totalMonthly = 0;
+
+    for (const property of occupiedProperties) {
+      const latestPrice = await PropertyPriceCollection.findOneAsync(
+        { property_id: property._id },
+        { sort: { date_set: -1 } } //uses most recent date for rent
+      );
+      if (latestPrice) {
+        totalMonthly += latestPrice.price_per_month;
+      }
+    }
+
+    const occupiedCount = occupiedProperties.length;
+    if (occupiedCount === 0) return {occupiedCount: occupiedCount,
+        rent: 0,
+      };
+
+    const averageRent = totalMonthly / occupiedCount;
+
+    return {
+        occupiedCount: occupiedCount,
+        rent: Math.round(averageRent * 100) / 100,
+      };
   },
 };
 
@@ -359,6 +412,7 @@ Meteor.methods({
   ...propertyGetStatusCountsLandlordMethod,
   ...propertyGetLandlordTotalIncomeMethod,
   ...propertyGetLandlordOccupancyRateMethod,
+  ...propertyGetLandlordAverageRent,
   ...propertyGetCountMethod,
   ...propertyGetListMethod,
   ...propertyInsertMethod,
