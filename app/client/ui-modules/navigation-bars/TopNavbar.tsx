@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { PropManagerLogoIcon } from "../theming/components/logo/PropManagerLogoIcon";
 import { PropManagerLogoText } from "../theming/components/logo/PropManagerLogoText";
@@ -8,6 +8,19 @@ import { SideBarSliderIcon } from "../theming/icons/SideBarSlider";
 import { useAppSelector, useAppDispatch } from "/app/client/store";
 import { ProfileFooter } from "../navigation-bars/side-nav-bars/components/ProfileFooter";
 import { signoutUser } from "../user-authentication/state/reducers/current-user-slice";
+import { NotificationBoard } from "../theming/components/NotificationBoard";
+import { selectTasks as selectAgentTasks, fetchAgentTasks } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
+import { selectTasks as selectTenantTasks, fetchTenantTasks } from "../role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
+import { selectTasks as selectLandlordTasks, fetchLandlordTasks } from "../role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
+
+interface Task {
+  title: string;
+  datetime: string;
+  status: string;
+  description?: string;
+  priority?: string;
+  taskId?: string;
+}
 
 interface TopNavbarProps {
   onSideBarOpened: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,6 +34,31 @@ export function TopNavbar({
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const authUser = useAppSelector((state) => state.currentUser.authUser);
 
+  const agentTasks = useAppSelector(selectAgentTasks);
+  const tenantTasks = useAppSelector(selectTenantTasks);
+  const landlordTasks = useAppSelector(selectLandlordTasks);
+
+  const upcomingTasks = authUser?.role === 'agent' ? agentTasks : authUser?.role === 'tenant' ? tenantTasks : authUser?.role === 'landlord' ? landlordTasks : [];
+
+  useEffect(() => {
+    if (authUser?.userId) {
+      switch (authUser.role) {
+        case 'agent':
+          dispatch(fetchAgentTasks(authUser.userId));
+          break;
+        case 'tenant':
+          dispatch(fetchTenantTasks(authUser.userId));
+          break;
+        case 'landlord':
+          dispatch(fetchLandlordTasks(authUser.userId));
+          break;
+        default:
+          // Handle other roles or no role if necessary
+          break;
+      }
+    }
+  }, [dispatch, authUser?.userId, authUser?.role]);
+
   const handleSignout = async () => {
     try {
       await dispatch(signoutUser()).unwrap();
@@ -32,6 +70,12 @@ export function TopNavbar({
 
   const handleGoHome = () => navigate("/");
   const handleGoProfile = () => navigate("/profile");
+
+  const [isNotificationBoardOpen, setIsNotificationBoardOpen] = useState(false);
+
+  const toggleNotificationBoard = () => {
+    setIsNotificationBoardOpen((prev) => !prev);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
@@ -59,9 +103,17 @@ export function TopNavbar({
             <>
               <BellIcon
                 hasNotifications={true}
-                className="text-gray-600"
-                onClick={() => console.log("Notification clicked")}
+                className="text-gray-600 cursor-pointer"
+                onClick={toggleNotificationBoard}
               />
+              <div className="relative">
+                {/* Notification Board */}
+                <NotificationBoard
+                  open={isNotificationBoardOpen}
+                  onClose={() => setIsNotificationBoardOpen(false)}
+                  tasks={upcomingTasks}
+                />
+              </div>
               <div className="cursor-pointer" onClick={handleGoProfile}>
                 <ProfileFooter
                   firstName={currentUser.firstName}
