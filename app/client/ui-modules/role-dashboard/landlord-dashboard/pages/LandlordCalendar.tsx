@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
-import { RoleTopNavbar } from "../../../navigation-bars/TopNavbar";
 import {
   fetchLandlordTasks,
   selectTasks,
   selectLoading,
 } from "../state/landlord-dashboard-slice";
-import {
-  landlordDashboardLinks,
-  settingLinks,
-} from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 export function LandlordCalendar(): React.JSX.Element {
@@ -18,7 +12,6 @@ export function LandlordCalendar(): React.JSX.Element {
   const tasks = useAppSelector(selectTasks); // Retrieve tasks from Redux store
   const loading = useAppSelector(selectLoading);
   const currentUser = useAppSelector((state) => state.currentUser.authUser); // Get the authenticated user
-  const [isSidebarOpen, onSideBarOpened] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
 
@@ -37,15 +30,7 @@ if (loading) {
 }
   return (
     <div className="min-h-screen">
-      <RoleTopNavbar onSideBarOpened={onSideBarOpened} />
       <div className="flex">
-        <RoleSideNavBar
-          isOpen={isSidebarOpen}
-          onClose={() => onSideBarOpened(false)}
-          dashboardLinks={landlordDashboardLinks} // Pass the dashboard links to the sidebar
-          settingsLinks={settingLinks} // Pass the links to the sidebar
-
-        />
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-bold mb-6">Landlord Calendar</h1>
           <div className="flex gap-6">

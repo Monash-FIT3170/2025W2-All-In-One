@@ -3,11 +3,8 @@ import { useSelector } from "react-redux";
 
 import { Link } from "react-router";
 import Ripple from "./animations/Ripple";
-import { SideNavBar } from "../navigation-bars/side-nav-bars/SideNavbar";
-import { TopNavbar } from "../navigation-bars/TopNavbar";
 import { Button } from "../theming-shadcn/Button";
 import { Input } from "../theming-shadcn/Input";
-import { agentLinks } from "../navigation-bars/side-nav-bars/side-nav-link-definitions";
 import { PropertyCard } from "./components/PropertyCard"; 
 import {
     fetchPropertiesAndListings,
@@ -21,8 +18,7 @@ export function GuestLandingPage() {
     const { properties: listedProperties, isLoading, error } = useSelector(
         (state: RootState) => selectGuestLandingPageUiState(state)
     );
-
-    const [isSidebarOpen, onSideBarOpened] = useState(false);
+    
     const [visibleCount, setVisibleCount] = useState(3);
 
     useEffect(() => {
@@ -35,8 +31,6 @@ export function GuestLandingPage() {
 
     return (
         <div className="p-5">
-            <TopNavbar onSideBarOpened={onSideBarOpened} />
-            <SideNavBar isOpen={isSidebarOpen} onClose={() => onSideBarOpened(false)} navLinks={agentLinks} />
             <div className="relative flex flex-col items-center justify-center min-h-[80vh] bg-white overflow-hidden px-4">
                 <Ripple />
                 <div className="relative z-10 text-center">
