@@ -26,14 +26,24 @@ export interface NavLinkItem {
 
 interface NavBarLinksProps {
   links: NavLinkItem[];
+  onClose?: () => void;
 }
 
-export function NavBarLinks({ links }: NavBarLinksProps) {
+export function NavBarLinks({ links, onClose }: NavBarLinksProps) {
   return (
     <>
       {links.map(({ to, label, icon }) => (
-        <Link to={to} className="flex items-center gap-2 p-2" key={to}>
-          {icon && icon} {/* Render the icon directly */}
+        <Link
+          to={to}
+          className="flex items-center gap-2 p-2"
+          key={to}
+          onClick={(e) => {
+            if (onClose) {
+              onClose();
+            }
+          }}
+        >
+          {icon && icon}
           <span>{label}</span>
         </Link>
       ))}

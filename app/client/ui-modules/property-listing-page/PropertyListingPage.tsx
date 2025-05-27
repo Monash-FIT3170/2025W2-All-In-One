@@ -70,7 +70,6 @@ export function PropertyListingPage({
   if (state.shouldShowLoadingState) {
     return (
       <>
-        <TopNavbar onSideBarOpened={() => {}} />
         <ListingPageContentLoadingSkeleton
           className={twMerge("p-5", className)}
         />
@@ -79,7 +78,6 @@ export function PropertyListingPage({
   } else {
     return (
       <>
-        <TopNavbar onSideBarOpened={() => {}} />
         <ListingPageContent
           streetNumber={state.streetNumber}
           street={state.street}
