@@ -27,7 +27,6 @@ export function PropertyFormPage() {
   const state: PropertyFormPageUiState = useSelector(
     selectPropertyFormUiState
   );
-  const features = state.features;
 
   const onClick = () => {
     console.log("Attempting to return to previous route.");
@@ -87,7 +86,7 @@ export function PropertyFormPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-6 py-10 rounded-md space-y-10">
-          <PropertyForm onSubmit={handleSubmit} form={form} landlords={state.landlords} features={features} />
+          <PropertyForm onSubmit={handleSubmit} form={form} landlords={state.landlords} features={state.featureOptions} />
       </div>
     </div>
   );

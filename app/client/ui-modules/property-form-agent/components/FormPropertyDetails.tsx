@@ -13,21 +13,14 @@ import { FormSchemaType } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
 import { MultiSelect } from "../../theming-shadcn/Multiselect";
-import { getAllPropertyFeatures } from "/app/client/library-modules/domain-models/property/repositories/feature-respository";
 
 export default function FormPropertyDetails({
   form,
   features,
 }: {
   form: UseFormReturn<FormSchemaType>;
-  features: { _id: string; name: string }[];
+  features: { value: string; label: string }[];
 }) {
-  const featureOptions = (features ?? []).map((feature) => ({
-    value: feature._id,
-    label: feature.name,
-  }));
-  
-
   return (
     <div className="border border-(--divider-color) w-full p-7 rounded-md mb-3">
       <FormHeading
@@ -113,7 +106,7 @@ export default function FormPropertyDetails({
             <FormLabel>Property Features</FormLabel>
             <FormControl>
               <MultiSelect
-                options={featureOptions}
+                options={features}
                 onValueChange={(values) =>
                   form.setValue("property_feature_ids", values)
                 }
@@ -128,5 +121,5 @@ export default function FormPropertyDetails({
         )}
       />
     </div>
-  );
-}
+)};
+
