@@ -6,6 +6,8 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiLandlord } from "../../../../shared/api-models/user/api-roles/ApiLandlord";
+import { TaskDocument } from "/app/server/database/task/models/TaskDocument";
+import { TaskCollection } from "/app/server/database/task/task-collections";
 //INSERT LANDLORD
 const landlordInsertMethod = {
   [MeteorMethodIdentifier.LANDLORD_INSERT]: async (
@@ -27,44 +29,51 @@ const landlordGetMethod = {
   [MeteorMethodIdentifier.LANDLORD_GET]: async (
     userId: string
   ): Promise<ApiLandlord> => {
-    const landlordDoc = await LandlordCollection.findOneAsync({ userAccountId: userId });
+    const landlordDoc = await LandlordCollection.findOneAsync({
+      userAccountId: userId,
+    });
 
     if (!landlordDoc) {
       throw meteorWrappedInvalidDataError(
         new InvalidDataError(`Landlord with user ID ${userId} not found.`)
       );
     }
-    return {
-      landlordId: landlordDoc._id!,
-      userAccountId: landlordDoc.userAccountId,
-      tasks: landlordDoc.task_ids,
-      firstName: landlordDoc.firstName,
-      lastName: landlordDoc.lastName,
-      email: landlordDoc.email,
-      createdAt: landlordDoc.createdAt,
-    };
+
+    return mapLandlordDocumentToDTO(landlordDoc);
   },
 };
 
 const landlordGetAllMethod = {
-  [MeteorMethodIdentifier.LANDLORD_GET_ALL]: async (): Promise<ApiLandlord[]> => {
+  [MeteorMethodIdentifier.LANDLORD_GET_ALL]: async (): Promise<
+    ApiLandlord[]
+  > => {
     const landlords = await LandlordCollection.find({}).fetchAsync();
     return await Promise.all(landlords.map(mapLandlordDocumentToDTO));
   },
 };
-
 async function mapLandlordDocumentToDTO(
   landlord: LandlordDocument
 ): Promise<ApiLandlord> {
+  const taskIds = landlord.task_ids ?? [];
+
+  const taskDocuments =
+    taskIds.length > 0 ? await getTaskDocumentsMatchingIds(taskIds) : [];
+
   return {
     landlordId: landlord._id!,
+    profileDataId: landlord.profileDataId,
     userAccountId: landlord.userAccountId,
-    tasks: landlord.task_ids,
-    firstName: landlord.firstName,
-    lastName: landlord.lastName,
-    email: landlord.email,
+    tasks: taskDocuments.map((doc) => doc.name), // will be empty if no tasks
     createdAt: landlord.createdAt,
   };
+}
+
+async function getTaskDocumentsMatchingIds(
+  ids: string[]
+): Promise<TaskDocument[]> {
+  return await TaskCollection.find({
+    _id: { $in: ids },
+  }).fetchAsync();
 }
 
 Meteor.methods({

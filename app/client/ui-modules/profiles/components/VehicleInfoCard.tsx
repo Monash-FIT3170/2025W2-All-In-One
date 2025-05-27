@@ -23,7 +23,7 @@ export function VehicleInfoCard({ profile, isEditing, onChange }: Props) {
     { label: "Make", key: "carMake", type: "string" },
     { label: "Model", key: "carModel", type: "string" },
     { label: "Year", key: "carYear", type: "string" },
-    { label: "License Playe", key: "carPlate", type: "string" },
+    { label: "License Plate", key: "carPlate", type: "string" },
   ];
   return (
     <CardWidget
@@ -34,6 +34,7 @@ export function VehicleInfoCard({ profile, isEditing, onChange }: Props) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {fields.map(({ label, key, type }) => (
           <EditableField
+            key={key}
             label={label}
             value={profile[key]}
             editing={isEditing}

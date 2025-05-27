@@ -56,7 +56,13 @@ export function PropertyFormPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-6 py-10 rounded-md space-y-10">
-          <PropertyForm onSubmit={handleSubmit} form={form} landlords={state.landlords} features={state.featureOptions} mode={PropertyFormMode.CREATE} />
+        <PropertyForm
+          onSubmit={handleSubmit}
+          form={form}
+          landlords={state.landlords}
+          features={state.featureOptions}
+          mode={PropertyFormMode.CREATE}
+        />
       </div>
     </div>
   );

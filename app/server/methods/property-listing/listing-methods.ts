@@ -37,15 +37,16 @@ const getListingForProperty = {
   },
 };
 
-
 const submitDraftListing = {
   [MeteorMethodIdentifier.LISTING_SUBMIT_DRAFT]: async (
     propertyId: string
   ): Promise<{ success: boolean; propertyId: string }> => {
     try {
       // Find the listing for this property
-      const listing = await getListingDocumentAssociatedWithProperty(propertyId);
-      
+      const listing = await getListingDocumentAssociatedWithProperty(
+        propertyId
+      );
+
       if (!listing) {
         throw meteorWrappedInvalidDataError(
           new InvalidDataError(
@@ -56,7 +57,7 @@ const submitDraftListing = {
 
       // Find the "Listed" listing status ID
       const listedStatus = await ListingStatusCollection.findOneAsync({
-        name: ListingStatus.LISTED
+        name: ListingStatus.LISTED,
       });
 
       if (!listedStatus) {
@@ -68,33 +69,38 @@ const submitDraftListing = {
       // Update the listing status
       const result = await ListingCollection.updateAsync(
         { property_id: propertyId },
-        { 
-          $set: { 
+        {
+          $set: {
             listing_status_id: listedStatus._id,
-
-          } 
+          },
         }
       );
 
       if (result === 0) {
         throw meteorWrappedInvalidDataError(
-          new InvalidDataError(`Failed to update listing for property ${propertyId}`)
+          new InvalidDataError(
+            `Failed to update listing for property ${propertyId}`
+          )
         );
       }
 
       return { success: true, propertyId };
     } catch (error) {
-      console.error('Error submitting draft listing:', error);
+      console.error("Error submitting draft listing:", error);
       throw error;
     }
   },
 };
 
 const getAllListedListings = {
-  [MeteorMethodIdentifier.LISTING_GET_ALL_LISTED]: async (): Promise<ApiListing[]> => {
+  [MeteorMethodIdentifier.LISTING_GET_ALL_LISTED]: async (): Promise<
+    ApiListing[]
+  > => {
     const listedStatus = ListingStatus.LISTED;
 
-    const listedStatusDocument = await getListingStatusDocumentByName(listedStatus);
+    const listedStatusDocument = await getListingStatusDocumentByName(
+      listedStatus
+    );
 
     if (!listedStatusDocument) {
       throw meteorWrappedInvalidDataError(
@@ -104,23 +110,29 @@ const getAllListedListings = {
       );
     }
 
-    const listingDocuments = await getListingDocumentsByStatus(listedStatusDocument._id);
+    const listingDocuments = await getListingDocumentsByStatus(
+      listedStatusDocument._id
+    );
 
     if (listingDocuments.length === 0) {
       return [];
     }
     try {
       const apiListings = await Promise.all(
-        listingDocuments.map(doc => mapListingDocumentToListingDTO(doc))
+        listingDocuments.map((doc) => mapListingDocumentToListingDTO(doc))
       );
       return apiListings;
     } catch (error) {
-      throw meteorWrappedInvalidDataError(error instanceof Error ? error : new Error(String(error)));
+      throw meteorWrappedInvalidDataError(
+        error instanceof Error ? error : new Error(String(error))
+      );
     }
   },
 };
 
-async function getListingDocumentsByStatus(statusId: string): Promise<ListingDocument[]> {
+async function getListingDocumentsByStatus(
+  statusId: string
+): Promise<ListingDocument[]> {
   return ListingCollection.find({
     listing_status_id: statusId,
   }).fetchAsync();

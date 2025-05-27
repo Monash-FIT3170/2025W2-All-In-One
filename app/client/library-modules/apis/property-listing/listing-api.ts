@@ -15,7 +15,9 @@ export async function apiGetListingForProperty(
 }
 
 export async function apiGetAllListedListings(): Promise<ApiListing[]> {
-  const fetchedListings: ApiListing[] = await Meteor.callAsync(MeteorMethodIdentifier.LISTING_GET_ALL_LISTED);
+  const fetchedListings: ApiListing[] = await Meteor.callAsync(
+    MeteorMethodIdentifier.LISTING_GET_ALL_LISTED
+  );
 
   return fetchedListings;
 }

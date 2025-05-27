@@ -51,7 +51,7 @@ export function PropertyListingPage({
   className?: string;
 }): React.JSX.Element {
   const [searchParams] = useSearchParams();
-  const propertyId = searchParams.get("propertyId");  
+  const propertyId = searchParams.get("propertyId");
   const dispatch = useAppDispatch();
   const state: PropertyListingPageUiState = useSelector(
     selectPropertyListingUiState
@@ -101,7 +101,9 @@ export function PropertyListingPage({
           listingStatusPillVariant={state.listingStatusPillVariant}
           shouldDisplayListingStatus={state.shouldDisplayListingStatus}
           shouldDisplaySubmitDraftButton={state.shouldDisplaySubmitDraftButton}
-          shouldDisplayReviewTenantButton={state.shouldDisplayReviewTenantButton}
+          shouldDisplayReviewTenantButton={
+            state.shouldDisplayReviewTenantButton
+          }
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
           onBack={() => {
             console.log("back button pressed");
@@ -233,7 +235,7 @@ function ListingPageContent({
         onSubmitDraftListing={onSubmitDraftListing}
         onReviewTenant={() => setIsReviewTenantModalOpen(true)}
       />
-      
+
       <ReviewTenantModal
         isOpen={isReviewTenantModalOpen}
         onClose={() => setIsReviewTenantModalOpen(false)}
@@ -244,10 +246,14 @@ function ListingPageContent({
           console.log(`Progressed application ${applicationId}`);
         }}
         onBackgroundPass={(applicationId: string) => {
-          console.log(`Background check passed for application ${applicationId}`);
+          console.log(
+            `Background check passed for application ${applicationId}`
+          );
         }}
         onBackgroundFail={(applicationId: string) => {
-          console.log(`Background check failed for application ${applicationId}`);
+          console.log(
+            `Background check failed for application ${applicationId}`
+          );
         }}
         onSendToLandlord={(applicationId: string) => {
           console.log(`Sent application ${applicationId} to landlord`);
@@ -424,7 +430,12 @@ function BottomBar({
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={twMerge("flex justify-between items-center items-center gap-2", className)}>
+    <div
+      className={twMerge(
+        "flex justify-between items-center items-center gap-2",
+        className
+      )}
+    >
       {/* Left side - Review Tenant Button */}
       <div className="flex">
         {shouldDisplayReviewTenantButton && (
