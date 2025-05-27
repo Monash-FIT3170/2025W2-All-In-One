@@ -4,7 +4,6 @@ import { Progress } from "../../components/ProgressBar";
 import { Meteor } from "meteor/meteor";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { useAppSelector } from "/app/client/store";
-import { current } from "@reduxjs/toolkit";
 
 export function LandlordDashboardCards() {
   const [propertyCount, setPropertyCount] = useState<number>(0);
@@ -17,6 +16,11 @@ export function LandlordDashboardCards() {
     monthly: number;
   } | null>(null);
   const [occupancyRate, setOccupancyRate] = useState<number | null>(null);
+  const [averageRent, setAverageRent] = useState<{
+    occupiedCount: number;
+    rent: number;
+  } | null>(null);
+
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
 
   useEffect(() => {
@@ -102,6 +106,26 @@ export function LandlordDashboardCards() {
     };
 
     getOccupancyRate();
+
+    const getAverageRent = async () => {
+      if (
+        currentUser &&
+        "landlordId" in currentUser &&
+        currentUser.landlordId
+      ) {
+        try {
+          const averageRent = await Meteor.callAsync(
+            MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_AVERAGE_RENT,
+            currentUser.landlordId
+          );
+          setAverageRent(averageRent);
+        } catch (error) {
+          console.error("Error fetching average rent for landlord:", error);
+        }
+      }
+    };
+
+    getAverageRent();
   }, [currentUser]);
 
   return (
@@ -129,9 +153,14 @@ export function LandlordDashboardCards() {
         )}
       </CardWidget>
       <CardWidget
-        title="Property Value"
-        value="$2.4M"
-        subtitle="+3.5% from last valuation"
+        title="Average Rent"
+        value={
+          averageRent !== null ? `$${averageRent.rent}/month` : "Loading..."
+        }
+        subtitle={ averageRent === null ?  "Loading..." :  averageRent.occupiedCount === 0 ? "No owned properties currently occupied..." : `Across ${averageRent.occupiedCount} occupied propert${
+                averageRent.occupiedCount === 1 ? "y" : "ies"
+              }`
+        }
       />
     </div>
   );
