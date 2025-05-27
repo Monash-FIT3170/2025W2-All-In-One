@@ -21,7 +21,13 @@ export async function apiInsertProperty(property: PropertyInsertData): Promise<s
 
 export async function apiUpdatePropertyData(updatedProperty: PropertyUpdateData): Promise<string> {
   return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_DATA_UPDATE, updatedProperty);
-}export async function apiGetAllProperties(): Promise<ApiProperty[]> {
+}
+
+export async function apiGetAllProperties(): Promise<ApiProperty[]> {
   const fetchedProperties: ApiProperty[] = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_ALL);
   return fetchedProperties;
+}
+
+export async function apiGetPropertyByTenantId(tenantId: string): Promise<ApiProperty> {
+  return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_BY_TENANT_ID, tenantId);
 }

@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../../store";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
+import { getPropertyByTenantId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
 interface TenantDashboardState {
   isLoading: boolean;
@@ -85,11 +86,8 @@ export const fetchTenantProperty = createAsyncThunk(
         throw new Error("Tenant ID not found in response");
       }
 
-      // Then fetch the property details using the tenant ID
-      const propertyData = await Meteor.callAsync(
-        MeteorMethodIdentifier.PROPERTY_GET_BY_TENANT_ID,
-        tenantResponse.tenantId
-      );
+      // Use the repository method instead of direct Meteor call
+      const propertyData = await getPropertyByTenantId(tenantResponse.tenantId);
 
       if (!propertyData) {
         throw new Error("No property found for tenant");
