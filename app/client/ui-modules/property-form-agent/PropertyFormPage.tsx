@@ -42,7 +42,6 @@ export function PropertyFormPage() {
     if (propertyId) {
       navigate(propertyId);
     }
-    console.log("Form submitted successfully:", values);
 
 };
   
