@@ -179,15 +179,18 @@ async function getListingStatusDocumentById(
 ): Promise<ListingStatusDocument | undefined> {
   return await ListingStatusCollection.findOneAsync(id);
 }
-const insertListingDocumentForProperty = {
-  [MeteorMethodIdentifier.LISTING_INSERT_PROPERTY]: async (
-    data: ApiInsertListingPayload
+const insertDraftListingDocumentForProperty = {
+  [MeteorMethodIdentifier.INSERT_PROPERTY_LISTING]: async (
+    data: ApiInsertListingPayload,
+    status: ListingStatus
   ): Promise<string> => {
     const listingStatus = await getListingStatusDocumentByName(
-      ListingStatus.DRAFT
+      status
     );
     if (!listingStatus) {
-      throw new Meteor.Error(`ListingStatus ${ListingStatus.DRAFT} does not exist`);
+      throw new Meteor.Error(
+        `ListingStatus ${ListingStatus.DRAFT} does not exist`
+      );
     }
     try {
       return ListingCollection.insertAsync({
@@ -195,17 +198,7 @@ const insertListingDocumentForProperty = {
         listing_status_id: listingStatus._id,
       });
     } catch (e) {
-      if (e instanceof Error) {
-        throw new Error(
-          `Failed to insert Property into ListingCollection: ${e.message}`
-        );
-      } else {
-        throw new Error(
-          `Failed to insert Property into ListingCollection: ${JSON.stringify(
-            e
-          )}`
-        );
-      }
+      throw new Error(`Failed to insert Property into ListingCollection: ${e}`);
     }
   },
 };
@@ -225,13 +218,12 @@ const getListingStatusIdByName = {
       throw new Meteor.Error("not-found", `ListingStatus ${name} not found`);
     }
     return document._id;
-  }
-}
-
+  },
+};
 
 Meteor.methods({
   ...getListingForProperty,
-  ...insertListingDocumentForProperty,
+  ...insertDraftListingDocumentForProperty,
   ...getListingStatusIdByName,
   ...submitDraftListing, 
   ...getAllListedListings

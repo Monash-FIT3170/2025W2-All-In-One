@@ -41,6 +41,7 @@ let globalTenant: ApiTenant;
 let globalLandlord: ApiLandlord;
 
 Meteor.startup(async () => {
+  await removeAllCollections();
   // await tempSeedPropertyStatusData();
   await permSeedListingStatusData();
   await tempSeedUserAndRoleData();
@@ -673,7 +674,19 @@ async function permSeedListingStatusData(): Promise<void> {
     });
   }
 }
-
+async function removeAllCollections(): Promise<void> {
+  console.log("Removing all collections...");
+  await Meteor.users.removeAsync({});
+  await PropertyCollection.removeAsync({});
+  await PropertyFeatureCollection.removeAsync({});
+  await PropertyPriceCollection.removeAsync({});
+  await PropertyStatusCollection.removeAsync({});
+  await InspectionCollection.removeAsync({});
+  await ListingCollection.removeAsync({});
+  await ListingStatusCollection.removeAsync({});
+  await TaskCollection.removeAsync({});
+  await TaskStatusCollection.removeAsync({});
+}
 async function permSeedPropertyFeaturesData(): Promise<void> {
   const features = [
     { _id: "1", name: "Washing Machine" },

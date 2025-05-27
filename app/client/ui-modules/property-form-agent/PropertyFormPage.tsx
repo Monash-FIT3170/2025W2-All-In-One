@@ -18,8 +18,9 @@ import { BlobNamePrefix, UploadResults } from "/app/shared/azure/blob-models";
 import { apiInsertPropertyListing } from "../../library-modules/apis/property-listing/listing-api";
 import { useNavigate } from "react-router";
 import { apiPropertyInsertPrice } from "../../library-modules/apis/property-price/price-api";
-import { NavigationPath } from "../../navigation";import { PropertyFormMode } from "./enum/PropertyFormMode";
-
+import { NavigationPath } from "../../navigation";
+import { PropertyFormMode } from "./enum/PropertyFormMode";
+import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
@@ -60,26 +61,10 @@ export function PropertyFormPage() {
       landlord_id: values.landlord,
       tenant_id: "", // not collected yet
     };
-    console.log("Insert Document:", insertDoc); 
     const propertyId = await insertProperty(insertDoc);
-    console.log("Property inserted with ID:", propertyId);
-
-    await apiPropertyInsertPrice(propertyId, 1500);
-    console.log("Property price inserted for ID:", propertyId);
-
-    const uploadReturnValues: UploadResults = await uploadFilesHandler(values.images,BlobNamePrefix.PROPERTY)
-
-    if (uploadReturnValues.failed.length > 0) {
-      console.error("Failed to upload some images:", uploadReturnValues.failed);
-      throw new Meteor.Error(`Image upload failed. Please try again.`);
-      return;
-    } 
-
-    const imageUrls: string[] = uploadReturnValues.success.map((uploadResult) => {return uploadResult.url})
-    await apiInsertPropertyListing(propertyId,imageUrls)
 
     navigator(`${NavigationPath.PropertyListing}?propertyId=${propertyId}`)
-  };
+};
   
   return (
     <div className="mt-6 ml-10">
