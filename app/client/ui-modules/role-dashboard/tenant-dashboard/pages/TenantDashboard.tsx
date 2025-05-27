@@ -1,7 +1,6 @@
 import React from "react";
 import { useEffect } from "react";
 import { UpcomingTasks } from "/app/client/ui-modules/role-dashboard/components/UpcomingTask";
-import PaymentHistory from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/PaymentHistory";
 import PropertyDetails from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/PropertyDetails";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
@@ -98,16 +97,6 @@ function TenantDashboard() {
               <div className="mt-5">
                 <UpcomingTasks tasks={tasks ?? []} />
               </div>
-
-              {/* <div className="mt-5">
-                <PaymentHistory
-                  payments={dummyPayments}
-                  onViewAllClick={() =>
-                    console.log("Navigate to payment history page")
-                  }
-                />
-              </div> */}
-
               <div className="mt-5">
                 {propertyLoading ? (
                   <div className="flex items-center justify-center h-full">

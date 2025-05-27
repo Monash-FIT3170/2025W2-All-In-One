@@ -326,6 +326,6 @@ Meteor.methods({
   ...propertyGetListMethod,
   ...propertyInsertMethod,
   ...propertyGetByTenantIdMethod,
-  ...updatePropertyData,,
+  ...updatePropertyData,
   ...propertyGetAllMethod
 });
