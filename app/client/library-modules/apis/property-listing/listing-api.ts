@@ -1,5 +1,6 @@
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
 import { ApiInsertListingPayload } from "/app/shared/api-models/property-listing/ListingInsertData";
+import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 export async function apiGetListingForProperty(
@@ -23,7 +24,8 @@ export async function apiGetAllListedListings(): Promise<ApiListing[]> {
 
 export async function apiInsertPropertyListing(
   propertyId: string,
-  imageUrls: string[]
+  imageUrls: string[],
+  status: ListingStatus
 ) {
   const data: ApiInsertListingPayload = {
     property_id: propertyId,
@@ -31,22 +33,23 @@ export async function apiInsertPropertyListing(
     inspection_ids: [],
   };
   const insertedListing: string = await Meteor.callAsync(
-    MeteorMethodIdentifier.LISTING_INSERT_PROPERTY,
-    data
+    MeteorMethodIdentifier.INSERT_PROPERTY_LISTING,
+    data,
+    status
   );
   return insertedListing;
 }
 
-export async function apiSubmitDraftListing(propertyId: string): Promise<void> {
-  await Meteor.callAsync(
-    MeteorMethodIdentifier.LISTING_SUBMIT_DRAFT,
-    propertyId
-  );
-}
 export async function apiGetListingStatusByName(name: string): Promise<string> {
   const listingStatusId = await Meteor.callAsync(
     MeteorMethodIdentifier.LISTING_STATUS_GET_BY_NAME,
     name
   );
   return listingStatusId;
+}
+export async function apiSubmitDraftListing(propertyId: string): Promise<void> {
+  await Meteor.callAsync(
+    MeteorMethodIdentifier.LISTING_SUBMIT_DRAFT,
+    propertyId
+  );
 }

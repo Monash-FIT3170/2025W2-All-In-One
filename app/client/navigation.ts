@@ -9,7 +9,7 @@ export enum NavigationPath {
   LandlordProperties = "/landlord-properties",
   LandlordCalendar = "/landlord-calendar",
   LandlordTasks = "/landlord-tasks",
-  PropertyListing = "/test",
+  PropertyListing = "/property-listing",
   Settings = "/settings",
   PropertyForm = "/propertyform",
   Login = "/login",
