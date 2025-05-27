@@ -47,7 +47,6 @@ function TenantDashboard() {
       })),
     };
   }, [propertyDetails]);
-  console.log(tasks);
 
   return (
     <div className="flex flex-row min-h-screen">
