@@ -38,6 +38,7 @@ import {
   ProfileCollection,
 } from "./database/user/user-collections";
 import { PropertyStatus } from "../shared/api-models/property/PropertyStatus";
+import "/app/server/methods/property/property-features/property-features-methods";
 import { ListingStatus } from "../shared/api-models/property-listing/ListingStatus";
 
 let globalAgent: ApiAgent;
@@ -46,6 +47,8 @@ let globalLandlord: ApiLandlord;
 
 Meteor.startup(async () => {
   await tempSeedUserAndRoleData();
+  await permSeedPropertyFeaturesData();
+  await tempSeedPropertyData();
   await tempSeedTaskData();
   await tempSeedProfileData();
   await tempSeedUserAndRoleData();
@@ -58,25 +61,25 @@ Meteor.startup(async () => {
 async function tempSeedUserAndRoleData(): Promise<void> {
   const seedUsers = [
     {
-      email: "testingagent@gmail.com",
+      email: "amandaapplebe@gmail.com",
       password: "password123",
-      firstName: "CassandraAgent",
-      lastName: "Vemor",
+      firstName: "Amanda",
+      lastName: "Applebe",
       accountType: Role.AGENT,
       agentCode: "AGENT123",
     },
     {
-      email: "testingtenantemail@gmail.com",
+      email: "toddtoolgate@gmail.com",
       password: "password123",
-      firstName: "TestTenant",
-      lastName: "Rod",
+      firstName: "Todd",
+      lastName: "Toolgate",
       accountType: Role.TENANT,
     },
     {
-      email: "testinglandlordemail@gmail.com",
+      email: "lewislad@gmail.com",
       password: "password123",
-      firstName: "TestLandlord",
-      lastName: "Rod",
+      firstName: "Lewis",
+      lastName: "Lad",
       accountType: Role.LANDLORD,
     },
   ];
@@ -170,21 +173,6 @@ async function tempSeedProfileData(): Promise<void> {
         await PropertyStatusCollection.insertAsync(status);
       }
     }
-
-    await PropertyFeatureCollection.insertAsync({
-      _id: "1",
-      name: "Pool",
-    });
-
-    await PropertyFeatureCollection.insertAsync({
-      _id: "2",
-      name: "Lots of space",
-    });
-
-    await PropertyFeatureCollection.insertAsync({
-      _id: "3",
-      name: "Garden",
-    });
 
     await PropertyPriceCollection.insertAsync({
       _id: "1",
@@ -297,9 +285,23 @@ async function tempSeedProfileData(): Promise<void> {
       property_id: "1",
       listing_status_id: "1",
       image_urls: [
-        "https://cdn.pixabay.com/photo/2018/08/04/11/30/draw-3583548_1280.png",
-        "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
-        "https://cdn.pixabay.com/photo/2024/05/26/10/15/bird-8788491_1280.jpg",
+        "https://images.unsplash.com/photo-1611420890968-c87853bfa973?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://plus.unsplash.com/premium_photo-1682889762731-375a6b22d794?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://plus.unsplash.com/premium_photo-1677474827615-31ea6fa13efe?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1568391300292-a5a1d96b82aa?q=80&w=1928&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1568495248636-6432b97bd949?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1631048501851-4aa85ffc3be8?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1582224163312-0735047647c6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1521783988139-89397d761dce?q=80&w=1925&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://plus.unsplash.com/premium_photo-1661902468735-eabf780f8ff6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://plus.unsplash.com/premium_photo-1681487208776-e308bfaa0539?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://plus.unsplash.com/premium_photo-1673141390230-8b4a3c3152b1?q=80&w=1973&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://plus.unsplash.com/premium_photo-1661963333824-fd020faec5fc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://plus.unsplash.com/premium_photo-1687960116506-f31f84371838?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1644847266252-14cb37a48371?q=80&w=1926&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1654291271293-ab9cb83208ce?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1610295186968-7ad29a75199e?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       ],
       inspection_ids: ["1", "2"],
     });
@@ -315,64 +317,278 @@ async function seedListedProperties(
   const propertyStatusVacantId = "1";
   const defaultFeatureIds = ["1", "2"];
 
-  for (let i = 4; i <= 13; i++) {
-    const propertyId = i.toString();
+  // Array of 20 different image URLs for the property listings
+  const imageUrlsPool = [
+    "https://images.unsplash.com/photo-1611420890968-c87853bfa973?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://plus.unsplash.com/premium_photo-1682889762731-375a6b22d794?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://plus.unsplash.com/premium_photo-1677474827615-31ea6fa13efe?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.unsplash.com/photo-1568391300292-a5a1d96b82aa?q=80&w=1928&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.unsplash.com/photo-1568495248636-6432b97bd949?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.unsplash.com/photo-1631048501851-4aa85ffc3be8?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.unsplash.com/photo-1582224163312-0735047647c6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.unsplash.com/photo-1521783988139-89397d761dce?q=80&w=1925&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://plus.unsplash.com/premium_photo-1661902468735-eabf780f8ff6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://plus.unsplash.com/premium_photo-1681487208776-e308bfaa0539?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://plus.unsplash.com/premium_photo-1673141390230-8b4a3c3152b1?q=80&w=1973&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://plus.unsplash.com/premium_photo-1661963333824-fd020faec5fc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://plus.unsplash.com/premium_photo-1687960116506-f31f84371838?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.unsplash.com/photo-1644847266252-14cb37a48371?q=80&w=1926&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.unsplash.com/photo-1654291271293-ab9cb83208ce?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.unsplash.com/photo-1610295186968-7ad29a75199e?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  ];
 
+  // Helper function to get 3 random unique URLs
+  function getRandomImageUrls(): string[] {
+    const shuffled = [...imageUrlsPool].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 3); // Select the first 3 URLs
+  }
+
+  // Properties to seed
+  const properties = [
+    {
+      _id: "4",
+      streetnumber: "40",
+      streetname: "Reno Street",
+      suburb: "Clayton",
+      province: "VIC",
+      postcode: "3191",
+      property_status_id: propertyStatusVacantId,
+      description:
+        "Spacious 2-bedroom property in a prime location. Features modern amenities and excellent transport links. Ideal for families or professionals looking for comfort and convenience. Property includes a well-maintained garden and off-street parking.",
+      summary_description: "Beautiful 2-bed property in Clayton.",
+      bathrooms: 4,
+      bedrooms: 7,
+      parking: 6,
+      property_feature_ids: defaultFeatureIds,
+      type: "House",
+      area: 320,
+      agent_id: agent?.agentId,
+      landlord_id: landlord?.landlordId,
+      tenant_id: tenant?.tenantId,
+    },
+    {
+      _id: "5",
+      streetnumber: "50",
+      streetname: "Developer Street",
+      suburb: "Frankston",
+      province: "VIC",
+      postcode: "3188",
+      property_status_id: propertyStatusVacantId,
+      description:
+        "Spacious 3-bedroom property in a prime location. Features modern amenities and excellent transport links. Ideal for families or professionals looking for comfort and convenience. Property includes a well-maintained garden and off-street parking.",
+      summary_description: "Beautiful 3-bed property in Frankston.",
+      bathrooms: 2,
+      bedrooms: 3,
+      parking: 2,
+      property_feature_ids: defaultFeatureIds,
+      type: "Townhouse",
+      area: 340,
+      agent_id: agent?.agentId,
+      landlord_id: landlord?.landlordId,
+      tenant_id: tenant?.tenantId,
+    },
+    {
+      _id: "6",
+      streetnumber: "60",
+      streetname: "Present Court",
+      suburb: "Cranbourne",
+      province: "VIC",
+      postcode: "3111",
+      property_status_id: propertyStatusVacantId,
+      description:
+        "Spacious 4-bedroom property in a prime location. Features modern amenities and excellent transport links. Ideal for families or professionals looking for comfort and convenience. Property includes a well-maintained garden and off-street parking.",
+      summary_description: "Beautiful 4-bed property in Cranbourne.",
+      bathrooms: 3,
+      bedrooms: 4,
+      parking: 2,
+      property_feature_ids: defaultFeatureIds,
+      type: "House",
+      area: 360,
+      agent_id: agent?.agentId,
+      landlord_id: landlord?.landlordId,
+      tenant_id: tenant?.tenantId,
+    },
+    {
+      _id: "7",
+      streetnumber: "70",
+      streetname: "Central Street",
+      suburb: "Bayswater",
+      province: "VIC",
+      postcode: "4441",
+      property_status_id: propertyStatusVacantId,
+      description:
+        "Spacious 2-bedroom property in a prime location. Features modern amenities and excellent transport links. Ideal for families or professionals looking for comfort and convenience. Property includes a well-maintained garden and off-street parking.",
+      summary_description: "Beautiful 2-bed property in Bayswater.",
+      bathrooms: 1,
+      bedrooms: 2,
+      parking: 1,
+      property_feature_ids: defaultFeatureIds,
+      type: "Apartment",
+      area: 380,
+      agent_id: agent?.agentId,
+      landlord_id: landlord?.landlordId,
+      tenant_id: tenant?.tenantId,
+    },
+    {
+      _id: "8",
+      streetnumber: "80",
+      streetname: "New Street",
+      suburb: "Melbourne",
+      province: "VIC",
+      postcode: "3000",
+      property_status_id: propertyStatusVacantId,
+      description:
+        "Modern 1-bedroom apartment in the heart of the city. Close to amenities and public transport.",
+      summary_description: "Chic 1-bed apartment in Melbourne.",
+      bathrooms: 1,
+      bedrooms: 1,
+      parking: 0,
+      property_feature_ids: defaultFeatureIds,
+      type: "Apartment",
+      area: 50,
+      agent_id: agent?.agentId,
+      landlord_id: landlord?.landlordId,
+      tenant_id: tenant?.tenantId,
+    },
+    {
+      _id: "9",
+      streetnumber: "90",
+      streetname: "Ocean View Road",
+      suburb: "Geelong",
+      province: "VIC",
+      postcode: "3220",
+      property_status_id: propertyStatusVacantId,
+      description:
+        "Luxurious 5-bedroom house with stunning ocean views. Features a private pool and spacious garden.",
+      summary_description: "Luxury 5-bed house in Geelong.",
+      bathrooms: 4,
+      bedrooms: 5,
+      parking: 3,
+      property_feature_ids: defaultFeatureIds,
+      type: "House",
+      area: 500,
+      agent_id: agent?.agentId,
+      landlord_id: landlord?.landlordId,
+      tenant_id: tenant?.tenantId,
+    },
+    {
+      _id: "10",
+      streetnumber: "100",
+      streetname: "Hilltop Avenue",
+      suburb: "Ballarat",
+      province: "VIC",
+      postcode: "3350",
+      property_status_id: propertyStatusVacantId,
+      description:
+        "Charming 3-bedroom cottage with a cozy fireplace and large backyard. Perfect for families.",
+      summary_description: "Charming 3-bed cottage in Ballarat.",
+      bathrooms: 2,
+      bedrooms: 3,
+      parking: 2,
+      property_feature_ids: defaultFeatureIds,
+      type: "Cottage",
+      area: 200,
+      agent_id: agent?.agentId,
+      landlord_id: landlord?.landlordId,
+      tenant_id: tenant?.tenantId,
+    },
+    {
+      _id: "11",
+      streetnumber: "110",
+      streetname: "Riverbank Street",
+      suburb: "Werribee",
+      province: "VIC",
+      postcode: "3030",
+      property_status_id: propertyStatusVacantId,
+      description:
+        "Stylish 2-bedroom apartment with modern finishes and a balcony overlooking the river.",
+      summary_description: "Stylish 2-bed apartment in Werribee.",
+      bathrooms: 1,
+      bedrooms: 2,
+      parking: 1,
+      property_feature_ids: defaultFeatureIds,
+      type: "Apartment",
+      area: 120,
+      agent_id: agent?.agentId,
+      landlord_id: landlord?.landlordId,
+      tenant_id: tenant?.tenantId,
+    },
+    {
+      _id: "12",
+      streetnumber: "120",
+      streetname: "Forest Lane",
+      suburb: "Dandenong",
+      province: "VIC",
+      postcode: "3175",
+      property_status_id: propertyStatusVacantId,
+      description:
+        "Spacious 4-bedroom family home with a large garden and double garage. Close to schools and parks.",
+      summary_description: "Spacious 4-bed home in Dandenong.",
+      bathrooms: 3,
+      bedrooms: 4,
+      parking: 2,
+      property_feature_ids: defaultFeatureIds,
+      type: "House",
+      area: 400,
+      agent_id: agent?.agentId,
+      landlord_id: landlord?.landlordId,
+      tenant_id: tenant?.tenantId,
+    },
+    {
+      _id: "13",
+      streetnumber: "130",
+      streetname: "Sunset Boulevard",
+      suburb: "Hobart",
+      province: "TAS",
+      postcode: "7000",
+      property_status_id: propertyStatusVacantId,
+      description:
+        "Elegant 3-bedroom townhouse with modern amenities and a private courtyard. Ideal for professionals.",
+      summary_description: "Elegant 3-bed townhouse in Hobart.",
+      bathrooms: 2,
+      bedrooms: 3,
+      parking: 1,
+      property_feature_ids: defaultFeatureIds,
+      type: "Townhouse",
+      area: 250,
+      agent_id: agent?.agentId,
+      landlord_id: landlord?.landlordId,
+      tenant_id: tenant?.tenantId,
+    },
+    // Add more properties here up to 13
+  ];
+
+  // Insert each property
+  for (const property of properties) {
     const existingProperty = await PropertyCollection.findOneAsync({
-      _id: propertyId,
+      _id: property._id,
     });
     if (existingProperty) {
       console.log(
-        `[Seed] Skipped inserting existing property in PropertyCollection: ${propertyId}`
+        `[Seed] Skipped inserting existing property in PropertyCollection: ${property._id}`
       );
       continue;
     }
-    await PropertyCollection.insertAsync({
-      _id: propertyId,
-      streetnumber: `${i * 10}`,
-      streetname: "Central Street",
-      suburb: ["Clayton", "Frankston", "Cranbourne", "Mexico"][i % 4],
-      province: "NY",
-      postcode: `${10000 + i}`,
-      property_status_id: propertyStatusVacantId,
-      description:
-        `Spacious ${
-          (i % 3) + 2
-        }-bedroom property in a prime location. Features modern amenities and excellent transport links. ` +
-        `Ideal for families or professionals looking for comfort and convenience. Property includes a well-maintained garden and off-street parking.`,
-      summary_description: `Beautiful ${(i % 3) + 2}-bed property in ${
-        ["Clayton", "Frankston", "Cranbourne", "Mexico"][i % 4]
-      }.`,
-      bathrooms: (i % 2) + 1,
-      bedrooms: (i % 3) + 2,
-      parking: (i % 2) + 1,
-      property_feature_ids: defaultFeatureIds,
-      type: i % 2 === 0 ? "Apartment" : "Townhouse",
-      area: 300 + i * 20,
-      agent_id: agent?.agentId,
-      landlord_id: landlord?.landlordId,
-      tenant_id: tenant.tenantId,
-    });
+
+    await PropertyCollection.insertAsync(property);
 
     await PropertyPriceCollection.insertAsync({
-      property_id: propertyId,
-      price_per_month: 1200 + i * 100,
+      property_id: property._id,
+      price_per_month: 1200 + parseInt(property._id) * 100,
       date_set: new Date(),
     });
 
-    const imageUrls = [
-      "https://cdn.pixabay.com/photo/2018/08/04/11/30/draw-3583548_1280.png",
-      "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
-      "https://cdn.pixabay.com/photo/2024/05/26/10/15/bird-8788491_1280.jpg",
-    ];
+    const randomImageUrls = getRandomImageUrls(); // Get 3 random image URLs
 
     await ListingCollection.insertAsync({
-      property_id: propertyId,
+      property_id: property._id,
       listing_status_id: listedStatusId, // "Listed"
-      image_urls: imageUrls,
+      image_urls: randomImageUrls,
       inspection_ids: ["1", "2", "3", "4"],
     });
-    console.log(`[Seed] Created listed property: ${propertyId}`);
+
+    console.log(`[Seed] Created listed property: ${property._id}`);
   }
 }
 
@@ -488,5 +704,27 @@ async function permSeedListingStatusData(): Promise<void> {
       _id: "4",
       name: ListingStatus.TENANT_APPROVAL,
     });
+  }
+}
+
+async function permSeedPropertyFeaturesData(): Promise<void> {
+  const features = [
+    { _id: "1", name: "Washing Machine" },
+    { _id: "2", name: "Hair Dryer" },
+    { _id: "3", name: "Garden" },
+    { _id: "4", name: "Air Conditioning" },
+    { _id: "5", name: "Heater" },
+    { _id: "6", name: "Garage" },
+    { _id: "7", name: "Pool" },
+  ];
+
+  for (const feature of features) {
+    const existing = await PropertyFeatureCollection.findOneAsync({
+      _id: feature._id,
+    });
+    if (!existing) {
+      await PropertyFeatureCollection.insertAsync(feature);
+      console.log(`[Seed] Inserted feature: ${feature.name}`);
+    }
   }
 }

@@ -17,18 +17,20 @@ export function PropertyForm({
   form,
   onSubmit,
   landlords,
+  features,
   mode = PropertyFormMode.CREATE,
 }: {
   form: UseFormReturn<FormSchemaType>;
   onSubmit: (values: FormSchemaType) => void;
   landlords: (Landlord & { firstName: string; lastName: string })[];
+  features: { value: string; label: string }[];
   mode: PropertyFormMode;
 }) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormBasicInformation form={form} landlords={landlords} />
-        <FormPropertyDetails form={form} />
+        <FormPropertyDetails form={form} features={features} />
         <FormPropertyImages form={form} />
         <FormListingOptions form={form} />
         <div className="flex justify-end mt-5">
@@ -46,16 +48,19 @@ export function PropertyForm({
 export const formDefaultValues: z.infer<typeof formSchema> = {
   landlord: "",
   property_type: "",
+  address_number: "",
   address: "",
+  suburb: "",
   city: "",
   state: "",
   postal_code: "",
   apartment_number: "",
+  monthly_rent: 0,
   bedroom_number: 0,
   bathroom_number: 0,
   space: 0,
   description: "",
-  // amenities: "",
+  property_feature_ids: [],
   images: [],
   available_dates: new Date(),
   lease_term: "",

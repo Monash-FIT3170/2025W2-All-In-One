@@ -5,8 +5,13 @@ import { getAllLandlords } from "/app/client/library-modules/domain-models/user/
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { getProfileDataById } from "/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository";
 
+import { PropertyFeatureDocument } from "/app/server/database/property/models/PropertyFeatureDocument";
+import { getAllPropertyFeatures } from "/app/client/library-modules/domain-models/property/repositories/feature-respository";
+
 const initialState: PropertyFormPageUiState = {
   landlords: [],
+  features: [],
+  featureOptions: [],
 };
 
 export const propertyFormSlice = createSlice({
@@ -15,13 +20,19 @@ export const propertyFormSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(load.fulfilled, (state, action) => {
-      state.landlords = action.payload;
+      state.landlords = action.payload.landlordsWithProfileData;
+      state.features = action.payload.features;
+      state.featureOptions = action.payload.features.map((feature) => ({
+        value: feature._id,
+        label: feature.name,
+      }));
     });
   },
 });
 
 export const load = createAsyncThunk("propertyForm/load", async () => {
   const landlords: Landlord[] = await getAllLandlords();
+  const features: PropertyFeatureDocument[] = await getAllPropertyFeatures();
   const landlordsWithProfileData = await Promise.all(
     landlords.map(async (landlord) => {
       const profile = await getProfileDataById(landlord.profileDataId);
@@ -33,7 +44,7 @@ export const load = createAsyncThunk("propertyForm/load", async () => {
       };
     })
   );
-  return landlordsWithProfileData;
+  return { landlordsWithProfileData, features };
 });
 
 export const selectPropertyFormUiState = (state: RootState) =>
