@@ -157,7 +157,12 @@ export function LandlordDashboardCards() {
         value={
           averageRent !== null ? `$${averageRent.rent}/month` : "Loading..."
         }
-        subtitle={ averageRent === null ?  "Loading..." :  averageRent.occupiedCount === 0 ? "No owned properties currently occupied..." : `Across ${averageRent.occupiedCount} occupied propert${
+        subtitle={
+          averageRent === null
+            ? "Loading..."
+            : averageRent.occupiedCount === 0
+            ? "No owned properties currently occupied..."
+            : `Across ${averageRent.occupiedCount} occupied propert${
                 averageRent.occupiedCount === 1 ? "y" : "ies"
               }`
         }
