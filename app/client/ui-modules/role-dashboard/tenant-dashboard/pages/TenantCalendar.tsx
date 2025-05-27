@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { selectTasks, selectLoading, fetchTenantTasks } from "../state/tenant-dashboard-slice";
-import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
-import { RoleTopNavbar } from "../../../navigation-bars/TopNavbar";
-import {
-  tenantDashboardLinks,
-  settingLinks,
-} from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 export function TenantCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const tasks = useAppSelector(selectTasks); // Retrieve tasks from Redux store
 
-  const [isSidebarOpen, onSideBarOpened] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
   const loading = useAppSelector(selectLoading);
@@ -37,14 +30,7 @@ export function TenantCalendar(): React.JSX.Element {
 
   return (
     <div className="min-h-screen">
-      <RoleTopNavbar onSideBarOpened={onSideBarOpened} />
       <div className="flex">
-        <RoleSideNavBar
-          isOpen={isSidebarOpen}
-          onClose={() => onSideBarOpened(false)}
-          dashboardLinks={tenantDashboardLinks} // Pass the dashboard links to the sidebar
-          settingsLinks={settingLinks} // Pass the links to the sidebar
-        />
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-bold mb-6">Tenant Calendar</h1>
           <div className="flex gap-6">

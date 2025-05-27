@@ -11,15 +11,8 @@ import {
   selectPropertyLoading,
 } from "../../tenant-dashboard/state/tenant-dashboard-slice";
 import DashboardCards from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/DashboardCards";
-import { RoleTopNavbar } from "../../../navigation-bars/TopNavbar";
-import { RoleSideNavBar } from "../../../navigation-bars/side-nav-bars/SideNavbar";
-import {
-  tenantDashboardLinks,
-  settingLinks,
-} from "../../../navigation-bars/side-nav-bars/side-nav-link-definitions";
 
 function TenantDashboard() {
-  const [isSidebarOpen, onSideBarOpened] = React.useState(false);
   const dispatch = useAppDispatch();
   const tasks = useAppSelector(selectTasks);
   const propertyDetails = useAppSelector(selectPropertyDetails);
@@ -58,14 +51,7 @@ function TenantDashboard() {
   return (
     <div className="flex flex-row min-h-screen">
       <div className="flex-1">
-        <RoleTopNavbar onSideBarOpened={onSideBarOpened} />
         <div className="flex">
-          <RoleSideNavBar
-            isOpen={isSidebarOpen}
-            onClose={() => onSideBarOpened(false)}
-            dashboardLinks={tenantDashboardLinks}
-            settingsLinks={settingLinks}
-          />
           <div className="flex-1 p-6">
             <DashboardCards rentAmount={propertyDetails?.pricePerMonth} />
             <div className=" grid grid-cols-1 md:grid-cols-2 gap-6 px-6">

@@ -27,6 +27,7 @@
   LANDLORD_GET_ALL = "landlords.getAll",
   PROPERTY_STATUS_GET = "propertyStatus.getOne",
   PROPERTY_GET_BY_TENANT_ID = "property.getByTenantId",
+  PROPERTY_FEATURES_GET_ALL = "propertyFeatures.getAll",
   LISTING_SUBMIT_DRAFT = "listing.submitDraft",
-  PROPERTY_DATA_UPDATE = "property.updateData"
+  PROPERTY_DATA_UPDATE = "property.updateData",
 }
