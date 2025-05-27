@@ -43,6 +43,7 @@ Meteor.startup(async () => {
   await tempSeedTaskData();
   // await tempSeedPropertyStatusData();
   await permSeedListingStatusData();
+  await seedListedProperties(globalAgent, globalLandlord, globalTenant);
 });
 
 async function tempSeedUserAndRoleData(): Promise<void> {
@@ -255,6 +256,12 @@ async function tempSeedPropertyData(): Promise<void> {
       endtime: new Date("2025-04-17T11:00:00Z"),
     });
 
+    await InspectionCollection.insertAsync({
+      _id: "4",
+      starttime: new Date("2026-04-16T10:00:00Z"),
+      endtime: new Date("2026-04-17T11:00:00Z"),
+    });
+
     await ListingCollection.insertAsync({
       property_id: "1",
       listing_status_id: "1",
@@ -267,6 +274,70 @@ async function tempSeedPropertyData(): Promise<void> {
     });
   }
 }
+
+async function seedListedProperties(
+  agent: ApiAgent,
+  landlord: ApiLandlord,
+  tenant: ApiTenant
+): Promise<void> {
+  const listedStatusId = "2";
+  const propertyStatusVacantId = "1"; 
+  const defaultFeatureIds = ["1", "2"]; 
+
+  for (let i = 4; i <= 13; i++) { 
+
+    const propertyId = i.toString();
+
+    const existingProperty = await PropertyCollection.findOneAsync({ _id: propertyId });
+    if (existingProperty) {
+      console.log(`[Seed] Skipped inserting existing property in PropertyCollection: ${propertyId}`);
+      continue;
+    }
+    await PropertyCollection.insertAsync({
+      _id: propertyId,
+      streetnumber: `${i * 10}`,
+      streetname: "Central Street",
+      suburb: ["Clayton", "Frankston", "Cranbourne", "Mexico"][i % 4],
+      province: "NY",
+      postcode: `${10000 + i}`,
+      property_status_id: propertyStatusVacantId,
+      description:
+        `Spacious ${(i % 3) + 2}-bedroom property in a prime location. Features modern amenities and excellent transport links. ` +
+        `Ideal for families or professionals looking for comfort and convenience. Property includes a well-maintained garden and off-street parking.`,
+      summary_description: `Beautiful ${(i % 3) + 2}-bed property in ${["Clayton", "Frankston", "Cranbourne", "Mexico"][i % 4]}.`,
+      bathrooms: (i % 2) + 1,
+      bedrooms: (i % 3) + 2,
+      parking: (i % 2) + 1,
+      property_feature_ids: defaultFeatureIds,
+      type: i % 2 === 0 ? "Apartment" : "Townhouse",
+      area: 300 + i * 20,
+      agent_id: agent?.agentId,
+      landlord_id: landlord?.landlordId,
+      tenant_id: tenant.tenantId,
+    });
+
+    await PropertyPriceCollection.insertAsync({
+      property_id: propertyId,
+      price_per_month: 1200 + i * 100,
+      date_set: new Date(),
+    });
+
+    const imageUrls = [
+      "https://cdn.pixabay.com/photo/2018/08/04/11/30/draw-3583548_1280.png",
+      "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
+      "https://cdn.pixabay.com/photo/2024/05/26/10/15/bird-8788491_1280.jpg",
+    ];
+
+    await ListingCollection.insertAsync({
+      property_id: propertyId,
+      listing_status_id: listedStatusId, // "Listed"
+      image_urls: imageUrls,
+      inspection_ids: ["1", "2", "3","4"],
+    });
+    console.log(`[Seed] Created listed property: ${propertyId}`);
+  }
+}
+
 // This function is used to seed the database with initial task data
 async function tempSeedTaskData(): Promise<void> {
   console.log("Seeding property data...");

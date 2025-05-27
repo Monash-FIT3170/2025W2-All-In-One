@@ -1,4 +1,3 @@
-import { get } from "react-hook-form";
 import { PropertyDocument } from "../../database/property/models/PropertyDocument";
 import {
   PropertyCollection,
@@ -10,9 +9,9 @@ import { PropertyFeatureDocument } from "/app/server/database/property/models/Pr
 import { PropertyPriceDocument } from "/app/server/database/property/models/PropertyPriceDocument";
 import { PropertyStatusDocument } from "/app/server/database/property/models/PropertyStatusDocument";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
-import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
+import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
 import { AgentDocument } from "../../database/user/models/role-models/AgentDocument";
 import { LandlordDocument } from "../../database/user/models/role-models/LandlordDocument";
 import { TenantDocument } from "../../database/user/models/role-models/TenantDocument";
@@ -20,6 +19,7 @@ import { AgentCollection, TenantCollection } from "../../database/user/user-coll
 import { LandlordCollection } from "../../database/user/user-collections";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
+import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
 
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
@@ -116,6 +116,15 @@ const propertyGetListMethod = {
 // It takes a PropertyDocument as input and returns a promise that resolves to an ApiProperty object
 // It fetches the property status, latest property price, and property features documents
 
+const propertyGetAllMethod = {
+[MeteorMethodIdentifier.PROPERTY_GET_ALL]: async (): Promise<ApiProperty[]> => {
+    const propertyDocuments = await PropertyCollection.find({}).fetchAsync();
+    const propertyDTOs = await Promise.all(
+      propertyDocuments.map((property) => mapPropertyDocumentToPropertyDTO(property))
+    );
+    return propertyDTOs;
+  },
+};
 async function mapPropertyDocumentToPropertyDTO(
   property: PropertyDocument
 ): Promise<ApiProperty> {
@@ -127,7 +136,7 @@ async function mapPropertyDocumentToPropertyDTO(
   );
   const propertyFeaturesDocuments =
     await getPropertyFeatureDocumentsMatchingIds(property.property_feature_ids);
-
+  
   const AgentDocument = property.agent_id
     ? await getAgentDocumentById(property.agent_id)
     : null; // Handle missing agent_id gracefully
@@ -282,6 +291,32 @@ const propertyGetByTenantIdMethod = {
   },
 };
 
+async function updatePropertyData(property: PropertyUpdateData): Promise<void> {
+  await PropertyCollection.updateAsync(property.propertyId, {
+    $set: {
+      streetnumber: property.streetnumber,
+      streetname: property.streetname,
+      suburb: property.suburb,
+      province: property.province,
+      postcode: property.postcode,
+      description: property.description,
+      summary_description: property.summaryDescription,
+      bathrooms: property.bathrooms,
+      bedrooms: property.bedrooms,
+      parking: property.parking,
+      features: property.features,
+      type: property.type,
+      area: property.area,
+      landlord_id: property.landlordId,
+    },
+  });
+}
+
+Meteor.methods({
+  [MeteorMethodIdentifier.PROPERTY_DATA_UPDATE]: updatePropertyData,
+});
+
+
 Meteor.methods({
   ...propertyGetMethod,
   ...propertyInsertMethod,
@@ -290,5 +325,7 @@ Meteor.methods({
   ...propertyGetCountMethod,
   ...propertyGetListMethod,
   ...propertyInsertMethod,
-  ...propertyGetByTenantIdMethod
+  ...propertyGetByTenantIdMethod,
+  ...updatePropertyData,,
+  ...propertyGetAllMethod
 });

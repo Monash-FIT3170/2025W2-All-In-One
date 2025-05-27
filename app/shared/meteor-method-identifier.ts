@@ -1,10 +1,11 @@
-export enum MeteorMethodIdentifier {
+ export enum MeteorMethodIdentifier {
   TASK_INSERT = "tasks.insert",
   TASK_GET = "tasks.getOne",
   TASK_GET_MULTIPLE = "tasks.getMultiple",
   BLOB_UPLOAD_FILE = "blobs.uploadFile",
   BLOB_UPLOAD_FILES = "blobs.uploadFiles",
   PROPERTY_GET = "properties.getOne",
+  PROPERTY_GET_ALL = 'properties.getAll',
   PROPERTY_GET_COUNT = "properties.getCount",
   PROPERTY_GET_LIST = "properties.getList",
   PROPERTY_INSERT = "properties.insert",
@@ -13,6 +14,7 @@ export enum MeteorMethodIdentifier {
   LISTING_GET_FOR_PROPERTY = "listings.getForProperty",
   LISTING_INSERT_PROPERTY = "listings.insertProperty",
   LISTING_STATUS_GET_BY_NAME = "listings.getStatusByName", 
+  LISTING_GET_ALL_LISTED = "listings.getAllListed",
   USER_REGISTER = "user.register",
   USER_ACCOUNT_INSERT = "users.insert",
   USER_ACCOUNT_GET = "users.getOne",
@@ -25,4 +27,6 @@ export enum MeteorMethodIdentifier {
   LANDLORD_GET_ALL = "landlords.getAll",
   PROPERTY_STATUS_GET = "propertyStatus.getOne",
   PROPERTY_GET_BY_TENANT_ID = "property.getByTenantId",
+  LISTING_SUBMIT_DRAFT = "listing.submitDraft",
+  PROPERTY_DATA_UPDATE = "property.updateData"
 }
