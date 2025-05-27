@@ -8,7 +8,7 @@ import { formSchema, FormSchemaType } from "./components/FormSchema";
 import { formDefaultValues, PropertyForm } from "./components/PropertyForm";
 import { useAppDispatch } from "../../store";
 import { PropertyFormPageUiState } from "./state/PropertyFormPageUIState";
-import { load, selectPropertyFormUiState } from "./state/reducers/property-form-slice";
+import { load, selectPropertyFormUiState, submitForm } from "./state/reducers/property-form-slice";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { NavigationPath } from "../../navigation";
