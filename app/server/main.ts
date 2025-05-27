@@ -685,7 +685,6 @@ async function removeAllCollections(): Promise<void> {
   await ListingCollection.removeAsync({});
   await ListingStatusCollection.removeAsync({});
   await TaskCollection.removeAsync({});
-  await TaskStatusCollection.removeAsync({});
 }
 async function permSeedPropertyFeaturesData(): Promise<void> {
   const features = [

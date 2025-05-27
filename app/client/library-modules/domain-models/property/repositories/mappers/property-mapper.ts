@@ -1,5 +1,6 @@
 import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
+import { PropertyFormData, PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 
 export function mapApiPropertyToProperty(property: ApiProperty): Property {
   return {
@@ -23,4 +24,33 @@ export function mapApiPropertyToProperty(property: ApiProperty): Property {
     landlordId: property.landlordId,
     tenantId: property.tenantId
   }
+}
+
+
+export function mapPropertyFormDataToInsertData(formData: PropertyFormData) {
+  const propertyInsertData: PropertyInsertData = {
+    streetnumber: formData.streetnumber,
+    streetname: formData.streetname,
+    suburb: formData.suburb,
+    province: formData.province,
+    postcode: formData.postcode,
+    property_status_id: formData.property_status_id,
+    description: formData.description,
+    summary_description: formData.summary_description,
+    bathrooms: formData.bathrooms,
+    bedrooms: formData.bedrooms,
+    parking: formData.parking,
+    property_feature_ids: formData.property_feature_ids,
+    type: formData.type,
+    area: formData.area,
+    agent_id: formData.agent_id,
+    landlord_id: formData.landlord_id,
+    tenant_id: formData.tenant_id,
+  };
+
+  return {
+    propertyInsertData,
+    monthly_rent: formData.monthly_rent,
+    images: formData.images,
+  };
 }

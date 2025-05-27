@@ -6,21 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon } from "lucide-react";
 import { formSchema, FormSchemaType } from "./components/FormSchema";
 import { formDefaultValues, PropertyForm } from "./components/PropertyForm";
-import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { useAppDispatch } from "../../store";
 import { PropertyFormPageUiState } from "./state/PropertyFormPageUIState";
 import { load, selectPropertyFormUiState } from "./state/reducers/property-form-slice";
 import { useSelector } from "react-redux";
-import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
-import { getPropertyStatusId, insertProperty} from "../../library-modules/domain-models/property/repositories/property-repository";
-import { uploadFilesHandler } from "../../library-modules/apis/azure/blob-api";
-import { BlobNamePrefix, UploadResults } from "/app/shared/azure/blob-models";
-import { apiInsertPropertyListing } from "../../library-modules/apis/property-listing/listing-api";
 import { useNavigate } from "react-router";
-import { apiPropertyInsertPrice } from "../../library-modules/apis/property-price/price-api";
 import { NavigationPath } from "../../navigation";
 import { PropertyFormMode } from "./enum/PropertyFormMode";
-import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
@@ -41,29 +33,8 @@ export function PropertyFormPage() {
   };
 
   const handleSubmit = async (values: FormSchemaType) => {
-  
-    const insertDoc: PropertyInsertData = {
-      streetnumber: values.address_number,
-      streetname: values.address,
-      suburb: values.city,
-      province: values.state,
-      postcode: values.postal_code,
-      property_status_id: await getPropertyStatusId(PropertyStatus.VACANT),
-      description: values.description,
-      summary_description: values.description.slice(0, 60),
-      bathrooms: values.bathroom_number,
-      bedrooms: values.bedroom_number,
-      parking: 0, // not collected yet
-      property_feature_ids: values.property_feature_ids,
-      type: values.property_type,
-      area: values.space,
-      agent_id: "", // not collected yet
-      landlord_id: values.landlord,
-      tenant_id: "", // not collected yet
-    };
-    const propertyId = await insertProperty(insertDoc);
-
-    navigator(`${NavigationPath.PropertyListing}?propertyId=${propertyId}`)
+    dispatch(submitForm(values));
+    navigator(`${NavigationPath.PropertyListing}?propertyId=${state.propertyId}`)
 };
   
   return (

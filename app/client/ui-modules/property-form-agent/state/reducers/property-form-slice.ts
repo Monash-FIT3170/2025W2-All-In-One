@@ -5,16 +5,17 @@ import { getAllLandlords } from "/app/client/library-modules/domain-models/user/
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { PropertyFeatureDocument } from "/app/server/database/property/models/PropertyFeatureDocument";
 import { getAllPropertyFeatures } from "/app/client/library-modules/domain-models/property/repositories/feature-respository";
-import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
+import { PropertyFormData } from "/app/shared/api-models/property/PropertyInsertData";
 import { insertProperty } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
-import { apiPropertyInsertPrice } from "/app/client/library-modules/apis/property-price/price-api";
 import { BlobNamePrefix, UploadResults } from "/app/shared/azure/blob-models";
-import { uploadFilesHandler } from "/app/client/library-modules/apis/azure/blob-api";
-import { apiInsertPropertyListing } from "/app/client/library-modules/apis/property-listing/listing-api";
+import { getImageUrlsFromUploadResults, uploadFilesHandler } from "/app/client/library-modules/apis/azure/blob-api";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
-import { NavigationPath } from "/app/client/navigation";
+import { mapPropertyFormDataToInsertData } from "/app/client/library-modules/domain-models/property/repositories/mappers/property-mapper";
+import { insertPropertyListing } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
+import { insertPropertyPrice } from "/app/client/library-modules/domain-models/property-price/property-price-repository";
 
 const initialState: PropertyFormPageUiState = {
+  propertyId: "",
   landlords: [],
   features: [],
   featureOptions: [],
@@ -33,6 +34,9 @@ export const propertyFormSlice = createSlice({
         label: feature.name,
       }));
     });
+    builder.addCase(submitForm.fulfilled, (state,action) => {
+      state.propertyId = action.payload.propertyId;
+    });
   },
 });
 
@@ -47,22 +51,15 @@ export const load = createAsyncThunk(
 
 export const submitForm = createAsyncThunk(
   "propertyForm/insertProperty",
-  async(propertyFormData: PropertyInsertData) => {
-    const propertyId = insertProperty(propertyFormData);
-    await apiPropertyInsertPrice(propertyId, 1500);
+  async(propertyFormData: PropertyFormData) => {
+    const { propertyInsertData, monthly_rent, images } = mapPropertyFormDataToInsertData(propertyFormData);
 
-    const uploadReturnValues: UploadResults = await uploadFilesHandler(values.images,BlobNamePrefix.PROPERTY)
-
-    if (uploadReturnValues.failed.length > 0) {
-      console.error("Failed to upload some images:", uploadReturnValues.failed);
-      throw new Meteor.Error(`Image upload failed. Please try again.`);
-      return;
-    } 
-
-    const imageUrls: string[] = uploadReturnValues.success.map((uploadResult) => {return uploadResult.url})
-    await apiInsertPropertyListing(propertyId,imageUrls,ListingStatus.DRAFT)
-
-    navigator(`${NavigationPath.PropertyListing}?propertyId=${propertyId}`)
+    const propertyId = await insertProperty(propertyInsertData);
+    await insertPropertyPrice(propertyId, monthly_rent);
+    const uploadResults: UploadResults = await uploadFilesHandler(images,BlobNamePrefix.PROPERTY)
+    const imageUrls = getImageUrlsFromUploadResults(uploadResults)
+    await insertPropertyListing(propertyId,imageUrls,ListingStatus.DRAFT)
+    return {propertyId};
   }
 )
 
