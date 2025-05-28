@@ -56,10 +56,6 @@ export const fetchPropertiesAndMetrics = createAsyncThunk(
       const totalRevenue = occupiedProperties.reduce((sum, property) => sum + property.pricePerMonth, 0);
       const occupancyRate = properties.length > 0 ? (occupiedProperties.length / properties.length) * 100 : 0;
 
-      console.log('Fetched properties:', properties);
-      console.log('Occupied properties:', occupiedProperties);
-      console.log('Calculated Occupancy Rate:', occupancyRate);
-
       return {
         properties,
         monthlyRevenue: totalRevenue,
