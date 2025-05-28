@@ -483,7 +483,7 @@ function ListingModalEditor({
     suburb: state.suburb,
     address_number: state.streetNumber,
     monthly_rent: Number(state.propertyPrice),
-    property_feature_ids: state.propertyFeatures
+    property_feature_ids: []
   };
 
   return (

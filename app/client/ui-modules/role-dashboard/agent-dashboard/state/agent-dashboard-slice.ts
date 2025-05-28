@@ -3,7 +3,7 @@ import { RootState } from "../../../../store";
 import { Meteor } from 'meteor/meteor';
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 import { ApiProperty } from '/app/shared/api-models/property/ApiProperty';
-
+import { PropertyStatus } from '/app/shared/api-models/property/PropertyStatus';
 
 type Property = ApiProperty;
 
@@ -52,7 +52,7 @@ export const fetchPropertiesAndMetrics = createAsyncThunk(
   async (agentId: string, { rejectWithValue }) => {
     try {
       const properties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, agentId) as ApiProperty[];
-      const occupiedProperties = properties.filter(property => property.propertyStatus === "Occupied");
+      const occupiedProperties = properties.filter(property => property.propertyStatus === PropertyStatus.OCCUPIED);
       const totalRevenue = occupiedProperties.reduce((sum, property) => sum + property.pricePerMonth, 0);
       const occupancyRate = properties.length > 0 ? (occupiedProperties.length / properties.length) * 100 : 0;
 
