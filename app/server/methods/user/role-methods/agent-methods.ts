@@ -6,6 +6,8 @@ import { AgentCollection } from "/app/server/database/user/user-collections";
 import { ApiAgent } from "../../../../shared/api-models/user/api-roles/ApiAgent";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
+import { TaskDocument } from "/app/server/database/task/models/TaskDocument";
+import { TaskCollection } from "/app/server/database/task/task-collections";
 
 // -- INSERT AGENT --
 
@@ -37,20 +39,36 @@ const agentGetMethod = {
         new InvalidDataError(`Agent with user ID ${userId} not found.`)
       );
     }
-    
-
-    return {
-      agentId: agentDoc._id!,
-      userAccountId: agentDoc.userAccountId,
-      tasks: agentDoc.task_ids,
-      firstName: agentDoc.firstName,
-      lastName: agentDoc.lastName,
-      email: agentDoc.email,
-      agentCode: agentDoc.agentCode,
-      createdAt: agentDoc.createdAt,
-    };
+    const agentDTO = await mapAgentDocumentToDTO(agentDoc).catch((error) => {
+      throw meteorWrappedInvalidDataError(error);
+    });
+    return agentDTO;
   },
 };
+
+async function mapAgentDocumentToDTO(agent: AgentDocument): Promise<ApiAgent> {
+  const taskIds = agent.task_ids ?? [];
+
+  const taskDocuments =
+    taskIds.length > 0 ? await getTaskDocumentsMatchingIds(taskIds) : [];
+
+  return {
+    agentId: agent._id!,
+    userAccountId: agent.userAccountId,
+    tasks: taskDocuments.map((doc) => doc._id),
+    agentCode: agent.agentCode,
+    createdAt: agent.createdAt,
+    profileDataId: agent.profileDataId,
+  };
+}
+
+async function getTaskDocumentsMatchingIds(
+  ids: string[]
+): Promise<TaskDocument[]> {
+  return await TaskCollection.find({
+    _id: { $in: ids },
+  }).fetchAsync();
+}
 
 Meteor.methods({
   ...agentInsertMethod,

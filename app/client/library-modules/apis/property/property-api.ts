@@ -5,12 +5,16 @@ import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInse
 import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
 
 export async function apiGetPropertyById(id: string): Promise<ApiProperty> {
+try{
   const fetchedProperty = await Meteor.callAsync(
     MeteorMethodIdentifier.PROPERTY_GET,
     id
   );
-
   return fetchedProperty;
+  } catch (error) {
+    console.error(`Error fetching property with ID ${id}:`, error);
+    throw error;
+  }
 }
 
 export async function apiGetPropertyStatusId(
@@ -89,4 +93,16 @@ export async function apiGetLandlordAverageRent(
     MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_AVERAGE_RENT,
     landlordId
   );
+
+export async function apiUpdatePropertyData(updatedProperty: PropertyUpdateData): Promise<string> {
+  return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_DATA_UPDATE, updatedProperty);
+}
+
+export async function apiGetAllProperties(): Promise<ApiProperty[]> {
+  const fetchedProperties: ApiProperty[] = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_ALL);
+  return fetchedProperties;
+}
+
+export async function apiGetPropertyByTenantId(tenantId: string): Promise<ApiProperty> {
+  return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_BY_TENANT_ID, tenantId);
 }

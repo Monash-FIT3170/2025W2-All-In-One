@@ -15,21 +15,28 @@ import {
   ListingStatusCollection,
 } from "/app/server/database/property-listing/listing-collections";
 import "/app/server/methods/property-status/property-status-methods";
+import "/app/server/methods/property-price/property-price-methods";
 import "./methods/user/user.register";
+import "./methods/user/profile-data-methods";
 import "./methods/user/user-account-methods";
 import "./methods/user/role-methods/agent-methods";
 import "./methods/user/role-methods/tenant-methods";
 import "./methods/user/role-methods/landlord-methods";
-import { TaskCollection } from "/app/server/database/task/task-collections";
-import { AgentCollection } from "/app/server/database/user/user-collections";
+import {
+  TaskCollection,
+} from "/app/server/database/task/task-collections";
+import { AgentCollection, UserAccountCollection } from "/app/server/database/user/user-collections";
 import { TenantCollection } from "./database/user/user-collections";
-import { LandlordCollection } from "./database/user/user-collections";
 import { Role } from "../shared/user-role-identifier";
 import { TaskStatus } from "../shared/task-status-identifier";
 import { MeteorMethodIdentifier } from "../shared/meteor-method-identifier";
 import { ApiAgent } from "../shared/api-models/user/api-roles/ApiAgent";
 import { ApiTenant } from "../shared/api-models/user/api-roles/ApiTenant";
 import { ApiLandlord } from "../shared/api-models/user/api-roles/ApiLandlord";
+import {
+  LandlordCollection,
+  ProfileCollection,
+} from "./database/user/user-collections";
 import { PropertyStatus } from "../shared/api-models/property/PropertyStatus";
 import "/app/server/methods/property/property-features/property-features-methods";
 import { ListingStatus } from "../shared/api-models/property-listing/ListingStatus";
@@ -39,12 +46,16 @@ let globalTenant: ApiTenant;
 let globalLandlord: ApiLandlord;
 
 Meteor.startup(async () => {
-  await tempSeedUserAndRoleData();
-  await permSeedPropertyFeaturesData();
-  await tempSeedPropertyData();
-  await tempSeedTaskData();
+  await removeAllCollections();
   // await tempSeedPropertyStatusData();
   await permSeedListingStatusData();
+  await tempSeedUserAndRoleData();
+  await permSeedPropertyFeaturesData();
+  // await tempSeedPropertyData();
+  await tempSeedTaskData();
+  await tempSeedProfileData();
+  await tempSeedUserAndRoleData();
+  await tempSeedTaskData();
   await seedListedProperties(globalAgent, globalLandlord, globalTenant);
 });
 
@@ -121,9 +132,29 @@ async function tempSeedUserAndRoleData(): Promise<void> {
   }
 }
 
-async function tempSeedPropertyData(): Promise<void> {
-  console.log("Seeding property data...");
+async function tempSeedProfileData(): Promise<void> {
+  if ((await ProfileCollection.find().countAsync()) === 0) {
+    ProfileCollection.insertAsync({
+      _id: "1",
+      firstName: "Steve",
+      lastName: "Minecraft",
+      email: "steve123456@gmail.com",
+      dob: "12/05/2025",
+      occupation: "Miner",
+      phone: "0432 555 222",
+      emergencyContact: "Alex",
+      employer: "The Mines",
+      workAddress: "Jungle Biome",
+      workPhone: "0122 222 123",
+      profilePicture: "img.com",
+      carMake: "Toyota",
+      carModel: "Prius",
+      carYear: "2000",
+      carPlate: "DXW003",
+    });
+  }
   if ((await PropertyCollection.find().countAsync()) === 0) {
+    console.log("Seeding Property Data")
     // Seed property statuses first
     const statuses = [
       { _id: "1", name: PropertyStatus.VACANT },
@@ -255,24 +286,24 @@ async function tempSeedPropertyData(): Promise<void> {
       property_id: "1",
       listing_status_id: "1",
       image_urls: [
-    "https://images.unsplash.com/photo-1611420890968-c87853bfa973?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://plus.unsplash.com/premium_photo-1682889762731-375a6b22d794?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://plus.unsplash.com/premium_photo-1677474827615-31ea6fa13efe?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1568391300292-a5a1d96b82aa?q=80&w=1928&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1568495248636-6432b97bd949?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1631048501851-4aa85ffc3be8?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1582224163312-0735047647c6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1521783988139-89397d761dce?q=80&w=1925&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://plus.unsplash.com/premium_photo-1661902468735-eabf780f8ff6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://plus.unsplash.com/premium_photo-1681487208776-e308bfaa0539?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://plus.unsplash.com/premium_photo-1673141390230-8b4a3c3152b1?q=80&w=1973&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://plus.unsplash.com/premium_photo-1661963333824-fd020faec5fc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://plus.unsplash.com/premium_photo-1687960116506-f31f84371838?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1644847266252-14cb37a48371?q=80&w=1926&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1654291271293-ab9cb83208ce?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1610295186968-7ad29a75199e?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-       ],
+        "https://images.unsplash.com/photo-1611420890968-c87853bfa973?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://plus.unsplash.com/premium_photo-1682889762731-375a6b22d794?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://plus.unsplash.com/premium_photo-1677474827615-31ea6fa13efe?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1568391300292-a5a1d96b82aa?q=80&w=1928&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1568495248636-6432b97bd949?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1631048501851-4aa85ffc3be8?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1582224163312-0735047647c6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1521783988139-89397d761dce?q=80&w=1925&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://plus.unsplash.com/premium_photo-1661902468735-eabf780f8ff6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://plus.unsplash.com/premium_photo-1681487208776-e308bfaa0539?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://plus.unsplash.com/premium_photo-1673141390230-8b4a3c3152b1?q=80&w=1973&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://plus.unsplash.com/premium_photo-1661963333824-fd020faec5fc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://plus.unsplash.com/premium_photo-1687960116506-f31f84371838?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1644847266252-14cb37a48371?q=80&w=1926&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1654291271293-ab9cb83208ce?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1610295186968-7ad29a75199e?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      ],
       inspection_ids: ["1", "2"],
     });
   }
@@ -676,7 +707,23 @@ async function permSeedListingStatusData(): Promise<void> {
     });
   }
 }
-
+async function removeAllCollections(): Promise<void> {
+  console.log("Removing all collections...");
+  await Meteor.users.removeAsync({});
+  await AgentCollection.removeAsync({});
+  await LandlordCollection.removeAsync({});
+  await TenantCollection.removeAsync({});
+  await ProfileCollection.removeAsync({});
+  await UserAccountCollection.removeAsync({});
+  await PropertyCollection.removeAsync({});
+  await PropertyFeatureCollection.removeAsync({});
+  await PropertyPriceCollection.removeAsync({});
+  await PropertyStatusCollection.removeAsync({});
+  await InspectionCollection.removeAsync({});
+  await ListingCollection.removeAsync({});
+  await ListingStatusCollection.removeAsync({});
+  await TaskCollection.removeAsync({})
+}
 async function permSeedPropertyFeaturesData(): Promise<void> {
   const features = [
     { _id: "1", name: "Washing Machine" },
@@ -689,7 +736,9 @@ async function permSeedPropertyFeaturesData(): Promise<void> {
   ];
 
   for (const feature of features) {
-    const existing = await PropertyFeatureCollection.findOneAsync({ _id: feature._id });
+    const existing = await PropertyFeatureCollection.findOneAsync({
+      _id: feature._id,
+    });
     if (!existing) {
       await PropertyFeatureCollection.insertAsync(feature);
       console.log(`[Seed] Inserted feature: ${feature.name}`);

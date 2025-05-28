@@ -6,6 +6,8 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { ApiTenant } from "../../../../shared/api-models/user/api-roles/ApiTenant";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
+import { TaskDocument } from "/app/server/database/task/models/TaskDocument";
+import { TaskCollection } from "/app/server/database/task/task-collections";
 
 // -- INSERT TENANT --
 const tenantInsertMethod = {
@@ -14,7 +16,6 @@ const tenantInsertMethod = {
   ): Promise<string> => {
     const newTenant: Mongo.OptionalId<TenantDocument> = {
       ...data,
-      task_ids: data.task_ids || [], // Ensure task_ids is initialized
       createdAt: new Date(),
     };
 
@@ -35,18 +36,35 @@ const tenantGetMethod = {
         new InvalidDataError(`Tenant with user ID ${userId} not found.`)
       );
     }
-    return {
-      tenantId: tenantDoc._id!,
-      userAccountId: tenantDoc.userAccountId,
-      tasks: tenantDoc.task_ids,
-      firstName: tenantDoc.firstName,
-      lastName: tenantDoc.lastName,
-      email: tenantDoc.email,
-      createdAt: tenantDoc.createdAt,
-    };
+
+    return mapTenantDocumentToDTO(tenantDoc);
   },
 };
 
+async function mapTenantDocumentToDTO(
+  tenant: TenantDocument
+): Promise<ApiTenant> {
+  const taskIds = tenant.task_ids ?? [];
+
+  const taskDocuments =
+    taskIds.length > 0 ? await getTaskDocumentsMatchingIds(taskIds) : [];
+
+  return {
+    tenantId: tenant._id!,
+    profileDataId: tenant.profileDataId,
+    userAccountId: tenant.userAccountId,
+    tasks: taskDocuments.map((doc) => doc._id),
+    createdAt: tenant.createdAt,
+  };
+}
+
+async function getTaskDocumentsMatchingIds(
+  ids: string[]
+): Promise<TaskDocument[]> {
+  return await TaskCollection.find({
+    _id: { $in: ids },
+  }).fetchAsync();
+}
 
 Meteor.methods({
   ...tenantInsertMethod,

@@ -5,21 +5,14 @@ import { useAppSelector, useAppDispatch } from '/app/client/store';
 import {
   fetchPropertyCount,
   fetchPropertiesAndMetrics,
-  selectPropertyCount,
-  selectMonthlyRevenue,
-  selectOccupancyRate,
-  selectIsLoading,
-  selectError
+  selectAgentDashboard
 } from '../state/agent-dashboard-slice';
 
 export function DashboardCards() {
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-  const propertyCount = useAppSelector(selectPropertyCount);
-  const monthlyRevenue = useAppSelector(selectMonthlyRevenue);
-  const occupancyRate = useAppSelector(selectOccupancyRate);
-  const isLoading = useAppSelector(selectIsLoading);
-  const error = useAppSelector(selectError);
+  const {propertyCount, monthlyRevenue, occupancyRate, isLoading, error} = useAppSelector(selectAgentDashboard);
   const dispatch = useAppDispatch();
+
 
   useEffect(() => {
     if (currentUser && 'agentId' in currentUser && currentUser.agentId) {

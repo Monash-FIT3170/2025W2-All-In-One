@@ -50,22 +50,6 @@ export function AgentDashboard(): React.JSX.Element {
       ])
     );
 
-    // dispatch(
-    //   setTasks([
-    //     {
-    //       title: "Property Inspection",
-    //       address: "123 Main St, Apt 4B",
-    //       datetime: "May 1, 2024",
-    //       status: "Due Soon" as const,
-    //     },
-    //     {
-    //       title: "Tenant Meeting",
-    //       address: "123 Main St, Apt 4B",
-    //       datetime: "April 25, 2024",
-    //       status: "Upcoming" as const,
-    //     },
-    //   ])
-    // );
   }, [dispatch]);
 
   return (
