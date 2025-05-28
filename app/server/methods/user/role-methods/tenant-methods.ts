@@ -53,7 +53,7 @@ async function mapTenantDocumentToDTO(
     tenantId: tenant._id!,
     profileDataId: tenant.profileDataId,
     userAccountId: tenant.userAccountId,
-    tasks: taskDocuments.map((doc) => doc.name),
+    tasks: taskDocuments.map((doc) => doc._id),
     createdAt: tenant.createdAt,
   };
 }
