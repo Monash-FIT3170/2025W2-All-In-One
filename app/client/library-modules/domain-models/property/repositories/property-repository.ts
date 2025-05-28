@@ -1,4 +1,4 @@
-import { apiGetPropertyById, apiInsertProperty } from "/app/client/library-modules/apis/property/property-api";
+import { apiGetAllProperties, apiGetPropertyById, apiInsertProperty } from "/app/client/library-modules/apis/property/property-api";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
 import { mapApiPropertyToProperty } from "./mappers/property-mapper";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
@@ -18,4 +18,11 @@ export async function getPropertyStatusId(name: PropertyStatus): Promise<string>
 
 export async function insertProperty(property: PropertyInsertData): Promise<string> {
   return await apiInsertProperty(property);
+}
+
+export async function getAllProperties(): Promise<Property[]> {
+  const apiProperties = await apiGetAllProperties();
+  const mappedProperties = apiProperties.map(mapApiPropertyToProperty);
+
+  return mappedProperties;
 }

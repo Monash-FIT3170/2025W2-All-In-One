@@ -25,9 +25,8 @@ export default function FormBasicInformation({
   landlords,
 }: {
   form: UseFormReturn<FormSchemaType>;
-  landlords: Landlord[];
+  landlords: (Landlord & { firstName: string; lastName: string })[];
 }) {
-
   return (
     <div className="border border-(--divider-color) w-full p-7 rounded-md mb-3">
       <FormHeading
@@ -46,9 +45,16 @@ export default function FormBasicInformation({
                   <SelectValue placeholder="Select a landlord" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent side="bottom" position="popper" className="z-[9999] bg-white">
+              <SelectContent
+                side="bottom"
+                position="popper"
+                className="z-[9999] bg-white"
+              >
                 {landlords.map((landlord) => (
-                  <SelectItem key={landlord.landlordId} value={landlord.landlordId}>
+                  <SelectItem
+                    key={landlord.landlordId}
+                    value={landlord.landlordId}
+                  >
                     {landlord.firstName} {landlord.lastName}
                   </SelectItem>
                 ))}
@@ -71,7 +77,11 @@ export default function FormBasicInformation({
                   <SelectValue placeholder="Select property type" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent side="bottom" position="popper" className="z-[9999] bg-white">
+              <SelectContent
+                side="bottom"
+                position="popper"
+                className="z-[9999] bg-white"
+              >
                 <SelectItem value="house">House</SelectItem>
                 <SelectItem value="apartment">Apartment</SelectItem>
               </SelectContent>
@@ -82,7 +92,22 @@ export default function FormBasicInformation({
         )}
       />
       <div className="grid grid-cols-12 gap-4">
-        <div className="col-span-4">
+      <div className="col-span-3">
+          <FormField
+            control={form.control}
+            name="address_number"
+            render={({ field }) => (
+              <FormItem className="py-2">
+                <FormLabel>Street Number</FormLabel>
+                <FormControl>
+                  <Input placeholder="123" type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="col-span-9">
           <FormField
             control={form.control}
             name="address"
@@ -90,7 +115,22 @@ export default function FormBasicInformation({
               <FormItem className="py-2">
                 <FormLabel>Street Address</FormLabel>
                 <FormControl>
-                  <Input placeholder="123 Main St" type="" {...field} />
+                  <Input placeholder="Main St" type="" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="col-span-6">
+          <FormField
+            control={form.control}
+            name="suburb"
+            render={({ field }) => (
+              <FormItem className="py-2">
+                <FormLabel>Suburb</FormLabel>
+                <FormControl>
+                  <Input placeholder="Clayton" type="" {...field} />
                 </FormControl>
 
                 <FormMessage />
@@ -99,6 +139,8 @@ export default function FormBasicInformation({
           />
         </div>
       </div>
+
+      
 
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-6">
@@ -145,7 +187,7 @@ export default function FormBasicInformation({
               <FormItem className="py-2">
                 <FormLabel>Postal Code</FormLabel>
                 <FormControl>
-                  <Input placeholder="3000" type="" {...field} />
+                  <Input placeholder="3000" type="number" {...field} />
                 </FormControl>
 
                 <FormMessage />
@@ -162,7 +204,24 @@ export default function FormBasicInformation({
               <FormItem className="py-2">
                 <FormLabel>Unit/Apt # (Optional)</FormLabel>
                 <FormControl>
-                  <Input placeholder="Apt 4B" type="" {...field} />
+                  <Input placeholder="Apt 4B" type="text" {...field} />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="col-span-12">
+          <FormField
+            control={form.control}
+            name="monthly_rent"
+            render={({ field }) => (
+              <FormItem className="py-2">
+                <FormLabel>Monthly Rent</FormLabel>
+                <FormControl>
+                  <Input placeholder="0" type="number" {...field} />
                 </FormControl>
 
                 <FormMessage />

@@ -32,3 +32,11 @@ export async function blobToUint8Array(blob: Blob): Promise<Uint8Array> {
     const arrayBuffer = await blob.arrayBuffer();
     return new Uint8Array(arrayBuffer);
   }
+
+export function getImageUrlsFromUploadResults(uploadResults: UploadResults): string[] {
+    if (uploadResults.failed.length > 0) {
+        console.error("Failed to upload some files:", uploadResults.failed);
+        throw new Meteor.Error(`File upload failed. Please try again.`);
+    }
+    return uploadResults.success.map((uploadResult) => uploadResult.url);
+}
