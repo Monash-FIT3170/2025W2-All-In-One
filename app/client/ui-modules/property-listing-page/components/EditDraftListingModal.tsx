@@ -83,8 +83,13 @@ export default function EditDraftListingModal(
                 <PropertyForm
                   onSubmit={handleSaveChanges}
                   form={listingInfo}
-                  landlords={props.landlords}
+                  landlords={props.landlords.map(l => ({
+                    ...l,
+                    firstName: (l as any).firstName ?? "",
+                    lastName: (l as any).lastName ?? "",
+                  }))}
                   mode={PropertyFormMode.EDIT}
+                  features={[]}
                 />
               </div>
             </div>
