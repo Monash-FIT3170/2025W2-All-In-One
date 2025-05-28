@@ -2,12 +2,16 @@ import React from "react";
 import { CardWidget } from "../../components/CardWidget";
 import { Progress } from "../../components/ProgressBar";
 
-function DashboardCards() {
+interface DashboardCardsProps {
+  rentAmount?: number;
+}
+
+function DashboardCards({ rentAmount }: DashboardCardsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
       <CardWidget
         title="Next Rent Payment"
-        value="$1,500"
+        value={rentAmount ? `$${rentAmount.toLocaleString()}` : "N/A"}
         subtitle="Due in 5 days (April 1)"
       />
 

@@ -15,9 +15,8 @@ import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
 import { AgentDocument } from "../../database/user/models/role-models/AgentDocument";
 import { LandlordDocument } from "../../database/user/models/role-models/LandlordDocument";
 import { TenantDocument } from "../../database/user/models/role-models/TenantDocument";
-import { AgentCollection } from "../../database/user/user-collections";
+import { AgentCollection, TenantCollection } from "../../database/user/user-collections";
 import { LandlordCollection } from "../../database/user/user-collections";
-import { TenantCollection } from "../../database/user/user-collections";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
@@ -263,6 +262,34 @@ const propertyInsertMethod = {
     }
   },
 };
+
+const propertyGetByTenantIdMethod = {
+  [MeteorMethodIdentifier.PROPERTY_GET_BY_TENANT_ID]: async (
+    tenantId: string
+  ): Promise<ApiProperty | null> => {
+   
+    try {
+      const propertyDocument = await PropertyCollection.findOneAsync({
+        tenant_id: tenantId,
+      });
+
+    if (!propertyDocument) {
+      return null;
+    }
+
+    const propertyDTO = await mapPropertyDocumentToPropertyDTO(
+      propertyDocument
+    ).catch((error) => {
+      throw meteorWrappedInvalidDataError(error);
+    });
+
+      return propertyDTO;
+    } catch (error) {
+      console.error("Error in propertyGetByTenantIdMethod:", error);
+      throw error;
+    }
+  },
+};
 const updatePropertyData = {
   [MeteorMethodIdentifier.PROPERTY_DATA_UPDATE]: async (
     property: PropertyUpdateData):
@@ -295,6 +322,7 @@ Meteor.methods({
   ...propertyGetCountMethod,
   ...propertyGetListMethod,
   ...propertyInsertMethod,
+  ...propertyGetByTenantIdMethod,
   ...updatePropertyData,
   ...propertyGetAllMethod
 });
