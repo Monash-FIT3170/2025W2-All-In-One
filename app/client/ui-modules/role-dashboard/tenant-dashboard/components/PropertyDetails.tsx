@@ -17,7 +17,7 @@ interface PropertyDetailsProps {
     apt?: string;
   };
   propertyType: string;
-  squareFootage: number;
+  squareFootage?: number;
   bedrooms: number;
   bathrooms: number;
   features: PropertyFeature[];
@@ -47,7 +47,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({
 
       {/* Property Image */}
       <div className="bg-gray-100 rounded-lg mb-6 flex items-center justify-center h-64">
-        {propertyImage ? (
+        {/* {propertyImage ? (
           <img
             src={propertyImage}
             alt="Property"
@@ -71,7 +71,12 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({
               <polyline points="21 15 16 10 5 21"></polyline>
             </svg>
           </div>
-        )}
+        )} */}
+        <img
+          src="https://images.unsplash.com/photo-1521783988139-89397d761dce?q=80&w=1925&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="Property"
+          className="w-full h-full object-cover rounded-lg"
+        />
       </div>
 
       {/* Address Section */}
@@ -90,7 +95,9 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({
 
         <div>
           <h3 className="text-gray-500 font-medium">Square Footage</h3>
-          <p className="text-xl font-bold">{squareFootage} sq ft</p>
+          <p className="text-xl font-bold">
+            {squareFootage ? `${squareFootage} sq ft` : "N/A"}
+          </p>
         </div>
 
         <div>

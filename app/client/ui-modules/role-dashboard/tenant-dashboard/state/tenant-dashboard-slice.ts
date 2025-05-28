@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../../store";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-
+import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
+import { getPropertyByTenantId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
 interface TenantDashboardState {
   isLoading: boolean;
@@ -15,12 +16,16 @@ interface TenantDashboardState {
     taskId?: string;
   }>;
   error: string | null;
+  propertyDetails: ApiProperty | null;
+  propertyLoading: boolean;
 }
 
 const initialState: TenantDashboardState = {
   isLoading: false,
   tasks: [],
   error: null,
+  propertyDetails: null,
+  propertyLoading: false,
 };
 
 export const fetchTenantTasks = createAsyncThunk(
@@ -67,6 +72,35 @@ export const fetchTenantTasks = createAsyncThunk(
   }
 );
 
+export const fetchTenantProperty = createAsyncThunk(
+  "tenantDashboard/fetchTenantProperty",
+  async (userId: string) => {
+    try {
+      // First, get the tenant data to get the tenant ID
+      const tenantResponse = await Meteor.callAsync(
+        MeteorMethodIdentifier.TENANT_GET,
+        userId
+      );
+
+      if (!tenantResponse?.tenantId) {
+        throw new Error("Tenant ID not found in response");
+      }
+
+      // Use the repository method instead of direct Meteor call
+      const propertyData = await getPropertyByTenantId(tenantResponse.tenantId);
+
+      if (!propertyData) {
+        throw new Error("No property found for tenant");
+      }
+
+      return propertyData;
+    } catch (error) {
+      console.error("Error fetching tenant property:", error);
+      throw error;
+    }
+  }
+);
+
 export const tenantDashboardSlice = createSlice({
   name: "tenantDashboard",
   initialState,
@@ -93,6 +127,17 @@ export const tenantDashboardSlice = createSlice({
       })
       .addCase(fetchTenantTasks.rejected, (state) => {
         state.isLoading = false;
+      })
+      .addCase(fetchTenantProperty.pending, (state) => {
+        state.propertyLoading = true;
+      })
+      .addCase(fetchTenantProperty.fulfilled, (state, action) => {
+        state.propertyLoading = false;
+        state.propertyDetails = action.payload;
+      })
+      .addCase(fetchTenantProperty.rejected, (state, action) => {
+        state.propertyLoading = false;
+        state.error = action.error.message || "Failed to fetch property details";
       });
   },
 });
@@ -101,6 +146,7 @@ export const { setLoading, setTasks, setError } = tenantDashboardSlice.actions;
 
 export const selectTenantDashboard = (state: RootState) => state.tenantDashboard;
 export const selectTasks = (state: RootState) => state.tenantDashboard.tasks;
-export const selectLoading = (state: RootState) =>
-  state.tenantDashboard.isLoading;
+export const selectLoading = (state: RootState) => state.tenantDashboard.isLoading;
+export const selectPropertyDetails = (state: RootState) => state.tenantDashboard.propertyDetails;
+export const selectPropertyLoading = (state: RootState) => state.tenantDashboard.propertyLoading;
 export default tenantDashboardSlice.reducer;
