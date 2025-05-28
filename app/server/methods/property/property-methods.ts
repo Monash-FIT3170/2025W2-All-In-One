@@ -208,10 +208,14 @@ const propertyGetListMethod = {
 // It fetches the property status, latest property price, and property features documents
 
 const propertyGetAllMethod = {
-[MeteorMethodIdentifier.PROPERTY_GET_ALL]: async (): Promise<ApiProperty[]> => {
+  [MeteorMethodIdentifier.PROPERTY_GET_ALL]: async (): Promise<
+    ApiProperty[]
+  > => {
     const propertyDocuments = await PropertyCollection.find({}).fetchAsync();
     const propertyDTOs = await Promise.all(
-      propertyDocuments.map((property) => mapPropertyDocumentToPropertyDTO(property))
+      propertyDocuments.map((property) =>
+        mapPropertyDocumentToPropertyDTO(property)
+      )
     );
     return propertyDTOs;
   },
@@ -227,7 +231,7 @@ async function mapPropertyDocumentToPropertyDTO(
   );
   const propertyFeaturesDocuments =
     await getPropertyFeatureDocumentsMatchingIds(property.property_feature_ids);
-  
+
   const AgentDocument = property.agent_id
     ? await getAgentDocumentById(property.agent_id)
     : null; // Handle missing agent_id gracefully
@@ -361,30 +365,57 @@ async function getStatusId(name: PropertyStatus): Promise<string> {
   return status._id;
 }
 
-async function updatePropertyData(property: PropertyUpdateData): Promise<void> {
-  await PropertyCollection.updateAsync(property.propertyId, {
-    $set: {
-      streetnumber: property.streetnumber,
-      streetname: property.streetname,
-      suburb: property.suburb,
-      province: property.province,
-      postcode: property.postcode,
-      description: property.description,
-      summary_description: property.summaryDescription,
-      bathrooms: property.bathrooms,
-      bedrooms: property.bedrooms,
-      parking: property.parking,
-      features: property.features,
-      type: property.type,
-      area: property.area,
-      landlord_id: property.landlordId,
-    },
-  });
-}
+const propertyGetByTenantIdMethod = {
+  [MeteorMethodIdentifier.PROPERTY_GET_BY_TENANT_ID]: async (
+    tenantId: string
+  ): Promise<ApiProperty | null> => {
+    try {
+      const propertyDocument = await PropertyCollection.findOneAsync({
+        tenant_id: tenantId,
+      });
 
-Meteor.methods({
-  [MeteorMethodIdentifier.PROPERTY_DATA_UPDATE]: updatePropertyData,
-});
+      if (!propertyDocument) {
+        return null;
+      }
+
+      const propertyDTO = await mapPropertyDocumentToPropertyDTO(
+        propertyDocument
+      ).catch((error) => {
+        throw meteorWrappedInvalidDataError(error);
+      });
+
+      return propertyDTO;
+    } catch (error) {
+      console.error("Error in propertyGetByTenantIdMethod:", error);
+      throw error;
+    }
+  },
+};
+
+const updatePropertyData = {
+  [MeteorMethodIdentifier.PROPERTY_DATA_UPDATE]: async (
+    property: PropertyUpdateData
+  ): Promise<void> => {
+    await PropertyCollection.updateAsync(property.propertyId, {
+      $set: {
+        streetnumber: property.streetnumber,
+        streetname: property.streetname,
+        suburb: property.suburb,
+        province: property.province,
+        postcode: property.postcode,
+        description: property.description,
+        summary_description: property.summaryDescription,
+        bathrooms: property.bathrooms,
+        bedrooms: property.bedrooms,
+        parking: property.parking,
+        features: property.features,
+        type: property.type,
+        area: property.area,
+        landlord_id: property.landlordId,
+      },
+    });
+  },
+};
 
 Meteor.methods({
   ...propertyGetMethod,
@@ -397,6 +428,7 @@ Meteor.methods({
   ...propertyGetCountMethod,
   ...propertyGetListMethod,
   ...propertyInsertMethod,
+  ...propertyGetByTenantIdMethod,
   ...updatePropertyData,
-  ...propertyGetAllMethod
+  ...propertyGetAllMethod,
 });
