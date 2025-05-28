@@ -1,9 +1,9 @@
 import { PropertyPriceCollection } from "../../database/property/property-collections";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { PropertyPriceInsertData } from "/app/shared/api-models/property-price/PropertyPriceInsertData";
+import { ApiInsertPropertyPricePayload } from "/app/shared/api-models/property-price/ApiInsertPropertyPricePayload";
 const insertPropertyPriceForProperty = {
   [MeteorMethodIdentifier.PROPERTY_PRICE_INSERT]: async (
-    propertyPriceData: PropertyPriceInsertData
+    propertyPriceData: ApiInsertPropertyPricePayload
   ): Promise<string> => {
     const propertyPrice = await PropertyPriceCollection.insertAsync(
       propertyPriceData

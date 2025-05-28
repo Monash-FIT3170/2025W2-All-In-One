@@ -263,8 +263,10 @@ const propertyInsertMethod = {
     }
   },
 };
-
-async function updatePropertyData(property: PropertyUpdateData): Promise<void> {
+const updatePropertyData = {
+  [MeteorMethodIdentifier.PROPERTY_DATA_UPDATE]: async (
+    property: PropertyUpdateData):
+     Promise<void> => {
   await PropertyCollection.updateAsync(property.propertyId, {
     $set: {
       streetnumber: property.streetnumber,
@@ -283,12 +285,7 @@ async function updatePropertyData(property: PropertyUpdateData): Promise<void> {
       landlord_id: property.landlordId,
     },
   });
-}
-
-Meteor.methods({
-  [MeteorMethodIdentifier.PROPERTY_DATA_UPDATE]: updatePropertyData,
-});
-
+}}
 
 Meteor.methods({
   ...propertyGetMethod,
@@ -298,6 +295,6 @@ Meteor.methods({
   ...propertyGetCountMethod,
   ...propertyGetListMethod,
   ...propertyInsertMethod,
-  ...updatePropertyData,,
+  ...updatePropertyData,
   ...propertyGetAllMethod
 });
