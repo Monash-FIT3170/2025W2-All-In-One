@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../../store";
-import { Meteor } from 'meteor/meteor';
-import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
-import { ApiProperty } from '/app/shared/api-models/property/ApiProperty';
-import { PropertyStatus } from '/app/shared/api-models/property/PropertyStatus';
+import { Meteor } from "meteor/meteor";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
+import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 
 type Property = ApiProperty;
 
@@ -23,7 +23,7 @@ interface AgentDashboardState {
     taskId?: string;
   }>;
   error: string | null;
-};
+}
 const initialState: AgentDashboardState = {
   isLoading: false,
   properties: [],
@@ -36,33 +36,47 @@ const initialState: AgentDashboardState = {
 
 // Async thunks
 export const fetchPropertyCount = createAsyncThunk(
-  'agentDashboard/fetchPropertyCount',
+  "agentDashboard/fetchPropertyCount",
   async (agentId: string, { rejectWithValue }) => {
     try {
-      const count = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_COUNT, agentId);
+      const count = await Meteor.callAsync(
+        MeteorMethodIdentifier.GET_AGENT_PROPERTY_COUNT,
+        agentId
+      );
       return count;
     } catch (error) {
-      return rejectWithValue('Failed to fetch property count');
+      return rejectWithValue("Failed to fetch property count");
     }
   }
 );
 
 export const fetchPropertiesAndMetrics = createAsyncThunk(
-  'agentDashboard/fetchPropertiesAndMetrics',
+  "agentDashboard/fetchPropertiesAndMetrics",
   async (agentId: string, { rejectWithValue }) => {
     try {
-      const properties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, agentId) as ApiProperty[];
-      const occupiedProperties = properties.filter(property => property.propertyStatus === PropertyStatus.OCCUPIED);
-      const totalRevenue = occupiedProperties.reduce((sum, property) => sum + property.pricePerMonth, 0);
-      const occupancyRate = properties.length > 0 ? (occupiedProperties.length / properties.length) * 100 : 0;
+      const properties = (await Meteor.callAsync(
+        MeteorMethodIdentifier.GET_ALL_AGENT_PROPERTIES,
+        agentId
+      )) as ApiProperty[];
+      const occupiedProperties = properties.filter(
+        (property) => property.propertyStatus === PropertyStatus.OCCUPIED
+      );
+      const totalRevenue = occupiedProperties.reduce(
+        (sum, property) => sum + property.pricePerMonth,
+        0
+      );
+      const occupancyRate =
+        properties.length > 0
+          ? (occupiedProperties.length / properties.length) * 100
+          : 0;
 
       return {
         properties,
         monthlyRevenue: totalRevenue,
-        occupancyRate
+        occupancyRate,
       };
     } catch (error) {
-      return rejectWithValue('Failed to fetch properties and metrics');
+      return rejectWithValue("Failed to fetch properties and metrics");
     }
   }
 );
@@ -91,10 +105,12 @@ export const fetchAgentTasks = createAsyncThunk(
             taskDetails.push({
               title: taskData.name,
               description: taskData.description,
-              datetime: taskData.dueDate ? new Date(taskData.dueDate).toLocaleDateString() : '',
+              datetime: taskData.dueDate
+                ? new Date(taskData.dueDate).toLocaleDateString()
+                : "",
               status: taskData.status,
               priority: taskData.priority,
-              taskId: taskData.taskId
+              taskId: taskData.taskId,
             });
           }
         } catch (error) {
@@ -164,12 +180,17 @@ export const agentDashboardSlice = createSlice({
 
 export const { setTasks } = agentDashboardSlice.actions;
 export const selectAgentDashboard = (state: RootState) => state.agentDashboard;
-export const selectProperties = (state: RootState) => state.agentDashboard.properties;
-export const selectPropertyCount = (state: RootState) => state.agentDashboard.propertyCount;
-export const selectMonthlyRevenue = (state: RootState) => state.agentDashboard.monthlyRevenue;
-export const selectOccupancyRate = (state: RootState) => state.agentDashboard.occupancyRate;
+export const selectProperties = (state: RootState) =>
+  state.agentDashboard.properties;
+export const selectPropertyCount = (state: RootState) =>
+  state.agentDashboard.propertyCount;
+export const selectMonthlyRevenue = (state: RootState) =>
+  state.agentDashboard.monthlyRevenue;
+export const selectOccupancyRate = (state: RootState) =>
+  state.agentDashboard.occupancyRate;
 export const selectTasks = (state: RootState) => state.agentDashboard.tasks;
-export const selectIsLoading = (state: RootState) => state.agentDashboard.isLoading;
+export const selectIsLoading = (state: RootState) =>
+  state.agentDashboard.isLoading;
 export const selectError = (state: RootState) => state.agentDashboard.error;
 
 export default agentDashboardSlice.reducer;

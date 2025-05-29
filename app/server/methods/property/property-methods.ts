@@ -63,8 +63,8 @@ const propertyGetStatusCountsLandlordMethod = {
   [MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_STATUS_COUNTS]: async (
     landlordId: string
   ): Promise<{ occupied: number; vacant: number }> => {
-    const occupiedId = await getStatusId(PropertyStatus.OCCUPIED);
-    const vacantId = await getStatusId(PropertyStatus.VACANT);
+    const occupiedId = await getPropertyStatusId(PropertyStatus.OCCUPIED);
+    const vacantId = await getPropertyStatusId(PropertyStatus.VACANT);
 
     // count properties of each status
     const occupiedCount = await PropertyCollection.find({
@@ -88,7 +88,7 @@ const propertyGetLandlordTotalIncomeMethod = {
   [MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_TOTAL_INCOME]: async (
     landlordId: string
   ): Promise<{ weekly: number; monthly: number }> => {
-    const occupiedId = await getStatusId(PropertyStatus.OCCUPIED);
+    const occupiedId = await getPropertyStatusId(PropertyStatus.OCCUPIED);
 
     const occupiedProperties = await PropertyCollection.find({
       landlord_id: landlordId,
@@ -121,7 +121,7 @@ const propertyGetLandlordOccupancyRateMethod = {
   [MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_OCCUPANCY_RATE]: async (
     landlordId: string
   ): Promise<number> => {
-    const occupiedId = await getStatusId(PropertyStatus.OCCUPIED);
+    const occupiedId = await getPropertyStatusId(PropertyStatus.OCCUPIED);
 
     const properties = await PropertyCollection.find({
       landlord_id: landlordId,
@@ -141,16 +141,22 @@ const propertyGetLandlordOccupancyRateMethod = {
   },
 };
 
-const propertyGetLandlordAverageRent = {
+const propertyGetLandlordAverageRentMethod = {
   [MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_AVERAGE_RENT]: async (
     landlordId: string
   ): Promise<{ occupiedCount: number; rent: number }> => {
-    const occupiedId = await getStatusId(PropertyStatus.OCCUPIED);
+    const occupiedId = await getPropertyStatusId(PropertyStatus.OCCUPIED);
 
     const occupiedProperties = await PropertyCollection.find({
       landlord_id: landlordId,
       property_status_id: occupiedId,
     }).fetchAsync();
+
+    // check if occupied properties exist for this landlord
+    const occupiedCount = occupiedProperties.length;
+    if (occupiedCount === 0) {
+      return { occupiedCount: 0, rent: 0 };
+    }
 
     const pricePromises = occupiedProperties.map((p) =>
       PropertyPriceCollection.findOneAsync(
@@ -158,38 +164,32 @@ const propertyGetLandlordAverageRent = {
         { sort: { date_set: -1 } } //uses most recent date for rent
       )
     );
+
     const latestPrices = await Promise.all(pricePromises);
-    const validPrices = latestPrices.filter((price) => price);
-    const occupiedCount = occupiedProperties.length;
-    const propertiesWithPrices = validPrices.length;
-
-    if (propertiesWithPrices === 0) {
-      return { occupiedCount, rent: 0 };
-    }
-
-    const totalMonthly = validPrices.reduce(
+    const totalMonthly = latestPrices.reduce(
       (sum, price) => sum + price!.price_per_month,
       0
     );
-    const averageRent = totalMonthly / propertiesWithPrices; //use only properties with prices in the calculation
+
+    const averageRent = totalMonthly / occupiedCount;
 
     return {
-      occupiedCount: occupiedCount,
+      occupiedCount,
       rent: Math.round(averageRent * 100) / 100,
     };
   },
 };
 
-const propertyGetCountMethod = {
-  [MeteorMethodIdentifier.PROPERTY_GET_COUNT]: async (
+const propertyGetCountAgentMethod = {
+  [MeteorMethodIdentifier.GET_AGENT_PROPERTY_COUNT]: async (
     agentId: string
   ): Promise<number> => {
     return await PropertyCollection.find({ agent_id: agentId }).countAsync();
   },
 };
 
-const propertyGetListMethod = {
-  [MeteorMethodIdentifier.PROPERTY_GET_LIST]: async (
+const propertyGetAllAgentPropertiesMethod = {
+  [MeteorMethodIdentifier.GET_ALL_AGENT_PROPERTIES]: async (
     agentId: string
   ): Promise<ApiProperty[]> => {
     const properties = await PropertyCollection.find({
@@ -358,7 +358,7 @@ const propertyInsertMethod = {
   },
 };
 
-async function getStatusId(name: PropertyStatus): Promise<string> {
+async function getPropertyStatusId(name: PropertyStatus): Promise<string> {
   const status = await PropertyStatusCollection.findOneAsync({ name });
   if (!status)
     throw new Meteor.Error("status-not-found", `Status ${name} not found`);
@@ -424,9 +424,9 @@ Meteor.methods({
   ...propertyGetStatusCountsLandlordMethod,
   ...propertyGetLandlordTotalIncomeMethod,
   ...propertyGetLandlordOccupancyRateMethod,
-  ...propertyGetLandlordAverageRent,
-  ...propertyGetCountMethod,
-  ...propertyGetListMethod,
+  ...propertyGetLandlordAverageRentMethod,
+  ...propertyGetCountAgentMethod,
+  ...propertyGetAllAgentPropertiesMethod,
   ...propertyInsertMethod,
   ...propertyGetByTenantIdMethod,
   ...updatePropertyData,
