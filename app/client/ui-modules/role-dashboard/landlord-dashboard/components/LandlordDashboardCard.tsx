@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { CardWidget } from "../../components/CardWidget";
 import { Progress } from "../../components/ProgressBar";
-import { Meteor } from "meteor/meteor";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { useAppSelector } from "/app/client/store";
+import { landlordPropertyRepository } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
 export function LandlordDashboardCards() {
   const [propertyCount, setPropertyCount] = useState<number>(0);
@@ -24,108 +23,39 @@ export function LandlordDashboardCards() {
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
 
   useEffect(() => {
-    const getPropertyCount = async () => {
-      if (
-        currentUser &&
-        "landlordId" in currentUser &&
-        currentUser.landlordId
-      ) {
+    if (currentUser && "landlordId" in currentUser && currentUser.landlordId) {
+      const fetchData = async () => {
         try {
-          const count = await Meteor.callAsync(
-            MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_COUNT,
-            currentUser.landlordId
-          );
+          const [count, statusCounts, income, occupancyRate, averageRent] =
+            await Promise.all([
+              landlordPropertyRepository.getLandlordPropertyCount(
+                currentUser.landlordId
+              ),
+              landlordPropertyRepository.getLandlordStatusCounts(
+                currentUser.landlordId
+              ),
+              landlordPropertyRepository.getLandlordIncome(
+                currentUser.landlordId
+              ),
+              landlordPropertyRepository.getLandlordOccupancyRate(
+                currentUser.landlordId
+              ),
+              landlordPropertyRepository.getLandlordAverageRent(
+                currentUser.landlordId
+              ),
+            ]);
+
           setPropertyCount(count);
-        } catch (error) {
-          console.error("Error fetching property count for landlord:", error);
-        }
-      }
-    };
-
-    getPropertyCount();
-
-    const getStatusCounts = async () => {
-      if (
-        currentUser &&
-        "landlordId" in currentUser &&
-        currentUser.landlordId
-      ) {
-        try {
-          const result = await Meteor.callAsync(
-            MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_STATUS_COUNTS,
-            currentUser.landlordId
-          );
-          setStatusCounts(result);
-        } catch (error) {
-          console.error("Error fetching status counts for landlord:", error);
-        }
-      }
-    };
-
-    getStatusCounts();
-
-    const getIncome = async () => {
-      if (
-        currentUser &&
-        "landlordId" in currentUser &&
-        currentUser.landlordId
-      ) {
-        try {
-          const result = await Meteor.callAsync(
-            MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_TOTAL_INCOME,
-            currentUser.landlordId
-          );
-          setIncome(result);
-        } catch (error) {
-          console.error(
-            "Error fetching monthly/weekly income for landlord:",
-            error
-          );
-        }
-      }
-    };
-
-    getIncome();
-
-    const getOccupancyRate = async () => {
-      if (
-        currentUser &&
-        "landlordId" in currentUser &&
-        currentUser.landlordId
-      ) {
-        try {
-          const rate = await Meteor.callAsync(
-            MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_OCCUPANCY_RATE,
-            currentUser.landlordId
-          );
-          setOccupancyRate(rate);
-        } catch (error) {
-          console.error("Error fetching occupancy rate for landlord:", error);
-        }
-      }
-    };
-
-    getOccupancyRate();
-
-    const getAverageRent = async () => {
-      if (
-        currentUser &&
-        "landlordId" in currentUser &&
-        currentUser.landlordId
-      ) {
-        try {
-          const averageRent = await Meteor.callAsync(
-            MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_AVERAGE_RENT,
-            currentUser.landlordId
-          );
+          setStatusCounts(statusCounts);
+          setIncome(income);
+          setOccupancyRate(occupancyRate);
           setAverageRent(averageRent);
         } catch (error) {
-          console.error("Error fetching average rent for landlord:", error);
+          console.error("Error fetching landlord dashboard data:", error);
         }
-      }
-    };
-
-    getAverageRent();
+      };
+      fetchData();
+    }
   }, [currentUser]);
 
   return (

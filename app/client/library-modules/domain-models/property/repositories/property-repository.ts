@@ -1,4 +1,9 @@
-import { apiGetAllProperties, apiGetPropertyById, apiInsertProperty, apiGetPropertyByTenantId } from "/app/client/library-modules/apis/property/property-api";
+import {
+  apiGetAllProperties,
+  apiGetPropertyById,
+  apiInsertProperty,
+  apiGetPropertyByTenantId,
+} from "/app/client/library-modules/apis/property/property-api";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
 import { mapApiPropertyToProperty } from "./mappers/property-mapper";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
@@ -64,9 +69,18 @@ export async function getLandlordAverageRent(
   return await apiGetLandlordAverageRent(landlordId);
 }
 
-export async function getPropertyByTenantId(tenantId: string): Promise<Property> {
+export async function getPropertyByTenantId(
+  tenantId: string
+): Promise<Property> {
   const apiProperty = await apiGetPropertyByTenantId(tenantId);
   const mappedProperty = mapApiPropertyToProperty(apiProperty);
   return mappedProperty;
 }
 
+export const landlordPropertyRepository = {
+  getLandlordPropertyCount,
+  getLandlordStatusCounts,
+  getLandlordIncome,
+  getLandlordOccupancyRate,
+  getLandlordAverageRent,
+};
