@@ -8,3 +8,7 @@ export async function getAgentById(id: string): Promise<Agent> {
 
     return mappedUserAccount;
 }
+
+export async function apiGetPropertyByAgentId(agentId: string): Promise<Agent> {
+  return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_BY_AGENT_ID, agentId);
+}

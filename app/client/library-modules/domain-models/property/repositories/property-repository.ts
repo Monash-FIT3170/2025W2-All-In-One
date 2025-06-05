@@ -33,8 +33,8 @@ export async function getPropertyByTenantId(tenantId: string): Promise<Property>
   return mappedProperty;
 }
 
-export async function getPropertyByAgentId(agentId: string): Promise<Property> {
-  const apiProperty = await apiGetPropertyByAgentId(agentId);
-  const mappedProperty = mapApiPropertyToProperty(apiProperty);
-  return mappedProperty;
+export async function getPropertyByAgentId(agentId: string): Promise<Property[]> {
+  const apiProperties = await apiGetPropertyByAgentId(agentId);
+  const mappedProperties = apiProperties.map(mapApiPropertyToProperty);
+  return mappedProperties;
 }
