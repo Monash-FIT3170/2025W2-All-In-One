@@ -2,14 +2,9 @@ import React, { useEffect } from "react";
 import { Button } from "../../../theming-shadcn/Button";
 import { CardWidget } from "../../components/CardWidget";
 import { useAppSelector, useAppDispatch } from "../../../../store";
-import { loadPropertyList, selectPropertyList, selectPropertyListLoading, selectPropertyListError } from "../../../property-listing-page/state/reducers/property-listing-slice";
+import {selectAgentProperties, selectPropertiesLoading, selectPropertiesError, fetchAgentProperties } from "../state/agent-dashboard-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
-
-interface Property {
-  address: string;
-  status: PropertyStatus;
-  rent: number;
-}
+import { Property } from '/app/client/library-modules/domain-models/property/Property';
 
 interface PropertyOverviewProps {
   className?: string;
@@ -20,21 +15,17 @@ export function PropertyOverview({
 }: PropertyOverviewProps): React.JSX.Element {
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-  const properties = useAppSelector(selectPropertyList);
-  const isLoading = useAppSelector(selectPropertyListLoading);
-  const error = useAppSelector(selectPropertyListError);
+  const properties = useAppSelector(selectAgentProperties);
+  const isLoading = useAppSelector(selectPropertiesLoading);
+  const error = useAppSelector(selectPropertiesError);
 
   useEffect(() => {
     if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
-      dispatch(loadPropertyList(currentUser.agentId));
+      dispatch(fetchAgentProperties(currentUser.agentId));
     }
   }, [currentUser, dispatch]);
 
-  const mappedProperties: Property[] = properties.map((property) => ({
-    address: `${property.streetnumber} ${property.streetname}`,
-    status: property.propertyStatus as PropertyStatus,
-    rent: property.pricePerMonth,
-  }));
+  const mappedProperties: Property[] = properties.map((property) => ({ ...property }));
 
   return (
     <CardWidget
@@ -69,21 +60,21 @@ export function PropertyOverview({
               <tbody className="divide-y divide-gray-200">
                 {mappedProperties.map((property, index) => (
                   <tr key={index} className="transition-colors hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm">{property.address}</td>
+                    <td className="px-6 py-4 text-sm">{`${property.streetnumber} ${property.streetname}`}</td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        property.status === PropertyStatus.CLOSED ? "bg-gray-100 text-gray-800" :
-                        property.status === PropertyStatus.DRAFT ? "bg-purple-100 text-purple-800" :
-                        property.status === PropertyStatus.LISTED ? "bg-blue-100 text-blue-800" :
-                        property.status === PropertyStatus.UNDER_MAINTENANCE ? "bg-yellow-100 text-yellow-800" :
-                        property.status === PropertyStatus.VACANT ? "bg-red-100 text-red-800" :
-                        property.status === PropertyStatus.OCCUPIED ? "bg-green-100 text-green-800" :
+                        property.propertyStatus === PropertyStatus.CLOSED ? "bg-gray-100 text-gray-800" :
+                        property.propertyStatus === PropertyStatus.DRAFT ? "bg-purple-100 text-purple-800" :
+                        property.propertyStatus === PropertyStatus.LISTED ? "bg-blue-100 text-blue-800" :
+                        property.propertyStatus === PropertyStatus.UNDER_MAINTENANCE ? "bg-yellow-100 text-yellow-800" :
+                        property.propertyStatus === PropertyStatus.VACANT ? "bg-red-100 text-red-800" :
+                        property.propertyStatus === PropertyStatus.OCCUPIED ? "bg-green-100 text-green-800" :
                         "bg-grey-100 text-grey-800"
                       }`}>
-                        {property.status}
+                        {property.propertyStatus}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm">${property.rent.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm">${property.pricePerMonth.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
