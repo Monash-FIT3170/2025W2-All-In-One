@@ -38,11 +38,5 @@ export async function apiGetPropertyByTenantId(tenantId: string): Promise<ApiPro
 }
 
 export async function apiGetPropertyByAgentId(agentId: string): Promise<ApiProperty[]> {
-  try {
-    const properties = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, agentId) as ApiProperty[];
-    return properties;
-  } catch (error) {
-    console.error(`Error fetching properties for agent ${agentId}:`, error);
-    throw error;
-  }
+  return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, agentId)
 }
