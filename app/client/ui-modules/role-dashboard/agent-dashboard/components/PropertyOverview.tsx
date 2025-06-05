@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React, { use, useEffect } from "react";
 import { Button } from "../../../theming-shadcn/Button";
 import { CardWidget } from "../../components/CardWidget";
 import { useAppSelector, useAppDispatch } from "../../../../store";
 import {selectProperties, selectPropertiesLoading, selectPropertiesError, fetchAgentProperties } from "../state/agent-dashboard-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { Property } from '/app/client/library-modules/domain-models/property/Property';
+import { useNavigate } from "react-router";
 
 interface PropertyOverviewProps {
   className?: string;
@@ -14,6 +15,7 @@ export function PropertyOverview({
   className = "",
 }: PropertyOverviewProps): React.JSX.Element {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const properties = useAppSelector(selectProperties);
   const isLoading = useAppSelector(selectPropertiesLoading);
@@ -27,6 +29,11 @@ export function PropertyOverview({
 
   const mappedProperties: Property[] = properties.map((property) => ({ ...property }));
 
+  // Handler for the button click
+  const handleViewAllClick = () => {
+    navigate("/agent-properties");
+  };
+
   return (
     <CardWidget
       title="Property Overview"
@@ -34,7 +41,9 @@ export function PropertyOverview({
       subtitle="Quick view of your managed properties"
       className={className}
       rightElement={
-        <button className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50">
+        <button className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50"
+          type="button"
+        >
           <span>Filter</span>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -84,9 +93,13 @@ export function PropertyOverview({
       </div>
 
       <div className="mt-4">
-        <Button variant="ghost" className="w-full">
+        <button
+          type="button"
+          onClick={handleViewAllClick}
+          className="w-full px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-200 transition-colors"
+        >
           View All Properties
-        </Button>
+        </button>
       </div>
     </CardWidget>
   );
