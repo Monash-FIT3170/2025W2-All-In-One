@@ -193,7 +193,6 @@ export const agentDashboardSlice = createSlice({
 
 export const { setTasks } = agentDashboardSlice.actions;
 export const selectAgentDashboard = (state: RootState) => state.agentDashboard;
-export const selectProperties = (state: RootState) => state.agentDashboard.properties;
 export const selectPropertyCount = (state: RootState) => state.agentDashboard.propertyCount;
 export const selectMonthlyRevenue = (state: RootState) => state.agentDashboard.monthlyRevenue;
 export const selectOccupancyRate = (state: RootState) => state.agentDashboard.occupancyRate;
@@ -204,7 +203,7 @@ export const selectIsLoading = (state: RootState) => state.agentDashboard.isLoad
 export const selectError = (state: RootState) => state.agentDashboard.error;
 
 //Selectors for agent properties
-export const selectAgentProperties = (state: RootState) => state.agentDashboard.properties;
+export const selectProperties = (state: RootState) => state.agentDashboard.properties;
 export const selectPropertiesLoading = (state: RootState) => state.agentDashboard.propertiesLoading;
 export const selectPropertiesError = (state: RootState) => state.agentDashboard.propertiesError;
 

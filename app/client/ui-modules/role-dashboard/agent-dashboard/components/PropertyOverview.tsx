@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Button } from "../../../theming-shadcn/Button";
 import { CardWidget } from "../../components/CardWidget";
 import { useAppSelector, useAppDispatch } from "../../../../store";
-import {selectAgentProperties, selectPropertiesLoading, selectPropertiesError, fetchAgentProperties } from "../state/agent-dashboard-slice";
+import {selectProperties, selectPropertiesLoading, selectPropertiesError, fetchAgentProperties } from "../state/agent-dashboard-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { Property } from '/app/client/library-modules/domain-models/property/Property';
 
@@ -15,7 +15,7 @@ export function PropertyOverview({
 }: PropertyOverviewProps): React.JSX.Element {
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-  const properties = useAppSelector(selectAgentProperties);
+  const properties = useAppSelector(selectProperties);
   const isLoading = useAppSelector(selectPropertiesLoading);
   const error = useAppSelector(selectPropertiesError);
 
