@@ -3,7 +3,6 @@ import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
-import { Role } from "/app/shared/user-role-identifier";
 
 export async function apiGetPropertyById(id: string): Promise<ApiProperty> {
   try {

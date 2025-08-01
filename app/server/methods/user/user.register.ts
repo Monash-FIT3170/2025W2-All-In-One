@@ -3,8 +3,6 @@ import { check, Match } from "meteor/check";
 import { Accounts } from "meteor/accounts-base";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { Role } from "../../../shared/user-role-identifier";
-import { use } from "react";
-import { string } from "zod";
 import { UserInsertData } from "./UserInsertData";
 
 type RegisterPayload = {
@@ -74,7 +72,7 @@ async function createAuthUser(
 ): Promise<string> {
   try {
     return await Accounts.createUserAsync({ email, password });
-  } catch (e: any) {
+  } catch (e) {
     if (
       e instanceof Meteor.Error &&
       e.message?.includes("check your credentials")

@@ -570,8 +570,6 @@ async function seedListedProperties(
     }
 
     await PropertyCollection.insertAsync(property);
-    await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_USER_INSERT, property._id, agent.agentId, Role.AGENT);
-    await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_USER_INSERT, property._id, landlord.landlordId, Role.LANDLORD);  
 
 
     await PropertyPriceCollection.insertAsync({
