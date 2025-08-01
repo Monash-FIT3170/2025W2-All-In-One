@@ -1,5 +1,7 @@
 // components/PropertyDetails.tsx
 import React from "react";
+import { useNavigate } from "react-router";
+import { NavigationPath } from "/app/client/navigation";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 interface PropertyFeature {
@@ -21,7 +23,6 @@ interface PropertyDetailsProps {
   bedrooms: number;
   bathrooms: number;
   features: PropertyFeature[];
-  onViewDetailsClick?: () => void;
 }
 
 const PropertyDetails: React.FC<PropertyDetailsProps> = ({
@@ -32,8 +33,13 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({
   bedrooms,
   bathrooms,
   features,
-  onViewDetailsClick = () => console.log("View property details clicked"),
 }) => {
+  const navigate = useNavigate();
+
+  const handleViewDetailsClick = () => {
+    navigate(NavigationPath.TenantProperty);
+  };
+
   // Format the full address
   const fullAddress = [
     `${address.street}${address.apt ? `, Apt ${address.apt}` : ""}`,
@@ -126,7 +132,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({
 
       {/* View Details Button */}
       <button
-        onClick={onViewDetailsClick}
+        onClick={handleViewDetailsClick}
         className="w-full py-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50 transition-colors"
       >
         View Property Details
