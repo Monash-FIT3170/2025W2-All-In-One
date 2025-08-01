@@ -3,6 +3,7 @@ import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
+import { Role } from "/app/shared/user-role-identifier";
 
 export async function apiGetPropertyById(id: string): Promise<ApiProperty> {
   try {
@@ -20,7 +21,12 @@ export async function apiGetPropertyStatusId(name: PropertyStatus): Promise<stri
 }
 
 export async function apiInsertProperty(property: PropertyInsertData): Promise<string> {
-  return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_INSERT, property);
+  const propertyId: string = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_INSERT, property);
+  return propertyId;
+}
+
+export async function apiInsertUserProperty(propertyId: string, userId: string,role: Role): Promise<void> {
+  await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_USER_INSERT, propertyId, userId, role);
 }
 
 export async function apiUpdatePropertyData(updatedProperty: PropertyUpdateData): Promise<string> {

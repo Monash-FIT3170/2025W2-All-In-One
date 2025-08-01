@@ -3,6 +3,9 @@ import { check, Match } from "meteor/check";
 import { Accounts } from "meteor/accounts-base";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { Role } from "../../../shared/user-role-identifier";
+import { use } from "react";
+import { string } from "zod";
+import { UserInsertData } from "./UserInsertData";
 
 type RegisterPayload = {
   email: string;
@@ -106,10 +109,10 @@ async function createRoleSpecificRecord(
       email: data.email,
     }
   );
-  const common = {
+  const common: UserInsertData = {
     userAccountId: userId,
     profileDataId: profileDataId,
-    createdAt: new Date(),
+    property_ids: [],
   };
 
   switch (data.accountType) {

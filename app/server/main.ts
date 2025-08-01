@@ -160,9 +160,6 @@ async function tempSeedProfileData(): Promise<void> {
       { _id: "1", name: PropertyStatus.VACANT },
       { _id: "2", name: PropertyStatus.OCCUPIED },
       { _id: "3", name: PropertyStatus.UNDER_MAINTENANCE },
-      { _id: "4", name: PropertyStatus.CLOSED },
-      { _id: "5", name: PropertyStatus.DRAFT },
-      { _id: "6", name: PropertyStatus.LISTED },
     ];
 
     // Add new status if it doesn't exist
@@ -573,6 +570,9 @@ async function seedListedProperties(
     }
 
     await PropertyCollection.insertAsync(property);
+    await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_USER_INSERT, property._id, agent.agentId, Role.AGENT);
+    await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_USER_INSERT, property._id, landlord.landlordId, Role.LANDLORD);  
+
 
     await PropertyPriceCollection.insertAsync({
       property_id: property._id,

@@ -4,4 +4,5 @@ export type TenantDocument = {
     task_ids: string[]; // array of task ids
     createdAt: Date;
     profileDataId: string;
+    property_ids: string[];
 };
