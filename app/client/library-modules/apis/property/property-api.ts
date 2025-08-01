@@ -21,12 +21,7 @@ export async function apiGetPropertyStatusId(name: PropertyStatus): Promise<stri
 }
 
 export async function apiInsertProperty(property: PropertyInsertData): Promise<string> {
-  const propertyId: string = await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_INSERT, property);
-  return propertyId;
-}
-
-export async function apiInsertUserProperty(propertyId: string, userId: string,role: Role): Promise<void> {
-  await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_USER_INSERT, propertyId, userId, role);
+  return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_INSERT, property);
 }
 
 export async function apiUpdatePropertyData(updatedProperty: PropertyUpdateData): Promise<string> {

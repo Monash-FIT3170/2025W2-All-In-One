@@ -112,7 +112,6 @@ async function createRoleSpecificRecord(
   const common: UserInsertData = {
     userAccountId: userId,
     profileDataId: profileDataId,
-    property_ids: [],
   };
 
   switch (data.accountType) {

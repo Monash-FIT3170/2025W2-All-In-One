@@ -10,7 +10,6 @@ export enum MeteorMethodIdentifier {
   PROPERTY_GET_COUNT = "properties.getCount",
   PROPERTY_GET_LIST = "properties.getList",
   PROPERTY_INSERT = "properties.insert", // Inserts property into property collection
-  PROPERTY_USER_INSERT = "properties.userInsert", // Inserts property in role specific collection
   PROPERTY_PRICE_INSERT = "properties.insertPrice", // Inserts property price into property price collection
   PROPERTY_LANDLORD_GET_COUNT = "properties.getCountLandlord",
   PROPERTY_LANDLORD_GET_STATUS_COUNTS = "properties.getStatusCountsLandlord",

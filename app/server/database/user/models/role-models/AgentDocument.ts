@@ -5,5 +5,4 @@ export type AgentDocument = {
     agentCode: string;
     createdAt: Date;
     profileDataId: string;
-    property_ids: string[];
 };

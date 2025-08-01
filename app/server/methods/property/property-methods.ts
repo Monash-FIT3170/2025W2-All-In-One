@@ -20,7 +20,6 @@ import { LandlordCollection } from "../../database/user/user-collections";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
-import { Role } from "/app/shared/user-role-identifier";
 
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
@@ -315,37 +314,6 @@ const updatePropertyData = {
   });
 }}
 
-const insertUserProperty = {
-  [MeteorMethodIdentifier.PROPERTY_USER_INSERT]: async (propertyId: string, userId: string, role: Role): Promise<void> => {
-    try {
-      console.log(`Inserting user property for user ${userId} and property ${propertyId} with role ${role}`);
-      switch (role) {
-        case Role.AGENT: {
-          await AgentCollection.updateAsync(userId, {
-            $addToSet: { property_ids: propertyId },
-          });
-          break;
-        }
-        case Role.LANDLORD: {
-          await LandlordCollection.updateAsync(userId, {
-            $addToSet: { property_ids: propertyId },
-          });
-          break;
-        }
-        case Role.TENANT: {
-            await TenantCollection.updateAsync(userId, {
-              $addToSet: { property_ids: propertyId },
-            });
-            break;
-        }
-      }
-    } catch (error) {
-      console.error(`Failed to insert user property for user ${userId} and property ${propertyId}:`, error);
-      throw meteorWrappedInvalidDataError(error as InvalidDataError);
-    } 
-  }
-}
-
 Meteor.methods({
   ...propertyGetMethod,
   ...propertyInsertMethod,
@@ -357,5 +325,4 @@ Meteor.methods({
   ...propertyGetByTenantIdMethod,
   ...updatePropertyData,
   ...propertyGetAllMethod,
-  ...insertUserProperty,
 });
