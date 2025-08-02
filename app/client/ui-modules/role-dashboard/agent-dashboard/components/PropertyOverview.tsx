@@ -6,6 +6,7 @@ import {selectProperties, selectPropertiesLoading, selectPropertiesError, fetchA
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { Property } from '/app/client/library-modules/domain-models/property/Property';
 import { useNavigate } from "react-router";
+import { NavigationPath } from "../../../../navigation";
 
 interface PropertyOverviewProps {
   className?: string;
@@ -27,11 +28,11 @@ export function PropertyOverview({
     }
   }, [currentUser, dispatch]);
 
-  const mappedProperties: Property[] = properties.map((property) => ({ ...property }));
+  // const mappedProperties: Property[] = properties.map((property) => ({ ...property }));
 
   // Handler for the button click
   const handleViewAllClick = () => {
-    navigate("/agent-properties");
+    navigate(NavigationPath.AgentProperties);
   };
 
   return (
@@ -67,7 +68,7 @@ export function PropertyOverview({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {mappedProperties.map((property, index) => (
+                {properties.map((property, index) => (
                   <tr key={index} className="transition-colors hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm">{`${property.streetnumber} ${property.streetname}`}</td>
                     <td className="px-6 py-4">
