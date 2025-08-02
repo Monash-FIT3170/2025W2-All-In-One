@@ -28,8 +28,6 @@ export function PropertyOverview({
     }
   }, [currentUser, dispatch]);
 
-  // const mappedProperties: Property[] = properties.map((property) => ({ ...property }));
-
   // Handler for the button click
   const handleViewAllClick = () => {
     navigate(NavigationPath.AgentProperties);
