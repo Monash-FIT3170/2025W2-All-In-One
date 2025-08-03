@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogContent,
@@ -11,68 +13,46 @@ import { Input } from "../../../theming-shadcn/Input";
 import { Label } from "../../../theming-shadcn/Label";
 import { Textarea } from "../../../theming-shadcn/Textarea";
 import { TaskStatus } from "/app/shared/task-status-identifier";
+import { 
+  taskFormSchema, 
+  TaskFormData, 
+  TaskData, 
+  defaultTaskFormValues 
+} from "./TaskFormSchema";
 
 interface AddTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (task: TaskData) => void;
-  selectedDateISO?: string | null;
-}
-
-export interface TaskData {
-  name: string;
-  description: string;
-  dueDate: Date;
-  priority: string;
-  taskStatus: TaskStatus;
-  createdDate: Date;
 }
 
 export function AddTaskModal({
   isOpen,
   onClose,
   onSubmit,
-  selectedDateISO,
 }: AddTaskModalProps): React.JSX.Element {
-  // Task form state
-  const [taskTitle, setTaskTitle] = useState<string>("");
-  const [taskDescription, setTaskDescription] = useState<string>("");
-  const [taskDueDate, setTaskDueDate] = useState<string>("");
-  const [taskPriority, setTaskPriority] = useState<string>("Medium");
-
-  // Pre-fill due date when selectedDateISO changes
-  useEffect(() => {
-    if (selectedDateISO && isOpen) {
-      setTaskDueDate(selectedDateISO);
-    }
-  }, [selectedDateISO, isOpen]);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<TaskFormData>({
+    resolver: zodResolver(taskFormSchema),
+    defaultValues: defaultTaskFormValues,
+  });
 
   const handleClose = () => {
-    // Clear form
-    setTaskTitle("");
-    setTaskDescription("");
-    setTaskDueDate("");
-    setTaskPriority("Medium");
+    reset();
     onClose();
   };
 
-  const handleSubmitTask = () => {
-    // Basic validation
-    if (!taskTitle.trim()) {
-      alert("Please enter a task title");
-      return;
-    }
-    if (!taskDueDate) {
-      alert("Please select a due date");
-      return;
-    }
-
+  const onFormSubmit = (data: TaskFormData) => {
     // Create task object matching TaskDocument structure
     const newTask: TaskData = {
-      name: taskTitle,
-      description: taskDescription,
-      dueDate: new Date(taskDueDate),
-      priority: taskPriority,
+      name: data.name,
+      description: data.description || "",
+      dueDate: new Date(data.dueDate),
+      priority: data.priority,
       taskStatus: TaskStatus.NOTSTARTED,
       createdDate: new Date(),
     };
@@ -88,7 +68,7 @@ export function AddTaskModal({
           <DialogTitle className="text-black text-lg font-semibold">Add New Task</DialogTitle>
         </DialogHeader>
         
-        <div className="p-4 space-y-4">
+        <form id="task-form" onSubmit={handleSubmit(onFormSubmit)} className="p-4 space-y-4">
           {/* Task Title */}
           <div>
             <Label htmlFor="task-title" className="text-black font-medium">
@@ -97,11 +77,13 @@ export function AddTaskModal({
             <Input
               id="task-title"
               type="text"
-              value={taskTitle}
-              onChange={(e) => setTaskTitle(e.target.value)}
+              {...register("name")}
               placeholder="Enter task title"
-              className="mt-1"
+              className={`mt-1 ${errors.name ? 'border-red-500' : ''}`}
             />
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+            )}
           </div>
 
           {/* Due Date */}
@@ -112,10 +94,12 @@ export function AddTaskModal({
             <Input
               id="task-due-date"
               type="date"
-              value={taskDueDate}
-              onChange={(e) => setTaskDueDate(e.target.value)}
-              className="mt-1"
+              {...register("dueDate")}
+              className={`mt-1 ${errors.dueDate ? 'border-red-500' : ''}`}
             />
+            {errors.dueDate && (
+              <p className="text-red-500 text-sm mt-1">{errors.dueDate.message}</p>
+            )}
           </div>
 
           {/* Description */}
@@ -125,8 +109,7 @@ export function AddTaskModal({
             </Label>
             <Textarea
               id="task-description"
-              value={taskDescription}
-              onChange={(e) => setTaskDescription(e.target.value)}
+              {...register("description")}
               placeholder="Enter task description"
               className="mt-1 resize-none"
               rows={3}
@@ -140,8 +123,7 @@ export function AddTaskModal({
             </Label>
             <select
               id="task-priority"
-              value={taskPriority}
-              onChange={(e) => setTaskPriority(e.target.value)}
+              {...register("priority")}
               className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <option value="Low">Low</option>
@@ -149,13 +131,13 @@ export function AddTaskModal({
               <option value="High">High</option>
             </select>
           </div>
-        </div>
+        </form>
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={handleClose}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleSubmitTask}>
+          <Button type="submit" form="task-form">
             Add Task
           </Button>
         </DialogFooter>

@@ -7,7 +7,8 @@ import {
 } from "../state/agent-dashboard-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
-import { AddTaskModal, TaskData } from "../components/AddTaskModal";
+import { AddTaskModal } from "../components/AddTaskModal";
+import { TaskData } from "../components/TaskFormSchema";
 
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
@@ -214,7 +215,6 @@ export function AgentCalendar(): React.JSX.Element {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSubmit={handleTaskSubmit}
-        selectedDateISO={selectedDateISO}
       />
     </div>
   );
