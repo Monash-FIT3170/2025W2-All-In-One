@@ -7,6 +7,12 @@ import {
 } from "../state/agent-dashboard-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../../../theming-shadcn/Dialog";
 
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
@@ -16,10 +22,19 @@ export function AgentCalendar(): React.JSX.Element {
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const handleDateSelection = (formatted: string, iso: string) => {
     setSelectedDate(formatted);
     setSelectedDateISO(iso);
+  };
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
   useEffect(() => {
@@ -159,7 +174,7 @@ export function AgentCalendar(): React.JSX.Element {
                   )}
                 </ul>
                 <br />
-                <Button>Add Task</Button>
+                <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
 
@@ -194,6 +209,18 @@ export function AgentCalendar(): React.JSX.Element {
           </div>
         </div>
       </div>
+
+      {/* Simple Add Task Modal */}
+      <Dialog open={isModalOpen} onOpenChange={handleCloseModal}>
+        <DialogContent className="sm:max-w-[425px] bg-white z-[100] border shadow-lg">
+          <DialogHeader>
+            <DialogTitle className="text-black text-lg font-semibold">Add New Task</DialogTitle>
+          </DialogHeader>
+          <div className="p-4">
+            <p className="text-black">add your task here</p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
