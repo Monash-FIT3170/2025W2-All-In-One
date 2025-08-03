@@ -12,7 +12,12 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "../../../theming-shadcn/Dialog";
+import { Input } from "../../../theming-shadcn/Input";
+import { Label } from "../../../theming-shadcn/Label";
+import { Textarea } from "../../../theming-shadcn/Textarea";
+import { TaskStatus } from "/app/shared/task-status-identifier";
 
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
@@ -23,6 +28,12 @@ export function AgentCalendar(): React.JSX.Element {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  
+  // Task form state
+  const [taskTitle, setTaskTitle] = useState<string>("");
+  const [taskDescription, setTaskDescription] = useState<string>("");
+  const [taskDueDate, setTaskDueDate] = useState<string>("");
+  const [taskPriority, setTaskPriority] = useState<string>("Medium");
 
   const handleDateSelection = (formatted: string, iso: string) => {
     setSelectedDate(formatted);
@@ -31,10 +42,47 @@ export function AgentCalendar(): React.JSX.Element {
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
+    // Pre-fill due date
+    if (selectedDateISO) {
+      setTaskDueDate(selectedDateISO);
+    }
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    // Clear form after closing modal
+    setTaskTitle("");
+    setTaskDescription("");
+    setTaskDueDate("");
+    setTaskPriority("Medium");
+  };
+
+  const handleSubmitTask = () => {
+    // Basic validation
+    if (!taskTitle.trim()) {
+      alert("Please enter a task title");
+      return;
+    }
+    if (!taskDueDate) {
+      alert("Please select a due date");
+      return;
+    }
+
+    // Create task object matching TaskDocument structure
+    const newTask = {
+      name: taskTitle,
+      description: taskDescription,
+      dueDate: new Date(taskDueDate),
+      priority: taskPriority,
+      taskStatus: TaskStatus.NOTSTARTED,
+      createdDate: new Date(),
+    };
+
+    console.log("Creating task:", newTask);
+    // TODO: Implement actual task creation logic here
+    // This would typically involve dispatching an action or calling an API
+
+    handleCloseModal();
   };
 
   useEffect(() => {
@@ -216,9 +264,78 @@ export function AgentCalendar(): React.JSX.Element {
           <DialogHeader>
             <DialogTitle className="text-black text-lg font-semibold">Add New Task</DialogTitle>
           </DialogHeader>
-          <div className="p-4">
-            <p className="text-black">add your task here</p>
+          
+          <div className="p-4 space-y-4">
+            {/* Task Title */}
+            <div>
+              <Label htmlFor="task-title" className="text-black font-medium">
+                Task Title *
+              </Label>
+              <Input
+                id="task-title"
+                type="text"
+                value={taskTitle}
+                onChange={(e) => setTaskTitle(e.target.value)}
+                placeholder="Enter task title"
+                className="mt-1"
+              />
+            </div>
+
+            {/* Due Date */}
+            <div>
+              <Label htmlFor="task-due-date" className="text-black font-medium">
+                Due Date *
+              </Label>
+              <Input
+                id="task-due-date"
+                type="date"
+                value={taskDueDate}
+                onChange={(e) => setTaskDueDate(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <Label htmlFor="task-description" className="text-black font-medium">
+                Description
+              </Label>
+              <Textarea
+                id="task-description"
+                value={taskDescription}
+                onChange={(e) => setTaskDescription(e.target.value)}
+                placeholder="Enter task description"
+                className="mt-1 resize-none"
+                rows={3}
+              />
+            </div>
+
+            {/* Priority */}
+            <div>
+              <Label htmlFor="task-priority" className="text-black font-medium">
+                Priority
+              </Label>
+              <select
+                id="task-priority"
+                value={taskPriority}
+                onChange={(e) => setTaskPriority(e.target.value)}
+                className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
           </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={handleCloseModal}>
+              Cancel
+            </Button>
+            <Button type="button" onClick={handleSubmitTask}>
+              Add Task
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
