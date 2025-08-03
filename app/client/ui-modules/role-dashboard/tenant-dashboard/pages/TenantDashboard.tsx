@@ -66,9 +66,6 @@ function TenantDashboard() {
                 ) : transformedPropertyDetails ? (
                   <PropertyDetails
                     {...transformedPropertyDetails}
-                    onViewDetailsClick={() =>
-                      console.log("Navigate to property details page")
-                    }
                   />
                 ) : (
                   <div className="text-center text-gray-500">
