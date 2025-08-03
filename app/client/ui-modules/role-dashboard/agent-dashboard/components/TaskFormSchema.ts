@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { TaskStatus } from "/app/shared/task-status-identifier";
+import { Task } from "/app/client/library-modules/domain-models/task/Task";
 
 // Form schema using Zod for task creation
 export const taskFormSchema = z.object({
@@ -12,15 +12,8 @@ export const taskFormSchema = z.object({
 // Inferred type from the schema
 export type TaskFormData = z.infer<typeof taskFormSchema>;
 
-// Task data interface for the final task object
-export interface TaskData {
-  name: string;
-  description: string;
-  dueDate: Date;
-  priority: string;
-  taskStatus: TaskStatus;
-  createdDate: Date;
-}
+// Task data interface for the final task object - reuse Task but omit auto-generated fields
+export type TaskData = Omit<Task, "taskId" | "createdDate">;
 
 // Default form values
 export const defaultTaskFormValues: TaskFormData = {

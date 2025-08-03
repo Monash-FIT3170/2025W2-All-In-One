@@ -47,14 +47,13 @@ export function AddTaskModal({
   };
 
   const onFormSubmit = (data: TaskFormData) => {
-    // Create task object matching TaskDocument structure
+    // Create task object matching Task domain model structure
     const newTask: TaskData = {
       name: data.name,
       description: data.description || "",
       dueDate: new Date(data.dueDate),
       priority: data.priority,
-      taskStatus: TaskStatus.NOTSTARTED,
-      createdDate: new Date(),
+      status: TaskStatus.NOTSTARTED,
     };
 
     onSubmit(newTask);
