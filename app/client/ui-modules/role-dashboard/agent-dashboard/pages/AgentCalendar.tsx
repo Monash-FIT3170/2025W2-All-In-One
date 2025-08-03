@@ -9,6 +9,7 @@ import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 import { AddTaskModal } from "../components/AddTaskModal";
 import { TaskData } from "../components/TaskFormSchema";
+import { apiCreateTask } from "/app/client/library-modules/apis/task/task-api";
 
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
@@ -33,8 +34,25 @@ export function AgentCalendar(): React.JSX.Element {
     setIsModalOpen(false);
   };
 
-  const handleTaskSubmit = (taskData: TaskData) => {
-    console.log("Creating task:", taskData);
+  const handleTaskSubmit = async (taskData: TaskData) => {
+    try {
+      // Create the task in the database
+      const apiData = {
+        name: taskData.name,
+        description: taskData.description,
+        dueDate: new Date(taskData.dueDate), // Convert string to Date
+        priority: taskData.priority.toLowerCase() as "low" | "medium" | "high",
+      };
+            
+      const createdTask = await apiCreateTask(apiData);
+      console.log("Task created successfully:", createdTask);
+      
+      // Close the modal
+      setIsModalOpen(false);
+      
+    } catch (error) {
+      console.error("Error creating task:", error);
+    }
   };
 
   useEffect(() => {
