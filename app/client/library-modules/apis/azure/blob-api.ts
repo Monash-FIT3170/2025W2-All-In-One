@@ -1,4 +1,4 @@
-import {UploadResults, FileInfo,isValidBlobContentType, BlobNamePrefix, UploadResult } from '/app/shared/azure/blob-models'
+import {UploadResults, FileInfo,isValidBlobContentType, BlobNamePrefix, UploadResult, dummyUploadResults } from '/app/shared/azure/blob-models'
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 export async function uploadFileHandler(blob: Blob, blobName: string): Promise<UploadResult>{
@@ -9,7 +9,13 @@ export async function uploadFileHandler(blob: Blob, blobName: string): Promise<U
 }
 
 export async function uploadFilesHandler(blobs: File[], blobNamePrefix: BlobNamePrefix): Promise<UploadResults>{
-    const files: FileInfo[] = await Promise.all(
+  
+  if (Meteor.isDevelopment) {
+    console.warn("Development mode: Skipping file upload.");
+    return dummyUploadResults;  
+  }
+  
+  const files: FileInfo[] = await Promise.all(
         blobs.map(async (file) => {
           const uint8Array = await blobToUint8Array(file);
 
@@ -40,3 +46,4 @@ export function getImageUrlsFromUploadResults(uploadResults: UploadResults): str
     }
     return uploadResults.success.map((uploadResult) => uploadResult.url);
 }
+

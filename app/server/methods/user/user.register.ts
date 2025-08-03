@@ -3,6 +3,7 @@ import { check, Match } from "meteor/check";
 import { Accounts } from "meteor/accounts-base";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { Role } from "../../../shared/user-role-identifier";
+import { UserInsertData } from "./UserInsertData";
 
 type RegisterPayload = {
   email: string;
@@ -71,7 +72,7 @@ async function createAuthUser(
 ): Promise<string> {
   try {
     return await Accounts.createUserAsync({ email, password });
-  } catch (e: any) {
+  } catch (e) {
     if (
       e instanceof Meteor.Error &&
       e.message?.includes("check your credentials")
@@ -106,10 +107,9 @@ async function createRoleSpecificRecord(
       email: data.email,
     }
   );
-  const common = {
+  const common: UserInsertData = {
     userAccountId: userId,
     profileDataId: profileDataId,
-    createdAt: new Date(),
   };
 
   switch (data.accountType) {
