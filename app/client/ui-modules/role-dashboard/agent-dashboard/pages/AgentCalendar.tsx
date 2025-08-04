@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
-  fetchAgentDetails,
+  fetchAgentTasks,
   selectTasks,
   selectIsLoading,
 } from "../state/agent-dashboard-slice";
@@ -24,7 +24,7 @@ export function AgentCalendar(): React.JSX.Element {
 
   useEffect(() => {
     if (currentUser?.userId) {
-      dispatch(fetchAgentDetails(currentUser.userId)); // Pass the userId to fetchAgentDetails
+      dispatch(fetchAgentTasks(currentUser.userId)); // Pass the userId to fetchAgentTasks
     }
   }, [dispatch, currentUser?.userId]);
 

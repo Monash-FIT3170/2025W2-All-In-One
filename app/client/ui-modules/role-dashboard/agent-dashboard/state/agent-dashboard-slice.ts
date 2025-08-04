@@ -87,8 +87,8 @@ export const fetchPropertiesAndMetrics = createAsyncThunk(
     }
   }
 );
-export const fetchAgentDetails = createAsyncThunk(
-  "agentDashboard/fetchAgentDetails",
+export const fetchAgentTasks = createAsyncThunk(
+  "agentDashboard/fetchAgentTasks",
   async (userId: string) => {
     const agentResponse = await getAgentById(userId);
 
@@ -148,15 +148,15 @@ export const agentDashboardSlice = createSlice({
         state.error = action.payload as string;
       })
       // Agent Tasks
-      .addCase(fetchAgentDetails.pending, (state) => {
+      .addCase(fetchAgentTasks.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(fetchAgentDetails.fulfilled, (state, action) => {
+      .addCase(fetchAgentTasks.fulfilled, (state, action) => {
         state.isLoading = false;
         // Use the fetched task details
         state.tasks = action.payload.taskDetails || [];
       })
-      .addCase(fetchAgentDetails.rejected, (state) => {
+      .addCase(fetchAgentTasks.rejected, (state) => {
         state.isLoading = false;
       })
       // Agent Properties

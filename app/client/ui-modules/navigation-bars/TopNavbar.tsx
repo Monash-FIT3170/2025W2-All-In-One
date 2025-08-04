@@ -9,7 +9,7 @@ import { useAppSelector, useAppDispatch } from "/app/client/store";
 import { ProfileFooter } from "../navigation-bars/side-nav-bars/components/ProfileFooter";
 import { signoutUser } from "../user-authentication/state/reducers/current-user-slice";
 import { NotificationBoard } from "../theming/components/NotificationBoard";
-import { selectTasks as selectAgentTasks, fetchAgentDetails } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
+import { selectTasks as selectAgentTasks, fetchAgentTasks } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
 import { selectTasks as selectTenantTasks, fetchTenantTasks } from "../role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
 import { selectTasks as selectLandlordTasks, fetchLandlordDetails } from "../role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
 
@@ -36,7 +36,7 @@ export function TopNavbar({
     if (authUser?.userId) {
       switch (authUser.role) {
         case 'agent':
-          dispatch(fetchAgentDetails(authUser.userId));
+          dispatch(fetchAgentTasks(authUser.userId));
           break;
         case 'tenant':
           dispatch(fetchTenantTasks(authUser.userId));
