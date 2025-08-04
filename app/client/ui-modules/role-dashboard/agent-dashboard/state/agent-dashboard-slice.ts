@@ -4,11 +4,12 @@ import { Meteor } from 'meteor/meteor';
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 import { ApiProperty } from '/app/shared/api-models/property/ApiProperty';
 import { PropertyStatus } from '/app/shared/api-models/property/PropertyStatus';
-
-type Property = ApiProperty;
+import { getPropertyByAgentId } from '/app/client/library-modules/domain-models/property/repositories/property-repository';
+import { Property } from '/app/client/library-modules/domain-models/property/Property';
 
 interface AgentDashboardState {
   isLoading: boolean;
+  propertiesLoading: boolean;
   properties: Property[];
   propertyCount: number;
   monthlyRevenue: number;
@@ -23,18 +24,32 @@ interface AgentDashboardState {
     taskId?: string;
   }>;
   error: string | null;
+  propertiesError: string | null;
 };
 const initialState: AgentDashboardState = {
   isLoading: false,
+  propertiesLoading: false,
   properties: [],
   propertyCount: 0,
   monthlyRevenue: 0,
   occupancyRate: 0,
   tasks: [],
   error: null,
+  propertiesError: null
 };
 
 // Async thunks
+
+// Fetch agent's properties
+export const fetchAgentProperties = createAsyncThunk<
+  Property[],
+  string
+>(
+    'agentDashboard/fetchProperties',
+    async (agentId: string) => {
+        return await getPropertyByAgentId(agentId);
+    }
+);
 export const fetchPropertyCount = createAsyncThunk(
   'agentDashboard/fetchPropertyCount',
   async (agentId: string, { rejectWithValue }) => {
@@ -148,6 +163,7 @@ export const agentDashboardSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       })
+      // Agent Tasks
       .addCase(fetchAgentTasks.pending, (state) => {
         state.isLoading = true;
       })
@@ -158,18 +174,37 @@ export const agentDashboardSlice = createSlice({
       })
       .addCase(fetchAgentTasks.rejected, (state) => {
         state.isLoading = false;
-      });
+      })
+      // Agent Properties
+      .addCase(fetchAgentProperties.pending, (state) => {
+        state.propertiesLoading = true;
+        state.propertiesError = null;
+      })
+      .addCase(fetchAgentProperties.fulfilled, (state, action) => {
+        state.propertiesLoading = false;
+        state.properties = action.payload;
+      })
+      .addCase(fetchAgentProperties.rejected, (state, action) => {
+        state.propertiesLoading = false;
+        state.propertiesError = action.error.message || 'Failed to fetch agent properties';
+    })
   },
 });
 
 export const { setTasks } = agentDashboardSlice.actions;
 export const selectAgentDashboard = (state: RootState) => state.agentDashboard;
-export const selectProperties = (state: RootState) => state.agentDashboard.properties;
 export const selectPropertyCount = (state: RootState) => state.agentDashboard.propertyCount;
 export const selectMonthlyRevenue = (state: RootState) => state.agentDashboard.monthlyRevenue;
 export const selectOccupancyRate = (state: RootState) => state.agentDashboard.occupancyRate;
+
+// Selectors for agent tasks
 export const selectTasks = (state: RootState) => state.agentDashboard.tasks;
 export const selectIsLoading = (state: RootState) => state.agentDashboard.isLoading;
 export const selectError = (state: RootState) => state.agentDashboard.error;
+
+//Selectors for agent properties
+export const selectProperties = (state: RootState) => state.agentDashboard.properties;
+export const selectPropertiesLoading = (state: RootState) => state.agentDashboard.propertiesLoading;
+export const selectPropertiesError = (state: RootState) => state.agentDashboard.propertiesError;
 
 export default agentDashboardSlice.reducer;

@@ -3,6 +3,7 @@ import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
+import { Meteor } from 'meteor/meteor';
 
 export async function apiGetPropertyById(id: string): Promise<ApiProperty> {
   try {
@@ -34,4 +35,8 @@ export async function apiGetAllProperties(): Promise<ApiProperty[]> {
 
 export async function apiGetPropertyByTenantId(tenantId: string): Promise<ApiProperty> {
   return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_BY_TENANT_ID, tenantId);
+}
+
+export async function apiGetPropertyByAgentId(agentId: string): Promise<ApiProperty[]> {
+  return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, agentId);
 }

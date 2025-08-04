@@ -55,7 +55,7 @@ export function AgentCalendar(): React.JSX.Element {
                 <ul className="space-y-4 mt-2">
                   {tasks
                     .filter((task) => {
-                      if (!task.datetime) return false; // Takss without a date just get passed over
+                      if (!task.datetime) return false; // Tasks without a date just get passed over
 
                       // Get the selected date (it should be in YYYY-MM-DD format)
                       const selectedDateObj = selectedDateISO ? new Date(selectedDateISO) : new Date();
