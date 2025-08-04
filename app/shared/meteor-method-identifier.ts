@@ -26,10 +26,11 @@ export enum MeteorMethodIdentifier {
   TENANT_GET = "tenants.getOne",
   LANDLORD_INSERT = "landlords.insert",
   LANDLORD_GET = "landlords.getOne",
-  LANDLORD_GET_ALL = "landlords.getAll",
+  LANDLORD_GET_ALL = "landlords.getAll", // Get All Landlords
   PROPERTY_STATUS_GET = "propertyStatus.getOne", // Find ID of property status by name
   PROPERTY_GET_BY_TENANT_ID = "property.getByTenantId",
   PROPERTY_GET_BY_AGENT_ID = "property.getByAgentId", // fetches all properties managed by an agent by their ID
+  PROPERTY_GET_ALL_BY_LANDLORD_ID = "property.getAllByLandlordId", // fetches all properties managed by a landlord by their ID
   PROPERTY_DATA_UPDATE = "property.updateData",
   PROFILE_GET = "profileData.getOne",
   PROFILE_EDIT = "profileData.edit",

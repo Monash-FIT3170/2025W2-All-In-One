@@ -1,32 +1,22 @@
-import React, { use, useEffect } from "react";
-import { Button } from "../../../theming-shadcn/Button";
+import React from "react";
 import { CardWidget } from "../../components/CardWidget";
-import { useAppSelector, useAppDispatch } from "../../../../store";
-import {selectProperties, selectPropertiesLoading, selectPropertiesError, fetchAgentProperties } from "../state/agent-dashboard-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { Property } from '/app/client/library-modules/domain-models/property/Property';
 import { useNavigate } from "react-router";
 import { NavigationPath } from "../../../../navigation";
 
 interface PropertyOverviewProps {
-  className?: string;
+  properties: Property[];
+  isLoading?: boolean;
+  error?: string | null;
 }
 
 export function PropertyOverview({
-  className = "",
+  properties,
+  isLoading = true,
+  error = null,
 }: PropertyOverviewProps): React.JSX.Element {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-  const properties = useAppSelector(selectProperties);
-  const isLoading = useAppSelector(selectPropertiesLoading);
-  const error = useAppSelector(selectPropertiesError);
-
-  useEffect(() => {
-    if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
-      dispatch(fetchAgentProperties(currentUser.agentId));
-    }
-  }, [currentUser, dispatch]);
 
   // Handler for the button click
   const handleViewAllClick = () => {
@@ -38,7 +28,6 @@ export function PropertyOverview({
       title="Property Overview"
       value=""
       subtitle="Quick view of your managed properties"
-      className={className}
       rightElement={
         <button className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50"
           type="button"

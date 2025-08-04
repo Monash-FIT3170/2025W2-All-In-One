@@ -40,3 +40,6 @@ export async function apiGetPropertyByTenantId(tenantId: string): Promise<ApiPro
 export async function apiGetPropertyByAgentId(agentId: string): Promise<ApiProperty[]> {
   return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_LIST, agentId);
 }
+export async function apiGetAllPropertiesByLandlordId(landlordId: string): Promise<ApiProperty[]> {
+  return await Meteor.callAsync(MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_LANDLORD_ID, landlordId);
+}
