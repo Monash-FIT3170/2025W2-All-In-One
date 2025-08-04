@@ -93,7 +93,7 @@ export function PropertyOverview({
       </div>
 
       <div className="mt-4">
-        <Button variant="ghost" className="w-full">
+        <Button variant="ghost" className="w-full py-3 border-transparent rounded-lg text-center hover:bg-gray-50 transition-colors">
           View All Properties
         </Button>
       </div>

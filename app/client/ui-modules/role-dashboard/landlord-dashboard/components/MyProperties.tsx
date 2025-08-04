@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "../../../theming-shadcn/Button";
 import { CardWidget } from "../../components/CardWidget";
- 
+
 interface Property {
   address: string;
   status: "Occupied" | "Vacant"
@@ -20,7 +20,7 @@ export function MyProperties({
   return (
     <CardWidget
       title="My Properties"
-      value=""  
+      value=""
       subtitle="Overview of your investment properties"
       className={className}
       rightElement={
@@ -65,7 +65,7 @@ export function MyProperties({
       </div>
 
       <div className="mt-4">
-      <Button variant="ghost" className="w-full">
+      <Button variant="ghost" className="w-full py-3 border-transparent rounded-lg text-center hover:bg-gray-50 transition-colors">
         View All Properties
         </Button>
       </div>

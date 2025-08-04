@@ -91,7 +91,7 @@ export function UpcomingTasks({
         )}
       </div>
       <div className="mt-4">
-        <Button variant="ghost" className="w-full" onClick={handleViewAllTasks}>
+        <Button variant="ghost" className="w-full py-3 border-transparent rounded-lg text-center hover:bg-gray-50 transition-colors" onClick={handleViewAllTasks}>
           View All Tasks
         </Button>
       </div>
