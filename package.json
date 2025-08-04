@@ -12,7 +12,7 @@
   "dependencies": {
     "@azure/arm-subscriptions": "^5.1.0",
     "@azure/identity": "^4.9.1",
-    "@azure/storage-blob": "^12.27.0",
+    "@azure/storage-blob": "^12.15.0",
     "@babel/runtime": "^7.27.1",
     "@fullcalendar/core": "^6.1.17",
     "@fullcalendar/daygrid": "^6.1.17",
@@ -35,6 +35,8 @@
     "@radix-ui/react-toast": "^1.2.13",
     "@reduxjs/toolkit": "^2.8.0",
     "@tailwindcss/postcss": "^4.0.17",
+    "@typespec/http-client-js": "^0.7.0",
+    "@typespec/ts-http-runtime": "^0.3.0",
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

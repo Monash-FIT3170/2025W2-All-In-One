@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { useAppSelector } from "../../../store";
 import { CardWidget } from "./CardWidget";
 import { Button } from "../../theming-shadcn/Button";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { parse, format, isToday, isTomorrow, compareAsc } from "date-fns";
+import { Role } from "/app/shared/user-role-identifier";
+import { NavigationPath } from "../../../navigation";
 
 interface Task {
   title: string;
@@ -22,6 +26,9 @@ export function UpcomingTasks({
   tasks,
   className = "",
 }: UpcomingTasksProps): React.JSX.Element {
+  const navigate = useNavigate();
+  const currentUser = useAppSelector((state) => state.currentUser.authUser);
+
   // Transform tasks and sort by date
   const transformedTasks = tasks
     .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks
@@ -42,6 +49,30 @@ export function UpcomingTasks({
       const dateB = parse(b.datetime, "dd/MM/yyyy", new Date());
       return compareAsc(dateA, dateB);
     });
+  const handleViewAllTasks = () => {
+    const role = currentUser?.role;
+
+    if (!role) {
+      console.warn("No user role found");
+      return;
+    }
+
+    // Role to calendar path mapping - automatically handles new roles
+    const roleToCalendarMap: Record<string, string> = {
+      [Role.AGENT]: NavigationPath.AgentCalendar,
+      [Role.LANDLORD]: NavigationPath.LandlordCalendar,
+      [Role.TENANT]: NavigationPath.TenantCalendar,
+    };
+
+    const calendarPath = roleToCalendarMap[role];
+
+    if (calendarPath) {
+      navigate(calendarPath);
+    } else {
+      console.warn(`No calendar path defined for role: ${role}`);
+    }
+  };
+
 
   return (
     <CardWidget
@@ -60,7 +91,7 @@ export function UpcomingTasks({
         )}
       </div>
       <div className="mt-4">
-        <Button variant="ghost" className="w-full">
+        <Button variant="ghost" className="w-full" onClick={handleViewAllTasks}>
           View All Tasks
         </Button>
       </div>
