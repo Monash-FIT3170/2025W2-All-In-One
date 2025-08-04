@@ -1,5 +1,4 @@
 import { Meteor } from "meteor/meteor";
-import { Mongo } from "meteor/mongo";
 import { UserAccountCollection } from "../../database/user/user-collections";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { UserAccountDocument } from "../../database/user/models/UserAccountDocument";
@@ -36,7 +35,7 @@ const userGetMethod = {
         try {
             const userDTO = await mapUserDocumentToDTO(userDocument);
             return userDTO;
-        } catch (error: any) {
+        } catch (error) {
             throw meteorWrappedInvalidDataError(
                 error instanceof Error ? error : new Error("Unknown error")
             );

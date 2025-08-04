@@ -43,3 +43,22 @@ export enum BlobNamePrefix{
     DOCUMENT = 'document/',
     PHOTO = 'photo/',
 }
+
+const dummySuccess1: UploadResultSuccess = {
+  blobName: "property/-1748400481798-0-house1.jpg",
+  success: true,
+  url: "https://allinonepropertymediadev.blob.core.windows.net/property-media-dev/property/-1748400481798-0-house1.jpg",
+  response: {} as BlobUploadCommonResponse,
+};
+
+const dummySuccess2: UploadResultSuccess = {
+  blobName: "property/-1748402898829-1-house2.jpg",
+  success: true,
+  url: "https://allinonepropertymediadev.blob.core.windows.net/property-media-dev/property/-1748402898829-1-house2.jpg",
+  response: {} as BlobUploadCommonResponse,
+};
+
+export const dummyUploadResults: UploadResults = {
+  success: [dummySuccess1, dummySuccess2],
+  failed: [],
+};

@@ -6,7 +6,6 @@ import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 
-import { TaskStatus } from "/app/shared/task-status-identifier";
 
 /**
  * Retrieves a task by its ID and returns it as an `ApiTask` DTO.
