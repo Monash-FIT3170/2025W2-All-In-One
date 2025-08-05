@@ -9,6 +9,7 @@ import { getTaskById } from "/app/client/library-modules/domain-models/task/repo
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { getPropertyByAgentId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
+import { er } from "@fullcalendar/core/internal-common";
 
 interface AgentDashboardState {
   isLoading: boolean;
@@ -34,12 +35,28 @@ const initialState: AgentDashboardState = {
 };
 
 // Async thunks
-
-// Fetch agent's properties
-export const fetchAgentProperties = createAsyncThunk<Property[], string>(
+export const  fetchAgentDetails = createAsyncThunk(
   "agentDashboard/fetchProperties",
-  async (agentId: string) => {
-    return await getPropertyByAgentId(agentId);
+  async (userId: string) => {
+    let properties;
+    let tasks;
+    try {
+     properties = await getPropertyByAgentId(userId);
+     const agent = await getAgentById(userId);  
+     tasks = await Promise.all(agent.tasks.map((taskId) => {
+        return getTaskById(taskId);
+     }))
+
+     return {
+       properties: properties,
+       tasks: tasks  
+     }
+     }
+
+    catch (error) {
+      console.error("Error fetching agent details:", error);
+      throw new Meteor.Error("Failed to fetch agent properties");
+    }
   }
 );
 export const fetchPropertyCount = createAsyncThunk(
@@ -155,20 +172,22 @@ export const agentDashboardSlice = createSlice({
         state.isLoading = false;
         // Use the fetched task details
         state.tasks = action.payload.taskDetails || [];
+        
       })
       .addCase(fetchAgentTasks.rejected, (state) => {
         state.isLoading = false;
       })
       // Agent Properties
-      .addCase(fetchAgentProperties.pending, (state) => {
+      .addCase(fetchAgentDetails.pending, (state) => {
         state.propertiesLoading = true;
         state.propertiesError = null;
       })
-      .addCase(fetchAgentProperties.fulfilled, (state, action) => {
+      .addCase(fetchAgentDetails.fulfilled, (state, action) => {
         state.propertiesLoading = false;
-        state.properties = action.payload;
+        state.properties = action.payload.properties;
+        state.tasks = action.payload.tasks || [];
       })
-      .addCase(fetchAgentProperties.rejected, (state, action) => {
+      .addCase(fetchAgentDetails.rejected, (state, action) => {
         state.propertiesLoading = false;
         state.propertiesError =
           action.error.message || "Failed to fetch agent properties";

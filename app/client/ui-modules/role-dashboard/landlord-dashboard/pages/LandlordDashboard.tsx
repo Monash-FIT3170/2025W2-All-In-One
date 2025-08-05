@@ -7,7 +7,7 @@ import { MyProperties } from "../components/MyProperties";
 import {
   selectTasks,
   selectProperties,
-  fetchLandlordProperties,
+  fetchLandlordDetails,
 } from "../state/landlord-dashboard-slice";
 
 export function LandlordDashboard(): React.JSX.Element {
@@ -18,7 +18,7 @@ export function LandlordDashboard(): React.JSX.Element {
 
   useEffect(() => {
     if (currentUser?.userId) {
-      dispatch(fetchLandlordProperties(currentUser.userId));
+      dispatch(fetchLandlordDetails(currentUser.userId));
     }
     else{
       console.warn("No user ID found. Please log in to view the dashboard.");

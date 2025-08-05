@@ -4,7 +4,7 @@ import { PropertyOverview } from "../components/PropertyOverview";
 import { DashboardCards } from "../components/DashboardCard";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
-  fetchAgentProperties,
+  fetchAgentDetails,
   selectError,
   selectIsLoading,
   selectProperties,
@@ -23,9 +23,12 @@ export function AgentDashboard(): React.JSX.Element {
 
   useEffect(() => {
     if (currentUser?.userId) {
-      dispatch(fetchAgentProperties(currentUser.userId));
+      dispatch(fetchAgentDetails(currentUser.userId));
     }
-  }, [currentUser]);
+    else {
+      console.warn("No user ID found. Please log in to view the dashboard.");
+    }
+  }, []);
 
   return (
     <div className="min-h-screen">

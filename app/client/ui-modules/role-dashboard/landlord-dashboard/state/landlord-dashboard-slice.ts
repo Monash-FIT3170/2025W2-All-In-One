@@ -30,27 +30,27 @@ export const fetchLandlordProperties = createAsyncThunk(
 export const fetchLandlordDetails = createAsyncThunk(
   "landlordDashboard/fetchLandlordDetails",
   async (userId: string) => {
+    let properties;
+    let taskDetails;
     // First, get the landlord data which includes task IDs
-    const landlordResponse = await getLandlordById(userId);
-
-    // Fetch task details for each task ID
-    const taskDetails = [];
-    if (landlordResponse.tasks && landlordResponse.tasks.length > 0) {
-      for (const taskId of landlordResponse.tasks) {
-        try {
-          const taskData = await getTaskById(taskId);
-          if (taskData) {
-            taskDetails.push(taskData);
-          }
-        } catch (error) {
-          console.error(`Error fetching task ${taskId}:`, error);
-        }
-      }
-    }
+    try{
+      const landlordResponse = await getLandlordById(userId);
+    
+      // Fetch task details for each task ID
+      taskDetails = await Promise.all(landlordResponse.tasks.map(async (taskId) => {
+        const task = await getTaskById(taskId);
+        return task;
+      }));
+      properties = await getAllPropertiesByLandlordId(userId);  
     return {
+      properties: properties,
       taskDetails: taskDetails,
     };
+  } catch (error) {
+      console.error("Error fetching landlord details:", error);
+      throw new Meteor.Error("Failed to fetch landlord properties");
   }
+}
 );
 
 export const landlordDashboardSlice = createSlice({
@@ -82,6 +82,7 @@ export const landlordDashboardSlice = createSlice({
         state.isLoading = false;
         // Use the fetched task details
         state.tasks = action.payload.taskDetails || [];
+        state.properties = action.payload.properties || [];
       })
       .addCase(fetchLandlordDetails.rejected, (state) => {
         state.isLoading = false;
