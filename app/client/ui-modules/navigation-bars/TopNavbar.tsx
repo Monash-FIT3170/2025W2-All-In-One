@@ -11,7 +11,7 @@ import { signoutUser } from "../user-authentication/state/reducers/current-user-
 import { NotificationBoard } from "../theming/components/NotificationBoard";
 import { selectTasks as selectAgentTasks, fetchAgentTasks } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
 import { selectTasks as selectTenantTasks, fetchTenantTasks } from "../role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
-import { selectTasks as selectLandlordTasks, fetchLandlordDetails } from "../role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
+import { selectTasks as selectLandlordTasks, fetchLandlordTasks } from "../role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
 
 interface TopNavbarProps {
   onSideBarOpened: React.Dispatch<React.SetStateAction<boolean>>;
@@ -42,7 +42,7 @@ export function TopNavbar({
           dispatch(fetchTenantTasks(authUser.userId));
           break;
         case 'landlord':
-          dispatch(fetchLandlordDetails(authUser.userId));
+          dispatch(fetchLandlordTasks(authUser.userId));
           break;
         default:
           // Handle other roles or no role if necessary

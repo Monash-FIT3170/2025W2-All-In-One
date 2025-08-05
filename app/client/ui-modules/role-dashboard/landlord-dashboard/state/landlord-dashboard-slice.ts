@@ -19,24 +19,30 @@ const initialState: LandlordDashboardState = {
   properties: [],
   error: null,
 };
-export const fetchLandlordProperties = createAsyncThunk(
-  "landlordDashboard/fetchLandlordProperties",  
-  async (landlordId: string) => {
-    // Fetch properties for the landlord
-    const properties = await getAllPropertiesByLandlordId(landlordId);
-    return properties;
+
+export const fetchLandlordTasks = createAsyncThunk(
+  "landlordDashboard/fetchLandlordTasks",
+  async (userId: string) => {
+    try {
+      const landlord = await getLandlordById(userId);
+      const tasks = await Promise.all(
+        landlord.tasks.map((taskId) => getTaskById(taskId))
+      );
+      return tasks;
+    } catch (error) {
+      console.error("Error fetching landlord tasks:", error);
+      throw new Error("Failed to fetch landlord tasks");
+    }
   }
 )
+
 export const fetchLandlordDetails = createAsyncThunk(
   "landlordDashboard/fetchLandlordDetails",
   async (userId: string) => {
     let properties;
     let taskDetails;
-    // First, get the landlord data which includes task IDs
     try{
       const landlordResponse = await getLandlordById(userId);
-    
-      // Fetch task details for each task ID
       taskDetails = await Promise.all(landlordResponse.tasks.map(async (taskId) => {
         const task = await getTaskById(taskId);
         return task;
@@ -87,17 +93,17 @@ export const landlordDashboardSlice = createSlice({
       .addCase(fetchLandlordDetails.rejected, (state) => {
         state.isLoading = false;
       })
-      .addCase(fetchLandlordProperties.pending, (state) => {
+      .addCase(fetchLandlordTasks.pending, (state) => { 
         state.isLoading = true;
       })
-
-      .addCase(fetchLandlordProperties.fulfilled, (state, action) => {
+      .addCase(fetchLandlordTasks.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.properties = action.payload;
+        state.tasks = action.payload || [];
       })
-      .addCase(fetchLandlordProperties.rejected, (state) => {
+      .addCase(fetchLandlordTasks.rejected, (state) => {
         state.isLoading = false;
-      }); 
+        state.error = "Failed to fetch landlord tasks";
+      });
   },
 });
 
