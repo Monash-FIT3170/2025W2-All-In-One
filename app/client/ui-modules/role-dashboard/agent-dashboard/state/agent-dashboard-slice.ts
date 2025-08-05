@@ -35,25 +35,25 @@ const initialState: AgentDashboardState = {
 };
 
 // Async thunks
-export const  fetchAgentDetails = createAsyncThunk(
+export const fetchAgentDetails = createAsyncThunk(
   "agentDashboard/fetchProperties",
   async (userId: string) => {
     let properties;
     let tasks;
     try {
-     properties = await getPropertyByAgentId(userId);
-     const agent = await getAgentById(userId);  
-     tasks = await Promise.all(agent.tasks.map((taskId) => {
-        return getTaskById(taskId);
-     }))
+      properties = await getPropertyByAgentId(userId);
+      const agent = await getAgentById(userId);
+      tasks = await Promise.all(
+        agent.tasks.map((taskId) => {
+          return getTaskById(taskId);
+        })
+      );
 
-     return {
-       properties: properties,
-       tasks: tasks  
-     }
-     }
-
-    catch (error) {
+      return {
+        properties: properties,
+        tasks: tasks,
+      };
+    } catch (error) {
       console.error("Error fetching agent details:", error);
       throw new Meteor.Error("Failed to fetch agent properties");
     }
@@ -79,7 +79,7 @@ export const fetchPropertiesAndMetrics = createAsyncThunk(
   async (agentId: string, { rejectWithValue }) => {
     try {
       const properties = (await Meteor.callAsync(
-        MeteorMethodIdentifier.PROPERTY_GET_LIST,
+        MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID,
         agentId
       )) as ApiProperty[];
       const occupiedProperties = properties.filter(
@@ -172,7 +172,6 @@ export const agentDashboardSlice = createSlice({
         state.isLoading = false;
         // Use the fetched task details
         state.tasks = action.payload.taskDetails || [];
-        
       })
       .addCase(fetchAgentTasks.rejected, (state) => {
         state.isLoading = false;
