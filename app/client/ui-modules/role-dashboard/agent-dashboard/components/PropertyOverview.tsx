@@ -4,6 +4,7 @@ import { CardWidget } from "../../components/CardWidget";
 import { useAppSelector, useAppDispatch } from "../../../../store";
 import { loadPropertyList, selectPropertyList, selectPropertyListLoading, selectPropertyListError } from "../../../property-listing-page/state/reducers/property-listing-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
+import { ViewAllButton } from "../../components/ViewAllButton";
 
 interface Property {
   address: string;
@@ -93,9 +94,9 @@ export function PropertyOverview({
       </div>
 
       <div className="mt-4">
-        <Button variant="ghost" className="w-full">
+        <ViewAllButton>
           View All Properties
-        </Button>
+        </ViewAllButton>
       </div>
     </CardWidget>
   );
