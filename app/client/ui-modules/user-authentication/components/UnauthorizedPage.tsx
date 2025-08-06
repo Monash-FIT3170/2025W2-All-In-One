@@ -3,15 +3,7 @@ import { useNavigate } from "react-router";
 import { Button } from "../../theming-shadcn/Button";
 import { useRoleBasedNavigation } from "../hooks/useRoleBasedNavigation";
 
-interface UnauthorizedPageProps {
-  requiredRole?: string;
-  currentRole?: string;
-}
-
-export const UnauthorizedPage: React.FC<UnauthorizedPageProps> = ({
-  requiredRole,
-  currentRole,
-}) => {
+export const UnauthorizedPage: React.FC = () => {
   const navigate = useNavigate();
   const { getDashboardPath } = useRoleBasedNavigation();
 
@@ -50,13 +42,6 @@ export const UnauthorizedPage: React.FC<UnauthorizedPageProps> = ({
         
         <p className="text-gray-600 mb-6">
           You don't have permission to access this page.
-          {requiredRole && currentRole && (
-            <span className="block mt-2 text-sm">
-              Required role: <span className="font-semibold">{requiredRole}</span>
-              <br />
-              Your role: <span className="font-semibold">{currentRole}</span>
-            </span>
-          )}
         </p>
         
         <div className="space-y-3">
