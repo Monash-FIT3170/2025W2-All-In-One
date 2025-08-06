@@ -1,0 +1,40 @@
+import { useAppSelector } from "../../../store";
+import { Role } from "/app/shared/user-role-identifier";
+
+export const useRoleBasedNavigation = () => {
+  const authUser = useAppSelector((state) => state.currentUser.authUser);
+
+  const isAuthenticated = !!authUser;
+  const userRole = authUser?.role;
+
+  const canAccessRoute = (allowedRoles: Role[]): boolean => {
+    if (!isAuthenticated) return false;
+    return allowedRoles.includes(userRole!);
+  };
+
+  const getDashboardPath = (): string => {
+    if (!isAuthenticated) return "/";
+    
+    const roleDashboardMap: Record<Role, string> = {
+      [Role.AGENT]: "/agent-dashboard",
+      [Role.TENANT]: "/tenant-dashboard",
+      [Role.LANDLORD]: "/landlord-dashboard",
+    };
+
+    return roleDashboardMap[userRole!] || "/";
+  };
+
+  const isAgent = userRole === Role.AGENT;
+  const isTenant = userRole === Role.TENANT;
+  const isLandlord = userRole === Role.LANDLORD;
+
+  return {
+    isAuthenticated,
+    userRole,
+    canAccessRoute,
+    getDashboardPath,
+    isAgent,
+    isTenant,
+    isLandlord,
+  };
+}; 
