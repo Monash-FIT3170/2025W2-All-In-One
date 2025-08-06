@@ -2,7 +2,7 @@ import React from "react";
 import { Navigate, useLocation } from "react-router";
 import { useAppSelector } from "../../../store";
 import { Role } from "/app/shared/user-role-identifier";
-import { UnauthorizedPage } from "./UnauthorizedPage";
+import { UnauthorizedPage } from "./UnauthorisedPage";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
