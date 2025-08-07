@@ -38,6 +38,7 @@ import {
   LandlordRoute,
   AuthenticatedRoute 
 } from "./ui-modules/user-authentication/components/RouteGuards";
+import { NavigationPath } from "./navigation";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -72,110 +73,110 @@ function AppRoot(): React.JSX.Element {
         <RoleSideNavBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<GuestLandingPage />} />
-          <Route path="/signin" element={<AuthTabs initialTab="signin" />} />
-          <Route path="/signup" element={<AuthTabs initialTab="signup" />} />
-          <Route path="/property-listing" element={<PropertyListingPage />} />
+          <Route path={NavigationPath.Home} element={<GuestLandingPage />} />
+          <Route path={NavigationPath.Signin} element={<AuthTabs initialTab="signin" />} />
+          <Route path={NavigationPath.Signup} element={<AuthTabs initialTab="signup" />} />
+          <Route path={NavigationPath.PropertyListing} element={<PropertyListingPage />} />
           
           {/* Agent-only routes */}
-          <Route path="/agent-dashboard" element={
+          <Route path={NavigationPath.AgentDashboard} element={
             <AgentRoute>
               <AgentDashboard />
             </AgentRoute>
           } />
-          <Route path="/agent-properties" element={
+          <Route path={NavigationPath.AgentProperties} element={
             <AgentRoute>
               <AgentProperty />
             </AgentRoute>
           } />
-          <Route path="/agent-calendar" element={
+          <Route path={NavigationPath.AgentCalendar} element={
             <AgentRoute>
               <AgentCalendar />
             </AgentRoute>
           } />
-          <Route path="/agent-messages" element={
+          <Route path={NavigationPath.AgentMessages} element={
             <AgentRoute>
               <AgentMessage />
             </AgentRoute>
           } />
-          <Route path="/agent-tasks" element={
+          <Route path={NavigationPath.AgentTasks} element={
             <AgentRoute>
               <AgentTask />
             </AgentRoute>
           } />
           {/* Agent and Landlord routes */}
-          <Route path="/propertyform" element={
+          <Route path={NavigationPath.PropertyForm} element={
             <AgentRoute>
               <PropertyFormPage />
             </AgentRoute>
           } />
           
           {/* Landlord-only routes */}
-          <Route path="/landlord-dashboard" element={
+          <Route path={NavigationPath.LandlordDashboard} element={
             <LandlordRoute>
               <LandlordDashboard />
             </LandlordRoute>
           } />
-          <Route path="/landlord-properties" element={
+          <Route path={NavigationPath.LandlordProperties} element={
             <LandlordRoute>
               <LandlordProperty />
             </LandlordRoute>
           } />
-          <Route path="/landlord-calendar" element={
+          <Route path={NavigationPath.LandlordCalendar} element={
             <LandlordRoute>
               <LandlordCalendar />
             </LandlordRoute>
           } />
-          <Route path="/landlord-tasks" element={
+          <Route path={NavigationPath.LandlordTasks} element={
             <LandlordRoute>
               <LandlordTask />
             </LandlordRoute>
           } />
           
           {/* Tenant-only routes */}
-          <Route path="/tenant-dashboard" element={
+          <Route path={NavigationPath.TenantDashboard} element={
             <TenantRoute>
               <TenantDashboard />
             </TenantRoute>
           } />
-          <Route path="/tenant-property" element={
+          <Route path={NavigationPath.TenantProperty} element={
             <TenantRoute>
               <TenantProperty />
             </TenantRoute>
           } />
-          <Route path="/tenant-calendar" element={
+          <Route path={NavigationPath.TenantCalendar} element={
             <TenantRoute>
               <TenantCalendar />
             </TenantRoute>
           } />
-          <Route path="/tenant-maintenance" element={
+          <Route path={NavigationPath.TenantMaintenance} element={
             <TenantRoute>
               <TenantMaintenance />
             </TenantRoute>
           } />
-          <Route path="/tenant-messages" element={
+          <Route path={NavigationPath.TenantMessages} element={
             <TenantRoute>
               <TenantMessages />
             </TenantRoute>
           } />
-          <Route path="/tenant-documents" element={
+          <Route path={NavigationPath.TenantDocuments} element={
             <TenantRoute>
               <TenantDocument />
             </TenantRoute>
           } />
-          <Route path="/tenant-search-properties" element={
+          <Route path={NavigationPath.TenantSearchProperties} element={
             <TenantRoute>
               <TenantSearchProperties />
             </TenantRoute>
           } />
           
           {/* Authenticated user routes */}
-          <Route path="/settings" element={
+          <Route path={NavigationPath.Settings} element={
             <AuthenticatedRoute>
               <SettingsPage />
             </AuthenticatedRoute>
           } />
-          <Route path="/profile" element={
+          <Route path={NavigationPath.Profile} element={
             <AuthenticatedRoute>
               <ProfilePage />
             </AuthenticatedRoute>

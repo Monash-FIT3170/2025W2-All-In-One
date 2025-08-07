@@ -3,6 +3,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { useNavigate, useLocation } from "react-router";
 import { SigninForm } from "./SigninForm";
 import { SignupForm } from "./SignupForm";
+import { NavigationPath } from "../../navigation";
 
 const tabTriggerClass =
   "w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all text-gray-500 data-[state=active]:bg-white data-[state=active]:text-black";
@@ -19,9 +20,9 @@ export const AuthTabs = ({ initialTab }: AuthTabsProps) => {
   // Sync tab state with current URL path
   useEffect(() => {
     const currentPath = location.pathname;
-    if (currentPath === "/signin") {
+    if (currentPath === NavigationPath.Signin) {
       setTab("signin");
-    } else if (currentPath === "/signup") {
+    } else if (currentPath === NavigationPath.Signup) {
       setTab("signup");
     }
   }, [location.pathname]);
@@ -29,7 +30,7 @@ export const AuthTabs = ({ initialTab }: AuthTabsProps) => {
   const handleTabChange = (value: string) => {
     const newTab = value as "signin" | "signup";
     setTab(newTab);
-    navigate(newTab === "signup" ? "/signup" : "/signin");
+    navigate(newTab === "signup" ? NavigationPath.Signup : NavigationPath.Signin);
   };
 
   return (

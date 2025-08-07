@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router";
 import { Button } from "../../theming-shadcn/Button";
 import { useRoleBasedNavigation } from "../hooks/useRoleBasedNavigation";
+import { NavigationPath } from "/app/client/navigation";
 
 export const UnauthorizedPage: React.FC = () => {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export const UnauthorizedPage: React.FC = () => {
   };
 
   const handleGoHome = () => {
-    navigate("/");
+    navigate(NavigationPath.Home);
   };
 
   return (

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router";
 import { useRoleBasedNavigation } from "./useRoleBasedNavigation";
+import { NavigationPath } from "/app/client/navigation";
 
 export const useRoleBasedRedirect = () => {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ export const useRoleBasedRedirect = () => {
     if (isAuthenticated) {
       navigate(getDashboardPath());
     } else {
-      navigate("/");
+      navigate(NavigationPath.Home);
     }
   };
 
@@ -17,7 +18,7 @@ export const useRoleBasedRedirect = () => {
     if (isAuthenticated) {
       navigate(page);
     } else {
-      navigate("/signin");
+      navigate(NavigationPath.Signin);
     }
   };
 

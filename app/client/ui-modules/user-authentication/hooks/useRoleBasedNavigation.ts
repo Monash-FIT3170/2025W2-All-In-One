@@ -1,5 +1,6 @@
 import { useAppSelector } from "../../../store";
 import { Role } from "/app/shared/user-role-identifier";
+import { NavigationPath } from "/app/client/navigation";
 
 export const useRoleBasedNavigation = () => {
   const authUser = useAppSelector((state) => state.currentUser.authUser);
@@ -16,12 +17,12 @@ export const useRoleBasedNavigation = () => {
     if (!isAuthenticated) return "/";
     
     const roleDashboardMap: Record<Role, string> = {
-      [Role.AGENT]: "/agent-dashboard",
-      [Role.TENANT]: "/tenant-dashboard",
-      [Role.LANDLORD]: "/landlord-dashboard",
+      [Role.AGENT]: NavigationPath.AgentDashboard,
+      [Role.TENANT]: NavigationPath.TenantDashboard,
+      [Role.LANDLORD]: NavigationPath.LandlordDashboard,
     };
 
-    return roleDashboardMap[userRole!] || "/";
+    return roleDashboardMap[userRole!] || NavigationPath.Home;
   };
 
   const isAgent = userRole === Role.AGENT;
