@@ -18,7 +18,6 @@ function TenantDashboard() {
   const propertyDetails = useAppSelector(selectPropertyDetails);
   const propertyLoading = useAppSelector(selectPropertyLoading);
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
-
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchTenantTasks(currentUser.userId));

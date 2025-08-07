@@ -20,14 +20,15 @@ interface Task {
 interface UpcomingTasksProps {
   tasks: Task[];
   className?: string;
+  currentUser?: any;
 }
 
 export function UpcomingTasks({
   tasks,
   className = "",
+  currentUser
 }: UpcomingTasksProps): React.JSX.Element {
-  const navigate = useNavigate();
-  const currentUser = useAppSelector((state) => state.currentUser.authUser);
+  const navigate = useNavigate()
 
   // Transform tasks and sort by date
   const transformedTasks = tasks
