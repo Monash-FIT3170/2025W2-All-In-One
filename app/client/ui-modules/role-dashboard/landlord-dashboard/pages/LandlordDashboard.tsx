@@ -55,7 +55,7 @@ export function LandlordDashboard(): React.JSX.Element {
           <LandlordDashboardCards />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <MyProperties properties={properties} />
-            <UpcomingTasks tasks={tasks} />
+            <UpcomingTasks tasks={tasks} currentUser={currentUser}/>
           </div>
         </div>
       </div>

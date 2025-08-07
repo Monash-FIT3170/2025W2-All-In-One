@@ -21,7 +21,6 @@ export function AgentDashboard(): React.JSX.Element {
       dispatch(fetchAgentTasks(currentUser.userId));
     }
   }, [dispatch, currentUser?.userId]);
-
   useEffect(() => {
     // Dummy data to be replaced with API calls
     // This useEffect hook is used to set the initial state of properties and tasks when the component mounts.
@@ -59,7 +58,7 @@ export function AgentDashboard(): React.JSX.Element {
           <h1 className="text-2xl font-bold mb-6">Agent Dashboard</h1>
           <DashboardCards />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <UpcomingTasks tasks={tasks} /> <PropertyOverview />
+            <UpcomingTasks tasks={tasks} currentUser ={currentUser} /> <PropertyOverview />
           </div>
         </div>
       </div>
