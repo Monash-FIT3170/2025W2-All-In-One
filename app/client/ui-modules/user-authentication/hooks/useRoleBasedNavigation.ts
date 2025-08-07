@@ -6,15 +6,9 @@ export const useRoleBasedNavigation = () => {
   const authUser = useAppSelector((state) => state.currentUser.authUser);
 
   const isAuthenticated = !!authUser;
-  const userRole = authUser?.role;
-
-  const canAccessRoute = (allowedRoles: Role[]): boolean => {
-    if (!isAuthenticated) return false;
-    return allowedRoles.includes(userRole!);
-  };
 
   const getDashboardPath = (): string => {
-    if (!isAuthenticated) return "/";
+    if (!isAuthenticated) return NavigationPath.Home;
     
     const roleDashboardMap: Record<Role, string> = {
       [Role.AGENT]: NavigationPath.AgentDashboard,
@@ -22,20 +16,11 @@ export const useRoleBasedNavigation = () => {
       [Role.LANDLORD]: NavigationPath.LandlordDashboard,
     };
 
-    return roleDashboardMap[userRole!] || NavigationPath.Home;
+    return roleDashboardMap[authUser.role] || NavigationPath.Home;
   };
-
-  const isAgent = userRole === Role.AGENT;
-  const isTenant = userRole === Role.TENANT;
-  const isLandlord = userRole === Role.LANDLORD;
 
   return {
     isAuthenticated,
-    userRole,
-    canAccessRoute,
     getDashboardPath,
-    isAgent,
-    isTenant,
-    isLandlord,
   };
-}; 
+};
