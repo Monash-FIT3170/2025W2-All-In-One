@@ -340,30 +340,32 @@ const propertySearchMethod = {
     ): Promise<ApiProperty[]> => {
         try {
             // trims and lowercases the query to ensure consistent matching
-            const cleanedQuery = query.trim().toLowerCase();
+            const cleanedQuery = query
+                .trim()
+                .toLowerCase()
+                .replace(/[^\w\s]/g, " ");
             if (!cleanedQuery) return [];
 
             // splits the query into multiple tokens i.e "Cranbourne VIC 3977" becomes
             // ["Cranbourne", "VIC", "3977"]
             const tokens = cleanedQuery.split(/\s+/);
-            const regexes = tokens.map((token) => new RegExp(token, "i"));
 
             // maps the regex tokens to a MongoDB query
             const mongoQuery = {
-                $and: regexes.map((regex) => ({
+                $and: tokens.map((token) => ({
                     $or: [
-                        { suburb: regex },
-                        { postcode: regex },
-                        { province: regex },
-                        { streetname: regex },
+                        { suburb: { $regex: token, $options: "i" } },
+                        { postcode: { $regex: token, $options: "i" } },
+                        { province: { $regex: token, $options: "i" } },
+                        { streetname: { $regex: token, $options: "i" } },
                     ],
                 })),
             };
 
             // finds properties matching the query in suburb, postcode, or streetname
-            const matchingProperties = await PropertyCollection.find({
-                mongoQuery,
-            }).fetchAsync();
+            const matchingProperties = await PropertyCollection.find(
+                mongoQuery
+            ).fetchAsync();
 
             // Map the matching properties to ApiProperty DTOs
             const dtoResults = await Promise.all(

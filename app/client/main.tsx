@@ -32,6 +32,7 @@ import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/T
 import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
 import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
 import { loadCurrentUser } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
+import { GuestSearchResultsPage } from "./ui-modules/guest-landing-page/SearchResultPage";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -66,6 +67,7 @@ function AppRoot(): React.JSX.Element {
         <RoleSideNavBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         <Routes>
           <Route path="/" element={<GuestLandingPage />} />
+          <Route path="/search" element={<GuestSearchResultsPage />} />
           <Route path="/agent-dashboard" element={<AgentDashboard />} />
           <Route path="/agent-properties" element={<AgentProperty />} />
           <Route path="/agent-calendar" element={<AgentCalendar />} />
