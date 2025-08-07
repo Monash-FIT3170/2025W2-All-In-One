@@ -339,15 +339,30 @@ const propertySearchMethod = {
         query: string // query string to search for properties
     ): Promise<ApiProperty[]> => {
         try {
-            const regex = new RegExp(query, "i"); // case-insensitive regex
+            // trims and lowercases the query to ensure consistent matching
+            const cleanedQuery = query.trim().toLowerCase();
+            if (!cleanedQuery) return [];
+
+            // splits the query into multiple tokens i.e "Cranbourne VIC 3977" becomes
+            // ["Cranbourne", "VIC", "3977"]
+            const tokens = cleanedQuery.split(/\s+/);
+            const regexes = tokens.map((token) => new RegExp(token, "i"));
+
+            // maps the regex tokens to a MongoDB query
+            const mongoQuery = {
+                $and: regexes.map((regex) => ({
+                    $or: [
+                        { suburb: regex },
+                        { postcode: regex },
+                        { province: regex },
+                        { streetname: regex },
+                    ],
+                })),
+            };
 
             // finds properties matching the query in suburb, postcode, or streetname
             const matchingProperties = await PropertyCollection.find({
-                $or: [
-                    { suburb: regex },
-                    { postcode: regex },
-                    { streetname: regex },
-                ],
+                mongoQuery,
             }).fetchAsync();
 
             // Map the matching properties to ApiProperty DTOs
