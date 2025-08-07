@@ -20,7 +20,9 @@ interface Task {
 interface UpcomingTasksProps {
   tasks: Task[];
   className?: string;
-  currentUser?: any;
+  currentUser?: {
+    role?: string;
+  };
 }
 
 export function UpcomingTasks({
