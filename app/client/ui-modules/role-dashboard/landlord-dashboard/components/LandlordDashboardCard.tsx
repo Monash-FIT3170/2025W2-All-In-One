@@ -1,61 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { CardWidget } from "../../components/CardWidget";
 import { Progress } from "../../components/ProgressBar";
-import { Meteor } from "meteor/meteor";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { useAppSelector } from "/app/client/store";
-import { current } from "@reduxjs/toolkit";
+import { selectLandlordDashboard } from "../state/landlord-dashboard-slice";
 
 export function LandlordDashboardCards() {
-  const [propertyCount, setPropertyCount] = useState<number>(0);
-  const [statusCounts, setStatusCounts] = useState<{
-    occupied: number;
-    vacant: number;
-  } | null>(null);
-  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const dashboardData = useAppSelector(selectLandlordDashboard);
 
-  useEffect(() => {
-    const getPropertyCount = async () => {
-      if (
-        currentUser &&
-        "landlordId" in currentUser &&
-        currentUser.landlordId
-      ) {
-        try {
-          const count = await Meteor.callAsync(
-            MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_COUNT,
-            currentUser.landlordId
-          );
-          setPropertyCount(count);
-        } catch (error) {
-          console.error("Error fetching property count for landlord:", error);
-        }
-      }
-    };
-
-    getPropertyCount();
-
-    const getStatusCounts = async () => {
-      if (
-        currentUser &&
-        "landlordId" in currentUser &&
-        currentUser.landlordId
-      ) {
-        try {
-          const result = await Meteor.callAsync(
-            MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_STATUS_COUNTS,
-            currentUser.landlordId
-          );
-          setStatusCounts(result);
-        } catch (error) {
-          console.error("Error fetching status counts for landlord:", error);
-        }
-      }
-    };
-
-    getStatusCounts();
-  }, [currentUser]);
-
+  const propertyCount = dashboardData?.propertyCount ?? 0;
+  const statusCounts = dashboardData?.statusCounts ?? null;
+  const income = dashboardData?.income ?? null;
+  const occupancyRate = dashboardData?.occupancyRate ?? null;
+  const averageRent = dashboardData?.averageRent ?? null;
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
       <CardWidget

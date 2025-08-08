@@ -8,19 +8,22 @@ import {
   selectTasks,
   selectProperties,
   fetchLandlordDetails,
+  fetchLandlordDashboard,
+  selectLandlordDashboard,
 } from "../state/landlord-dashboard-slice";
 
 export function LandlordDashboard(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const properties = useAppSelector(selectProperties);
   const tasks = useAppSelector(selectTasks);
+  const dashboardData = useAppSelector(selectLandlordDashboard);
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
 
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchLandlordDetails(currentUser.userId));
-    }
-    else{
+      dispatch(fetchLandlordDashboard(currentUser.userId));
+    } else {
       console.warn("No user ID found. Please log in to view the dashboard.");
     }
   }, []);
