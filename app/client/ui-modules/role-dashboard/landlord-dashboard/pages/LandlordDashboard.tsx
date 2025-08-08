@@ -8,7 +8,6 @@ import {
   selectTasks,
   selectProperties,
   fetchLandlordDetails,
-  fetchLandlordDashboard,
   selectLandlordDashboard,
 } from "../state/landlord-dashboard-slice";
 
@@ -22,7 +21,6 @@ export function LandlordDashboard(): React.JSX.Element {
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchLandlordDetails(currentUser.userId));
-      dispatch(fetchLandlordDashboard(currentUser.userId));
     } else {
       console.warn("No user ID found. Please log in to view the dashboard.");
     }
