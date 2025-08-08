@@ -80,10 +80,10 @@ export async function apiGetAllPropertiesByLandlordId(
 }
 
 export async function apiGetLandlordDashboard(
-    landlordId: string
-  ): Promise<ApiLandlordDashboard> {
-    return await Meteor.callAsync(
-      MeteorMethodIdentifier.GET_LANDLORD_DASHBOARD,
-      landlordId
-    );
-  }
+  landlordId: string
+): Promise<ApiLandlordDashboard> {
+  return await Meteor.callAsync(
+    MeteorMethodIdentifier.GET_LANDLORD_DASHBOARD,
+    landlordId
+  );
+}

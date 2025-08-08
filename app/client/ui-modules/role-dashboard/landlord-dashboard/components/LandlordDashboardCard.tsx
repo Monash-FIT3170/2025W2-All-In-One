@@ -12,6 +12,7 @@ export function LandlordDashboardCards() {
   const income = dashboardData?.income ?? null;
   const occupancyRate = dashboardData?.occupancyRate ?? null;
   const averageRent = dashboardData?.averageRent ?? null;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
       <CardWidget
@@ -25,16 +26,31 @@ export function LandlordDashboardCards() {
       />
       <CardWidget
         title="Total Income"
-        value="$1850/week"
-        subtitle="$7400/month"
+        value={income ? `$${income.weekly}/week` : "Loading..."}
+        subtitle={income ? `$${income.monthly}/month` : "Loading..."}
       />
-      <CardWidget title="Occupancy Rate" value="67%">
-        <Progress value={67} className="mt-2" />
+      <CardWidget
+        title="Occupancy Rate"
+        value={occupancyRate !== null ? `${occupancyRate}%` : "Loading..."}
+      >
+        {occupancyRate !== null && (
+          <Progress value={occupancyRate} className="mt-2" />
+        )}
       </CardWidget>
       <CardWidget
-        title="Property Value"
-        value="$2.4M"
-        subtitle="+3.5% from last valuation"
+        title="Average Rent"
+        value={
+          averageRent !== null ? `$${averageRent.rent}/month` : "Loading..."
+        }
+        subtitle={
+          averageRent === null
+            ? "Loading..."
+            : averageRent.occupiedCount === 0
+            ? "No owned properties currently occupied..."
+            : `Across ${averageRent.occupiedCount} occupied propert${
+                averageRent.occupiedCount === 1 ? "y" : "ies"
+              }`
+        }
       />
     </div>
   );
