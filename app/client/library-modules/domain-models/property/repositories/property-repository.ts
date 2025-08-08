@@ -1,9 +1,9 @@
-import { apiGetAllProperties, apiGetPropertyById, apiInsertProperty, apiGetPropertyByTenantId, apiGetPropertyByAgentId, apiGetAllPropertiesByLandlordId } from "/app/client/library-modules/apis/property/property-api";
+import { apiGetAllProperties, apiGetPropertyStatusId, apiGetLandlordDashboard, apiGetPropertyById, apiInsertProperty, apiGetPropertyByTenantId, apiGetPropertyByAgentId, apiGetAllPropertiesByLandlordId } from "/app/client/library-modules/apis/property/property-api";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
 import { mapApiPropertyToProperty } from "./mappers/property-mapper";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
-import { apiGetPropertyStatusId } from "/app/client/library-modules/apis/property/property-api";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
+import { ApiLandlordDashboard } from "/app/shared/api-models/landlord/ApiLandlordDashboard";
 
 export async function getPropertyById(id: string): Promise<Property> {
   const apiProperty = await apiGetPropertyById(id);
@@ -39,8 +39,12 @@ export async function getPropertyByAgentId(agentId: string): Promise<Property[]>
   return mappedProperties;
 }
 
-export async function getAllPropertiesByLandlordId(landlordId: string): Promise<Property[]> {
-  const apiProperties = await apiGetAllPropertiesByLandlordId(landlordId);
-  const mappedProperties = apiProperties.map(mapApiPropertyToProperty);
-  return mappedProperties;
-}
+export async function fetchLandlordDashboardData(
+    landlordId: string
+  ): Promise<ApiLandlordDashboard> {
+    return await apiGetLandlordDashboard(landlordId);
+  }
+  
+  export const landlordPropertyRepository = {
+    fetchLandlordDashboardData,
+  };
