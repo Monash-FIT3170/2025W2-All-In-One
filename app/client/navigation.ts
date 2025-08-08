@@ -12,7 +12,7 @@ export enum NavigationPath {
   PropertyListing = "/property-listing",
   Settings = "/settings",
   PropertyForm = "/propertyform",
-  Login = "/login",
+  Signin = "/signin",
   Profile = "/profile",
   Signup = "/signup",
   TenantDashboard = "/tenant-dashboard",

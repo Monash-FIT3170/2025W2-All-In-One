@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
+import { useLocation, useNavigate } from "react-router";
 import {
   selectSigninFormUIState,
   setEmail,
   setPassword,
   signinUser,
 } from "./state/reducers/signin-form-slice";
-import { useRedirectToDashboard } from "../hooks/redirectToDashboardHook";
+import { useRoleBasedRedirect } from "./hooks/useRoleBasedRedirect";
 
 const inputClass =
   "w-full px-4 py-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-200 text-sm";
@@ -14,17 +15,35 @@ const labelClass = "block mb-1 text-sm font-medium text-gray-700";
 
 export const SigninForm = () => {
   const dispatch = useAppDispatch();
+  const location = useLocation();
+  const navigate = useNavigate();
   const signinState = useAppSelector(selectSigninFormUIState);
-  const redirectToDashboard = useRedirectToDashboard();
+  const { redirectToDashboard } = useRoleBasedRedirect();
+  // this is to be used to redirect to dashboard once a direct sign in is requested
+  const authUser = useAppSelector((state) => state.currentUser.authUser);
+
+  const from = location.state?.from?.pathname;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const result = await dispatch(signinUser());
 
+    // check if sing in was redirected from an original request
     if (signinUser.fulfilled.match(result)) {
-      redirectToDashboard(result.payload);
+      if (from) {
+        // navigate to the original request
+        navigate(from, { replace: true });
+      }
+      // else: do nothing, let useEffect handle dashboard redirect
     }
   };
+
+  // Redirect to dashboard after login if no "from" and user is authenticated
+  useEffect(() => {
+    if (authUser && !from) {
+      redirectToDashboard();
+    }
+  }, [authUser, from, redirectToDashboard]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">

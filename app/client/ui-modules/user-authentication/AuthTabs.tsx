@@ -1,23 +1,49 @@
 import React, { useEffect, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { SigninForm } from "./SigninForm";
 import { SignupForm } from "./SignupForm";
+import { NavigationPath } from "../../navigation";
 
 const tabTriggerClass =
   "w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all text-gray-500 data-[state=active]:bg-white data-[state=active]:text-black";
 
+// Define auth tab types using actual navigation paths
+export type AuthTabType = typeof NavigationPath.Signin | typeof NavigationPath.Signup;
+
+export interface AuthTabConfig {
+  SIGNIN: typeof NavigationPath.Signin;
+  SIGNUP: typeof NavigationPath.Signup;
+}
+
+export const AUTH_TABS: AuthTabConfig = {
+  SIGNIN: NavigationPath.Signin,
+  SIGNUP: NavigationPath.Signup,
+} as const;
+
 type AuthTabsProps = {
-  initialTab: "signin" | "signup";
+  initialTab: AuthTabType;
 };
 
 export const AuthTabs = ({ initialTab }: AuthTabsProps) => {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"signin" | "signup">(initialTab);
+  const location = useLocation();
+  const [tab, setTab] = useState<AuthTabType>(initialTab);
+
+  // Sync tab state with current URL path
+  useEffect(() => {
+    const currentPath = location.pathname;
+    if (currentPath === NavigationPath.Signin) {
+      setTab(AUTH_TABS.SIGNIN);
+    } else if (currentPath === NavigationPath.Signup) {
+      setTab(AUTH_TABS.SIGNUP);
+    }
+  }, [location.pathname]);
 
   const handleTabChange = (value: string) => {
-    setTab(value as "signin" | "signup");
-    navigate(value === "signup" ? "/signup" : "/signin");
+    const newTab = value as AuthTabType;
+    setTab(newTab);
+    navigate(newTab);
   };
 
   return (
