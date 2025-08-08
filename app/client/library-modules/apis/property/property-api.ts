@@ -1,5 +1,6 @@
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
+import { ApiLandlordDashboard } from "/app/shared/api-models/landlord/ApiLandlordDashboard";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
@@ -44,7 +45,7 @@ export async function apiUpdatePropertyData(
   );
 }
 
-export async function apiGetAllProperties(): Promise<ApiProperty[]> {
+export async function AllProperties(): Promise<ApiProperty[]> {
   const fetchedProperties: ApiProperty[] = await Meteor.callAsync(
     MeteorMethodIdentifier.PROPERTY_GET_ALL
   );
@@ -60,47 +61,11 @@ export async function apiGetPropertyByTenantId(
   );
 }
 
-export async function apiGetLandlordPropertyCount(
+export async function apiGetLandlordDashboard(
   landlordId: string
-): Promise<number> {
+): Promise<ApiLandlordDashboard> {
   return await Meteor.callAsync(
-    MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_COUNT,
-    landlordId
-  );
-}
-
-export async function apiGetLandlordStatusCounts(
-  landlordId: string
-): Promise<{ occupied: number; vacant: number }> {
-  return await Meteor.callAsync(
-    MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_STATUS_COUNTS,
-    landlordId
-  );
-}
-
-export async function apiGetLandlordIncome(
-  landlordId: string
-): Promise<{ weekly: number; monthly: number }> {
-  return await Meteor.callAsync(
-    MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_TOTAL_INCOME,
-    landlordId
-  );
-}
-
-export async function apiGetLandlordOccupancyRate(
-  landlordId: string
-): Promise<number> {
-  return await Meteor.callAsync(
-    MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_OCCUPANCY_RATE,
-    landlordId
-  );
-}
-
-export async function apiGetLandlordAverageRent(
-  landlordId: string
-): Promise<{ occupiedCount: number; rent: number }> {
-  return await Meteor.callAsync(
-    MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_AVERAGE_RENT,
+    MeteorMethodIdentifier.GET_LANDLORD_DASHBOARD,
     landlordId
   );
 }
