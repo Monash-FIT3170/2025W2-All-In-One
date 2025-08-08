@@ -3,18 +3,13 @@ import { RootState } from "../../../../store";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 import { getPropertyByTenantId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
+import { getTenantById } from "/app/client/library-modules/domain-models/user/role-repositories/tenant-repository";
+import { Task } from "/app/client/library-modules/domain-models/task/Task";
+import { getTaskById } from "/app/client/library-modules/domain-models/task/repositories/task-repository";
 
 interface TenantDashboardState {
   isLoading: boolean;
-  tasks: Array<{
-    title: string;
-    address?: string;
-    datetime: string;
-    status: string;
-    description?: string;
-    priority?: string;
-    taskId?: string;
-  }>;
+  tasks: Task[];
   error: string | null;
   propertyDetails: ApiProperty | null;
   propertyLoading: boolean;
@@ -32,10 +27,7 @@ export const fetchTenantTasks = createAsyncThunk(
   "tenantDashboard/fetchTenantTasks",
   async (userId: string) => {
     // First, get the tenant data which includes task IDs
-    const tenantResponse = await Meteor.callAsync(
-      MeteorMethodIdentifier.TENANT_GET,
-      userId
-    );
+    const tenantResponse = await getTenantById(userId);
 
     // Fetch task details for each task ID
     const taskDetails = [];
@@ -43,21 +35,11 @@ export const fetchTenantTasks = createAsyncThunk(
       for (const taskId of tenantResponse.tasks) {
         try {
           // Fetch task details using the TASK_GET method
-          const taskData = await Meteor.callAsync(
-            MeteorMethodIdentifier.TASK_GET,
-            taskId
-          );
+          const taskData = await getTaskById(taskId);
 
           if (taskData) {
             // Format the task data for display
-            taskDetails.push({
-              title: taskData.name,
-              description: taskData.description,
-              datetime: taskData.dueDate ? new Date(taskData.dueDate).toLocaleDateString() : '',
-              status: taskData.status,
-              priority: taskData.priority,
-              taskId: taskData.taskId
-            });
+            taskDetails.push(taskData)
           }
         } catch (error) {
           console.error(`Error fetching task ${taskId}:`, error);
