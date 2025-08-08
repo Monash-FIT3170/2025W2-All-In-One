@@ -93,14 +93,12 @@ const submitDraftListing = {
 };
 
 const getAllListedListings = {
-  [MeteorMethodIdentifier.LISTING_GET_ALL_LISTED]: async (): Promise<
-    ApiListing[]
-  > => {
+  [MeteorMethodIdentifier.LISTING_GET_ALL_LISTED]: async (
+    skip: number = 0,
+    limit: number = 3
+  ): Promise<ApiListing[]> => {
     const listedStatus = ListingStatus.LISTED;
-
-    const listedStatusDocument = await getListingStatusDocumentByName(
-      listedStatus
-    );
+    const listedStatusDocument = await getListingStatusDocumentByName(listedStatus);
 
     if (!listedStatusDocument) {
       throw meteorWrappedInvalidDataError(
@@ -110,9 +108,15 @@ const getAllListedListings = {
       );
     }
 
-    const listingDocuments = await getListingDocumentsByStatus(
-      listedStatusDocument._id
-    );
+    const listingDocuments = await ListingCollection.find(
+      {
+        listing_status_id: listedStatusDocument._id,
+      },
+      {
+        skip: skip,
+        limit: limit,
+      }
+    ).fetchAsync();
 
     if (listingDocuments.length === 0) {
       return [];

@@ -17,8 +17,8 @@ export async function submitDraftListing(propertyId: string): Promise<void> {
 }
 
 
-export async function getAllListedListings(): Promise<{ apiListing: ApiListing }[]> {
-  const apiListings = await apiGetAllListedListings();
+export async function getAllListedListings(skip = 0, limit = 3): Promise<{ apiListing: ApiListing }[]> {
+  const apiListings = await apiGetAllListedListings(skip, limit);
   return apiListings.map(apiListing => ({ apiListing }));
 }
 

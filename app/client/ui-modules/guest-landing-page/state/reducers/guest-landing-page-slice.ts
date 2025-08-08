@@ -14,20 +14,17 @@ const initialState: GuestLandingPageUiState = {
 
 export const fetchPropertiesAndListings = createAsyncThunk<
   PropertyWithListingData[],
-  void,
+  { skip: number; limit: number },
   { state: RootState }
 >(
   "guestLandingPage/fetchPropertiesAndListings",
-  async () => {
-    const listedListings = await getAllListedListings();
-
-
+  async ({ skip, limit }) => {
+    const listedListings = await getAllListedListings(skip, limit);
     const propertyDataPromises = listedListings.map((listing) =>
-      getPropertyWithListingDataUseCase(listing.apiListing.property_id));
-
+      getPropertyWithListingDataUseCase(listing.apiListing.property_id)
+    );
     const allResults = await Promise.all(propertyDataPromises);
-
-    return allResults
+    return allResults;
   }
 );
 
@@ -41,9 +38,14 @@ export const guestLandingPageSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(fetchPropertiesAndListings.fulfilled, (state, action: PayloadAction<PropertyWithListingData[]>) => {
+      .addCase(fetchPropertiesAndListings.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.properties = action.payload;
+        const skip = action.meta.arg.skip;
+        if (skip === 0) {
+          state.properties = action.payload;
+        } else {
+          state.properties = [...state.properties, ...action.payload];
+        }
       })
       .addCase(fetchPropertiesAndListings.rejected, (state, action) => {
         state.isLoading = false;
