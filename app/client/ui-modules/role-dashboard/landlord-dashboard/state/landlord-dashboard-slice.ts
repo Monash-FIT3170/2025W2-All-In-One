@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../../store";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { fetchLandlordDashboardData } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
 interface LandlordDashboardState {
   isLoading: boolean;
@@ -14,6 +15,23 @@ interface LandlordDashboardState {
     priority?: string;
     taskId?: string;
   }>;
+
+  dashboardData: {
+    propertyCount: number;
+    statusCounts: {
+      occupied: number;
+      vacant: number;
+    };
+    income: {
+      weekly: number;
+      monthly: number;
+    };
+    occupancyRate: number;
+    averageRent: {
+      occupiedCount: number;
+      rent: number;
+    };
+  } | null;
   error: string | null;
 }
 
@@ -21,6 +39,7 @@ const initialState: LandlordDashboardState = {
   isLoading: false,
   tasks: [],
   properties: [],
+  dashboardData: null,
   error: null,
 };
 
@@ -49,10 +68,12 @@ export const fetchLandlordTasks = createAsyncThunk(
             taskDetails.push({
               title: taskData.name,
               description: taskData.description,
-              datetime: taskData.dueDate ? new Date(taskData.dueDate).toLocaleDateString() : '',
+              datetime: taskData.dueDate
+                ? new Date(taskData.dueDate).toLocaleDateString()
+                : "",
               status: taskData.status,
               priority: taskData.priority,
-              taskId: taskData.taskId
+              taskId: taskData.taskId,
             });
           }
         } catch (error) {
@@ -64,6 +85,21 @@ export const fetchLandlordTasks = createAsyncThunk(
     return {
       ...landlordResponse,
       taskDetails: taskDetails,
+    };
+  }
+);
+
+export const fetchLandlordDashboard = createAsyncThunk(
+  "landlordDashboard/fetchLandlordDashboard",
+  async (landlordId: string) => {
+    const dashboardData = await fetchLandlordDashboardData(landlordId);
+    
+    return {
+      propertyCount: dashboardData.totalPropertyCount,
+      statusCounts: dashboardData.propertyStatusCounts,
+      income: dashboardData.totalIncome,
+      occupancyRate: dashboardData.occupancyRate,
+      averageRent: dashboardData.averageRent,
     };
   }
 );
@@ -81,12 +117,15 @@ export const landlordDashboardSlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
-    setTasks: (state, action: PayloadAction<LandlordDashboardState["tasks"]>) => {
+    setTasks: (
+      state,
+      action: PayloadAction<LandlordDashboardState["tasks"]>
+    ) => {
       state.tasks = action.payload;
     },
     setProperties: (state, action: PayloadAction<Property[]>) => {
-          state.properties = action.payload;
-        },
+      state.properties = action.payload;
+    },
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
@@ -103,15 +142,30 @@ export const landlordDashboardSlice = createSlice({
       })
       .addCase(fetchLandlordTasks.rejected, (state) => {
         state.isLoading = false;
+      })
+      .addCase(fetchLandlordDashboard.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchLandlordDashboard.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.dashboardData = action.payload;
+      })
+      .addCase(fetchLandlordDashboard.rejected, (state) => {
+        state.isLoading = false;
+        state.error = "Failed to load landlord dashboard statistics.";
       });
   },
 });
 
-export const { setLoading, setTasks, setProperties, setError } = landlordDashboardSlice.actions;
+export const { setLoading, setTasks, setProperties, setError } =
+  landlordDashboardSlice.actions;
+export const selectLandlordDashboard = (state: RootState) =>
+  state.landlordDashboard.dashboardData;
 
-export const selectLandlordDashboard = (state: RootState) => state.landlordDashboard;
 export const selectTasks = (state: RootState) => state.landlordDashboard.tasks;
-export const selectProperties = (state: RootState) => state.landlordDashboard.properties;
+export const selectProperties = (state: RootState) =>
+  state.landlordDashboard.properties;
 export const selectLoading = (state: RootState) =>
   state.landlordDashboard.isLoading;
+
 export default landlordDashboardSlice.reducer;
