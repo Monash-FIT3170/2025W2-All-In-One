@@ -2,61 +2,16 @@ import React, { useState, useEffect } from "react";
 import { CardWidget } from "../../components/CardWidget";
 import { Progress } from "../../components/ProgressBar";
 import { useAppSelector } from "/app/client/store";
-import { landlordPropertyRepository } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
+import { selectLandlordDashboard } from "../state/landlord-dashboard-slice";
 
 export function LandlordDashboardCards() {
-  const [propertyCount, setPropertyCount] = useState<number>(0);
-  const [statusCounts, setStatusCounts] = useState<{
-    occupied: number;
-    vacant: number;
-  } | null>(null);
-  const [income, setIncome] = useState<{
-    weekly: number;
-    monthly: number;
-  } | null>(null);
-  const [occupancyRate, setOccupancyRate] = useState<number | null>(null);
-  const [averageRent, setAverageRent] = useState<{
-    occupiedCount: number;
-    rent: number;
-  } | null>(null);
+  const dashboardData = useAppSelector(selectLandlordDashboard);
 
-  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-
-  useEffect(() => {
-    if (currentUser && "landlordId" in currentUser && currentUser.landlordId) {
-      const fetchData = async () => {
-        try {
-          const [count, statusCounts, income, occupancyRate, averageRent] =
-            await Promise.all([
-              landlordPropertyRepository.getLandlordPropertyCount(
-                currentUser.landlordId
-              ),
-              landlordPropertyRepository.getLandlordStatusCounts(
-                currentUser.landlordId
-              ),
-              landlordPropertyRepository.getLandlordIncome(
-                currentUser.landlordId
-              ),
-              landlordPropertyRepository.getLandlordOccupancyRate(
-                currentUser.landlordId
-              ),
-              landlordPropertyRepository.getLandlordAverageRent(
-                currentUser.landlordId
-              ),
-            ]);
-
-          setPropertyCount(count);
-          setStatusCounts(statusCounts);
-          setIncome(income);
-          setOccupancyRate(occupancyRate);
-          setAverageRent(averageRent);
-        } catch (error) {
-          console.error("Error fetching landlord dashboard data:", error);
-        }
-      };
-      fetchData();
-    }
-  }, [currentUser]);
+  const propertyCount = dashboardData?.propertyCount ?? 0;
+  const statusCounts = dashboardData?.statusCounts ?? null;
+  const income = dashboardData?.income ?? null;
+  const occupancyRate = dashboardData?.occupancyRate ?? null;
+  const averageRent = dashboardData?.averageRent ?? null;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
