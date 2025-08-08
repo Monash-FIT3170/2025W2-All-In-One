@@ -3,6 +3,7 @@ import { Container, createRoot } from "react-dom/client";
 import { Meteor } from "meteor/meteor";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { Provider } from "react-redux";
+import { APIProvider } from "@vis.gl/react-google-maps";
 import { store, useAppDispatch } from "./store";
 import { DefaultTheme } from "./ui-modules/theming/themes/DefaultTheme";
 
@@ -32,6 +33,7 @@ import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/T
 import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
 import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
 import { loadCurrentUser } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
+import { getEnv } from "./library-modules/utils/env-utils";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -42,7 +44,9 @@ function initialiseReactRoot(): void {
   root.render(
     <React.StrictMode>
       <Provider store={store}>
-        <AppRoot />
+        <APIProvider apiKey={getEnv("GOOGLE_MAPS_API_KEY")}>
+          <AppRoot />
+        </APIProvider>
       </Provider>
     </React.StrictMode>
   );
