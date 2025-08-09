@@ -1,44 +1,41 @@
-import React, { use, useEffect } from "react";
-import { Button } from "../../../theming-shadcn/Button";
+import React from "react";
 import { CardWidget } from "../../components/CardWidget";
-import { useAppSelector, useAppDispatch } from "../../../../store";
-import {selectProperties, selectPropertiesLoading, selectPropertiesError, fetchAgentProperties } from "../state/agent-dashboard-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { Property } from '/app/client/library-modules/domain-models/property/Property';
+import { PropertyWithListingData } from "../../../../library-modules/use-cases/property-listing/models/PropertyWithListingData";
 import { useNavigate } from "react-router";
 import { NavigationPath } from "../../../../navigation";
 
 interface PropertyOverviewProps {
-  className?: string;
+  properties: Property[];
+  isLoading?: boolean;
+  error?: string | null;
 }
 
 export function PropertyOverview({
-  className = "",
+  properties,
+  isLoading = true,
+  error = null,
 }: PropertyOverviewProps): React.JSX.Element {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-  const properties = useAppSelector(selectProperties);
-  const isLoading = useAppSelector(selectPropertiesLoading);
-  const error = useAppSelector(selectPropertiesError);
-
-  useEffect(() => {
-    if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
-      dispatch(fetchAgentProperties(currentUser.agentId));
-    }
-  }, [currentUser, dispatch]);
 
   // Handler for the button click
   const handleViewAllClick = () => {
     navigate(NavigationPath.AgentProperties);
   };
 
+  // Property click handler to navigate to property details
+  const handlePropertyClick = (propertyId: string) => {
+    if (propertyId) {            
+        navigate(`/property-listing?propertyId=${propertyId}`);
+    }
+  }
+
   return (
     <CardWidget
       title="Property Overview"
       value=""
       subtitle="Quick view of your managed properties"
-      className={className}
       rightElement={
         <button className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50"
           type="button"
@@ -67,7 +64,11 @@ export function PropertyOverview({
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {properties.map((property, index) => (
-                  <tr key={index} className="transition-colors hover:bg-gray-50">
+                  <tr key={index} className="transition-colors hover:bg-gray-50" 
+                      onClick={() => handlePropertyClick(property.propertyId)} role="button" 
+                      tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && handlePropertyClick(property.propertyId)} 
+                      aria-label={'View property details for property at ${property.streetnumber} ${property.streetname}'}
+                      >
                     <td className="px-6 py-4 text-sm">{`${property.streetnumber} ${property.streetname}`}</td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -75,8 +76,8 @@ export function PropertyOverview({
                         property.propertyStatus === PropertyStatus.DRAFT ? "bg-purple-100 text-purple-800" :
                         property.propertyStatus === PropertyStatus.LISTED ? "bg-blue-100 text-blue-800" :
                         property.propertyStatus === PropertyStatus.UNDER_MAINTENANCE ? "bg-yellow-100 text-yellow-800" :
-                        property.propertyStatus === PropertyStatus.VACANT ? "bg-red-100 text-red-800" :
-                        property.propertyStatus === PropertyStatus.OCCUPIED ? "bg-green-100 text-green-800" :
+                        property.propertyStatus === PropertyStatus.VACANT ? "bg-green-100 text-green-800" :
+                        property.propertyStatus === PropertyStatus.OCCUPIED ? "bg-red-100 text-red-800" :
                         "bg-grey-100 text-grey-800"
                       }`}>
                         {property.propertyStatus}
