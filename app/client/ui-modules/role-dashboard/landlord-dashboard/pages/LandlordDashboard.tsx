@@ -15,7 +15,6 @@ export function LandlordDashboard(): React.JSX.Element {
   const properties = useAppSelector(selectProperties);
   const tasks = useAppSelector(selectTasks);
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
-
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchLandlordDetails(currentUser.userId));
@@ -23,7 +22,7 @@ export function LandlordDashboard(): React.JSX.Element {
     else{
       console.warn("No user ID found. Please log in to view the dashboard.");
     }
-  }, []);
+  }, [currentUser]);
 
   return (
     <div className="min-h-screen">

@@ -10,7 +10,6 @@ import {
   selectProperties,
   selectTasks,
 } from "../state/agent-dashboard-slice";
-import { cu } from "@fullcalendar/core/internal-common";
 
 export function AgentDashboard(): React.JSX.Element {
   const dispatch = useAppDispatch(); // is used to dispatch actions to the Redux store.
@@ -19,8 +18,6 @@ export function AgentDashboard(): React.JSX.Element {
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
   const isLoading = useAppSelector(selectIsLoading)
   const error = useAppSelector(selectError)
-  console.log(properties, "properties in agent dashboard");
-
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchAgentDetails(currentUser.userId));
