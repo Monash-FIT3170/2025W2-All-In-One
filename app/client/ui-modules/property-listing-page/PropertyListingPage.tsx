@@ -41,6 +41,9 @@ import {
 } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
 import { DynamicMap } from "../theming/components/map/DynamicMap";
 import { SubHeading } from "../theming/components/SubHeading";
+import { MarkerWithToggleableInfoWindow } from "../theming/components/map/markers/MarkerWithToggleableInfoWindow";
+import { Marker } from "@vis.gl/react-google-maps";
+import { BasicMarker } from "../theming/components/map/markers/BasicMarker";
 
 export function PropertyListingPage({
   className = "",
@@ -407,7 +410,12 @@ function ListingDetails({
       <div className="flex-1 flex flex-col">
         <PropertyFeatures featuresList={propertyFeatures} className="mb-4" />
         <SubHeading text="Location" className="mb-2" />
-        <DynamicMap initialLatitude={-37.949884} initialLongitude={145.152494} sizeClassName="size-full" />
+        <DynamicMap 
+          initialLatitude={-37.949884} 
+          initialLongitude={145.152494} 
+          markers={[<BasicMarker latitude={-37.949884} longitude={145.152494}/>]}
+          sizeClassName="size-full" 
+        />
       </div>
     </div>
   );

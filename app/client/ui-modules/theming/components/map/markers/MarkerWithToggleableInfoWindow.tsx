@@ -8,7 +8,7 @@ export function MarkerWithToggleableInfoWindow({
 }: {
   latitude: number;
   longitude: number;
-  infoWindowContent?: React.JSX.Element;
+  infoWindowContent: React.JSX.Element;
 }): React.JSX.Element {
   const [markerRef, marker] = useAdvancedMarkerRef();
   const [shouldShowInfoWindow, setShouldShowInfoWindow] = useState(false);
