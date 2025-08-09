@@ -36,13 +36,11 @@ import { PropertyListingPageUiState } from "/app/client/ui-modules/property-list
 import { useSearchParams } from "react-router";
 import EditDraftListingModal from "./components/EditDraftListingModal";
 import { EditDraftListingButton } from "./components/EditDraftListingButton";
-import { PropertyForm } from "../property-form-agent/components/PropertyForm";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  formSchema,
   FormSchemaType,
 } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
+import { DynamicMap } from "../theming/components/map/DynamicMap";
+import { SubHeading } from "../theming/components/SubHeading";
 
 export function PropertyListingPage({
   className = "",
@@ -407,7 +405,9 @@ function ListingDetails({
       </div>
 
       <div className="flex-1 flex flex-col">
-        <PropertyFeatures featuresList={propertyFeatures} />
+        <PropertyFeatures featuresList={propertyFeatures} className="mb-4" />
+        <SubHeading text="Location" className="mb-2" />
+        <DynamicMap initialLatitude={-37.949884} initialLongitude={145.152494} sizeClassName="size-full" />
       </div>
     </div>
   );
@@ -431,7 +431,7 @@ function BottomBar({
   return (
     <div
       className={twMerge(
-        "flex justify-between items-center items-center gap-2",
+        "flex justify-between items-center gap-2",
         className
       )}
     >
