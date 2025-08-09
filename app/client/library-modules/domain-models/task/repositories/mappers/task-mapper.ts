@@ -7,11 +7,9 @@ export function mapApiTasktoTask(task: ApiTask): Task {
     taskId: task.taskId,
     name: task.name,
     status: task.status as TaskStatus,
-    createdDate: task.createdDate.toISOString(),
-    dueDate: task.dueDate.toISOString(),
+    createdDate: task.createdDate.toISOString().slice(0, 10), // Format to YYYY-MM-DD
+    dueDate: task.dueDate.toISOString().slice(0, 10), // Format to YYYY-MM-DD
     description: task.description,
-    priority: task.priority
-  }
+    priority: task.priority,
+  };
 }
-
-

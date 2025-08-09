@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "../../../../store";
 import { Meteor } from "meteor/meteor";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
@@ -9,7 +9,6 @@ import { getTaskById } from "/app/client/library-modules/domain-models/task/repo
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { getPropertyByAgentId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
-import { er } from "@fullcalendar/core/internal-common";
 
 interface AgentDashboardState {
   isLoading: boolean;
@@ -41,8 +40,8 @@ export const fetchAgentDetails = createAsyncThunk(
     let properties;
     let tasks;
     try {
-      properties = await getPropertyByAgentId(userId);
       const agent = await getAgentById(userId);
+      properties = await getPropertyByAgentId(agent.agentId);
       tasks = await Promise.all(
         agent.tasks.map((taskId) => {
           return getTaskById(taskId);
@@ -78,10 +77,7 @@ export const fetchPropertiesAndMetrics = createAsyncThunk(
   "agentDashboard/fetchPropertiesAndMetrics",
   async (agentId: string, { rejectWithValue }) => {
     try {
-      const properties = (await Meteor.callAsync(
-        MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID,
-        agentId
-      )) as ApiProperty[];
+      const properties = await getPropertyByAgentId(agentId); 
       const occupiedProperties = properties.filter(
         (property) => property.propertyStatus === PropertyStatus.OCCUPIED
       );

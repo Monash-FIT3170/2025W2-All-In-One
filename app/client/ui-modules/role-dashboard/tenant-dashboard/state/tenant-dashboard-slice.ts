@@ -1,87 +1,72 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../../store";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 import { getPropertyByTenantId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { getTenantById } from "/app/client/library-modules/domain-models/user/role-repositories/tenant-repository";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { getTaskById } from "/app/client/library-modules/domain-models/task/repositories/task-repository";
+import { Property } from "/app/client/library-modules/domain-models/property/Property";
 
 interface TenantDashboardState {
   isLoading: boolean;
   tasks: Task[];
   error: string | null;
-  propertyDetails: ApiProperty | null;
-  propertyLoading: boolean;
+  property: Property | null;
 }
 
 const initialState: TenantDashboardState = {
   isLoading: false,
   tasks: [],
   error: null,
-  propertyDetails: null,
-  propertyLoading: false,
+  property: null,
 };
 
-export const fetchTenantTasks = createAsyncThunk(
+export const fetchTenantDetails = createAsyncThunk(
   "tenantDashboard/fetchTenantTasks",
   async (userId: string) => {
     // First, get the tenant data which includes task IDs
-    const tenantResponse = await getTenantById(userId);
-
-    // Fetch task details for each task ID
-    const taskDetails = [];
-    if (tenantResponse.tasks && tenantResponse.tasks.length > 0) {
-      for (const taskId of tenantResponse.tasks) {
-        try {
-          // Fetch task details using the TASK_GET method
-          const taskData = await getTaskById(taskId);
-
-          if (taskData) {
-            // Format the task data for display
-            taskDetails.push(taskData)
-          }
-        } catch (error) {
-          console.error(`Error fetching task ${taskId}:`, error);
+    let property;
+    let tasks;
+    try {
+      const tenantResponse = await getTenantById(userId);
+      tasks = await Promise.all(
+         tenantResponse.tasks.map((taskId) => {
+         return getTaskById(taskId);
         }
-      }
+      )
+    )
+    property = await getPropertyByTenantId(tenantResponse.tenantId);  
+    }
+    catch (error) {
+      console.error("Error fetching tenant details:", error);
+      throw new Meteor.Error("Failed to fetch tenant details");
     }
 
     return {
-      ...tenantResponse,
-      taskDetails: taskDetails,
+      property: property,
+      tasks: tasks,
     };
   }
 );
 
-export const fetchTenantProperty = createAsyncThunk(
+export const fetchTenantTasks = createAsyncThunk(
   "tenantDashboard/fetchTenantProperty",
   async (userId: string) => {
+    let tasks;
     try {
-      // First, get the tenant data to get the tenant ID
-      const tenantResponse = await Meteor.callAsync(
-        MeteorMethodIdentifier.TENANT_GET,
-        userId
-      );
-
-      if (!tenantResponse?.tenantId) {
-        throw new Error("Tenant ID not found in response");
-      }
-
-      // Use the repository method instead of direct Meteor call
-      const propertyData = await getPropertyByTenantId(tenantResponse.tenantId);
-
-      if (!propertyData) {
-        throw new Error("No property found for tenant");
-      }
-
-      return propertyData;
-    } catch (error) {
-      console.error("Error fetching tenant property:", error);
-      throw error;
-    }
+      const tenantResponse = await getTenantById(userId);
+      tasks = await Promise.all(
+         tenantResponse.tasks.map((taskId) => {
+         return getTaskById(taskId);
+        }
+      )
+    )
   }
-);
+  catch (error) {
+    console.error("Error fetching tenant tasks:", error);
+    throw new Meteor.Error("Failed to fetch tenant tasks");
+  }
+  return { tasks: tasks };
+})
 
 export const tenantDashboardSlice = createSlice({
   name: "tenantDashboard",
@@ -99,28 +84,19 @@ export const tenantDashboardSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchTenantTasks.pending, (state) => {
+      .addCase(fetchTenantDetails.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(fetchTenantTasks.fulfilled, (state, action) => {
+      .addCase(fetchTenantDetails.fulfilled, (state, action) => {
         state.isLoading = false;
         // Use the fetched task details
-        state.tasks = action.payload.taskDetails || [];
+        state.tasks = action.payload.tasks || [];
+        state.property = action.payload.property || null; 
+
       })
-      .addCase(fetchTenantTasks.rejected, (state) => {
+      .addCase(fetchTenantDetails.rejected, (state) => {
         state.isLoading = false;
       })
-      .addCase(fetchTenantProperty.pending, (state) => {
-        state.propertyLoading = true;
-      })
-      .addCase(fetchTenantProperty.fulfilled, (state, action) => {
-        state.propertyLoading = false;
-        state.propertyDetails = action.payload;
-      })
-      .addCase(fetchTenantProperty.rejected, (state, action) => {
-        state.propertyLoading = false;
-        state.error = action.error.message || "Failed to fetch property details";
-      });
   },
 });
 
@@ -129,6 +105,5 @@ export const { setLoading, setTasks, setError } = tenantDashboardSlice.actions;
 export const selectTenantDashboard = (state: RootState) => state.tenantDashboard;
 export const selectTasks = (state: RootState) => state.tenantDashboard.tasks;
 export const selectLoading = (state: RootState) => state.tenantDashboard.isLoading;
-export const selectPropertyDetails = (state: RootState) => state.tenantDashboard.propertyDetails;
-export const selectPropertyLoading = (state: RootState) => state.tenantDashboard.propertyLoading;
+export const selectPropertyDetails = (state: RootState) => state.tenantDashboard.property;
 export default tenantDashboardSlice.reducer;
