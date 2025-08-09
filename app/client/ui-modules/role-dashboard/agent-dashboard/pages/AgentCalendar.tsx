@@ -7,6 +7,9 @@ import {
 } from "../state/agent-dashboard-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
+import { AddTaskModal } from "../components/AddTaskModal";
+import { TaskData } from "../components/TaskFormSchema";
+import { apiCreateTask } from "/app/client/library-modules/apis/task/task-api";
 
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
@@ -16,10 +19,40 @@ export function AgentCalendar(): React.JSX.Element {
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const handleDateSelection = (formatted: string, iso: string) => {
     setSelectedDate(formatted);
     setSelectedDateISO(iso);
+  };
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleTaskSubmit = async (taskData: TaskData) => {
+    try {
+      // Create the task in the database
+      const apiData = {
+        name: taskData.name,
+        description: taskData.description,
+        dueDate: new Date(taskData.dueDate), // Convert string to Date
+        priority: taskData.priority.toLowerCase() as "low" | "medium" | "high",
+      };
+            
+      const createdTask = await apiCreateTask(apiData);
+      console.log("Task created successfully:", createdTask);
+      
+      // Close the modal
+      setIsModalOpen(false);
+      
+    } catch (error) {
+      console.error("Error creating task:", error);
+    }
   };
 
   useEffect(() => {
@@ -159,7 +192,7 @@ export function AgentCalendar(): React.JSX.Element {
                   )}
                 </ul>
                 <br />
-                <Button>Add Task</Button>
+                <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
 
@@ -194,6 +227,13 @@ export function AgentCalendar(): React.JSX.Element {
           </div>
         </div>
       </div>
+
+      {/* Add Task Modal */}
+      <AddTaskModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleTaskSubmit}
+      />
     </div>
   );
 }
