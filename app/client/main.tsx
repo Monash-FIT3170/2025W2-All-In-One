@@ -33,7 +33,7 @@ import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/T
 import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
 import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
 import { loadCurrentUser } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
-import { getEnv } from "./library-modules/utils/env-utils";
+import { getEnvOrWarn } from "./library-modules/utils/env-utils";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -44,9 +44,7 @@ function initialiseReactRoot(): void {
   root.render(
     <React.StrictMode>
       <Provider store={store}>
-        <APIProvider apiKey={getEnv("GOOGLE_MAPS_API_KEY")}>
           <AppRoot />
-        </APIProvider>
       </Provider>
     </React.StrictMode>
   );
