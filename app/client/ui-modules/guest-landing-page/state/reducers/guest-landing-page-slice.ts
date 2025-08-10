@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "/app/client/store";
-import { GuestLandingPageUiState } from "../GuestLandingPageUiState"; 
+import { GuestLandingPageUiState } from "../GuestLandingPageUiState";
 import { PropertyWithListingData } from "/app/client/library-modules/use-cases/property-listing/models/PropertyWithListingData";
 import { getPropertyWithListingDataUseCase } from "/app/client/library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
 import { getAllListedListings } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
@@ -43,7 +43,14 @@ export const guestLandingPageSlice = createSlice({
       })
       .addCase(fetchPropertiesAndListings.fulfilled, (state, action: PayloadAction<PropertyWithListingData[]>) => {
         state.isLoading = false;
-        state.properties = action.payload;
+        // Convert Date objects to strings to make them serializable
+        state.properties = action.payload.map(property => ({
+          ...property,
+          inspections: property.inspections.map(inspection => ({
+            start_time: inspection.start_time instanceof Date ? inspection.start_time.toISOString() : inspection.start_time,
+            end_time: inspection.end_time instanceof Date ? inspection.end_time.toISOString() : inspection.end_time,
+          }))
+        }));
       })
       .addCase(fetchPropertiesAndListings.rejected, (state, action) => {
         state.isLoading = false;

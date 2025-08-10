@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
-  fetchLandlordTasks,
+  fetchLandlordDetails,
   selectTasks,
   selectLoading,
 } from "../state/landlord-dashboard-slice";
@@ -21,7 +21,7 @@ export function LandlordCalendar(): React.JSX.Element {
   };
 
   useEffect(() => {    if (currentUser?.userId) {
-    dispatch(fetchLandlordTasks(currentUser.userId)); // Pass the userId to fetchLandlordTasks
+    dispatch(fetchLandlordDetails(currentUser.userId)); // Pass the userId to fetchLandlordDetails
   }
 }, [dispatch, currentUser?.userId]);
 

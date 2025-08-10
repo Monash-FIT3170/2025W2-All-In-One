@@ -6,46 +6,24 @@ import { UpcomingTasks } from "../../components/UpcomingTask";
 import { MyProperties } from "../components/MyProperties";
 import {
   selectTasks,
-  setTasks,
   selectProperties,
-  setProperties,
-  fetchLandlordTasks,
+  fetchLandlordDetails,
 } from "../state/landlord-dashboard-slice";
 
 export function LandlordDashboard(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const properties = useAppSelector(selectProperties);
-
   const tasks = useAppSelector(selectTasks);
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
 
   useEffect(() => {
     if (currentUser?.userId) {
-      dispatch(fetchLandlordTasks(currentUser.userId));
+      dispatch(fetchLandlordDetails(currentUser.userId));
     }
-  }, [dispatch, currentUser?.userId]);
-
-  useEffect(() => {
-    dispatch(
-      setProperties([
-        {
-          address: "42 Bondi Road",
-          status: "Occupied" as const,
-          rent: 650,
-        },
-        {
-          address: "15 Chapel Street",
-          status: "Vacant" as const,
-          rent: 720,
-        },
-        {
-          address: "78 Brunswick Street",
-          status: "Occupied" as const,
-          rent: 480,
-        },
-      ])
-    );
-  }, [dispatch]);
+    else{
+      console.warn("No user ID found. Please log in to view the dashboard.");
+    }
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -55,7 +33,7 @@ export function LandlordDashboard(): React.JSX.Element {
           <LandlordDashboardCards />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <MyProperties properties={properties} />
-            <UpcomingTasks tasks={tasks} currentUser={currentUser}/>
+            <UpcomingTasks tasks={tasks ?? []} currentUser={currentUser}/>
           </div>
         </div>
       </div>

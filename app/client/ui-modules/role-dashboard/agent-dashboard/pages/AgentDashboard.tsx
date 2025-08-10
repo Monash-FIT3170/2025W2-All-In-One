@@ -4,52 +4,31 @@ import { PropertyOverview } from "../components/PropertyOverview";
 import { DashboardCards } from "../components/DashboardCard";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
-  fetchAgentTasks,
+  fetchAgentDetails,
+  selectError,
+  selectIsLoading,
   selectProperties,
   selectTasks,
 } from "../state/agent-dashboard-slice";
-import { setProperties } from "../../landlord-dashboard/state/landlord-dashboard-slice";
+import { cu } from "@fullcalendar/core/internal-common";
 
 export function AgentDashboard(): React.JSX.Element {
   const dispatch = useAppDispatch(); // is used to dispatch actions to the Redux store.
   const properties = useAppSelector(selectProperties); // is used to retrieve data from the Redux store.
   const tasks = useAppSelector(selectTasks);
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
+  const isLoading = useAppSelector(selectIsLoading)
+  const error = useAppSelector(selectError)
+  console.log(properties, "properties in agent dashboard");
 
   useEffect(() => {
     if (currentUser?.userId) {
-      dispatch(fetchAgentTasks(currentUser.userId));
+      dispatch(fetchAgentDetails(currentUser.userId));
     }
-  }, [dispatch, currentUser?.userId]);
-  useEffect(() => {
-    // Dummy data to be replaced with API calls
-    // This useEffect hook is used to set the initial state of properties and tasks when the component mounts.
-    dispatch(
-      setProperties([
-        {
-          address: "123 Main St",
-          status: "Occupied",
-          rent: 1500,
-        },
-        {
-          address: "456 Oak Ave",
-          status: "Vacant",
-          rent: 2200,
-        },
-        {
-          address: "789 Pine Rd",
-          status: "Vacant",
-          rent: 1800,
-        },
-        {
-          address: "101 Cedar Ln",
-          status: "Occupied",
-          rent: 1950,
-        },
-      ])
-    );
-
-  }, [dispatch]);
+    else {
+      console.warn("No user ID found. Please log in to view the dashboard.");
+    }
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -58,7 +37,7 @@ export function AgentDashboard(): React.JSX.Element {
           <h1 className="text-2xl font-bold mb-6">Agent Dashboard</h1>
           <DashboardCards />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <UpcomingTasks tasks={tasks} currentUser ={currentUser} /> <PropertyOverview />
+            <UpcomingTasks tasks={tasks} currentUser={currentUser} /> <PropertyOverview properties={properties} error={error} isLoading={isLoading}/>
           </div>
         </div>
       </div>

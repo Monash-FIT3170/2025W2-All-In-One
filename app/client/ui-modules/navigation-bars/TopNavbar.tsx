@@ -12,15 +12,7 @@ import { NotificationBoard } from "../theming/components/NotificationBoard";
 import { selectTasks as selectAgentTasks, fetchAgentTasks } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
 import { selectTasks as selectTenantTasks, fetchTenantTasks } from "../role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
 import { selectTasks as selectLandlordTasks, fetchLandlordTasks } from "../role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
-
-interface Task {
-  title: string;
-  datetime: string;
-  status: string;
-  description?: string;
-  priority?: string;
-  taskId?: string;
-}
+import { Role } from "/app/shared/user-role-identifier";
 
 interface TopNavbarProps {
   onSideBarOpened: React.Dispatch<React.SetStateAction<boolean>>;
@@ -44,13 +36,13 @@ export function TopNavbar({
   useEffect(() => {
     if (authUser?.userId) {
       switch (authUser.role) {
-        case 'agent':
+        case Role.AGENT:
           dispatch(fetchAgentTasks(authUser.userId));
           break;
-        case 'tenant':
+        case Role.TENANT:
           dispatch(fetchTenantTasks(authUser.userId));
           break;
-        case 'landlord':
+        case Role.LANDLORD:
           dispatch(fetchLandlordTasks(authUser.userId));
           break;
         default:

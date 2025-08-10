@@ -1,28 +1,21 @@
 import React from "react";
 import { Button } from "../../../theming-shadcn/Button";
 import { CardWidget } from "../../components/CardWidget";
-
-interface Property {
-  address: string;
-  status: "Occupied" | "Vacant"
-  rent: number;
-}
+import { Property } from "/app/client/library-modules/domain-models/property/Property";
+import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 
 interface PropertyOverviewProps {
   properties: Property[];
-  className?: string;
 }
 
 export function MyProperties({
-  properties,
-  className = "",
+  properties
 }: PropertyOverviewProps): React.JSX.Element {
   return (
     <CardWidget
       title="My Properties"
       value=""
       subtitle="Overview of your investment properties"
-      className={className}
       rightElement={
         <button className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50">
           <span>Filter</span>
@@ -46,17 +39,17 @@ export function MyProperties({
             <tbody className="divide-y divide-gray-200">
               {properties.map((property, index) => (
                 <tr key={index} className="transition-colors hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm">{property.address}</td>
+                  <td className="px-6 py-4 text-sm">{`${property.streetnumber} ${property.streetname}`}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      property.status === "Occupied" ? "bg-red-100 text-red-800" :
-                      property.status === "Vacant" ? "bg-green-100 text-green-800" :
+                      property.propertyStatus === PropertyStatus.OCCUPIED ? "bg-red-100 text-red-800" :
+                      property.propertyStatus === PropertyStatus.VACANT ? "bg-green-100 text-green-800" :
                       "bg-red-100 text-red-800"
                     }`}>
-                      {property.status}
+                      {property.propertyStatus}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm">${property.rent.toLocaleString()}</td>
+                  <td className="px-6 py-4 text-sm">${property.pricePerMonth.toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
