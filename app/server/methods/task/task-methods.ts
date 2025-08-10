@@ -5,6 +5,8 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
+import { TaskStatus } from "/app/shared/task-status-identifier";
+import { TaskPriority } from "/app/shared/task-priority-identifier";
 
 
 /**
@@ -40,7 +42,89 @@ const taskGetMethod = {
   },
 };
 
+/**
+ * Creates a new task in the database and returns the task ID.
+ *
+ * This Meteor method can be called from the client. It performs the following steps:
+ * 1. Validates the input data.
+ * 2. Creates a new TaskDocument with default values.
+ * 3. Inserts the task document into the database.
+ * 4. Updates the agent's task_ids array with the new task ID.
+ * 5. Returns the ID of the created task.
+ *
+ * @param taskData - The task data to create
+ * @returns A promise that resolves to the task ID string.
+ * @throws {InvalidDataError} If the task creation fails.
+ */
+const taskInsertMethod = {
+  [MeteorMethodIdentifier.TASK_INSERT]: async (taskData: {
+    name: string;
+    description: string;
+    dueDate: Date;
+    priority: TaskPriority;
+    userId: string;
+  }): Promise<string> => {
+    console.log("taskInsertMethod called with:", taskData);
+    
+    // Validate required fields - description can be empty
+    if (!taskData.name || taskData.name.trim() === "") {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("Task name is required")
+      );
+    }
+    
+    if (!taskData.dueDate) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("Due date is required")
+      );
+    }
+    
+    if (!taskData.priority) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("Priority is required")
+      );
+    }
 
+    if (!taskData.userId) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("User ID is required")
+      );
+    }
+
+    const taskDocument: Omit<TaskDocument, "_id"> = {
+      name: taskData.name.trim(),
+      description: taskData.description || "", // Handle empty description
+      dueDate: taskData.dueDate,
+      priority: taskData.priority,
+      taskStatus: TaskStatus.NOTSTARTED, // Default status
+      createdDate: new Date(),
+    };
+
+    try {
+      const insertedId = await TaskCollection.insertAsync(taskDocument);
+      const createdTask = await getTaskDocumentById(insertedId);
+      
+      if (!createdTask) {
+        throw new InvalidDataError("Failed to retrieve created task");
+      }
+
+      // Update the agent's task_ids array to include the new task
+      try {
+        await Meteor.callAsync(MeteorMethodIdentifier.AGENT_UPDATE_TASKS, taskData.userId, insertedId);
+        console.log("Agent task_ids updated successfully");
+      } catch (agentError) {
+        console.warn("Failed to update agent task_ids:", agentError);
+        // Don't fail the task creation if agent update fails - task was already created
+      }
+
+      return insertedId;
+    } catch (error) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Failed to create task: ${error}`)
+      );
+    }
+  },
+};
 
 /**
  * Maps a TaskDocument to an ApiTask DTO.
@@ -71,4 +155,5 @@ async function getTaskDocumentById(
 
 Meteor.methods({
   ...taskGetMethod,
+  ...taskInsertMethod,
 });
