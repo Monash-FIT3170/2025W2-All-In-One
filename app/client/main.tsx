@@ -33,7 +33,7 @@ import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/T
 import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
 import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
 import { loadCurrentUser } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
-import { getEnvOrWarn } from "./library-modules/utils/env-utils";
+import { getPublicEnvOrWarn } from "../shared/utils/env-utils";
 
 Meteor.startup(initialiseReactRoot);
 

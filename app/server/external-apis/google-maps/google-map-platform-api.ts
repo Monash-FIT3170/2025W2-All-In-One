@@ -1,6 +1,6 @@
-import { getEnvOrWarn } from "../../utils/env-utils";
-import { addQueryParamsToUrl } from "../../utils/url-utils";
-import { GeocodeResult } from "./models/map-platform-api-models";
+import { getPublicEnvOrWarn } from "../../../shared/utils/env-utils";
+import { addQueryParamsToUrl } from "../../../shared/utils/url-utils";
+import { GeocodeResult } from "./models/GeocodeResult";
 
 const GEOCODE_BASE_API_URL = 'https://maps.googleapis.com/maps/api/geocode';
 
@@ -13,7 +13,7 @@ const GEOCODE_BASE_API_URL = 'https://maps.googleapis.com/maps/api/geocode';
 export async function apiGeocodeAddress(address: string): Promise<GeocodeResult[]> {
   const queryParams = {
     "address": address,
-    "key": getEnvOrWarn('GOOGLE_MAPS_API_KEY')
+    "key": getPublicEnvOrWarn('GOOGLE_MAPS_API_KEY')
   }
 
   const geocodeUrl = addQueryParamsToUrl(`${GEOCODE_BASE_API_URL}/json`, queryParams);

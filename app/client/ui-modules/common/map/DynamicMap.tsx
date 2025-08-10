@@ -1,7 +1,7 @@
-import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
+import { APIProvider, Map } from "@vis.gl/react-google-maps";
 import React from "react";
 import { twMerge } from "tailwind-merge";
-import { getEnvOrWarn } from "/app/client/library-modules/utils/env-utils";
+import { getPublicEnvOrWarn } from "/app/shared/utils/env-utils";
 
 export enum MapZoom {
   ENTIRE_WORLD,
@@ -42,7 +42,7 @@ export function DynamicMap({
 
   return (
     <div className={twMerge(defaultSizeClassName, className)}>
-      <APIProvider apiKey={getEnvOrWarn("GOOGLE_MAPS_API_KEY")}>
+      <APIProvider apiKey={getPublicEnvOrWarn("GOOGLE_MAPS_API_KEY")}>
         <Map
           defaultCenter={{ lat: initialLatitude, lng: initialLongitude }}
           defaultZoom={zoomLevelMap[defaultZoom]}
