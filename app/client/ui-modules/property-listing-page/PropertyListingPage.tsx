@@ -42,6 +42,7 @@ import {
 import { DynamicMap } from "../common/map/DynamicMap";
 import { SubHeading } from "../theming/components/SubHeading";
 import { BasicMarker } from "../common/map/markers/BasicMarker";
+import { PropertyMap, PropertyMapUiState } from "./components/PropertyMap";
 
 export function PropertyListingPage({
   className = "",
@@ -93,6 +94,7 @@ export function PropertyListingPage({
           propertyParkingSpaces={state.propertyParkingSpaces}
           propertyBedrooms={state.propertyBedrooms}
           propertyPrice={state.propertyPrice}
+          mapUiState={state.mapUiState}
           inspectionBookingUiStateList={state.inspectionBookingUiStateList}
           listingImageUrls={state.listingImageUrls}
           listingStatusText={state.listingStatusText}
@@ -142,6 +144,7 @@ function ListingPageContent({
   propertyParkingSpaces,
   propertyBedrooms,
   propertyPrice,
+  mapUiState,
   inspectionBookingUiStateList,
   listingImageUrls,
   listingStatusText,
@@ -173,6 +176,7 @@ function ListingPageContent({
   propertyParkingSpaces: string;
   propertyBedrooms: string;
   propertyPrice: string;
+  mapUiState: PropertyMapUiState;
   inspectionBookingUiStateList: InspectionBookingListUiState[];
   listingImageUrls: string[];
   listingStatusText: string;
@@ -221,6 +225,7 @@ function ListingPageContent({
       />
       <ListingDetails
         propertyDescription={propertyDescription}
+        mapUiState={mapUiState}
         inspectionBookingUiStateList={inspectionBookingUiStateList}
         onBook={onBook}
         propertyFeatures={propertyFeatures}
@@ -380,12 +385,14 @@ function ListingHero({
 
 function ListingDetails({
   propertyDescription,
+  mapUiState,
   inspectionBookingUiStateList,
   onBook,
   propertyFeatures,
   className = "",
 }: {
   propertyDescription: string;
+  mapUiState: PropertyMapUiState;
   inspectionBookingUiStateList: InspectionBookingListUiState[];
   onBook: (index: number) => void;
   propertyFeatures: string[];
@@ -408,12 +415,7 @@ function ListingDetails({
       <div className="flex-1 flex flex-col">
         <PropertyFeatures featuresList={propertyFeatures} className="mb-4" />
         <SubHeading text="Location" className="mb-2" />
-        <DynamicMap 
-          initialLatitude={-37.949884} 
-          initialLongitude={145.152494} 
-          markers={[<BasicMarker latitude={-37.949884} longitude={145.152494}/>]}
-          sizeClassName="size-full" 
-        />
+        <PropertyMap mapUiState={mapUiState} />
       </div>
     </div>
   );

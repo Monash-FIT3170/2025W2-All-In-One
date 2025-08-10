@@ -20,14 +20,15 @@ const zoomLevelMap: Record<MapZoom, number> = {
 };
 
 /**
- * Google hosted dynamic map.
+ * Google Maps Platform dynamic map.
+ * 
+ * WARNING: This component is billed, please be careful with usage. If unsure, consult system architects.
  */
 export function DynamicMap({
   initialLatitude,
   initialLongitude,
   defaultZoom = MapZoom.STREET,
   markers = [],
-  sizeClassName = "h-64 w-96",
   className = "",
 }: {
   initialLatitude: number;
@@ -37,8 +38,10 @@ export function DynamicMap({
   sizeClassName?: string;
   className?: string;
 }): React.JSX.Element {
+  const defaultSizeClassName = "h-64 w-96";
+
   return (
-    <div className={twMerge(sizeClassName, className)}>
+    <div className={twMerge(defaultSizeClassName, className)}>
       <APIProvider apiKey={getEnvOrWarn("GOOGLE_MAPS_API_KEY")}>
         <Map
           defaultCenter={{ lat: initialLatitude, lng: initialLongitude }}

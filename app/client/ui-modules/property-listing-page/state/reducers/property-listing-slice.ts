@@ -33,8 +33,10 @@ const initialState: PropertyListingPageUiState = {
   propertyParkingSpaces: "",
   propertyBedrooms: "",
   propertyPrice: "",
-  propertyMapMarkerLatitude: 0,
-  propertyMapMarkerLongitude: 0,
+  mapUiState: {
+    markerLatitude: 0,
+    markerLongitude: 0,
+  },
   inspectionBookingUiStateList: [],
   listingImageUrls: [],
   listingStatusText: "",
@@ -92,8 +94,10 @@ export const propertyListingSlice = createSlice({
       state.propertyPrice = getPropertyPriceDisplayString(
         action.payload.pricePerMonth
       );
-      state.propertyMapMarkerLatitude = action.payload.locationLatitude
-      state.propertyMapMarkerLongitude = action.payload.locationLongitude;
+      state.mapUiState = {
+        markerLatitude: action.payload.locationLatitude,
+        markerLongitude: action.payload.locationLongitude,
+      }
       state.inspectionBookingUiStateList = action.payload.inspections.map(
         (inspection) => ({
           date: getFormattedDateStringFromDate(inspection.start_time),
