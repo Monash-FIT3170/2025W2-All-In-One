@@ -15,7 +15,10 @@ import { ApiProperty } from "../../../shared/api-models/property/ApiProperty";
 import { AgentDocument } from "../../database/user/models/role-models/AgentDocument";
 import { LandlordDocument } from "../../database/user/models/role-models/LandlordDocument";
 import { TenantDocument } from "../../database/user/models/role-models/TenantDocument";
-import { AgentCollection, TenantCollection } from "../../database/user/user-collections";
+import {
+  AgentCollection,
+  TenantCollection,
+} from "../../database/user/user-collections";
 import { LandlordCollection } from "../../database/user/user-collections";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
@@ -64,10 +67,10 @@ const propertyGetStatusCountsLandlordMethod = {
   ): Promise<{ occupied: number; vacant: number }> => {
     // get status IDs for occupied/vacant
     const occupiedStatus = await PropertyStatusCollection.findOneAsync({
-      name: PropertyStatus.OCCUPIED
+      name: PropertyStatus.OCCUPIED,
     });
     const vacantStatus = await PropertyStatusCollection.findOneAsync({
-      name: PropertyStatus.VACANT
+      name: PropertyStatus.VACANT,
     });
 
     if (!occupiedStatus || !vacantStatus) {
@@ -96,14 +99,20 @@ const propertyGetStatusCountsLandlordMethod = {
 };
 
 const propertyGetCountMethod = {
-  [MeteorMethodIdentifier.PROPERTY_GET_COUNT]: async (agentId: string): Promise<number> => {
+  [MeteorMethodIdentifier.PROPERTY_GET_COUNT]: async (
+    agentId: string
+  ): Promise<number> => {
     return await PropertyCollection.find({ agent_id: agentId }).countAsync();
   },
 };
 
 const propertyGetListMethod = {
-  [MeteorMethodIdentifier.PROPERTY_GET_LIST]: async (agentId: string): Promise<ApiProperty[]> => {
-    const properties = await PropertyCollection.find({ agent_id: agentId }).fetchAsync();
+  [MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID]: async (
+    agentId: string
+  ): Promise<ApiProperty[]> => {
+    const properties = await PropertyCollection.find({
+      agent_id: agentId,
+    }).fetchAsync();
     return Promise.all(properties.map(mapPropertyDocumentToPropertyDTO));
   },
 };
@@ -117,10 +126,14 @@ const propertyGetListMethod = {
 // It fetches the property status, latest property price, and property features documents
 
 const propertyGetAllMethod = {
-[MeteorMethodIdentifier.PROPERTY_GET_ALL]: async (): Promise<ApiProperty[]> => {
+  [MeteorMethodIdentifier.PROPERTY_GET_ALL]: async (): Promise<
+    ApiProperty[]
+  > => {
     const propertyDocuments = await PropertyCollection.find({}).fetchAsync();
     const propertyDTOs = await Promise.all(
-      propertyDocuments.map((property) => mapPropertyDocumentToPropertyDTO(property))
+      propertyDocuments.map((property) =>
+        mapPropertyDocumentToPropertyDTO(property)
+      )
     );
     return propertyDTOs;
   },
@@ -136,7 +149,7 @@ async function mapPropertyDocumentToPropertyDTO(
   );
   const propertyFeaturesDocuments =
     await getPropertyFeatureDocumentsMatchingIds(property.property_feature_ids);
-  
+
   const AgentDocument = property.agent_id
     ? await getAgentDocumentById(property.agent_id)
     : null; // Handle missing agent_id gracefully
@@ -267,21 +280,20 @@ const propertyGetByTenantIdMethod = {
   [MeteorMethodIdentifier.PROPERTY_GET_BY_TENANT_ID]: async (
     tenantId: string
   ): Promise<ApiProperty | null> => {
-   
     try {
       const propertyDocument = await PropertyCollection.findOneAsync({
         tenant_id: tenantId,
       });
 
-    if (!propertyDocument) {
-      return null;
-    }
+      if (!propertyDocument) {
+        return null;
+      }
 
-    const propertyDTO = await mapPropertyDocumentToPropertyDTO(
-      propertyDocument
-    ).catch((error) => {
-      throw meteorWrappedInvalidDataError(error);
-    });
+      const propertyDTO = await mapPropertyDocumentToPropertyDTO(
+        propertyDocument
+      ).catch((error) => {
+        throw meteorWrappedInvalidDataError(error);
+      });
 
       return propertyDTO;
     } catch (error) {
@@ -290,29 +302,47 @@ const propertyGetByTenantIdMethod = {
     }
   },
 };
+
+const propertyGetAllByLandlordId = {
+  [MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_LANDLORD_ID]: async (
+    landlordId: string
+  ): Promise<ApiProperty[]> => {
+    try {
+      const properties = await PropertyCollection.find({
+        landlord_id: landlordId,
+      }).fetchAsync();
+      return Promise.all(properties.map(mapPropertyDocumentToPropertyDTO));
+    } catch (error) {
+      console.error("Error in getAllPropertiesByLandlordId:", error);
+      throw meteorWrappedInvalidDataError(error as InvalidDataError);
+    }
+  },
+};
+
 const updatePropertyData = {
   [MeteorMethodIdentifier.PROPERTY_DATA_UPDATE]: async (
-    property: PropertyUpdateData):
-     Promise<void> => {
-  await PropertyCollection.updateAsync(property.propertyId, {
-    $set: {
-      streetnumber: property.streetnumber,
-      streetname: property.streetname,
-      suburb: property.suburb,
-      province: property.province,
-      postcode: property.postcode,
-      description: property.description,
-      summary_description: property.summaryDescription,
-      bathrooms: property.bathrooms,
-      bedrooms: property.bedrooms,
-      parking: property.parking,
-      features: property.features,
-      type: property.type,
-      area: property.area,
-      landlord_id: property.landlordId,
-    },
-  });
-}}
+    property: PropertyUpdateData
+  ): Promise<void> => {
+    await PropertyCollection.updateAsync(property.propertyId, {
+      $set: {
+        streetnumber: property.streetnumber,
+        streetname: property.streetname,
+        suburb: property.suburb,
+        province: property.province,
+        postcode: property.postcode,
+        description: property.description,
+        summary_description: property.summaryDescription,
+        bathrooms: property.bathrooms,
+        bedrooms: property.bedrooms,
+        parking: property.parking,
+        features: property.features,
+        type: property.type,
+        area: property.area,
+        landlord_id: property.landlordId,
+      },
+    });
+  },
+};
 
 Meteor.methods({
   ...propertyGetMethod,
@@ -323,6 +353,7 @@ Meteor.methods({
   ...propertyGetListMethod,
   ...propertyInsertMethod,
   ...propertyGetByTenantIdMethod,
+  ...propertyGetAllByLandlordId,
   ...updatePropertyData,
   ...propertyGetAllMethod,
 });

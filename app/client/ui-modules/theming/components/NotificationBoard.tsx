@@ -1,16 +1,8 @@
 import React from 'react';
 import { TaskStatus } from '/app/shared/task-status-identifier';
 import { parse, format, compareAsc } from "date-fns";
+import { Task } from '/app/client/library-modules/domain-models/task/Task';
 
-// test comment
-interface Task {
-  title: string;
-  datetime: string;
-  status: string;
-  description?: string;
-  priority?: string;
-  taskId?: string;
-}
 
 interface NotificationBoardProps {
   open: boolean;
@@ -41,34 +33,10 @@ export function NotificationBoard({ open, onClose, tasks }: NotificationBoardPro
 
   const transformedTasks = tasks
     .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks
-    .map((task) => {
-      try {
-        // Parse the datetime string (assuming DD/MM/YYYY format)
-        const dueDate = parse(task.datetime, "dd/MM/yyyy", new Date());
-
-        // Format the date to match the design
-        const formattedDate = formatTaskDate(dueDate);
-
-        return {
-          ...task,
-          datetime: formattedDate,
-        };
-      } catch (error) {
-        console.error('Error parsing date:', task.datetime);
-        return {
-          ...task,
-          datetime: 'Invalid Date',
-        };
-      }
-    })
     .sort((a, b) => {
-      try {
-        const dateA = parse(a.datetime, "dd/MM/yyyy", new Date());
-        const dateB = parse(b.datetime, "dd/MM/yyyy", new Date());
-        return compareAsc(dateA, dateB);
-      } catch (error) {
-        return 0;
-      }
+      const dateA = parse(a.dueDate, "dd/MM/yyyy", new Date());
+      const dateB = parse(b.dueDate, "dd/MM/yyyy", new Date());
+      return compareAsc(dateB, dateA); // Descending orderc
     });
 
   return (
@@ -93,7 +61,7 @@ export function NotificationBoard({ open, onClose, tasks }: NotificationBoardPro
               className="px-4 py-3 border-b last:border-b-0 border-gray-100 hover:bg-gray-50 transition"
             >
               <div className="flex justify-between items-start mb-1">
-                <div className="font-medium text-base text-gray-900">{task.title}</div>
+                <div className="font-medium text-base text-gray-900">{task.name}</div>
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusStyle(
                     task.status
@@ -103,7 +71,7 @@ export function NotificationBoard({ open, onClose, tasks }: NotificationBoardPro
                 </span>
               </div>
               <div className="flex items-center gap-2 text-xs text-gray-500">
-                <span>Due: {task.datetime}</span>
+                <span>Due: {task.dueDate}</span>
                 {task.priority && (
                   <>
                     <span>•</span>
