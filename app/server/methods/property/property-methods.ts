@@ -25,6 +25,8 @@ import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInse
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
 import { PropertyCoordinateDocument } from "../../database/property/models/PropertyCoordinateDocument";
+import { getGeocode } from "../../repositories/geocode/GeocodeRepository";
+import { Geocode } from "../../repositories/geocode/models/Geocode";
 
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
@@ -277,7 +279,11 @@ const propertyInsertMethod = {
     data: PropertyInsertData
   ): Promise<string> => {
     try {
+      const geocode = await getGeocode(getAddressFromPropertyInsertData(data))
+      const newCoordinatesId = await insertGeocodeIntoCoordinatesCollection(geocode);
+
       const propertyId = await PropertyCollection.insertAsync({
+        property_coordinate_id: newCoordinatesId,
         ...data,
       });
       return propertyId;
@@ -287,6 +293,21 @@ const propertyInsertMethod = {
     }
   },
 };
+
+function getAddressFromPropertyInsertData(
+  data: PropertyInsertData
+): string {
+  return `${data.streetnumber} ${data.streetname}, ${data.suburb}, ${data.province}`;
+}
+
+function insertGeocodeIntoCoordinatesCollection(
+  geocode: Geocode
+): Promise<string> {
+  return PropertyCoordinatesCollection.insertAsync({
+    latitude: geocode.latitude,
+    longitude: geocode.longitude,
+  });
+}
 
 const propertyGetByTenantIdMethod = {
   [MeteorMethodIdentifier.PROPERTY_GET_BY_TENANT_ID]: async (

@@ -5,10 +5,10 @@ import { GeocodeResult } from "./models/GeocodeResult";
 const GEOCODE_BASE_API_URL = 'https://maps.googleapis.com/maps/api/geocode';
 
 /**
- * Convert the address to a geocode (coordinates) using Google Maps API. Use sparingly as it may incur costs.
+ * Convert an address to a geocode (latitude, longitude) using Google Maps API. Use sparingly as it may incur costs.
+ * 
  * @param address address to geocode
  * @throws Error if the geocoding fails
- * @returns 
  */
 export async function apiGeocodeAddress(address: string): Promise<GeocodeResult[]> {
   const queryParams = {
