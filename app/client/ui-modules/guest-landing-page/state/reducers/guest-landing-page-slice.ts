@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "/app/client/store";
-import { GuestLandingPageUiState } from "../GuestLandingPageUiState"; 
+import { GuestLandingPageUiState } from "../GuestLandingPageUiState";
 import { PropertyWithListingData } from "/app/client/library-modules/use-cases/property-listing/models/PropertyWithListingData";
 import { getPropertyWithListingDataUseCase } from "/app/client/library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
 import { getAllListedListings } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
