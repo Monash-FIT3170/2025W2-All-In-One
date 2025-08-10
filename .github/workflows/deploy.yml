@@ -38,10 +38,13 @@ jobs:
       - name: Inject AZURE_CONNECTION_STRING
         run: |
           echo "{
+            \"public\": {
+              \"GOOGLE_MAPS_API_KEY\": \"${{ secrets.GOOGLE_MAPS_API_KEY }}\"
+            },
             \"private\": {
               \"AZURE_CONNECTION_STRING\": \"${{ secrets.AZURE_CONNECTION_STRING }}\"
-              }
-            }" > settings.json 
+            }
+          }" > settings.json 
 
       - name: Deploy
         run: |
