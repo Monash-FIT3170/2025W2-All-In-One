@@ -8,17 +8,13 @@ import { NavigationPath } from "../../navigation";
 const tabTriggerClass =
   "w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all text-gray-500 data-[state=active]:bg-white data-[state=active]:text-black";
 
-// Define auth tab types using actual navigation paths
+// Literal type for allowed tabs
 export type AuthTabType = typeof NavigationPath.Signin | typeof NavigationPath.Signup;
 
-export interface AuthTabConfig {
-  SIGNIN: typeof NavigationPath.Signin;
-  SIGNUP: typeof NavigationPath.Signup;
-}
-
-export const AUTH_TABS: AuthTabConfig = {
-  SIGNIN: NavigationPath.Signin,
-  SIGNUP: NavigationPath.Signup,
+// Map for tab labels and paths
+export const AUTH_TABS = {
+  SIGNIN: { label: "Sign in", path: NavigationPath.Signin },
+  SIGNUP: { label: "Sign up", path: NavigationPath.Signup },
 } as const;
 
 type AuthTabsProps = {
@@ -34,16 +30,22 @@ export const AuthTabs = ({ initialTab }: AuthTabsProps) => {
   useEffect(() => {
     const currentPath = location.pathname;
     if (currentPath === NavigationPath.Signin) {
-      setTab(AUTH_TABS.SIGNIN);
+      setTab(AUTH_TABS.SIGNIN.path);
     } else if (currentPath === NavigationPath.Signup) {
-      setTab(AUTH_TABS.SIGNUP);
+      setTab(AUTH_TABS.SIGNUP.path);
     }
   }, [location.pathname]);
 
   const handleTabChange = (value: string) => {
-    const newTab = value as AuthTabType;
-    setTab(newTab);
-    navigate(newTab);
+    // Only change if the value matches one of our tab paths
+    if (
+      value === AUTH_TABS.SIGNIN.path ||
+      value === AUTH_TABS.SIGNUP.path
+    ) {
+      const newTab: AuthTabType = value;
+      setTab(newTab);
+      navigate(newTab);
+    }
   };
 
   return (
@@ -51,19 +53,19 @@ export const AuthTabs = ({ initialTab }: AuthTabsProps) => {
       <div className="w-full max-w-lg rounded-xl border bg-white shadow-lg p-8">
         <Tabs.Root value={tab} onValueChange={handleTabChange} className="w-full">
           <Tabs.List className="inline-flex items-center justify-center w-full rounded-full bg-gray-100 p-1 mb-6">
-            <Tabs.Trigger value="signin" className={tabTriggerClass}>
-              Sign in 
+            <Tabs.Trigger value={AUTH_TABS.SIGNIN.path} className={tabTriggerClass}>
+              {AUTH_TABS.SIGNIN.label}
             </Tabs.Trigger>
-            <Tabs.Trigger value="signup" className={tabTriggerClass}>
-              Sign up
+            <Tabs.Trigger value={AUTH_TABS.SIGNUP.path} className={tabTriggerClass}>
+              {AUTH_TABS.SIGNUP.label}
             </Tabs.Trigger>
           </Tabs.List>
 
-          <Tabs.Content value="signin">
+          <Tabs.Content value={AUTH_TABS.SIGNIN.path}>
             <SigninForm />
           </Tabs.Content>
 
-          <Tabs.Content value="signup">
+          <Tabs.Content value={AUTH_TABS.SIGNUP.path}>
             <SignupForm />
           </Tabs.Content>
         </Tabs.Root>
