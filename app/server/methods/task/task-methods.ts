@@ -5,6 +5,7 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
+import { TaskStatus } from "/app/shared/task-status-identifier";
 
 
 /**
@@ -59,6 +60,7 @@ const taskInsertMethod = {
     description: string;
     dueDate: Date;
     priority: "low" | "medium" | "high";
+    userId: string;
   }): Promise<ApiTask> => {
     console.log("taskInsertMethod called with:", taskData);
     
@@ -81,6 +83,12 @@ const taskInsertMethod = {
       );
     }
 
+    if (!taskData.userId) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("User ID is required")
+      );
+    }
+
     const taskDocument: Omit<TaskDocument, "_id"> = {
       name: taskData.name.trim(),
       description: taskData.description || "", // Handle empty description
@@ -96,6 +104,15 @@ const taskInsertMethod = {
       
       if (!createdTask) {
         throw new InvalidDataError("Failed to retrieve created task");
+      }
+
+      // Update the agent's task_ids array to include the new task
+      try {
+        await Meteor.callAsync(MeteorMethodIdentifier.AGENT_UPDATE_TASKS, taskData.userId, insertedId);
+        console.log("Agent task_ids updated successfully");
+      } catch (agentError) {
+        console.warn("Failed to update agent task_ids:", agentError);
+        // Don't fail the task creation if agent update fails - task was already created
       }
 
       const apiTask = await mapTaskDocumentTotaskDTO(createdTask);

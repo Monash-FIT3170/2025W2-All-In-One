@@ -51,7 +51,7 @@ export function AddTaskModal({
     const newTask: TaskData = {
       name: data.name,
       description: data.description || "",
-      dueDate: new Date(data.dueDate),
+      dueDate: new Date(data.dueDate).toISOString(),
       priority: data.priority,
       status: TaskStatus.NOTSTARTED,
     };

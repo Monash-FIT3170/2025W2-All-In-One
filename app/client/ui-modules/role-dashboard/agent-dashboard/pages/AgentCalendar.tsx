@@ -36,12 +36,18 @@ export function AgentCalendar(): React.JSX.Element {
 
   const handleTaskSubmit = async (taskData: TaskData) => {
     try {
+      if (!currentUser?.userId) {
+        console.error("No current user found");
+        return;
+      }
+
       // Create the task in the database
       const apiData = {
         name: taskData.name,
         description: taskData.description,
         dueDate: new Date(taskData.dueDate), // Convert string to Date
         priority: taskData.priority.toLowerCase() as "low" | "medium" | "high",
+        userId: currentUser.userId, // Pass the current user's ID
       };
             
       const createdTask = await apiCreateTask(apiData);
@@ -49,6 +55,11 @@ export function AgentCalendar(): React.JSX.Element {
       
       // Close the modal
       setIsModalOpen(false);
+      
+      // Refresh tasks to show the new task
+      if (currentUser?.userId) {
+        dispatch(fetchAgentTasks(currentUser.userId));
+      }
       
     } catch (error) {
       console.error("Error creating task:", error);
@@ -88,7 +99,7 @@ export function AgentCalendar(): React.JSX.Element {
                 <ul className="space-y-4 mt-2">
                   {tasks
                     .filter((task) => {
-                      if (!task.datetime) return false; // Tasks without a date just get passed over
+                      if (!task.datetime) return false; // Takss without a date just get passed over
 
                       // Get the selected date (it should be in YYYY-MM-DD format)
                       const selectedDateObj = selectedDateISO ? new Date(selectedDateISO) : new Date();

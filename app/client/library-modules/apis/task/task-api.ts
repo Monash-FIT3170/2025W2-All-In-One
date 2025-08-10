@@ -13,6 +13,7 @@ export async function apiCreateTask(taskData: {
   description: string;
   dueDate: Date;
   priority: "low" | "medium" | "high";
+  userId: string;
 }): Promise<ApiTask> {
   try {
     const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT, taskData);
