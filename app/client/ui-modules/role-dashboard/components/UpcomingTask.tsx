@@ -9,10 +9,8 @@ import { NavigationPath } from "../../../navigation";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 
 
-export function UpcomingTasks({
-  tasks,
-  currentUser
-}: {
+export function UpcomingTasks(
+  props: {
   tasks: Task[];
   currentUser?: {
     role?: string;
@@ -21,7 +19,7 @@ export function UpcomingTasks({
   const navigate = useNavigate();
 
   // Transform tasks and sort by date
-  const transformedTasks: Task[] = tasks
+  const transformedTasks: Task[] = props.tasks
     .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks
     .sort((a, b) => {
       const dateA = parse(a.dueDate, "dd/MM/yyyy", new Date());
@@ -30,7 +28,7 @@ export function UpcomingTasks({
     });
 
   const handleViewAllTasks = () => {
-    const role = currentUser?.role;
+    const role = props.currentUser?.role;
 
     if (!role) {
       console.warn("No user role found");
