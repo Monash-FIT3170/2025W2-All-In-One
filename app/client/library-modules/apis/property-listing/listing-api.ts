@@ -14,11 +14,12 @@ export async function apiGetListingForProperty(
   return fetchedListing;
 }
 
-export async function apiGetAllListedListings(): Promise<ApiListing[]> {
+export async function apiGetAllListedListings(skip = 0, limit = 3): Promise<ApiListing[]> {
   const fetchedListings: ApiListing[] = await Meteor.callAsync(
-    MeteorMethodIdentifier.LISTING_GET_ALL_LISTED
+    MeteorMethodIdentifier.LISTING_GET_ALL_LISTED,
+    skip,
+    limit
   );
-
   return fetchedListings;
 }
 
