@@ -56,7 +56,7 @@ function TenantDashboard() {
             <DashboardCards rentAmount={propertyDetails?.pricePerMonth} />
             <div className=" grid grid-cols-1 md:grid-cols-2 gap-6 px-6">
               <div className="mt-5">
-                <UpcomingTasks tasks={tasks ?? []} />
+                <UpcomingTasks tasks={tasks} />
               </div>
               <div className="mt-5">
                 {propertyLoading ? (

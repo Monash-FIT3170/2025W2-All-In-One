@@ -3,44 +3,17 @@ import { CardWidget } from "./CardWidget";
 import { Button } from "../../theming-shadcn/Button";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { parse, format, isToday, isTomorrow, compareAsc } from "date-fns";
+import { Task } from "/app/client/library-modules/domain-models/task/Task";
 
-interface Task {
-  title: string;
-  datetime: string;
-  status: string;
-  description?: string;
-  priority?: string;
-  taskId?: string;
-}
 
-interface UpcomingTasksProps {
-  tasks: Task[];
-  className?: string;
-}
-
-export function UpcomingTasks({
-  tasks,
-  className = "",
-}: UpcomingTasksProps): React.JSX.Element {
+export function UpcomingTasks(props: {tasks:Task[]}): React.JSX.Element {
   // Transform tasks and sort by date
-  const transformedTasks = tasks
-    .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks
-    .map((task) => {
-      // Parse the datetime string (assuming DD/MM/YYYY format)
-      const dueDate = parse(task.datetime, "dd/MM/yyyy", new Date());
-
-      // Format the date to match the design
-      const formattedDate = formatTaskDate(dueDate);
-
-      return {
-        ...task,
-        datetime: formattedDate,
-      };
-    })
+  const transformedTasks: Task[] = props.tasks
+    .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks};
     .sort((a, b) => {
-      const dateA = parse(a.datetime, "dd/MM/yyyy", new Date());
-      const dateB = parse(b.datetime, "dd/MM/yyyy", new Date());
-      return compareAsc(dateA, dateB);
+      const dateA = parse(a.dueDate, "dd/MM/yyyy", new Date());
+      const dateB = parse(b.dueDate, "dd/MM/yyyy", new Date());
+      return compareAsc(dateB, dateA); // Descending orderc
     });
 
   return (
@@ -48,12 +21,11 @@ export function UpcomingTasks({
       title="Upcoming Tasks"
       value=""
       subtitle="Your scheduled tasks and appointments"
-      className={className}
     >
       <div className="mt-4 space-y-4">
         {transformedTasks.length > 0 ? (
           transformedTasks.map((task, index) => (
-            <TaskItem key={task.taskId || index} task={task} />
+            <TaskItem key={task.taskId} task={task} />
           ))
         ) : (
           <div className="text-center text-gray-500">No upcoming tasks</div>
@@ -98,7 +70,7 @@ function TaskItem({ task }: { task: Task }): React.JSX.Element {
     <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
       <div className="flex flex-col gap-1">
         <div className="flex justify-between items-start">
-          <h3 className="text-lg font-medium text-gray-900">{task.title}</h3>
+          <h3 className="text-lg font-medium text-gray-900">{task.name}</h3>
           <span
             className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusStyle(
               task.status
@@ -111,7 +83,7 @@ function TaskItem({ task }: { task: Task }): React.JSX.Element {
           <p className="text-gray-600 text-sm">{task.description}</p>
         )}
         <div className="flex items-center gap-2 text-gray-600">
-          <span className="text-base">{task.datetime}</span>
+          <span className="text-base">{task.dueDate}</span>
           {task.priority && (
             <>
               <span className="text-gray-400">•</span>

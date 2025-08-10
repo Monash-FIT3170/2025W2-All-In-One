@@ -7,9 +7,9 @@ export enum MeteorMethodIdentifier {
     BLOB_UPLOAD_FILES = "blobs.uploadFiles", // Uploads multiple files to Azure Blob Storage
     PROPERTY_GET = "properties.getOne",
     PROPERTY_GET_ALL = "properties.getAll",
+    PROPERTY_SEARCH = "properties.search",
     PROPERTY_GET_COUNT = "properties.getCount",
-    PROPERTY_GET_LIST = "properties.getList",
-    PROPERTY_SEARCH = "properties.search", // Search properties by various criteria
+    PROPERTY_GET_ALL_BY_AGENT_ID = "properties.getAllByAgentId", // Fetches all properties managed by an agent by their userID
     PROPERTY_INSERT = "properties.insert", // Inserts property into property collection
     PROPERTY_PRICE_INSERT = "properties.insertPrice", // Inserts property price into property price collection
     PROPERTY_LANDLORD_GET_COUNT = "properties.getCountLandlord",
@@ -27,10 +27,11 @@ export enum MeteorMethodIdentifier {
     TENANT_GET = "tenants.getOne",
     LANDLORD_INSERT = "landlords.insert",
     LANDLORD_GET = "landlords.getOne",
-    LANDLORD_GET_ALL = "landlords.getAll",
+    LANDLORD_GET_ALL = "landlords.getAll", // Get All Landlords
     PROPERTY_STATUS_GET = "propertyStatus.getOne", // Find ID of property status by name
     PROPERTY_GET_BY_TENANT_ID = "property.getByTenantId",
     PROPERTY_GET_BY_AGENT_ID = "property.getByAgentId", // fetches all properties managed by an agent by their ID
+    PROPERTY_GET_ALL_BY_LANDLORD_ID = "property.getAllByLandlordId", // fetches all properties managed by a landlord by their ID
     PROPERTY_DATA_UPDATE = "property.updateData",
     PROFILE_GET = "profileData.getOne",
     PROFILE_EDIT = "profileData.edit",
