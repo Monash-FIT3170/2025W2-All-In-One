@@ -3,7 +3,7 @@ import { apiGeocodeAddress } from "../../external-apis/google-maps/google-maps-p
 import { Geocode } from "./models/Geocode";
 
 /**
- * Convert an address to a geocode (latitude, longitude). Uses the best matchin geocode.
+ * Convert an address to a geocode (latitude, longitude). Uses the best matching geocode.
  *
  * WARNING: Use sparingly as it may incur costs.
  *
