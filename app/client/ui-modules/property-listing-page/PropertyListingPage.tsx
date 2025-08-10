@@ -41,8 +41,6 @@ import {
 } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
 import { DynamicMap } from "../common/map/DynamicMap";
 import { SubHeading } from "../theming/components/SubHeading";
-import { MarkerWithToggleableInfoWindow } from "../common/map/markers/MarkerWithToggleableInfoWindow";
-import { Marker } from "@vis.gl/react-google-maps";
 import { BasicMarker } from "../common/map/markers/BasicMarker";
 
 export function PropertyListingPage({

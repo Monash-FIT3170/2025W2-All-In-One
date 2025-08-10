@@ -19,6 +19,9 @@ const zoomLevelMap: Record<MapZoom, number> = {
   [MapZoom.BUILDING]: 20,
 };
 
+/**
+ * Google hosted dynamic map.
+ */
 export function DynamicMap({
   initialLatitude,
   initialLongitude,

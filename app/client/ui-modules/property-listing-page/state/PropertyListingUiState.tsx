@@ -23,6 +23,8 @@ export type PropertyListingPageUiState = {
   propertyParkingSpaces: string;
   propertyBedrooms: string;
   propertyPrice: string;
+  propertyMapMarkerLatitude: number;
+  propertyMapMarkerLongitude: number;
   inspectionBookingUiStateList: InspectionBookingListUiState[];
   listingImageUrls: string[];
   listingStatusText: string;
