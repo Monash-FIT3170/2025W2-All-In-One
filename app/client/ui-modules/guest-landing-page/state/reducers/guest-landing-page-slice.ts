@@ -14,20 +14,17 @@ const initialState: GuestLandingPageUiState = {
 
 export const fetchPropertiesAndListings = createAsyncThunk<
   PropertyWithListingData[],
-  void,
+  { skip: number; limit: number },
   { state: RootState }
 >(
   "guestLandingPage/fetchPropertiesAndListings",
-  async () => {
-    const listedListings = await getAllListedListings();
-
-
+  async ({ skip, limit }) => {
+    const listedListings = await getAllListedListings(skip, limit);
     const propertyDataPromises = listedListings.map((listing) =>
-      getPropertyWithListingDataUseCase(listing.apiListing.property_id));
-
+      getPropertyWithListingDataUseCase(listing.apiListing.property_id)
+    );
     const allResults = await Promise.all(propertyDataPromises);
-
-    return allResults
+    return allResults;
   }
 );
 
@@ -41,8 +38,9 @@ export const guestLandingPageSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(fetchPropertiesAndListings.fulfilled, (state, action: PayloadAction<PropertyWithListingData[]>) => {
+      .addCase(fetchPropertiesAndListings.fulfilled, (state, action) => {
         state.isLoading = false;
+<<<<<<< HEAD
         // Convert Date objects to strings to make them serializable
         state.properties = action.payload.map(property => ({
           ...property,
@@ -51,6 +49,14 @@ export const guestLandingPageSlice = createSlice({
             end_time: inspection.end_time instanceof Date ? inspection.end_time.toISOString() : inspection.end_time,
           }))
         }));
+=======
+        const skip = action.meta.arg.skip;
+        if (skip === 0) {
+          state.properties = action.payload;
+        } else {
+          state.properties = [...state.properties, ...action.payload];
+        }
+>>>>>>> 8cf3b93070b51985548ba5af1530fa226da84255
       })
       .addCase(fetchPropertiesAndListings.rejected, (state, action) => {
         state.isLoading = false;
