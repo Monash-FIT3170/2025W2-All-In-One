@@ -12,7 +12,7 @@ import { TaskData } from "../components/TaskFormSchema";
 import { apiCreateTask } from "/app/client/library-modules/apis/task/task-api";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
-
+import { UpcomingTasks } from "../../components/UpcomingTask";  
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch(); 
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
@@ -132,19 +132,14 @@ export function AgentCalendar(): React.JSX.Element {
                     <p className="text-gray-500 italic">No tasks for this date</p>
                   )}
                 </ul>
-                <br />
+                <br/>
                 <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
-
-            {/* Right Section: Upcoming Tasks */}
             <UpcomingTasks tasks={tasks} />
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Add Task Modal */}
       <AddTaskModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

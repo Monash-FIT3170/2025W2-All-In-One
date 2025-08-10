@@ -4,6 +4,7 @@ import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 import { UpcomingTasks } from "../../components/UpcomingTask";
 import { fetchTenantTasks, selectLoading, selectTasks } from "../state/tenant-dashboard-slice";
+import { TaskStatus } from "/app/shared/task-status-identifier";
 export function TenantCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch(); 
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
@@ -58,6 +59,17 @@ export function TenantCalendar(): React.JSX.Element {
                         {task.description && (
                           <p className="text-xs text-gray-500">{task.description}</p>
                         )}
+                        <div className="mt-2">
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            task.status === TaskStatus.COMPLETED
+                              ? "bg-green-100 text-green-800"
+                              : task.status === TaskStatus.INPROGRESS
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-blue-100 text-blue-800"
+                          }`}>
+                            {task.status}
+                          </span>
+                        </div>
                       </li>
                     ))}
                   {tasks.filter(task => task.dueDate === (selectedDateISO || new Date().toISOString().slice(0,10))).length === 0 && (

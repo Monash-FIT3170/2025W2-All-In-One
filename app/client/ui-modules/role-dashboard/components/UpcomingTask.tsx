@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { CardWidget } from "./CardWidget";
 import { Button } from "../../theming-shadcn/Button";
 import { TaskStatus } from "/app/shared/task-status-identifier";
-import { parse, format, isToday, isTomorrow, compareAsc } from "date-fns";
+import { parse, format, isTomorrow, compareAsc } from "date-fns";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 
 
