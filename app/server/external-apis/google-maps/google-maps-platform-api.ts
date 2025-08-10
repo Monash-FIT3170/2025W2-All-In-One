@@ -1,6 +1,6 @@
 import { getPublicEnvOrWarn } from "../../../shared/utils/env-utils";
 import { addQueryParamsToUrl } from "../../../shared/utils/url-utils";
-import { GeocodeResult } from "./models/GeocodeResult";
+import { ApiGeocodeResult } from "./models/ApiGeocodeResult";
 
 const GEOCODE_BASE_API_URL = 'https://maps.googleapis.com/maps/api/geocode';
 
@@ -10,7 +10,7 @@ const GEOCODE_BASE_API_URL = 'https://maps.googleapis.com/maps/api/geocode';
  * @param address address to geocode
  * @throws Error if the geocoding fails
  */
-export async function apiGeocodeAddress(address: string): Promise<GeocodeResult[]> {
+export async function apiGeocodeAddress(address: string): Promise<ApiGeocodeResult[]> {
   const queryParams = {
     "address": address,
     "key": getPublicEnvOrWarn('GOOGLE_MAPS_API_KEY')

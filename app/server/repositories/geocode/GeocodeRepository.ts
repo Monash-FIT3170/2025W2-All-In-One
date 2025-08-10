@@ -1,5 +1,6 @@
 import { ExternalApiError } from "../../errors/ExternalApiError";
 import { apiGeocodeAddress } from "../../external-apis/google-maps/google-maps-platform-api";
+import { ApiGeocodeResult } from "../../external-apis/google-maps/models/ApiGeocodeResult";
 import { Geocode } from "./models/Geocode";
 
 /**
@@ -14,9 +15,9 @@ import { Geocode } from "./models/Geocode";
  */
 export async function getGeocode(address: string, fallback?: Geocode): Promise<Geocode> {
   try {
-    const geocodeResult = await apiGeocodeAddress(address);
+    const geocodeResults = await apiGeocodeAddress(address);
 
-    if (geocodeResult.length === 0) {
+    if (geocodeResults.length === 0) {
       if (!fallback) {
         throw new ExternalApiError(`No geocode results found for the address (${address}).`);
       } else {
@@ -25,12 +26,7 @@ export async function getGeocode(address: string, fallback?: Geocode): Promise<G
       }
     }
 
-    const { lat, lng } = geocodeResult[0].geometry.location;
-
-    const geocode: Geocode = {
-      latitude: lat,
-      longitude: lng,
-    };
+    const geocode: Geocode = mapApiGeocodeResultsToGeocode(geocodeResults)[0];
 
     return geocode;
   } catch (error) {
@@ -42,4 +38,13 @@ export async function getGeocode(address: string, fallback?: Geocode): Promise<G
 
     return fallback;
   }
+}
+
+function mapApiGeocodeResultsToGeocode(results: ApiGeocodeResult[]): Geocode[] {
+  return results.map((result) => {
+    return {
+      latitude: result.geometry.location.lat,
+      longitude: result.geometry.location.lng,
+    };
+  });
 }

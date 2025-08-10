@@ -25,7 +25,7 @@ type PlusCode = {
   global_code: string;
 };
 
-export type GeocodeResult = {
+export type ApiGeocodeResult = {
   address_components: AddressComponent[];
   formatted_address: string;
   geometry: Geometry;
