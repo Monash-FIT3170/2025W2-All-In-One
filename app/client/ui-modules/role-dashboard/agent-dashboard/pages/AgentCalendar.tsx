@@ -52,8 +52,8 @@ export function AgentCalendar(): React.JSX.Element {
         userId: currentUser.userId, // Pass the current user's ID
       };
             
-      const createdTask = await apiCreateTask(apiData);
-      console.log("Task created successfully:", createdTask);
+      const createdTaskId = await apiCreateTask(apiData);
+      console.log("Task created successfully with ID:", createdTaskId);
       
       // Close the modal
       setIsModalOpen(false);

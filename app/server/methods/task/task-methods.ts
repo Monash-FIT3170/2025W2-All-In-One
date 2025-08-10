@@ -43,16 +43,17 @@ const taskGetMethod = {
 };
 
 /**
- * Creates a new task in the database and returns it as an `ApiTask` DTO.
+ * Creates a new task in the database and returns the task ID.
  *
  * This Meteor method can be called from the client. It performs the following steps:
  * 1. Validates the input data.
  * 2. Creates a new TaskDocument with default values.
  * 3. Inserts the task document into the database.
- * 4. Maps the created task document to an `ApiTask` DTO.
+ * 4. Updates the agent's task_ids array with the new task ID.
+ * 5. Returns the ID of the created task.
  *
  * @param taskData - The task data to create
- * @returns A promise that resolves to an `ApiTask` object.
+ * @returns A promise that resolves to the task ID string.
  * @throws {InvalidDataError} If the task creation fails.
  */
 const taskInsertMethod = {
@@ -62,7 +63,7 @@ const taskInsertMethod = {
     dueDate: Date;
     priority: TaskPriority;
     userId: string;
-  }): Promise<ApiTask> => {
+  }): Promise<string> => {
     console.log("taskInsertMethod called with:", taskData);
     
     // Validate required fields - description can be empty
@@ -116,9 +117,7 @@ const taskInsertMethod = {
         // Don't fail the task creation if agent update fails - task was already created
       }
 
-      const apiTask = await mapTaskDocumentTotaskDTO(createdTask);
-      
-      return apiTask;
+      return insertedId;
     } catch (error) {
       throw meteorWrappedInvalidDataError(
         new InvalidDataError(`Failed to create task: ${error}`)
