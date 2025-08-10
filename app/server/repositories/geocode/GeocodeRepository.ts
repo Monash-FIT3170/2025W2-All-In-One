@@ -1,5 +1,5 @@
 import { ExternalApiError } from "../../errors/ExternalApiError";
-import { apiGeocodeAddress } from "../../external-apis/google-maps/google-map-platform-api";
+import { apiGeocodeAddress } from "../../external-apis/google-maps/google-maps-platform-api";
 import { Geocode } from "./models/Geocode";
 
 /**
