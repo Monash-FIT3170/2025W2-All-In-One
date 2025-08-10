@@ -7,14 +7,13 @@ import { parse, format, isToday, isTomorrow, compareAsc } from "date-fns";
 import { Role } from "/app/shared/user-role-identifier";
 import { NavigationPath } from "../../../navigation";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
+import { UserAccount } from "/app/client/library-modules/domain-models/user/UserAccount";
 
 
 export function UpcomingTasks(
   props: {
   tasks: Task[];
-  currentUser?: {
-    role?: string;
-  } | null | any;
+  currentUser?: UserAccount | null;
 }): React.JSX.Element {
   const navigate = useNavigate();
 
