@@ -39,11 +39,11 @@ import { EditDraftListingButton } from "./components/EditDraftListingButton";
 import {
   FormSchemaType,
 } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
-import { DynamicMap } from "../theming/components/map/DynamicMap";
+import { DynamicMap } from "../common/map/DynamicMap";
 import { SubHeading } from "../theming/components/SubHeading";
-import { MarkerWithToggleableInfoWindow } from "../theming/components/map/markers/MarkerWithToggleableInfoWindow";
+import { MarkerWithToggleableInfoWindow } from "../common/map/markers/MarkerWithToggleableInfoWindow";
 import { Marker } from "@vis.gl/react-google-maps";
-import { BasicMarker } from "../theming/components/map/markers/BasicMarker";
+import { BasicMarker } from "../common/map/markers/BasicMarker";
 
 export function PropertyListingPage({
   className = "",

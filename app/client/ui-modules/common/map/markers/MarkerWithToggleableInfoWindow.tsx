@@ -4,14 +4,16 @@ import React, { useState } from "react";
 export function MarkerWithToggleableInfoWindow({
   latitude,
   longitude,
+  shouldInitiallyShowInfoWindow = false,
   infoWindowContent,
 }: {
   latitude: number;
   longitude: number;
+  shouldInitiallyShowInfoWindow?: boolean;
   infoWindowContent: React.JSX.Element;
 }): React.JSX.Element {
   const [markerRef, marker] = useAdvancedMarkerRef();
-  const [shouldShowInfoWindow, setShouldShowInfoWindow] = useState(false);
+  const [shouldShowInfoWindow, setShouldShowInfoWindow] = useState(shouldInitiallyShowInfoWindow);
 
   return (
     <>
