@@ -10,7 +10,7 @@ import { Geocode } from "./models/Geocode";
  *
  * @param address the address
  * @param fallback optional fallback geocode to use if the geocoding fails or no results are found
- * @throws ExternalApiError if the geocoding fails or no results are found
+ * @throws ExternalApiError if the geocoding fails or no results are found, and fallback is not set
  * @returns latitude and longitude of the address
  */
 export async function getGeocode(address: string, fallback?: Geocode): Promise<Geocode> {

@@ -3,7 +3,6 @@ import { Container, createRoot } from "react-dom/client";
 import { Meteor } from "meteor/meteor";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { Provider } from "react-redux";
-import { APIProvider } from "@vis.gl/react-google-maps";
 import { store, useAppDispatch } from "./store";
 import { DefaultTheme } from "./ui-modules/theming/themes/DefaultTheme";
 
