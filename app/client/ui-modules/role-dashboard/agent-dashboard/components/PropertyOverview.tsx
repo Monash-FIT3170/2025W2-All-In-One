@@ -1,6 +1,6 @@
 import React from "react";
 import { CardWidget } from "../../components/CardWidget";
-import { Button } from "../../../theming-shadcn/Button";
+import { ViewAllButton } from "../../components/ViewAllButton";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { Property } from '/app/client/library-modules/domain-models/property/Property';
 import { PropertyWithListingData } from "../../../../library-modules/use-cases/property-listing/models/PropertyWithListingData";
@@ -93,11 +93,11 @@ export function PropertyOverview({
         )}
       </div>
 
-             <div className="mt-4">
-         <Button variant="ghost" className="w-full" onClick={handleViewAllClick}>
-           View All Properties
-         </Button>
-       </div>
+                           <div className="mt-4">
+          <ViewAllButton onClick={handleViewAllClick}>
+            View All Properties
+          </ViewAllButton>
+        </div>
     </CardWidget>
   );
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router";
 import { CardWidget } from "./CardWidget";
-import { Button } from "../../theming-shadcn/Button";
+import { ViewAllButton } from "./ViewAllButton";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { parse, format, isToday, isTomorrow, compareAsc } from "date-fns";
 import { Role } from "/app/shared/user-role-identifier";
@@ -69,9 +69,9 @@ export function UpcomingTasks({
         )}
       </div>
       <div className="mt-4">
-        <Button variant="ghost" className="w-full" onClick={handleViewAllTasks}>
+        <ViewAllButton onClick={handleViewAllTasks}>
           View All Tasks
-        </Button>
+        </ViewAllButton>
       </div>
     </CardWidget>
   );
