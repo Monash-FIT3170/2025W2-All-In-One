@@ -11,6 +11,7 @@ import { AddTaskModal } from "../components/AddTaskModal";
 import { TaskData } from "../components/TaskFormSchema";
 import { apiCreateTask } from "/app/client/library-modules/apis/task/task-api";
 import { TaskStatus } from "/app/shared/task-status-identifier";
+import { TaskPriority } from "/app/shared/task-priority-identifier";
 
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
@@ -47,7 +48,7 @@ export function AgentCalendar(): React.JSX.Element {
         name: taskData.name,
         description: taskData.description,
         dueDate: new Date(taskData.dueDate), // Convert string to Date
-        priority: taskData.priority.toLowerCase() as "low" | "medium" | "high",
+        priority: taskData.priority,
         userId: currentUser.userId, // Pass the current user's ID
       };
             

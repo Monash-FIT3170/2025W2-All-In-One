@@ -1,12 +1,13 @@
 import { z } from "zod";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
+import { TaskPriority } from "/app/shared/task-priority-identifier";
 
 // Form schema using Zod for task creation
 export const taskFormSchema = z.object({
   name: z.string().min(1, "Task title is required"),
   description: z.string(),
   dueDate: z.string().min(1, "Due date is required"),
-  priority: z.enum(["Low", "Medium", "High"]),
+  priority: z.nativeEnum(TaskPriority),
 });
 
 // Inferred type from the schema
@@ -20,5 +21,5 @@ export const defaultTaskFormValues: TaskFormData = {
   name: "",
   description: "",
   dueDate: "",
-  priority: "Medium",
+  priority: TaskPriority.MEDIUM,
 };

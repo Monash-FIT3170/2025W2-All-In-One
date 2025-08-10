@@ -6,6 +6,7 @@ import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { TaskStatus } from "/app/shared/task-status-identifier";
+import { TaskPriority } from "/app/shared/task-priority-identifier";
 
 
 /**
@@ -59,7 +60,7 @@ const taskInsertMethod = {
     name: string;
     description: string;
     dueDate: Date;
-    priority: "low" | "medium" | "high";
+    priority: TaskPriority;
     userId: string;
   }): Promise<ApiTask> => {
     console.log("taskInsertMethod called with:", taskData);
