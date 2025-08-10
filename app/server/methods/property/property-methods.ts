@@ -286,7 +286,7 @@ const propertyInsertMethod = {
         property_coordinate_id: newCoordinatesId,
         ...data,
       });
-      
+
       return propertyId;
     } catch (error) {
       console.error("Failed to insert property:", error);

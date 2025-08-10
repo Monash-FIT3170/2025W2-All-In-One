@@ -47,6 +47,8 @@ export function DynamicMap({
           defaultCenter={{ lat: initialLatitude, lng: initialLongitude }}
           defaultZoom={zoomLevelMap[defaultZoom]}
           mapId="DEMO_MAP_ID"
+          colorScheme="LIGHT"
+          renderingType="VECTOR"
           reuseMaps={true}
         >
           {markers}
