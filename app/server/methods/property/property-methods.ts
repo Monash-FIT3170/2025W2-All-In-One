@@ -356,7 +356,6 @@ const propertySearchMethod = {
                     $or: [
                         { suburb: { $regex: token, $options: "i" } },
                         { postcode: { $regex: token, $options: "i" } },
-                        { province: { $regex: token, $options: "i" } },
                         { streetname: { $regex: token, $options: "i" } },
                     ],
                 })),

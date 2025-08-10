@@ -18,14 +18,13 @@ export function GuestSearchResultsPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [visibleCount, setVisibleCount] = useState(3);
-
+    const [searchQuery, setSearchQuery] = useState(query);
     useEffect(() => {
         const fetch = async () => {
             setIsLoading(true);
-            console.log("query is", query); // DEBUG
+
             try {
                 const baseResults = await searchProperties(query);
-                console.log("Search results:", baseResults); // ADD THIS 👀
 
                 const resultsWithListingData = await Promise.all(
                     baseResults.map((prop: { propertyId: string }) =>
@@ -33,14 +32,10 @@ export function GuestSearchResultsPage() {
                     )
                 );
 
-                console.log("Listing data results:", resultsWithListingData); // 👀
-
                 setProperties(resultsWithListingData);
                 setError(null);
             } catch (err: any) {
                 console.error("Search error caught:", err);
-                console.error("Message:", err?.message);
-                console.error("Stack:", err?.stack);
                 setError("An error occurred while searching properties.");
             } finally {
                 setIsLoading(false);
