@@ -5,7 +5,7 @@ log_user 1
 log_file login.log
 
 # Increase timeout to 30 seconds
-set timeout 30
+set timeout 300
 
 if {$argc != 2} {
   puts "The script takes exactly two arguments, username and password in sequence."
