@@ -1,4 +1,4 @@
-name: Deployment
+name: "Deployment"
 
 on:
   push:
@@ -13,38 +13,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Install Meteor CLI
-      - name: Install Meteor
-        run: curl https://install.meteor.com/ | sh
+      - name: Install meteor
+        run: npx meteor
 
-      # Install dependencies
-      - name: Install NPM dependencies
+      - name: Install dependencies
         run: npm install
 
-      # Install expect via apt-get (more reliable than brew)
       - name: Install expect
         run: |
-          sudo apt-get update
-          sudo apt-get install -y expect
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew install expect
 
-      # Galaxy login step
       - name: Galaxy login
         working-directory: ./scripts
         env:
           GALAXY_USERNAME: ${{ secrets.GALAXY_USERNAME }}
           GALAXY_PASSWORD: ${{ secrets.GALAXY_PASSWORD }}
+          AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y expect
-          ls -l ./galaxy-login.sh       # Check script presence and permissions
-          export PATH="$HOME/.meteor:$PATH"
+          export PATH="/home/runner/.meteor:$PATH"
           chmod +x ./galaxy-login.sh
           ./galaxy-login.sh "$GALAXY_USERNAME" "$GALAXY_PASSWORD"
-          export DEPLOY_HOSTNAME=ap-southeast-2.galaxy.meteor.com
-          meteor deploy 20251pm-allinone.au.meteorapp.com --settings settings.json --free --mongo
 
-      # Create settings.json
-      - name: Inject settings
+      - name: Inject AZURE_CONNECTION_STRING
         run: |
           echo "{
             \"public\": {
@@ -55,9 +46,8 @@ jobs:
             }
           }" > settings.json 
 
-      # Deploy to Galaxy
       - name: Deploy
         run: |
-          export PATH="$HOME/.meteor:$PATH"
+          export PATH="/home/runner/.meteor:$PATH"
           export DEPLOY_HOSTNAME=ap-southeast-2.galaxy.meteor.com
           meteor deploy 20251pm-allinone.au.meteorapp.com --settings settings.json --free --mongo
