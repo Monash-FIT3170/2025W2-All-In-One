@@ -1,5 +1,12 @@
 #!/home/linuxbrew/.linuxbrew/bin/expect -f
 
+# Enable logging to console and file
+log_user 1
+log_file login.log
+
+# Increase timeout to 30 seconds
+set timeout 300
+
 if {$argc != 2} {
   puts "The script takes exactly two arguments, username and password in sequence."
   exit
@@ -10,10 +17,33 @@ set password [lindex $argv 1]
 # =============== SCRIPT ================
 spawn meteor login
 
-expect "Username:"
+
+expect {
+  -re "Username:" {}
+  timeout {
+    puts "Timeout waiting for Username prompt"
+    exit 1
+  }
+}
+
 send "$username\r"
 
-expect "Password:"
+expect {
+  -re "Password:" {}
+  timeout {
+    puts "Timeout waiting for Password prompt"
+    exit 1
+  }
+}
+
 send "$password\r"
 
-expect eof
+# Wait for either EOF or a success message indicating login is complete
+expect {
+  eof {}
+  -re "Logged in as ttristannguyen. Thanks for being a Meteor developer!" {}
+  timeout {
+    puts "Timeout waiting for login to complete"
+    exit 1
+  }
+}
