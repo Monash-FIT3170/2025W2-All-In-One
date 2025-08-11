@@ -9,5 +9,7 @@ export type ReviewTenantModalProps = {
   onBackgroundFail: (applicationId: string) => void;
   onSendToLandlord: (applicationId: string) => void;
   propertyAddress?: string;
+  propertyLandlordId?: string;
+  propertyId?: string;
   tenantApplications?: TenantApplication[];
 }
