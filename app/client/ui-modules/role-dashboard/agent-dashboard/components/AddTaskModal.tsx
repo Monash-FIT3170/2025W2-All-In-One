@@ -21,13 +21,15 @@ import {
   defaultTaskFormValues 
 } from "./TaskFormSchema";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-
+import { useEffect } from 'react';
+import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
+import { useAppSelector } from "/app/client/store";
 
 interface AddTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (task: TaskData) => void;
-  agentId: string;
+  agentId?: string;
 }
 
 export function AddTaskModal({
@@ -36,6 +38,9 @@ export function AddTaskModal({
   onSubmit,
   agentId,
 }: AddTaskModalProps): React.JSX.Element {
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser) as Agent | undefined;
+  const resolvedAgentId = agentId ?? currentUser?.agentId;
+
   const {
     register,
     handleSubmit,
@@ -52,12 +57,12 @@ export function AddTaskModal({
 
   // Fetch properties for the agent when the modal opens
   useEffect(() => {
-    if (!agentId) return;
+    if (!resolvedAgentId) return;
 
     // Call the Meteor method to get properties for the agent
     Meteor.call(
       MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID,
-      agentId,
+      resolvedAgentId,
       (err: Meteor.Error, result: any[]) => {
         if (err) {
           console.error("Failed to fetch properties:", err);
@@ -171,12 +176,13 @@ export function AddTaskModal({
               className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <option value="">Select Property</option>
+                {properties.map((p) => (
+                <option key={p._id} value={p._id}>
+                  {`${p.streetnumber} ${p.streetname}, ${p.suburb}`}
+                </option>
+                ))}   
             </select>
           </div>
-
-
-
-
         </form>
 
         <DialogFooter>
@@ -191,3 +197,4 @@ export function AddTaskModal({
     </Dialog>
   );
 }
+
