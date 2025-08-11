@@ -25,8 +25,18 @@ export function GuestLandingPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        dispatch(fetchPropertiesAndListings());
+        dispatch(fetchPropertiesAndListings({ skip: 0, limit: 3 }));
     }, [dispatch]);
+
+    const handleViewMore = () => {
+        dispatch(
+            fetchPropertiesAndListings({
+                skip: listedProperties.length,
+                limit: 3,
+            })
+        );
+        setVisibleCount(visibleCount + 3);
+    };
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -87,15 +97,9 @@ export function GuestLandingPage() {
                                             />
                                         ))}
                                 </div>
-                                {visibleCount < listedProperties.length && (
+                                {listedProperties.length % 3 === 0 && (
                                     <div className="mt-6">
-                                        <Button
-                                            onClick={() =>
-                                                setVisibleCount(
-                                                    visibleCount + 3
-                                                )
-                                            }
-                                        >
+                                        <Button onClick={handleViewMore}>
                                             View More
                                         </Button>
                                     </div>
