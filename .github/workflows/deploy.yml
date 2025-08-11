@@ -40,6 +40,8 @@ jobs:
           export PATH="$HOME/.meteor:$PATH"
           chmod +x ./galaxy-login.sh
           ./galaxy-login.sh "$GALAXY_USERNAME" "$GALAXY_PASSWORD"
+          export DEPLOY_HOSTNAME=ap-southeast-2.galaxy.meteor.com
+          meteor deploy 20251pm-allinone.au.meteorapp.com --settings settings.json --free --mongo
 
       # Create settings.json
       - name: Inject settings
