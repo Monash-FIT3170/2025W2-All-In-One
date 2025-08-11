@@ -8,7 +8,7 @@ export enum MeteorMethodIdentifier {
   PROPERTY_GET = "properties.getOne",
   PROPERTY_GET_ALL = "properties.getAll",
   PROPERTY_GET_COUNT = "properties.getCount",
-  PROPERTY_GET_ALL_BY_AGENT_ID = "properties.getAllByAgentId", // Fetches all properties managed by an agent by their userID  
+  PROPERTY_GET_ALL_BY_AGENT_ID = "properties.getAllByAgentId", // Fetches all properties managed by an agent by their userID
   PROPERTY_INSERT = "properties.insert", // Inserts property into property collection
   PROPERTY_PRICE_INSERT = "properties.insertPrice", // Inserts property price into property price collection
   PROPERTY_LANDLORD_GET_COUNT = "properties.getCountLandlord",
@@ -27,6 +27,9 @@ export enum MeteorMethodIdentifier {
   TENANT_GET = "tenants.getOne",
   LANDLORD_INSERT = "landlords.insert",
   LANDLORD_GET = "landlords.getOne",
+  LANDLORD_GET_BY_LANDLORD_ID = "landlords.getByLandlordId", // Get landlord by landlord ID (not user ID)
+  LANDLORD_UPDATE_TASKS = "landlords.updateTasks", // Adds the id of the newly created task to the landlord's task_ids
+  LANDLORD_UPDATE_TASKS_BY_USER_ID = "landlords.updateTasksByUserId", // Adds the id of the newly created task to the landlord's task_ids using userAccountId
   LANDLORD_GET_ALL = "landlords.getAll", // Get All Landlords
   PROPERTY_STATUS_GET = "propertyStatus.getOne", // Find ID of property status by name
   PROPERTY_GET_BY_TENANT_ID = "property.getByTenantId",

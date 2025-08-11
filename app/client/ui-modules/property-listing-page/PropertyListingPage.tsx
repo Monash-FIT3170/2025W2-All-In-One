@@ -105,6 +105,8 @@ export function PropertyListingPage({
             state.shouldDisplayReviewTenantButton
           }
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
+          propertyLandlordId={state.propertyLandlordId}
+          propertyId={state.propertyId}
           onBack={() => {
             console.log("back button pressed");
           }}
@@ -153,6 +155,8 @@ function ListingPageContent({
   shouldDisplaySubmitDraftButton,
   shouldDisplayReviewTenantButton,
   shouldDisplayEditListingButton,
+  propertyLandlordId,
+  propertyId,
   onBack,
   onBook,
   onApply,
@@ -185,6 +189,8 @@ function ListingPageContent({
   shouldDisplaySubmitDraftButton: boolean;
   shouldDisplayReviewTenantButton: boolean;
   shouldDisplayEditListingButton: boolean;
+  propertyLandlordId: string;
+  propertyId: string;
   onBack: () => void;
   onBook: (index: number) => void;
   onApply: () => void;
@@ -262,6 +268,8 @@ function ListingPageContent({
           console.log(`Sent application ${applicationId} to landlord`);
         }}
         propertyAddress={`${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`}
+        propertyLandlordId={propertyLandlordId}
+        propertyId={propertyId}
       />
     </div>
   );
