@@ -37,3 +37,13 @@ expect {
 }
 
 send "$password\r"
+
+# Wait for either EOF or a success message indicating login is complete
+expect {
+  eof {}
+  -re "Logged in as ttristannguyen. Thanks for being a Meteor developer!" {}
+  timeout {
+    puts "Timeout waiting for login to complete"
+    exit 1
+  }
+}

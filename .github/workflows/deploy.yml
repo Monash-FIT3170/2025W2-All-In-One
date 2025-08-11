@@ -48,6 +48,10 @@ jobs:
 
       - name: Deploy
         run: |
-          export PATH="/home/runner/.meteor:$PATH"
-          export DEPLOY_HOSTNAME=ap-southeast-2.galaxy.meteor.com
+          sudo apt-get update
+          sudo apt-get install -y expect
+          chmod +x galaxy-login.sh
+          ./galaxy-login.sh "$GALAXY_USERNAME" "$GALAXY_PASSWORD"
+          cd ..
+          export PATH="$HOME/.meteor:$PATH"
           meteor deploy 20251pm-allinone.au.meteorapp.com --settings settings.json --free --mongo
