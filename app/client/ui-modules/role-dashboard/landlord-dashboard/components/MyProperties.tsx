@@ -3,7 +3,7 @@ import { Button } from "../../../theming-shadcn/Button";
 import { CardWidget } from "../../components/CardWidget";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
- 
+
 interface PropertyOverviewProps {
   properties: Property[];
 }
@@ -14,7 +14,7 @@ export function MyProperties({
   return (
     <CardWidget
       title="My Properties"
-      value=""  
+      value=""
       subtitle="Overview of your investment properties"
       rightElement={
         <button className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50">
@@ -58,7 +58,7 @@ export function MyProperties({
       </div>
 
       <div className="mt-4">
-      <Button variant="ghost" className="w-full">
+      <Button variant="ghost" className="w-full py-3 border-transparent rounded-lg text-center hover:bg-gray-50 transition-colors">
         View All Properties
         </Button>
       </div>
