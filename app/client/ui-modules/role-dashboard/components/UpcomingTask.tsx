@@ -1,20 +1,54 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router";
 import { CardWidget } from "./CardWidget";
-import { Button } from "../../theming-shadcn/Button";
+import { ViewAllButton } from "./ViewAllButton";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { parse, format, isToday, isTomorrow, compareAsc } from "date-fns";
+import { Role } from "/app/shared/user-role-identifier";
+import { NavigationPath } from "../../../navigation";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
+import { UserAccount } from "/app/client/library-modules/domain-models/user/UserAccount";
 
 
-export function UpcomingTasks(props: {tasks:Task[]}): React.JSX.Element {
+export function UpcomingTasks(
+  props: {
+  tasks: Task[];
+  currentUser?: UserAccount | null;
+}): React.JSX.Element {
+  const navigate = useNavigate();
+
   // Transform tasks and sort by date
   const transformedTasks: Task[] = props.tasks
-    .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks};
+    .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks
     .sort((a, b) => {
       const dateA = parse(a.dueDate, "dd/MM/yyyy", new Date());
       const dateB = parse(b.dueDate, "dd/MM/yyyy", new Date());
       return compareAsc(dateB, dateA); // Descending orderc
     });
+
+  const handleViewAllTasks = () => {
+    const role = props.currentUser?.role;
+
+    if (!role) {
+      console.warn("No user role found");
+      return;
+    }
+
+    // Role to calendar path mapping - automatically handles new roles
+    const roleToCalendarMap: Record<string, string> = {
+      [Role.AGENT]: NavigationPath.AgentCalendar,
+      [Role.LANDLORD]: NavigationPath.LandlordCalendar,
+      [Role.TENANT]: NavigationPath.TenantCalendar,
+    };
+
+    const calendarPath = roleToCalendarMap[role];
+
+    if (calendarPath) {
+      navigate(calendarPath);
+    } else {
+      console.warn(`No calendar path defined for role: ${role}`);
+    }
+  };
 
   return (
     <CardWidget
@@ -32,9 +66,9 @@ export function UpcomingTasks(props: {tasks:Task[]}): React.JSX.Element {
         )}
       </div>
       <div className="mt-4">
-        <Button variant="ghost" className="w-full">
+        <ViewAllButton onClick={handleViewAllTasks}>
           View All Tasks
-        </Button>
+        </ViewAllButton>
       </div>
     </CardWidget>
   );

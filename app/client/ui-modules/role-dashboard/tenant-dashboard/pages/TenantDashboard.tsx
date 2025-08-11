@@ -18,7 +18,6 @@ function TenantDashboard() {
   const propertyDetails = useAppSelector(selectPropertyDetails);
   const propertyLoading = useAppSelector(selectPropertyLoading);
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
-
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchTenantTasks(currentUser.userId));
@@ -56,7 +55,7 @@ function TenantDashboard() {
             <DashboardCards rentAmount={propertyDetails?.pricePerMonth} />
             <div className=" grid grid-cols-1 md:grid-cols-2 gap-6 px-6">
               <div className="mt-5">
-                <UpcomingTasks tasks={tasks} />
+                <UpcomingTasks tasks={tasks} currentUser={currentUser} />
               </div>
               <div className="mt-5">
                 {propertyLoading ? (
