@@ -25,30 +25,6 @@ export function AgentCalendar(): React.JSX.Element {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [properties, setProperties] = useState<Record<string, string>>({});
-
-  // Fetch properties for tasks
-  useEffect(() => {
-    const fetchProperties = async () => {
-      const propsMap: Record<string, string> = {};
-      for (const task of tasks) {
-        if (task.property && !propsMap[task.property]) {
-          try {
-            const data: Property = await getPropertyById(task.property);
-            propsMap[task.property] =
-              `${data.streetnumber} ${data.streetname}, ${data.suburb}, ${data.province}`;
-          } catch (err) {
-            console.error(`Failed to fetch property ${task.property}`, err);
-          }
-        }
-      }
-      setProperties(propsMap);
-    };
-    if (tasks.length) {
-      console.log("Fetching properties for tasks:", tasks);
-      fetchProperties();
-    }
-  }, [tasks]);
 
   useEffect(() => {
     if (currentUser?.userId) {
@@ -155,11 +131,9 @@ export function AgentCalendar(): React.JSX.Element {
                           </p>
                         )}
                         {/* Property address if exists */}
-                        {task.property && properties[task.property] && (
                           <p className="text-sm text-gray-700 mt-1">
-                            {properties[task.property]}
+                            {task.property}
                           </p>
-                        )}
                         <div className="mt-2">
                           <span
                             className={`text-xs px-2 py-1 rounded-full ${

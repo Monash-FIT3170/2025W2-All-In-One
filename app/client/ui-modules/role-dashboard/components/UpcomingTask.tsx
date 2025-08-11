@@ -9,9 +9,7 @@ import { NavigationPath } from "../../../navigation";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { UserAccount } from "/app/client/library-modules/domain-models/user/UserAccount";
 
-
-export function UpcomingTasks(
-  props: {
+export function UpcomingTasks(props: {
   tasks: Task[];
   currentUser?: UserAccount | null;
 }): React.JSX.Element {
@@ -99,7 +97,7 @@ function TaskItem({ task }: { task: Task }): React.JSX.Element {
         return "bg-gray-100 text-gray-800";
     }
   };
-  const isOverdue = new Date(task.dueDate) < new Date()
+  const isOverdue = new Date(task.dueDate) < new Date();
 
   return (
     <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
@@ -107,15 +105,18 @@ function TaskItem({ task }: { task: Task }): React.JSX.Element {
         <div className="flex justify-between items-start">
           <h3 className="text-lg font-medium text-gray-900">{task.name}</h3>
           <div className="flex items-center gap-2">
-          <span
-            className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusStyle(
-              task.status
-            )}`}
-          >
-            {task.status}
-          </span>
-          { isOverdue && (
-            <span className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">Overdue</span>)}
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusStyle(
+                task.status
+              )}`}
+            >
+              {task.status}
+            </span>
+            {isOverdue && (
+              <span className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                Overdue
+              </span>
+            )}
           </div>
         </div>
         {task.description && (
@@ -129,6 +130,10 @@ function TaskItem({ task }: { task: Task }): React.JSX.Element {
               <span>Priority: {task.priority}</span>
             </>
           )}
+        </div>
+        <div>
+          {/* Property address if exists */}
+          <p className="text-sm text-gray-700 mt-1">{task.property}</p>
         </div>
       </div>
     </div>
