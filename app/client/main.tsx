@@ -49,7 +49,7 @@ function initialiseReactRoot(): void {
   root.render(
     <React.StrictMode>
       <Provider store={store}>
-        <AppRoot />
+          <AppRoot />
       </Provider>
     </React.StrictMode>
   );
