@@ -75,6 +75,7 @@ export function Calendar({
       height="auto"
       dayCellDidMount={dayCellDidMount}
       dateClick={handleDateClick}
+      initialDate={selectedDateISO ?? undefined}
     />
   );
 }
