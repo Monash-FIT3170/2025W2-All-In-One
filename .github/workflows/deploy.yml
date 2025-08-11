@@ -49,5 +49,5 @@ jobs:
       - name: Deploy
         run: |
           export PATH="$HOME/.meteor:$PATH"
-          export DEPLOY_HOSTNAME=ap-southeast-2.galaxy.meteor.co
+          export DEPLOY_HOSTNAME=ap-southeast-2.galaxy.meteor.com
           meteor deploy 20251pm-allinone.au.meteorapp.com --settings settings.json --free --mongo
