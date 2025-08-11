@@ -8,7 +8,6 @@ import { searchProperties } from "../../library-modules/domain-models/property/r
 
 import { Input } from "../theming-shadcn/Input";
 import { useLocation, useNavigate } from "react-router";
-import { set } from "date-fns";
 
 // load up 9 properties at a time
 const PAGE_SIZE = 9;
@@ -26,10 +25,10 @@ export function GuestSearchResultsPage() {
     const [query, setQuery] = useState(getQueryParam(location.search));
     const [properties, setProperties] = useState<PropertyWithListingData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
     const [searchQuery, setSearchQuery] = useState(query.replace(/\+/g, " "));
 
+    // decodes the query when URL changes
     useEffect(() => {
         const q = getQueryParam(location.search);
         setQuery(q);
@@ -71,7 +70,8 @@ export function GuestSearchResultsPage() {
                     );
                 setProperties(propertiesWithData);
             } catch (err) {
-                setError("Failed to fetch properties. Please try again later.");
+                console.error("Search error:", err);
+                setProperties([]); // shows no results if there's an error
             } finally {
                 setIsLoading(false);
             }
@@ -93,14 +93,7 @@ export function GuestSearchResultsPage() {
 
     return (
         <div className="min-h-screen bg-white text-neutral-900">
-            {/* HERO — headline + pill search, faint rings */}
             <div className="relative px-4">
-                <div
-                    aria-hidden
-                    className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-[520px] max-w-5xl opacity-50
-          [background:repeating-radial-gradient(ellipse_at_center,rgba(0,0,0,0.06)_0,rgba(0,0,0,0.06)_1px,transparent_1px,transparent_120px)]
-          [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]"
-                />
                 <div className="relative mx-auto max-w-5xl py-12 text-center">
                     <h1 className="geist-extrabold text-3xl sm:text-4xl md:text-[40px]">
                         Find your perfect rental home
@@ -109,22 +102,6 @@ export function GuestSearchResultsPage() {
                         {/* pill search bar */}
                         <div className="flex rounded-2xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
                             <div className="relative flex-1">
-                                {/* search icon */}
-                                <svg
-                                    className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                >
-                                    <circle cx="11" cy="11" r="7" />
-                                    <line
-                                        x1="21"
-                                        y1="21"
-                                        x2="16.65"
-                                        y2="16.65"
-                                    />
-                                </svg>
                                 <Input
                                     type="search"
                                     placeholder="Melbourne"
@@ -157,7 +134,7 @@ export function GuestSearchResultsPage() {
                 </div>
             </div>
 
-            {/* RESULTS INFO */}
+            {/* results */}
             <div className="mx-auto max-w-6xl px-4 sm:px-6">
                 <p className="mb-4 text-[15px] font-medium">
                     {isLoading
@@ -168,19 +145,15 @@ export function GuestSearchResultsPage() {
                 </p>
             </div>
 
-            {/* CARDS */}
+            {/* property cards */}
             <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-16">
-                {error && (
-                    <div className="text-center text-red-500">{error}</div>
-                )}
-
-                {!isLoading && !error && properties.length === 0 && (
+                {!isLoading && properties.length === 0 && (
                     <div className="text-center text-neutral-700">
                         No results found for “{decodedQueryForDisplay}”.
                     </div>
                 )}
 
-                {!isLoading && !error && properties.length > 0 && (
+                {!isLoading && properties.length > 0 && (
                     <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {shown.map((prop) => (
@@ -189,10 +162,6 @@ export function GuestSearchResultsPage() {
                                     className="bg-white border border-neutral-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition"
                                 >
                                     <PropertyCard {...prop} />
-                                    {/* Optional: uncomment if you want the per-card CTA like the mock */}
-                                    {/* <div className="px-4 pb-4">
-                    <Button variant="outline" className="h-9 w-full rounded-xl">View details</Button>
-                  </div> */}
                                 </div>
                             ))}
                         </div>
