@@ -18,4 +18,6 @@ export type ApiProperty = {
   agentId: string;
   landlordId: string;
   tenantId: string;
+  locationLatitude: number;
+  locationLongitude: number;
 }

@@ -18,6 +18,8 @@ export type PropertyWithListingData = {
   type: string;
   area?: number;
   image_urls: string[];
+  locationLatitude: number;
+  locationLongitude: number;
   listing_status: string;
   inspections: {
     start_time: Date;

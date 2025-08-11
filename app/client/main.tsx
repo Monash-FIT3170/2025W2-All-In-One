@@ -49,7 +49,7 @@ function initialiseReactRoot(): void {
   root.render(
     <React.StrictMode>
       <Provider store={store}>
-        <AppRoot />
+          <AppRoot />
       </Provider>
     </React.StrictMode>
   );
@@ -74,8 +74,8 @@ function AppRoot(): React.JSX.Element {
         <Routes>
           {/* Public routes */}
           <Route path={NavigationPath.Home} element={<GuestLandingPage />} />
-          <Route path={NavigationPath.Signin} element={<AuthTabs initialTab="signin" />} />
-          <Route path={NavigationPath.Signup} element={<AuthTabs initialTab="signup" />} />
+          <Route path={NavigationPath.Signin} element={<AuthTabs initialTab={NavigationPath.Signin} />}/>
+          <Route path={NavigationPath.Signup} element={<AuthTabs initialTab={NavigationPath.Signup} />}/>
           <Route path={NavigationPath.PropertyListing} element={<PropertyListingPage />} />
           
           {/* Agent-only routes */}

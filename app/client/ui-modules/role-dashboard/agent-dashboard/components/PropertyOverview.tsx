@@ -1,5 +1,6 @@
 import React from "react";
 import { CardWidget } from "../../components/CardWidget";
+import { ViewAllButton } from "../../components/ViewAllButton";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { Property } from '/app/client/library-modules/domain-models/property/Property';
 import { PropertyWithListingData } from "../../../../library-modules/use-cases/property-listing/models/PropertyWithListingData";
@@ -26,7 +27,7 @@ export function PropertyOverview({
 
   // Property click handler to navigate to property details
   const handlePropertyClick = (propertyId: string) => {
-    if (propertyId) {            
+    if (propertyId) {
         navigate(`/property-listing?propertyId=${propertyId}`);
     }
   }
@@ -64,9 +65,9 @@ export function PropertyOverview({
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {properties.map((property, index) => (
-                  <tr key={index} className="transition-colors hover:bg-gray-50" 
-                      onClick={() => handlePropertyClick(property.propertyId)} role="button" 
-                      tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && handlePropertyClick(property.propertyId)} 
+                  <tr key={index} className="transition-colors hover:bg-gray-50"
+                      onClick={() => handlePropertyClick(property.propertyId)} role="button"
+                      tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && handlePropertyClick(property.propertyId)}
                       aria-label={'View property details for property at ${property.streetnumber} ${property.streetname}'}
                       >
                     <td className="px-6 py-4 text-sm">{`${property.streetnumber} ${property.streetname}`}</td>
@@ -92,15 +93,11 @@ export function PropertyOverview({
         )}
       </div>
 
-      <div className="mt-4">
-        <button
-          type="button"
-          onClick={handleViewAllClick}
-          className="w-full px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-200 transition-colors"
-        >
-          View All Properties
-        </button>
-      </div>
+                           <div className="mt-4">
+          <ViewAllButton onClick={handleViewAllClick}>
+            View All Properties
+          </ViewAllButton>
+        </div>
     </CardWidget>
   );
 }
