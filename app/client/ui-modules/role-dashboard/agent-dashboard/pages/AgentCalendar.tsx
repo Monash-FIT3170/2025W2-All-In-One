@@ -12,23 +12,51 @@ import { TaskData } from "../components/TaskFormSchema";
 import { apiCreateTask } from "/app/client/library-modules/apis/task/task-api";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
-import { UpcomingTasks } from "../../components/UpcomingTask";  
+import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
+import { UpcomingTasks } from "../../components/UpcomingTask";
+
+import { Property } from "/app/client/library-modules/domain-models/property/Property";
+
 export function AgentCalendar(): React.JSX.Element {
-  const dispatch = useAppDispatch(); 
+  const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
   const tasks = useAppSelector(selectTasks); // Retrieve tasks from Redux store
   const loading = useAppSelector(selectIsLoading);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  useEffect(() => { 
+  const [properties, setProperties] = useState<Record<string, string>>({});
+
+  // Fetch properties for tasks
+  useEffect(() => {
+    const fetchProperties = async () => {
+      const propsMap: Record<string, string> = {};
+      for (const task of tasks) {
+        if (task.property && !propsMap[task.property]) {
+          try {
+            const data: Property = await getPropertyById(task.property);
+            propsMap[task.property] =
+              `${data.streetnumber} ${data.streetname}, ${data.suburb}, ${data.province}`;
+          } catch (err) {
+            console.error(`Failed to fetch property ${task.property}`, err);
+          }
+        }
+      }
+      setProperties(propsMap);
+    };
+    if (tasks.length) {
+      console.log("Fetching properties for tasks:", tasks);
+      fetchProperties();
+    }
+  }, [tasks]);
+
+  useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchAgentTasks(currentUser.userId)); // Fetch tasks for the current user
-    }
-    else {
+    } else {
       console.warn("No user ID found. Please log in to view the calendar.");
     }
-  },[currentUser])
+  }, [currentUser]);
   const handleDateSelection = (formatted: string, iso: string) => {
     setSelectedDate(formatted);
     setSelectedDateISO(iso);
@@ -56,19 +84,19 @@ export function AgentCalendar(): React.JSX.Element {
         dueDate: new Date(taskData.dueDate), // Convert string to Date
         priority: taskData.priority,
         userId: currentUser.userId, // Pass the current user's ID
+        property: taskData.property, // Pass the selected property
       };
-            
+
       const createdTaskId = await apiCreateTask(apiData);
       console.log("Task created successfully with ID:", createdTaskId);
-      
+
       // Close the modal
       setIsModalOpen(false);
-      
+
       // Refresh tasks to show the new task
       if (currentUser?.userId) {
         dispatch(fetchAgentTasks(currentUser.userId));
       }
-      
     } catch (error) {
       console.error("Error creating task:", error);
     }
@@ -83,7 +111,6 @@ export function AgentCalendar(): React.JSX.Element {
   if (loading) {
     return <div>Loading...</div>;
   }
-
 
   return (
     <div className="min-h-screen">
@@ -103,43 +130,69 @@ export function AgentCalendar(): React.JSX.Element {
                 <h2 className="text-lg font-semibold">
                   {selectedDate
                     ? selectedDate
-                    : new Date().toLocaleDateString('en-AU')}
+                    : new Date().toLocaleDateString("en-AU")}
                 </h2>
                 <ul className="space-y-4 mt-2">
                   {tasks
-                    .filter((task) => task.dueDate === (selectedDateISO || new Date().toISOString().slice(0, 10)))
+                    .filter(
+                      (task) =>
+                        task.dueDate ===
+                        (selectedDateISO ||
+                          new Date().toISOString().slice(0, 10))
+                    )
                     .map((task, index) => (
-                      <li key={index} className="p-4 rounded shadow bg-white border border-gray-200">
+                      <li
+                        key={index}
+                        className="p-4 rounded shadow bg-white border border-gray-200"
+                      >
                         <p className="font-bold text-lg">{task.name}</p>
-                        <p className="text-sm text-gray-600 mb-2">{task.dueDate}</p>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {task.dueDate}
+                        </p>
                         {task.description && (
-                          <p className="text-xs text-gray-500">{task.description}</p>
+                          <p className="text-xs text-gray-500">
+                            {task.description}
+                          </p>
+                        )}
+                        {/* Property address if exists */}
+                        {task.property && properties[task.property] && (
+                          <p className="text-sm text-gray-700 mt-1">
+                            {properties[task.property]}
+                          </p>
                         )}
                         <div className="mt-2">
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            task.status === TaskStatus.COMPLETED
-                              ? "bg-green-100 text-green-800"
-                              : task.status === TaskStatus.INPROGRESS
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-blue-100 text-blue-800"
-                          }`}>
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full ${
+                              task.status === TaskStatus.COMPLETED
+                                ? "bg-green-100 text-green-800"
+                                : task.status === TaskStatus.INPROGRESS
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-blue-100 text-blue-800"
+                            }`}
+                          >
                             {task.status}
                           </span>
                         </div>
                       </li>
                     ))}
-                  {tasks.filter(task => task.dueDate === (selectedDateISO || new Date().toISOString().slice(0,10))).length === 0 && (
-                    <p className="text-gray-500 italic">No tasks for this date</p>
+                  {tasks.filter(
+                    (task) =>
+                      task.dueDate ===
+                      (selectedDateISO || new Date().toISOString().slice(0, 10))
+                  ).length === 0 && (
+                    <p className="text-gray-500 italic">
+                      No tasks for this date
+                    </p>
                   )}
                 </ul>
-                <br/>
+                <br />
                 <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
             <UpcomingTasks tasks={tasks} />
-            </div>
           </div>
         </div>
+      </div>
       <AddTaskModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

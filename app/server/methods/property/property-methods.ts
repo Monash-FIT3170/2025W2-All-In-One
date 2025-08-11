@@ -27,7 +27,6 @@ import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpda
 import { PropertyCoordinateDocument } from "../../database/property/models/PropertyCoordinateDocument";
 import { getGeocode } from "../../repositories/geocode/GeocodeRepository";
 import { Geocode } from "../../repositories/geocode/models/Geocode";
-
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
 // If the property is not found, it throws an InvalidDataError

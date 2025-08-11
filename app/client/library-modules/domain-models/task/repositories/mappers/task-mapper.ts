@@ -11,5 +11,6 @@ export function mapApiTasktoTask(task: ApiTask): Task {
     dueDate: task.dueDate.toISOString().slice(0, 10), // Format to YYYY-MM-DD
     description: task.description,
     priority: task.priority,
+    property: task.property,
   };
 }
