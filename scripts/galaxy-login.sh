@@ -17,10 +17,23 @@ set password [lindex $argv 1]
 # =============== SCRIPT ================
 spawn meteor login
 
-expect "Username:"
+
+expect {
+  -re "Username:" {}
+  timeout {
+    puts "Timeout waiting for Username prompt"
+    exit 1
+  }
+}
+
 send "$username\r"
 
-expect "Password:"
-send "$password\r"
+expect {
+  -re "Password:" {}
+  timeout {
+    puts "Timeout waiting for Password prompt"
+    exit 1
+  }
+}
 
-expect eof
+send "$password\r"
