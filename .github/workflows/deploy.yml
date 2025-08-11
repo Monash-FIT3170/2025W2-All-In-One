@@ -34,6 +34,9 @@ jobs:
           GALAXY_USERNAME: ${{ secrets.GALAXY_USERNAME }}
           GALAXY_PASSWORD: ${{ secrets.GALAXY_PASSWORD }}
         run: |
+          sudo apt-get update
+          sudo apt-get install -y expect
+          ls -l ./galaxy-login.sh       # Check script presence and permissions
           export PATH="$HOME/.meteor:$PATH"
           chmod +x ./galaxy-login.sh
           ./galaxy-login.sh "$GALAXY_USERNAME" "$GALAXY_PASSWORD"
