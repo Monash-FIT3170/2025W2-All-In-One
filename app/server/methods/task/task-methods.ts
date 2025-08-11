@@ -62,6 +62,7 @@ const taskInsertMethod = {
     description: string;
     dueDate: Date;
     priority: TaskPriority;
+    property: string;
     userId: string;
   }): Promise<string> => {
     console.log("taskInsertMethod called with:", taskData);
@@ -96,6 +97,7 @@ const taskInsertMethod = {
       description: taskData.description || "", // Handle empty description
       dueDate: taskData.dueDate,
       priority: taskData.priority,
+      taskProperty: taskData.property || "", // Optional property, can be empty
       taskStatus: TaskStatus.NOTSTARTED, // Default status
       createdDate: new Date(),
     };
@@ -144,6 +146,7 @@ async function mapTaskDocumentTotaskDTO(task: TaskDocument): Promise<ApiTask> {
     dueDate: task.dueDate,
     description: task.description,
     priority: task.priority,
+    property: task.taskProperty,
   };
 }
 

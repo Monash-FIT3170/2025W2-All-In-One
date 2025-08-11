@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -20,17 +20,21 @@ import {
   TaskData, 
   defaultTaskFormValues 
 } from "./TaskFormSchema";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+
 
 interface AddTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (task: TaskData) => void;
+  agentId: string;
 }
 
 export function AddTaskModal({
   isOpen,
   onClose,
   onSubmit,
+  agentId,
 }: AddTaskModalProps): React.JSX.Element {
   const {
     register,
@@ -41,6 +45,29 @@ export function AddTaskModal({
     resolver: zodResolver(taskFormSchema),
     defaultValues: defaultTaskFormValues,
   });
+  
+ const [properties, setProperties] = useState<
+    { _id: string; streetnumber: string; streetname: string; suburb: string }[]
+  >([]);
+
+  // Fetch properties for the agent when the modal opens
+  useEffect(() => {
+    if (!agentId) return;
+
+    // Call the Meteor method to get properties for the agent
+    Meteor.call(
+      MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID,
+      agentId,
+      (err: Meteor.Error, result: any[]) => {
+        if (err) {
+          console.error("Failed to fetch properties:", err);
+          return;
+        }
+        setProperties(result || []);
+      }
+    );
+  }, [agentId]);
+
 
   const handleClose = () => {
     reset();
@@ -54,6 +81,7 @@ export function AddTaskModal({
       description: data.description || "",
       dueDate: new Date(data.dueDate).toISOString(),
       priority: data.priority,
+      property: data.property || "", // Optional property id
       status: TaskStatus.NOTSTARTED,
     };
 
@@ -131,6 +159,24 @@ export function AddTaskModal({
               <option value={TaskPriority.HIGH}>High</option>
             </select>
           </div>
+          
+          {/*Task Property*/}
+          <div>
+            <Label htmlFor="task-property" className="text-black font-medium">
+              Select a property that this task will take place in.
+            </Label>
+            <select
+              id="task-property"
+              {...register("property")}
+              className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <option value="">Select Property</option>
+            </select>
+          </div>
+
+
+
+
         </form>
 
         <DialogFooter>

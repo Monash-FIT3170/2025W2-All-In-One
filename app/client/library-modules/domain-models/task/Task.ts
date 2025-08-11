@@ -9,4 +9,5 @@ export type Task = {
   dueDate: string;
   description: string;
   priority: TaskPriority;
+  property: string;
 };

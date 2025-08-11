@@ -8,4 +8,5 @@ export type ApiTask = {
   dueDate: Date;
   description: string;
   priority: TaskPriority;
+  property: string;
 }
