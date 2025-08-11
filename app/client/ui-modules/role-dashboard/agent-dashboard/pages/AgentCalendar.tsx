@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
-  fetchAgentTasks,
   selectTasks,
   selectIsLoading,
+  fetchAgentTasks,
 } from "../state/agent-dashboard-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
@@ -12,17 +12,23 @@ import { TaskData } from "../components/TaskFormSchema";
 import { apiCreateTask } from "/app/client/library-modules/apis/task/task-api";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
-
+import { UpcomingTasks } from "../../components/UpcomingTask";  
 export function AgentCalendar(): React.JSX.Element {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch(); 
+  const currentUser = useAppSelector((state) => state.currentUser.authUser);
   const tasks = useAppSelector(selectTasks); // Retrieve tasks from Redux store
   const loading = useAppSelector(selectIsLoading);
-  const currentUser = useAppSelector((state) => state.currentUser.authUser); // Get the authenticated user
-
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
+  useEffect(() => { 
+    if (currentUser?.userId) {
+      dispatch(fetchAgentTasks(currentUser.userId)); // Fetch tasks for the current user
+    }
+    else {
+      console.warn("No user ID found. Please log in to view the calendar.");
+    }
+  },[currentUser])
   const handleDateSelection = (formatted: string, iso: string) => {
     setSelectedDate(formatted);
     setSelectedDateISO(iso);
@@ -78,6 +84,7 @@ export function AgentCalendar(): React.JSX.Element {
     return <div>Loading...</div>;
   }
 
+
   return (
     <div className="min-h-screen">
       <div className="flex">
@@ -100,32 +107,11 @@ export function AgentCalendar(): React.JSX.Element {
                 </h2>
                 <ul className="space-y-4 mt-2">
                   {tasks
-                    .filter((task) => {
-                      if (!task.dueDate) return false; // Tasks without a date just get passed over
-
-                      // Get the selected date (it should be in YYYY-MM-DD format)
-                      const selectedDateObj = selectedDateISO ? new Date(selectedDateISO) : new Date();
-
-                      // Parse the task due date (it should be an ISO string)
-                      const taskDateObj = new Date(task.dueDate);
-
-                      // If we can't parse the date, skip this task
-                      if (isNaN(taskDateObj.getTime())) {
-                        return false;
-                      }
-
-                      // Compare only the date part (year, month, day)
-                      // WE don't care about time here because we are selecting a date on the calendar, not a time
-                      return (
-                        selectedDateObj.getFullYear() === taskDateObj.getFullYear() &&
-                        selectedDateObj.getMonth() === taskDateObj.getMonth() &&
-                        selectedDateObj.getDate() === taskDateObj.getDate()
-                      );
-                    })
+                    .filter((task) => task.dueDate === (selectedDateISO || new Date().toISOString().slice(0, 10)))
                     .map((task, index) => (
                       <li key={index} className="p-4 rounded shadow bg-white border border-gray-200">
                         <p className="font-bold text-lg">{task.name}</p>
-                        <p className="text-sm text-gray-600 mb-2">{new Date(task.dueDate).toLocaleDateString('en-AU')}</p>
+                        <p className="text-sm text-gray-600 mb-2">{task.dueDate}</p>
                         {task.description && (
                           <p className="text-xs text-gray-500">{task.description}</p>
                         )}
@@ -142,68 +128,18 @@ export function AgentCalendar(): React.JSX.Element {
                         </div>
                       </li>
                     ))}
-                  {tasks.filter(task => {
-                    if (!task.dueDate) return false;
-
-                    // Get the selected date
-                    const selectedDateObj = selectedDateISO ? new Date(selectedDateISO) : new Date();
-
-                    // Parse the task due date (it should be an ISO string)
-                    const taskDateObj = new Date(task.dueDate);
-
-                    // If we can't parse the date, skip this task
-                    if (isNaN(taskDateObj.getTime())) {
-                      return false;
-                    }
-
-                    // Compare only the date part
-                    return (
-                      selectedDateObj.getFullYear() === taskDateObj.getFullYear() &&
-                      selectedDateObj.getMonth() === taskDateObj.getMonth() &&
-                      selectedDateObj.getDate() === taskDateObj.getDate()
-                    );
-                  }).length === 0 && (
+                  {tasks.filter(task => task.dueDate === (selectedDateISO || new Date().toISOString().slice(0,10))).length === 0 && (
                     <p className="text-gray-500 italic">No tasks for this date</p>
                   )}
                 </ul>
-                <br />
+                <br/>
                 <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
-
-            {/* Right Section: Upcoming Tasks */}
-            <div className="w-1/3">
-              <h2 className="text-lg font-semibold mb-4">Upcoming Tasks</h2>
-              <ul className="space-y-4">
-                {tasks.length > 0 ? (
-                  tasks.map((task, index) => (
-                    <li key={index} className="p-4 rounded shadow bg-white border border-gray-200">
-                      <p className="font-bold text-lg">{task.name}</p>
-                      <p className="text-sm text-gray-600 mb-2">{new Date(task.dueDate).toLocaleDateString('en-AU')}</p>
-                      <p className="text-xs text-gray-500">{task.description}</p>
-                      <div className="mt-2">
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          task.status === TaskStatus.COMPLETED
-                            ? "bg-green-100 text-green-800"
-                            : task.status === TaskStatus.INPROGRESS
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-blue-100 text-blue-800"
-                        }`}>
-                          {task.status}
-                        </span>
-                      </div>
-                    </li>
-                  ))
-                ) : (
-                  <p className="text-gray-500 italic">No upcoming tasks</p>
-                )}
-              </ul>
+            <UpcomingTasks tasks={tasks} />
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Add Task Modal */}
       <AddTaskModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
