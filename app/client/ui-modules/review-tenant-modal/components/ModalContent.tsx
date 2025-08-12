@@ -6,8 +6,8 @@ type ModalContentProps = {
   applications: TenantApplication[];
   onReject: (applicationId: string) => void;
   onProgress: (applicationId: string) => void;
-  onBackgroundPass: (applicationId: string) => void;
-  onBackgroundFail: (applicationId: string) => void;
+  // onBackgroundPass: (applicationId: string) => void;
+  // onBackgroundFail: (applicationId: string) => void;
   onSendToLandlord: (applicationId: string) => void;
 }
 
@@ -15,8 +15,8 @@ export function ModalContent({
   applications,
   onReject,
   onProgress,
-  onBackgroundPass,
-  onBackgroundFail,
+  // onBackgroundPass,
+  // onBackgroundFail,
   onSendToLandlord,
 }: ModalContentProps): React.JSX.Element {
   return (
@@ -28,8 +28,8 @@ export function ModalContent({
             application={application}
             onReject={onReject}
             onProgress={onProgress}
-            onBackgroundPass={onBackgroundPass}
-            onBackgroundFail={onBackgroundFail}
+            // onBackgroundPass={onBackgroundPass}
+            // onBackgroundFail={onBackgroundFail}
             onSendToLandlord={onSendToLandlord}
           />
         ))}

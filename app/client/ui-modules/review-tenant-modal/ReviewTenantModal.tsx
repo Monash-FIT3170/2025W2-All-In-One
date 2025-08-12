@@ -8,7 +8,7 @@ import { ModalHeader } from './components/ModalHeader';
 import { FilterTabs } from './components/FilterTabs';
 import { ModalContent } from './components/ModalContent';
 import { ModalDone } from './components/ModalDone';
-import { apiCreateTask } from '/app/client/library-modules/apis/task/task-api';
+import { apiCreateTaskForAgent } from '/app/client/library-modules/apis/task/task-api';
 import { TaskPriority } from '/app/shared/task-priority-identifier';
 import { apiCreateTaskForLandlord } from '/app/client/library-modules/apis/task/task-api';
 
@@ -19,14 +19,14 @@ export function ReviewTenantModal({
   onClose,
   onReject,
   onProgress,
-  onBackgroundPass,
-  onBackgroundFail,
+  // onBackgroundPass,
+  // onBackgroundFail,
   onSendToLandlord,
   propertyAddress,
   propertyLandlordId,
   propertyId,
   tenantApplications = [
-    // Default mock data for backward compatibility
+    // Default mock data
     {
       id: '1',
       name: 'Rehan W',
@@ -56,13 +56,12 @@ export function ReviewTenantModal({
       id: '6',
       name: 'Maddy C',
       status: TenantApplicationStatus.ACCEPTED,
-      backgroundCheck: BackgroundCheckStatus.PASS,
     },
   ],
 }: ReviewTenantModalProps): React.JSX.Element {
   const [applications, setApplications] = React.useState<TenantApplication[]>(tenantApplications);
-
   const [activeFilter, setActiveFilter] = React.useState<FilterType>(FilterType.ALL);
+  const [currentStep, setCurrentStep] = React.useState<number>(1); // Track which step the tenant application is on
 
   const handleReject = (applicationId: string) => {
     setApplications(currentApplications =>
@@ -82,24 +81,31 @@ export function ReviewTenantModal({
     onProgress(applicationId);
   };
 
-  const handleBackgroundPass = (applicationId: string) => {
-    setApplications(currentApplications =>
-      currentApplications.map(app =>
-        app.id === applicationId ? { ...app, backgroundCheck: BackgroundCheckStatus.PASS } : app
-      )
-    );
-    onBackgroundPass(applicationId);
-  };
+  // const handleBackgroundPass = (applicationId: string) => {
+  //   setApplications(currentApplications =>
+  //     currentApplications.map(app =>
+  //       app.id === applicationId ? {
+  //         ...app,
+  //         status: TenantApplicationStatus.BACKGROUND_CHECK_PASSED
+  //       } : app
+  //     )
+  //   );
+  //   onBackgroundPass(applicationId);
+  // };
 
-  const handleBackgroundFail = (applicationId: string) => {
-    setApplications(currentApplications =>
-      currentApplications.map(app =>
-        app.id === applicationId ? { ...app, backgroundCheck: BackgroundCheckStatus.FAIL } : app
-      )
-    );
-    onBackgroundFail(applicationId);
-  };
+  // const handleBackgroundFail = (applicationId: string) => {
+  //   setApplications(currentApplications =>
+  //     currentApplications.map(app =>
+  //       app.id === applicationId ? {
+  //         ...app,
+  //         status: TenantApplicationStatus.BACKGROUND_CHECK_FAILED
+  //        } : app
+  //     )
+  //   );
+  //   onBackgroundFail(applicationId);
+  // };
 
+  // Step 1: Send all accepted applicants to landlord
   const handleSendToLandlord = async (applicationId: string) => {
     try {
       if (!propertyLandlordId) {
@@ -107,16 +113,26 @@ export function ReviewTenantModal({
         return;
       }
 
-      // Get the tenant application details
-      const application = applications.find(app => app.id === applicationId);
-      if (!application) {
-        console.error('Application not found');
+      // // Get the tenant application details
+      // const application = applications.find(app => app.id === applicationId);
+      // if (!application) {
+      //   console.error('Application not found');
+      //   return;
+      // }
+
+      // Check if there are any accepted applications
+      const acceptedApplications = applications.filter(app =>
+        app.status === TenantApplicationStatus.ACCEPTED
+      );
+
+      if (acceptedApplications.length === 0) {
+        console.error('No accepted applications to send to landlord');
         return;
       }
 
-      // Create a task for the landlord
-      const taskName = `Review Tenant Application - ${application.name}`;
-      const taskDescription = `Review tenant application for ${application.name} for property at ${propertyAddress || 'your property'}. The tenant has been accepted and passed background check.`;
+      // Create a task for the landlord with all accepted applications
+      const taskName = `Review ${acceptedApplications.length} Tenant Application(s)`;
+      const taskDescription = `Review ${acceptedApplications.length} accepted tenant application(s) for property at ${propertyAddress || 'your property'}. Applicants: ${acceptedApplications.map(app => app.name).join(', ')}`;
       const dueDate = new Date();
       dueDate.setDate(dueDate.getDate() + 7); // Due in 7 days
 
@@ -128,11 +144,19 @@ export function ReviewTenantModal({
         landlordId: propertyLandlordId,
       });
 
-      console.log(`Successfully sent application ${applicationId} to landlord`);
-      onSendToLandlord(applicationId);
+      // Update all accepted applications to landlord review status
+      setApplications(currentApplications =>
+        currentApplications.map(app =>
+          app.status === TenantApplicationStatus.ACCEPTED
+            ? { ...app, status: TenantApplicationStatus.LANDLORD_REVIEW, step: 2 }
+            : app
+        )
+      );
+
+      console.log(`Successfully sent ${acceptedApplications.length} application(s) to landlord ${propertyLandlordId}`);
+      onSendToLandlord(acceptedApplications.map(app => app.id).join(','));
     } catch (error) {
-      console.error('Failed to send application to landlord:', error);
-      // You might want to show an error message to the user here
+      console.error('Failed to send applications to landlord:', error);
     }
   };
 
@@ -142,6 +166,10 @@ export function ReviewTenantModal({
     if (activeFilter === FilterType.ACCEPTED) return app.status === TenantApplicationStatus.ACCEPTED;
     return false;
   });
+
+  // Get counts of accepted applications
+  const acceptedCount = applications.filter(app => app.status === TenantApplicationStatus.ACCEPTED).length;
+  // const backgroundCheckPassedCount = applications.filter(app => app.status === TenantApplicationStatus.BACKGROUND_CHECK_PASSED).length;
 
   if (!isOpen) return <></>;
 
@@ -159,10 +187,21 @@ export function ReviewTenantModal({
           applications={filteredApplications}
           onReject={handleReject}
           onProgress={handleProgress}
-          onBackgroundPass={handleBackgroundPass}
-          onBackgroundFail={handleBackgroundFail}
           onSendToLandlord={handleSendToLandlord}
         />
+
+         {/* Step 1: Send accepted applicants to landlord */}
+         {acceptedCount > 0 && (
+          <div className="p-4 border-t">
+            <button
+              onClick={handleSendToLandlord}
+              className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+            >
+              Send {acceptedCount} Accepted Applicant(s) to Landlord
+            </button>
+          </div>
+        )}
+
 
         <ModalDone onClose={onClose} />
       </div>
