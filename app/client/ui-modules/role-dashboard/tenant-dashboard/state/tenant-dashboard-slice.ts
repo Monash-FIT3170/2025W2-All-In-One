@@ -21,24 +21,35 @@ const initialState: TenantDashboardState = {
 };
 
 export const fetchTenantDetails = createAsyncThunk(
-  "tenantDashboard/fetchTenantTasks",
+  "tenantDashboard/fetchTenantDetails",
   async (userId: string) => {
     // First, get the tenant data which includes task IDs
-    let property;
-    let tasks;
+    let property = null;
+    let tasks: Task[] = [];
+    
     try {
       const tenantResponse = await getTenantById(userId);
-      tasks = await Promise.all(
-         tenantResponse.tasks.map((taskId) => {
-         return getTaskById(taskId);
-        }
-      )
-    )
-    property = await getPropertyByTenantId(tenantResponse.tenantId);  
+      
+      // Fetch tasks (if any)
+      if (tenantResponse.tasks && tenantResponse.tasks.length > 0) {
+        tasks = await Promise.all(
+          tenantResponse.tasks.map((taskId) => {
+            return getTaskById(taskId);
+          })
+        );
+      }
+      
+      // Try to fetch property - this might fail if no property is assigned
+      try {
+        property = await getPropertyByTenantId(tenantResponse.tenantId);
+      } catch (propertyError) {
+        console.log("No property found for tenant:", tenantResponse.tenantId);
+        // Property remains null - this is expected for tenants without assigned properties
+      }
     }
     catch (error) {
       console.error("Error fetching tenant details:", error);
-      throw new Meteor.Error("Failed to fetch tenant details");
+      throw new Error("Failed to fetch tenant details");
     }
 
     return {
@@ -47,26 +58,6 @@ export const fetchTenantDetails = createAsyncThunk(
     };
   }
 );
-
-export const fetchTenantTasks = createAsyncThunk(
-  "tenantDashboard/fetchTenantProperty",
-  async (userId: string) => {
-    let tasks;
-    try {
-      const tenantResponse = await getTenantById(userId);
-      tasks = await Promise.all(
-         tenantResponse.tasks.map((taskId) => {
-         return getTaskById(taskId);
-        }
-      )
-    )
-  }
-  catch (error) {
-    console.error("Error fetching tenant tasks:", error);
-    throw new Meteor.Error("Failed to fetch tenant tasks");
-  }
-  return { tasks: tasks };
-})
 
 export const tenantDashboardSlice = createSlice({
   name: "tenantDashboard",

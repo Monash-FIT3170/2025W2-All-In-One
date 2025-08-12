@@ -1,12 +1,40 @@
 import React from "react";
 import { CardWidget } from "../../components/CardWidget";
 import { Progress } from "../../components/ProgressBar";
+import { Task } from "/app/client/library-modules/domain-models/task/Task";
+import { TaskStatus } from "/app/shared/task-status-identifier";
 
 interface DashboardCardsProps {
   rentAmount?: number;
+  tasks?: Task[];
 }
 
-function DashboardCards({ rentAmount }: DashboardCardsProps) {
+function DashboardCards({ rentAmount, tasks = [] }: DashboardCardsProps) {
+  // Calculate pending tasks (not completed)
+  const pendingTasks = tasks.filter(task => task.status !== TaskStatus.COMPLETED);
+  const pendingTasksCount = pendingTasks.length;
+  
+  // Calculate tasks due this week
+  const tasksDueThisWeek = pendingTasks.filter(task => {
+    const dueDate = new Date(task.dueDate); // dueDate is in YYYY-MM-DD format
+    const today = new Date();
+    
+    // Get the start of this week (Sunday)
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    // Get the end of this week (Saturday)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+    
+    // Set dueDate to start of day for proper comparison
+    dueDate.setHours(0, 0, 0, 0);
+    
+    return dueDate >= startOfWeek && dueDate <= endOfWeek;
+  }).length;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
       <CardWidget
@@ -24,9 +52,15 @@ function DashboardCards({ rentAmount }: DashboardCardsProps) {
       </CardWidget>
 
       <CardWidget
-        title="Maintenance"
-        value="2 Active"
-        subtitle="1 scheduled for tomorrow"
+        title="Pending Tasks"
+        value={pendingTasksCount === 0 ? "0" : `${pendingTasksCount} Active`}
+        subtitle={
+          pendingTasksCount === 0 
+            ? "No Pending tasks" 
+            : tasksDueThisWeek > 0 
+              ? `${tasksDueThisWeek} due this week`
+              : "No tasks due this week"
+        }
       />
 
       <CardWidget
