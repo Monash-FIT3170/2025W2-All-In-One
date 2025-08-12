@@ -69,7 +69,7 @@ export function PropertyDetails({
         <div>
           <h3 className="text-gray-500 font-medium">Area</h3>
           <p className="text-xl font-bold">
-          {property.area}m^2`
+          {property.area} m²
           </p>
         </div>
 
