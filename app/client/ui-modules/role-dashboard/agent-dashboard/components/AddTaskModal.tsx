@@ -14,14 +14,14 @@ import { Label } from "../../../theming-shadcn/Label";
 import { Textarea } from "../../../theming-shadcn/Textarea";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
-import { 
-  taskFormSchema, 
-  TaskFormData, 
-  TaskData, 
-  defaultTaskFormValues 
+import {
+  taskFormSchema,
+  TaskFormData,
+  TaskData,
+  defaultTaskFormValues,
 } from "./TaskFormSchema";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { useEffect } from 'react';
+import { useEffect } from "react";
 import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
 import { useAppSelector } from "/app/client/store";
 
@@ -38,7 +38,9 @@ export function AddTaskModal({
   onSubmit,
   agentId,
 }: AddTaskModalProps): React.JSX.Element {
-  const currentUser = useAppSelector((state) => state.currentUser.currentUser) as Agent | undefined;
+  const currentUser = useAppSelector(
+    (state) => state.currentUser.currentUser
+  ) as Agent | undefined;
   const resolvedAgentId = agentId ?? currentUser?.agentId;
 
   const {
@@ -50,12 +52,18 @@ export function AddTaskModal({
     resolver: zodResolver(taskFormSchema),
     defaultValues: defaultTaskFormValues,
   });
-  
- const [properties, setProperties] = useState<
-    { _id: string; streetnumber: string; streetname: string; suburb: string }[]
+
+  const [properties, setProperties] = useState<
+    {
+      _id: string;
+      streetnumber: string;
+      streetname: string;
+      suburb: string;
+      propertyId: string;
+    }[]
   >([]);
 
-  // Fetch properties for the agent when the modal opens
+  // Fetch properties names for the agent when the modal opens
   useEffect(() => {
     if (!resolvedAgentId) return;
 
@@ -73,7 +81,6 @@ export function AddTaskModal({
     );
   }, [agentId]);
 
-
   const handleClose = () => {
     reset();
     onClose();
@@ -86,7 +93,7 @@ export function AddTaskModal({
       description: data.description || "",
       dueDate: new Date(data.dueDate).toISOString(),
       priority: data.priority,
-      property: data.property || "", 
+      property: data.property || "",
       propertyId: data.propertyId || "", // Optional property ID
       status: TaskStatus.NOTSTARTED,
     };
@@ -99,10 +106,16 @@ export function AddTaskModal({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px] bg-white z-[100] border shadow-lg">
         <DialogHeader>
-          <DialogTitle className="text-black text-lg font-semibold">Add New Task</DialogTitle>
+          <DialogTitle className="text-black text-lg font-semibold">
+            Add New Task
+          </DialogTitle>
         </DialogHeader>
-        
-        <form id="task-form" onSubmit={handleSubmit(onFormSubmit)} className="p-4 space-y-4">
+
+        <form
+          id="task-form"
+          onSubmit={handleSubmit(onFormSubmit)}
+          className="p-4 space-y-4"
+        >
           {/* Task Title */}
           <div>
             <Label htmlFor="task-title" className="text-black font-medium">
@@ -113,7 +126,7 @@ export function AddTaskModal({
               type="text"
               {...register("name")}
               placeholder="Enter task title"
-              className={`mt-1 ${errors.name ? 'border-red-500' : ''}`}
+              className={`mt-1 ${errors.name ? "border-red-500" : ""}`}
             />
             {errors.name && (
               <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
@@ -129,16 +142,21 @@ export function AddTaskModal({
               id="task-due-date"
               type="date"
               {...register("dueDate")}
-              className={`mt-1 ${errors.dueDate ? 'border-red-500' : ''}`}
+              className={`mt-1 ${errors.dueDate ? "border-red-500" : ""}`}
             />
             {errors.dueDate && (
-              <p className="text-red-500 text-sm mt-1">{errors.dueDate.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors.dueDate.message}
+              </p>
             )}
           </div>
 
           {/* Description */}
           <div>
-            <Label htmlFor="task-description" className="text-black font-medium">
+            <Label
+              htmlFor="task-description"
+              className="text-black font-medium"
+            >
               Description
             </Label>
             <Textarea
@@ -165,7 +183,7 @@ export function AddTaskModal({
               <option value={TaskPriority.HIGH}>High</option>
             </select>
           </div>
-          
+
           {/*Task Property*/}
           <div>
             <Label htmlFor="task-property" className="text-black font-medium">
@@ -177,11 +195,29 @@ export function AddTaskModal({
               className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <option value="">Select Property</option>
-                {properties.map((p) => (
+              {properties.map((p) => (
                 <option key={p._id} value={p._id}>
                   {`${p.streetnumber} ${p.streetname}, ${p.suburb}`}
                 </option>
-                ))}   
+              ))}
+            </select>
+          </div>
+          {/* Property ID (optional) */}
+          <div>
+            <Label htmlFor="task-property" className="text-black font-medium">
+              Select a property ID that this task will take place in.
+            </Label>
+            <select
+              id="task-property"
+              {...register("propertyId")}
+              className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <option value="">Select Property ID </option>
+              {properties.map((p) => (
+                <option key={p._id} value={p._id}>
+                  {`${p.propertyId}`}
+                </option>
+              ))}
             </select>
           </div>
         </form>
@@ -198,4 +234,3 @@ export function AddTaskModal({
     </Dialog>
   );
 }
-
