@@ -33,12 +33,10 @@ import {
   submitDraftListingAsync,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
-import { useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import EditDraftListingModal from "./components/EditDraftListingModal";
 import { EditDraftListingButton } from "./components/EditDraftListingButton";
-import {
-  FormSchemaType,
-} from "/app/client/ui-modules/property-form-agent/components/FormSchema";
+import { FormSchemaType } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
 import { DynamicMap } from "../common/map/DynamicMap";
 import { SubHeading } from "../theming/components/SubHeading";
 import { BasicMarker } from "../common/map/markers/BasicMarker";
@@ -49,6 +47,7 @@ export function PropertyListingPage({
 }: {
   className?: string;
 }): React.JSX.Element {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const propertyId = searchParams.get("propertyId");
   const dispatch = useAppDispatch();
@@ -106,7 +105,7 @@ export function PropertyListingPage({
           }
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
           onBack={() => {
-            console.log("back button pressed");
+            navigate("/");
           }}
           onBook={(index: number) => {
             console.log(`booking button ${index} pressed`);
@@ -438,10 +437,7 @@ function BottomBar({
 }): React.JSX.Element {
   return (
     <div
-      className={twMerge(
-        "flex justify-between items-center gap-2",
-        className
-      )}
+      className={twMerge("flex justify-between items-center gap-2", className)}
     >
       {/* Left side - Review Tenant Button */}
       <div className="flex">
@@ -490,7 +486,7 @@ function ListingModalEditor({
     suburb: state.suburb,
     address_number: state.streetNumber,
     monthly_rent: Number(state.propertyPrice),
-    property_feature_ids: []
+    property_feature_ids: [],
   };
 
   return (
