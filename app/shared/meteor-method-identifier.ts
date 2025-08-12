@@ -30,7 +30,6 @@ export enum MeteorMethodIdentifier {
   LANDLORD_GET = "landlords.getOne",
   LANDLORD_GET_BY_LANDLORD_ID = "landlords.getByLandlordId", // Get landlord by landlord ID (not user ID)
   LANDLORD_UPDATE_TASKS = "landlords.updateTasks", // Adds the id of the newly created task to the landlord's task_ids
-  LANDLORD_UPDATE_TASKS_BY_USER_ID = "landlords.updateTasksByUserId", // Adds the id of the newly created task to the landlord's task_ids using userAccountId
   LANDLORD_GET_ALL = "landlords.getAll", // Get All Landlords
   PROPERTY_STATUS_GET = "propertyStatus.getOne", // Find ID of property status by name
   PROPERTY_GET_BY_TENANT_ID = "property.getByTenantId",

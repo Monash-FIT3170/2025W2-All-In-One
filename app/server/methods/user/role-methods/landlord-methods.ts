@@ -91,32 +91,6 @@ const landlordUpdateTasksMethod = {
   },
 };
 
-//UPDATE LANDLORD TASKS BY USER ID
-// This method adds a new task ID to the landlord's task_ids array using userAccountId
-const landlordUpdateTasksByUserIdMethod = {
-  [MeteorMethodIdentifier.LANDLORD_UPDATE_TASKS_BY_USER_ID]: async (
-    userAccountId: string,
-    taskId: string
-  ): Promise<void> => {
-    const landlordDoc = await LandlordCollection.findOneAsync({
-      userAccountId: userAccountId,
-    });
-
-    if (!landlordDoc) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Landlord with user account ID ${userAccountId} not found.`)
-      );
-    }
-
-    const currentTaskIds = landlordDoc.task_ids || [];
-    const updatedTaskIds = [...currentTaskIds, taskId];
-
-    await LandlordCollection.updateAsync(
-      { userAccountId: userAccountId },
-      { $set: { task_ids: updatedTaskIds } }
-    );
-  },
-};
 
 const landlordGetAllMethod = {
   [MeteorMethodIdentifier.LANDLORD_GET_ALL]: async (): Promise<
@@ -157,6 +131,5 @@ Meteor.methods({
   ...landlordGetMethod,
   ...landlordGetByLandlordIdMethod,
   ...landlordUpdateTasksMethod,
-  ...landlordUpdateTasksByUserIdMethod,
   ...landlordGetAllMethod,
 });

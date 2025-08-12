@@ -127,7 +127,7 @@ const taskInsertForAgentMethod = {
 };
 
 /**
- * Creates a new task for AGENT in the database and returns the task ID.
+ * Creates a new task for LANDLORD in the database and returns the task ID.
  * */
 
 const taskInsertForLandlordMethod = {
@@ -182,9 +182,7 @@ const taskInsertForLandlordMethod = {
         throw new InvalidDataError("Failed to retrieve created task");
       }
 
-      // Get landlord's userAccountId and update their task_ids array
       try {
-        // We can directly use the landlordId we already have!
         await Meteor.callAsync(MeteorMethodIdentifier.LANDLORD_UPDATE_TASKS, taskData.landlordId, insertedId);
         console.log("Landlord task_ids updated successfully");
       } catch (landlordError) {
