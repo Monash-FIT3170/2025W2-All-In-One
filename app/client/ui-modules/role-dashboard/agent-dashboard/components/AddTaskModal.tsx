@@ -86,7 +86,8 @@ export function AddTaskModal({
       description: data.description || "",
       dueDate: new Date(data.dueDate).toISOString(),
       priority: data.priority,
-      property: data.property || "", // Optional property id
+      property: data.property || "", 
+      propertyId: data.propertyId || "", // Optional property ID
       status: TaskStatus.NOTSTARTED,
     };
 

@@ -61,6 +61,7 @@ export function AgentCalendar(): React.JSX.Element {
         priority: taskData.priority,
         userId: currentUser.userId, // Pass the current user's ID
         property: taskData.property, // Pass the selected property
+        propertyId: taskData.propertyId || "", // Optional property ID
       };
 
       const createdTaskId = await apiCreateTask(apiData);

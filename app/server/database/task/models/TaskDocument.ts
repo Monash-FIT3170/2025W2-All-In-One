@@ -10,4 +10,5 @@ export type TaskDocument = {
   description: string;
   priority: TaskPriority;
   taskProperty: string;
+  taskPropertyId: string;
 }

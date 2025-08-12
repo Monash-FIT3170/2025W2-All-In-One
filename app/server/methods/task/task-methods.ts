@@ -63,6 +63,7 @@ const taskInsertMethod = {
     dueDate: Date;
     priority: TaskPriority;
     property: string;
+    propertyId: string; // Optional property ID
     userId: string;
   }): Promise<string> => {
     console.log("taskInsertMethod called with:", taskData);
@@ -98,6 +99,7 @@ const taskInsertMethod = {
       dueDate: taskData.dueDate,
       priority: taskData.priority,
       taskProperty: taskData.property || "", // Optional property, can be empty
+      taskPropertyId: taskData.propertyId || "", // Optional property ID, can be empty
       taskStatus: TaskStatus.NOTSTARTED, // Default status
       createdDate: new Date(),
     };
@@ -111,13 +113,15 @@ const taskInsertMethod = {
       }
 
       // Update the agent's task_ids array to include the new task
+      console.log("Before agent update call");
       try {
-        await Meteor.callAsync(MeteorMethodIdentifier.AGENT_UPDATE_TASKS, taskData.userId, insertedId);
+        await Meteor.call(MeteorMethodIdentifier.AGENT_UPDATE_TASKS, taskData.userId, insertedId);
         console.log("Agent task_ids updated successfully");
       } catch (agentError) {
         console.warn("Failed to update agent task_ids:", agentError);
         // Don't fail the task creation if agent update fails - task was already created
       }
+      console.log("After agent update call");
 
       return insertedId;
     } catch (error) {
@@ -147,6 +151,7 @@ async function mapTaskDocumentTotaskDTO(task: TaskDocument): Promise<ApiTask> {
     description: task.description,
     priority: task.priority,
     property: task.taskProperty,
+    propertyId: task.taskPropertyId, // Optional property ID
   };
 }
 

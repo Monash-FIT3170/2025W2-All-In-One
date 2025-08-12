@@ -12,5 +12,6 @@ export function mapApiTasktoTask(task: ApiTask): Task {
     description: task.description,
     priority: task.priority,
     property: task.property,
+    propertyId: task.propertyId, // Optional property ID
   };
 }
