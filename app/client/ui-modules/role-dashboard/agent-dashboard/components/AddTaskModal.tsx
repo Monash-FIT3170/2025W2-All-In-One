@@ -88,13 +88,17 @@ export function AddTaskModal({
 
   const onFormSubmit = (data: TaskFormData) => {
     // Create task object matching Task domain model structure
+    console.log("Form data:", data);
+    const selectedProperty = properties.find((p) => p.propertyId === data.property);
+    console.log("Selected property:", selectedProperty);
+
     const newTask: TaskData = {
       name: data.name,
       description: data.description || "",
       dueDate: new Date(data.dueDate).toISOString(),
       priority: data.priority,
       property: data.property || "",
-      propertyId: data.propertyId || "", // Optional property ID
+      propertyId: selectedProperty ? selectedProperty.propertyId : "",
       status: TaskStatus.NOTSTARTED,
     };
 
@@ -196,14 +200,14 @@ export function AddTaskModal({
             >
               <option value="">Select Property</option>
               {properties.map((p) => (
-                <option key={p._id} value={p._id}>
+                <option key={p._id} value={p.propertyId}>
                   {`${p.streetnumber} ${p.streetname}, ${p.suburb}`}
                 </option>
               ))}
             </select>
           </div>
           {/* Property ID (optional) */}
-          <div>
+          {/* <div>
             <Label htmlFor="task-property" className="text-black font-medium">
               Select a property ID that this task will take place in.
             </Label>
@@ -219,7 +223,7 @@ export function AddTaskModal({
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
         </form>
 
         <DialogFooter>
