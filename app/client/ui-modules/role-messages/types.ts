@@ -1,3 +1,7 @@
+// TODO: These are temporary view models for UI display.
+// They will be replaced with proper domain models from library modules and database collections 
+// when implemented in backend half of this feature
+
 export interface Conversation {
   id: string;
   name: string;

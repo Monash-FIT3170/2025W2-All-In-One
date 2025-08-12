@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Conversation, Message } from "/app/client/ui-modules/messages/types";
-import { ConversationList } from "/app/client/ui-modules/messages/components/ConversationList";
-import { ChatWindow } from "/app/client/ui-modules/messages/components/ChatWindow";
+import { Conversation, Message } from "./types";
+import { ConversationList } from "./components/ConversationList";
+import { ChatWindow } from "./components/ChatWindow";
 
 function TenantMessages() {
   const [activeId, setActiveId] = useState<string>("1");
