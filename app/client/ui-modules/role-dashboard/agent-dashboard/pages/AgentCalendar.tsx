@@ -14,7 +14,7 @@ import { TaskStatus } from "/app/shared/task-status-identifier";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { UpcomingTasks } from "../../components/UpcomingTask";
-
+import { TaskMap, TaskMapUiState } from "../components/TaskMap";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
 
 export function AgentCalendar(): React.JSX.Element {
@@ -25,7 +25,9 @@ export function AgentCalendar(): React.JSX.Element {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
+  const [mapUiState, setMapUiState] = useState<TaskMapUiState>({
+    markers: [], // start with empty or populate with initial markers if you have any
+  });
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchAgentTasks(currentUser.userId)); // Fetch tasks for the current user
@@ -33,6 +35,50 @@ export function AgentCalendar(): React.JSX.Element {
       console.warn("No user ID found. Please log in to view the calendar.");
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    async function loadTodayMarkers() {
+      // Filter tasks to match the ones below the calendar
+      const tasksForSelectedDate = tasks.filter(
+        (task) =>
+          task.dueDate === 
+          (selectedDateISO || new Date().toISOString().slice(0, 10))
+      );
+
+      // Fetch property coordinates for each task
+      const markers = await Promise.all(
+        tasksForSelectedDate.map(async (task) => {
+          if (!task.propertyId) return null;
+          try {
+            const property = await getPropertyById(task.propertyId);
+            if (
+              property.locationLatitude != null &&
+              property.locationLongitude != null
+            ) {
+              console.log(`Marker for task ${task.taskId} at property ${task.propertyId} added.`);
+              console.log(`Property coordinates: ${property.locationLatitude}, ${property.locationLongitude}`);
+              return {
+                latitude: property.locationLatitude,
+                longitude: property.locationLongitude,
+              };
+            }
+          } catch (err) {
+            console.error(`Error fetching property ${task.propertyId}:`, err);
+          }
+          return null;
+        })
+      );
+
+      setMapUiState({
+        markers: markers.filter(
+          (m): m is { latitude: number; longitude: number } => m !== null
+        ),
+      });
+    }
+
+    loadTodayMarkers();
+  }, [tasks, selectedDateISO]);
+
   const handleDateSelection = (formatted: string, iso: string) => {
     setSelectedDate(formatted);
     setSelectedDateISO(iso);
@@ -132,9 +178,9 @@ export function AgentCalendar(): React.JSX.Element {
                           </p>
                         )}
                         {/* Property address if exists */}
-                          <p className="text-sm text-gray-700 mt-1">
-                            {task.property}
-                          </p>
+                        <p className="text-sm text-gray-700 mt-1">
+                          {task.property}
+                        </p>
                         <div className="mt-2">
                           <span
                             className={`text-xs px-2 py-1 rounded-full ${
@@ -161,7 +207,7 @@ export function AgentCalendar(): React.JSX.Element {
                   )}
                 </ul>
                 <br />
-                
+                <TaskMap mapUiState={mapUiState} />
                 <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
