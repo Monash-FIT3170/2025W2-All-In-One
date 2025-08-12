@@ -11,6 +11,8 @@ interface TenantDashboardState {
   tasks: Task[];
   error: string | null;
   property: Property | null;
+  messagesCount: number;
+  leaseStatus: string;
 }
 
 const initialState: TenantDashboardState = {
@@ -18,6 +20,8 @@ const initialState: TenantDashboardState = {
   tasks: [],
   error: null,
   property: null,
+  messagesCount: 0, // Default value for messages
+  leaseStatus: "N/A", // Default value for lease status
 };
 
 export const fetchTenantDetails = createAsyncThunk(
@@ -72,6 +76,12 @@ export const tenantDashboardSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+    setMessagesCount: (state, action: PayloadAction<number>) => {
+      state.messagesCount = action.payload;
+    },
+    setLeaseStatus: (state, action: PayloadAction<string>) => {
+      state.leaseStatus = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -91,10 +101,12 @@ export const tenantDashboardSlice = createSlice({
   },
 });
 
-export const { setLoading, setTasks, setError } = tenantDashboardSlice.actions;
+export const { setLoading, setTasks, setError, setMessagesCount, setLeaseStatus } = tenantDashboardSlice.actions;
 
 export const selectTenantDashboard = (state: RootState) => state.tenantDashboard;
 export const selectTasks = (state: RootState) => state.tenantDashboard.tasks;
 export const selectLoading = (state: RootState) => state.tenantDashboard.isLoading;
 export const selectPropertyDetails = (state: RootState) => state.tenantDashboard.property;
+export const selectMessagesCount = (state: RootState) => state.tenantDashboard.messagesCount;
+export const selectLeaseStatus = (state: RootState) => state.tenantDashboard.leaseStatus;
 export default tenantDashboardSlice.reducer;
