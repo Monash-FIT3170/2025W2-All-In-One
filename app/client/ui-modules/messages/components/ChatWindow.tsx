@@ -2,7 +2,7 @@ import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Input } from "/app/client/ui-modules/theming-shadcn/Input";
 import { Button } from "/app/client/ui-modules/theming-shadcn/Button";
-import { Paperclip, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { Message } from "../types";
 
 interface ChatWindowProps {
@@ -34,7 +34,7 @@ export function ChatWindow({ header, messages, messageText, onChangeMessage, onS
 
           {/* Messages List */}
           <div className="flex-1 overflow-hidden">
-            <div className="h-full overflow-y-auto p-4">
+            <div className="h-full overflow-y-auto p-4"> {/* Scrollable area */}
               <div className="space-y-4">
                 {messages.map((m) => (
                   <div key={m.id} className={`flex ${m.isOutgoing ? "justify-end" : "justify-start"}`}>
@@ -58,18 +58,15 @@ export function ChatWindow({ header, messages, messageText, onChangeMessage, onS
           {/* Composer */}
           <div className="p-4 border-t border-gray-200 flex-shrink-0">
             <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm">
-                <Paperclip className="h-4 w-4" />
-              </Button>
               <Input
                 placeholder="Type a message..."
                 value={messageText}
                 onChange={(e) => onChangeMessage(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && onSend()}
-                className="flex-1"
+                className="flex-1 h-12 text-base"
               />
-              <Button onClick={onSend} size="sm">
-                <Send className="h-4 w-4" />
+              <Button onClick={onSend} size="sm" className="h-12 px-4">
+                <Send className="h-5 w-5" />
               </Button>
             </div>
           </div>
