@@ -1,5 +1,6 @@
 export enum MeteorMethodIdentifier {
-  TASK_INSERT = "tasks.insert",
+  TASK_INSERT_FOR_AGENT = "tasks.insertForAgent",
+  TASK_INSERT_FOR_LANDLORD = "tasks.insertForLandlord",
   TASK_GET_ALL = "tasks.getAll",
   TASK_GET = "tasks.getOne",
   TASK_GET_MULTIPLE = "tasks.getMultiple",

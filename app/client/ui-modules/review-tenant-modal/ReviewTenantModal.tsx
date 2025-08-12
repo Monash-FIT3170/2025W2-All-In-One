@@ -10,6 +10,9 @@ import { ModalContent } from './components/ModalContent';
 import { ModalDone } from './components/ModalDone';
 import { apiCreateTask } from '/app/client/library-modules/apis/task/task-api';
 import { TaskPriority } from '/app/shared/task-priority-identifier';
+import { apiCreateTaskForLandlord } from '/app/client/library-modules/apis/task/task-api';
+
+
 
 export function ReviewTenantModal({
   isOpen,
@@ -117,12 +120,12 @@ export function ReviewTenantModal({
       const dueDate = new Date();
       dueDate.setDate(dueDate.getDate() + 7); // Due in 7 days
 
-      await apiCreateTask({
+      await apiCreateTaskForLandlord({
         name: taskName,
         description: taskDescription,
         dueDate: dueDate,
         priority: TaskPriority.MEDIUM,
-        userId: propertyLandlordId,
+        landlordId: propertyLandlordId,
       });
 
       console.log(`Successfully sent application ${applicationId} to landlord`);

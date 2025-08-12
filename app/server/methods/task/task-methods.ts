@@ -43,7 +43,7 @@ const taskGetMethod = {
 };
 
 /**
- * Creates a new task in the database for an AGENT and returns the task ID.
+ * Creates a new task for AGENT in the database and returns the task ID.
  *
  * This Meteor method can be called from the client. It performs the following steps:
  * 1. Validates the input data.
@@ -57,14 +57,14 @@ const taskGetMethod = {
  * @throws {InvalidDataError} If the task creation fails.
  */
 const taskInsertForAgentMethod = {
-  [MeteorMethodIdentifier.TASK_INSERT]: async (taskData: {
+  [MeteorMethodIdentifier.TASK_INSERT_FOR_AGENT]: async (taskData: {
     name: string;
     description: string;
     dueDate: Date;
     priority: TaskPriority;
     userId: string;
   }): Promise<string> => {
-    console.log("taskInsertMethod called with:", taskData);
+    console.log("taskInsertForAgentMethod called with:", taskData);
 
     // Validate required fields - description can be empty
     if (!taskData.name || taskData.name.trim() === "") {
@@ -126,8 +126,12 @@ const taskInsertForAgentMethod = {
   },
 };
 
+/**
+ * Creates a new task for AGENT in the database and returns the task ID.
+ * */
+
 const taskInsertForLandlordMethod = {
-  [MeteorMethodIdentifier.TASK_INSERT]: async (taskData: {
+  [MeteorMethodIdentifier.TASK_INSERT_FOR_LANDLORD]: async (taskData: {
     name: string;
     description: string;
     dueDate: Date;
@@ -196,7 +200,6 @@ const taskInsertForLandlordMethod = {
     }
   },
 };
-
 /**
  * Maps a TaskDocument to an ApiTask DTO.
  *

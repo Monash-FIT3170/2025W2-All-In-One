@@ -9,7 +9,7 @@ import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 import { AddTaskModal } from "../components/AddTaskModal";
 import { TaskData } from "../components/TaskFormSchema";
-import { apiCreateTask } from "/app/client/library-modules/apis/task/task-api";
+import { apiCreateTaskForAgent } from "/app/client/library-modules/apis/task/task-api";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
 
@@ -51,18 +51,18 @@ export function AgentCalendar(): React.JSX.Element {
         priority: taskData.priority,
         userId: currentUser.userId, // Pass the current user's ID
       };
-            
-      const createdTaskId = await apiCreateTask(apiData);
+
+      const createdTaskId = await apiCreateTaskForAgent(apiData);
       console.log("Task created successfully with ID:", createdTaskId);
-      
+
       // Close the modal
       setIsModalOpen(false);
-      
+
       // Refresh tasks to show the new task
       if (currentUser?.userId) {
         dispatch(fetchAgentTasks(currentUser.userId));
       }
-      
+
     } catch (error) {
       console.error("Error creating task:", error);
     }
