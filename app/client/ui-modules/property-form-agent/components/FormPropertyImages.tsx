@@ -207,7 +207,7 @@ export default function FormPropertyImages({
                           </div>
 
                           {/* Order indicator */}
-                          <div className="absolute bottom-2 left-2 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                          <div className="absolute bottom-2 right-2 bg-blue-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-medium">
                             {index + 1}
                           </div>
                         </div>
