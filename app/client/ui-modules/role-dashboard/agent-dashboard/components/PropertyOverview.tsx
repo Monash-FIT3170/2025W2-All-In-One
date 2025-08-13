@@ -28,7 +28,7 @@ export function PropertyOverview({
   // Property click handler to navigate to property details
   const handlePropertyClick = (propertyId: string) => {
     if (propertyId) {
-        navigate(`/property-listing?propertyId=${propertyId}`);
+        navigate(`/property-listing?propertyId=${propertyId}&from=agent-dashboard`);
     }
   }
 
