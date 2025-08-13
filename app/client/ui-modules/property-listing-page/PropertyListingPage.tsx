@@ -41,6 +41,7 @@ import { DynamicMap } from "../common/map/DynamicMap";
 import { SubHeading } from "../theming/components/SubHeading";
 import { BasicMarker } from "../common/map/markers/BasicMarker";
 import { PropertyMap, PropertyMapUiState } from "./components/PropertyMap";
+import { NavigationPath } from "../../navigation";
 
 export function PropertyListingPage({
   className = "",
@@ -105,7 +106,13 @@ export function PropertyListingPage({
           }
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
           onBack={() => {
-            navigate("/");
+            const from = searchParams.get("from");
+            if (from === "agent-dashboard") {
+              navigate(NavigationPath.AgentDashboard)
+            }
+            else {
+              navigate(NavigationPath.Home)
+            }
           }}
           onBook={(index: number) => {
             console.log(`booking button ${index} pressed`);
