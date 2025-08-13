@@ -171,21 +171,21 @@ export default function FormPropertyImages({
                         >
                           {/* Drag Handle */}
                           <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <div className="bg-black bg-opacity-50 rounded p-1 cursor-move">
+                            <div className="bg-black bg-opacity-50 rounded p-1 cursor-move h-6 w-6 flex items-center justify-center">
                               <GripVertical className="w-4 h-4 text-white" />
                             </div>
                           </div>
 
                           {/* Remove Button */}
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            className="absolute top-2 right-2 z-10 w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={() => removeFile(index)}
-                          >
-                            <X className="w-3 h-3" />
-                          </Button>
+                          <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              type="button"
+                              className="bg-red-500 hover:bg-red-600 rounded p-1 h-6 w-6 flex items-center justify-center transition-colors"
+                              onClick={() => removeFile(index)}
+                            >
+                              <X className="w-3 h-3 text-white" />
+                            </button>
+                          </div>
 
                           {/* Image Preview */}
                           <div className="aspect-square">
