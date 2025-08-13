@@ -251,19 +251,19 @@ function ListingPageContent({
         onReject={(applicationId: string) => {
           console.log(`Rejected application ${applicationId}`);
         }}
-        onProgress={(applicationId: string) => {
+        onAccept={(applicationId: string) => {
           console.log(`Progressed application ${applicationId}`);
         }}
-        onBackgroundPass={(applicationId: string) => {
-          console.log(
-            `Background check passed for application ${applicationId}`
-          );
-        }}
-        onBackgroundFail={(applicationId: string) => {
-          console.log(
-            `Background check failed for application ${applicationId}`
-          );
-        }}
+        // onBackgroundPass={(applicationId: string) => {
+        //   console.log(
+        //     `Background check passed for application ${applicationId}`
+        //   );
+        // }}
+        // onBackgroundFail={(applicationId: string) => {
+        //   console.log(
+        //     `Background check failed for application ${applicationId}`
+        //   );
+        // }}
         onSendToLandlord={(applicationId: string) => {
           console.log(`Sent application ${applicationId} to landlord`);
         }}

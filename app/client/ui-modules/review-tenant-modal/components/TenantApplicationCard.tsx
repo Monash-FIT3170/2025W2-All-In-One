@@ -3,12 +3,12 @@ import { TenantApplication } from '../types/TenantApplication';
 import { TenantApplicationStatus } from '../enums/TenantApplicationStatus';
 import { BackgroundCheckStatus } from '../enums/BackgroundCheckStatus';
 import { StatusBadge, BackgroundBadge } from './StatusBadges';
-import { RejectButton, ProgressButton, BackgroundPassButton, BackgroundFailButton, SendToLandlordButton } from '../../property-listing-page/components/TenantReviewButtons';
+import { RejectButton, AcceptButton, BackgroundPassButton, BackgroundFailButton, SendToLandlordButton } from '../../property-listing-page/components/TenantReviewButtons';
 
 type TenantApplicationCardProps = {
   application: TenantApplication;
   onReject: (applicationId: string) => void;
-  onProgress: (applicationId: string) => void;
+  onAccept: (applicationId: string) => void;
   // onBackgroundPass: (applicationId: string) => void;
   // onBackgroundFail: (applicationId: string) => void;
   onSendToLandlord: (applicationId: string) => void;
@@ -17,7 +17,7 @@ type TenantApplicationCardProps = {
 export function TenantApplicationCard({
   application,
   onReject,
-  onProgress,
+  onAccept,
   // onBackgroundPass,
   // onBackgroundFail,
   onSendToLandlord,
@@ -42,7 +42,7 @@ export function TenantApplicationCard({
           {application.status === TenantApplicationStatus.UNDETERMINED && (
             <>
               <RejectButton onClick={() => onReject(application.id)} />
-              <ProgressButton onClick={() => onProgress(application.id)} />
+              <AcceptButton onClick={() => onAccept(application.id)} />
             </>
           )}
         </div>

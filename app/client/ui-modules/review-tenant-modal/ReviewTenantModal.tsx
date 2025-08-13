@@ -18,7 +18,7 @@ export function ReviewTenantModal({
   isOpen,
   onClose,
   onReject,
-  onProgress,
+  onAccept,
   // onBackgroundPass,
   // onBackgroundFail,
   onSendToLandlord,
@@ -72,13 +72,13 @@ export function ReviewTenantModal({
     onReject(applicationId);
   };
 
-  const handleProgress = (applicationId: string) => {
+  const handleAccept = (applicationId: string) => {
     setApplications(currentApplications =>
       currentApplications.map(app =>
         app.id === applicationId ? { ...app, status: TenantApplicationStatus.ACCEPTED } : app
       )
     );
-    onProgress(applicationId);
+    onAccept(applicationId);
   };
 
   // const handleBackgroundPass = (applicationId: string) => {
@@ -186,7 +186,7 @@ export function ReviewTenantModal({
         <ModalContent
           applications={filteredApplications}
           onReject={handleReject}
-          onProgress={handleProgress}
+          onAccept={handleAccept}
           onSendToLandlord={handleSendToLandlord}
         />
 
