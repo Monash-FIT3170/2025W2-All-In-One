@@ -1,48 +1,102 @@
-import React, { useState } from "react";
-import { Conversation, Message } from "./types";
+import React, { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { ConversationList } from "./components/ConversationList";
 import { ChatWindow } from "./components/ChatWindow";
+import {
+  selectConversationsForRole,
+  selectActiveConversationId,
+  selectAllMessages,
+  selectMessageText,
+  selectConversationsLoading,
+  selectError,
+  fetchConversations,
+  fetchConversationMessages,
+  sendMessage,
+  setActiveConversation,
+  setMessageText,
+} from "./state/reducers/messages-slice";
 
-function TenantMessages() {
-  const [activeId, setActiveId] = useState<string>("1");
-  const [messageText, setMessageText] = useState("");
+export function TenantMessages(): React.JSX.Element {
+  const dispatch = useAppDispatch();
+  
+  // Selectors
+  const conversations = useAppSelector(selectConversationsForRole('tenant'));
+  const activeConversationId = useAppSelector(selectActiveConversationId);
+  const messages = useAppSelector(selectAllMessages);
+  const messageText = useAppSelector(selectMessageText);
+  const conversationsLoading = useAppSelector(selectConversationsLoading);
+  const error = useAppSelector(selectError);
 
-  // TODO: replace with real tenant conversations
-  const conversations: Conversation[] = [
-    { id: "1", name: "John Smith", role: "Property Manager", avatar: "JS", lastMessage: "We'll schedule the maintenance", timestamp: "10:30 AM", unreadCount: 0 },
-    { id: "2", name: "Sarah Johnson", role: "Leasing Agent", avatar: "SJ", lastMessage: "Your lease renewal documents are", timestamp: "Yesterday", unreadCount: 1 },
-    { id: "3", name: "Michael Chen", role: "Maintenance Supervisor", avatar: "MC", lastMessage: "Repair completed. Please confirm", timestamp: "Mar 25", unreadCount: 0 },
-  ];
+  // Get current user ID for fetching conversations
+  const currentUser = useAppSelector((state) => state.currentUser.authUser);
 
-  // TODO: replace with real messages
-  const messages: Message[] = [
-    { id: "1", text: "Hello, the faucet is leaking.", timestamp: "Yesterday, 9:15 AM", isOutgoing: true, isRead: true },
-    { id: "2", text: "Thanks for reporting. When works for a visit?", timestamp: "Yesterday, 9:45 AM", isOutgoing: false, isRead: false },
-    { id: "3", text: "Tomorrow morning is good.", timestamp: "Yesterday, 10:15 AM", isOutgoing: true, isRead: true },
-  ];
+  useEffect(() => {
+    if (currentUser?.userId) {
+      dispatch(fetchConversations(currentUser.userId));
+    }
+  }, [dispatch, currentUser?.userId]);
 
-  const active = conversations.find(c => c.id === activeId) || null;
+  useEffect(() => {
+    if (activeConversationId) {
+      dispatch(fetchConversationMessages(activeConversationId));
+    }
+  }, [dispatch, activeConversationId]);
+
+  const handleSelectConversation = (conversationId: string) => {
+    dispatch(setActiveConversation(conversationId));
+  };
+
+  const handleChangeMessage = (value: string) => {
+    dispatch(setMessageText(value));
+  };
 
   const handleSend = () => {
-    if (!messageText.trim()) return;
-    // TODO: send message
-    setMessageText("");
+    if (!messageText.trim() || !activeConversationId) return;
+    
+    dispatch(sendMessage({
+      conversationId: activeConversationId,
+      text: messageText.trim()
+    }));
   };
+
+  const active = conversations.find(c => c.id === activeConversationId) || null;
+
+  if (conversationsLoading) {
+    return (
+      <div className="bg-gray-50 flex justify-center p-2 pt-3">
+        <div className="w-full max-w-[1720px] h-[calc(100vh-8rem)] bg-white rounded-xl shadow-lg flex items-center justify-center">
+          <div className="text-gray-500">Loading conversations...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-gray-50 flex justify-center p-2 pt-3">
+        <div className="w-full max-w-[1720px] h-[calc(100vh-8rem)] bg-white rounded-xl shadow-lg flex items-center justify-center">
+          <div className="text-red-500">Error: {error}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-50 flex justify-center p-2 pt-3">
       <div className="w-full max-w-[1720px] h-[calc(100vh-8rem)] bg-white rounded-xl shadow-lg flex overflow-hidden">
-        <ConversationList conversations={conversations} activeId={activeId} onSelect={setActiveId} />
+        <ConversationList 
+          conversations={conversations} 
+          activeId={activeConversationId || undefined} 
+          onSelect={handleSelectConversation} 
+        />
         <ChatWindow
           header={active ? { name: active.name, role: active.role, avatar: active.avatar } : null}
           messages={messages}
           messageText={messageText}
-          onChangeMessage={setMessageText}
+          onChangeMessage={handleChangeMessage}
           onSend={handleSend}
         />
       </div>
     </div>
   );
 }
-
-export default TenantMessages;

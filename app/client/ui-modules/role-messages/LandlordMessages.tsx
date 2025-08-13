@@ -1,48 +1,102 @@
-import React, { useState } from "react";
-import { Conversation, Message } from "./types";
+import React, { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { ConversationList } from "./components/ConversationList";
 import { ChatWindow } from "./components/ChatWindow";
+import {
+  selectConversationsForRole,
+  selectActiveConversationId,
+  selectAllMessages,
+  selectMessageText,
+  selectConversationsLoading,
+  selectError,
+  fetchConversations,
+  fetchConversationMessages,
+  sendMessage,
+  setActiveConversation,
+  setMessageText,
+} from "./state/reducers/messages-slice";
 
-function LandlordMessages() {
-  const [activeId, setActiveId] = useState<string>("1");
-  const [messageText, setMessageText] = useState("");
+export function LandlordMessages(): React.JSX.Element {
+  const dispatch = useAppDispatch();
+  
+  // Selectors
+  const conversations = useAppSelector(selectConversationsForRole('landlord'));
+  const activeConversationId = useAppSelector(selectActiveConversationId);
+  const messages = useAppSelector(selectAllMessages);
+  const messageText = useAppSelector(selectMessageText);
+  const conversationsLoading = useAppSelector(selectConversationsLoading);
+  const error = useAppSelector(selectError);
 
-  // TODO: replace with real landlord conversations
-  const conversations: Conversation[] = [
-    { id: "1", name: "Alex Carter", role: "Agent", avatar: "AC", lastMessage: "Tenant application received", timestamp: "09:20 AM", unreadCount: 0 },
-    { id: "2", name: "Priya Singh", role: "Tenant", avatar: "PS", lastMessage: "Rent paid for April", timestamp: "Yesterday", unreadCount: 0 },
-    { id: "3", name: "Michael Chen", role: "Maintenance", avatar: "MC", lastMessage: "Inspection scheduled Fri 2 PM", timestamp: "Mar 24", unreadCount: 1 },
-  ];
+  // Get current user ID for fetching conversations
+  const currentUser = useAppSelector((state) => state.currentUser.authUser);
 
-  // TODO: replace with real messages
-  const messages: Message[] = [
-    { id: "1", text: "Hi Alex, can we review the new application?", timestamp: "Yesterday, 2:05 PM", isOutgoing: true, isRead: true },
-    { id: "2", text: "Yes, I will send you the summary shortly.", timestamp: "Yesterday, 2:16 PM", isOutgoing: false, isRead: false },
-    { id: "3", text: "Thanks!", timestamp: "Yesterday, 2:18 PM", isOutgoing: true, isRead: true },
-  ];
+  useEffect(() => {
+    if (currentUser?.userId) {
+      dispatch(fetchConversations(currentUser.userId));
+    }
+  }, [dispatch, currentUser?.userId]);
 
-  const active = conversations.find(c => c.id === activeId) || null;
+  useEffect(() => {
+    if (activeConversationId) {
+      dispatch(fetchConversationMessages(activeConversationId));
+    }
+  }, [dispatch, activeConversationId]);
+
+  const handleSelectConversation = (conversationId: string) => {
+    dispatch(setActiveConversation(conversationId));
+  };
+
+  const handleChangeMessage = (value: string) => {
+    dispatch(setMessageText(value));
+  };
 
   const handleSend = () => {
-    if (!messageText.trim()) return;
-    // TODO: send message
-    setMessageText("");
+    if (!messageText.trim() || !activeConversationId) return;
+    
+    dispatch(sendMessage({
+      conversationId: activeConversationId,
+      text: messageText.trim()
+    }));
   };
+
+  const active = conversations.find(c => c.id === activeConversationId) || null;
+
+  if (conversationsLoading) {
+    return (
+      <div className="bg-gray-50 flex justify-center p-2 pt-3">
+        <div className="w-full max-w-[1720px] h-[calc(100vh-8rem)] bg-white rounded-xl shadow-lg flex items-center justify-center">
+          <div className="text-gray-500">Loading conversations...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-gray-50 flex justify-center p-2 pt-3">
+        <div className="w-full max-w-[1720px] h-[calc(100vh-8rem)] bg-white rounded-xl shadow-lg flex items-center justify-center">
+          <div className="text-red-500">Error: {error}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-50 flex justify-center p-2 pt-3">
       <div className="w-full max-w-[1720px] h-[calc(100vh-8rem)] bg-white rounded-xl shadow-lg flex overflow-hidden">
-        <ConversationList title="Messages" conversations={conversations} activeId={activeId} onSelect={setActiveId} />
+        <ConversationList 
+          conversations={conversations} 
+          activeId={activeConversationId || undefined} 
+          onSelect={handleSelectConversation} 
+        />
         <ChatWindow
           header={active ? { name: active.name, role: active.role, avatar: active.avatar } : null}
           messages={messages}
           messageText={messageText}
-          onChangeMessage={setMessageText}
+          onChangeMessage={handleChangeMessage}
           onSend={handleSend}
         />
       </div>
     </div>
   );
-}
-
-export default LandlordMessages; 
+} 

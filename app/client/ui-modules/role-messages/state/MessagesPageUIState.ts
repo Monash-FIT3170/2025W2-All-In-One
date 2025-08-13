@@ -1,6 +1,6 @@
 import { Conversation, Message } from "../types";
 
-export interface AgentMessagesState {
+export interface MessagesState {
   isLoading: boolean;
   conversations: Conversation[];
   activeConversationId: string | null;

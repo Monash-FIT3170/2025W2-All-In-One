@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../../store";
-import { AgentMessagesState } from "../AgentMessagesPageUIState";
+import { MessagesState } from "../MessagesPageUIState";
 import { Conversation, Message } from "../../types";
 
-const initialState: AgentMessagesState = {
+const initialState: MessagesState = {
   isLoading: false,
   conversations: [],
   activeConversationId: null,
@@ -15,13 +15,14 @@ const initialState: AgentMessagesState = {
 };
 
 // Async thunks
-export const fetchAgentConversations = createAsyncThunk(
-  "agentMessages/fetchConversations",
-  async (agentId: string, { rejectWithValue }) => {
+export const fetchConversations = createAsyncThunk(
+  "messages/fetchConversations",
+  async (userId: string, { rejectWithValue }) => {
     try {
-      // TODO: REPLACE WITH ACTUAL API CALL TO GET CONVOS
-      // For now, return mock data
+      // TODO: Replace with actual API call to fetch conversations
+      // For now, return mock data for all roles
       const mockConversations: Conversation[] = [
+        // Agent conversations
         {
           id: "1",
           name: "John Smith",
@@ -49,6 +50,53 @@ export const fetchAgentConversations = createAsyncThunk(
           timestamp: "Mar 25",
           unreadCount: 0,
         },
+        // Landlord conversations
+        {
+          id: "4",
+          name: "Alex Carter",
+          role: "Agent",
+          avatar: "AC",
+          lastMessage: "Tenant application received",
+          timestamp: "09:20 AM",
+          unreadCount: 0,
+        },
+        {
+          id: "5",
+          name: "Priya Singh",
+          role: "Tenant",
+          avatar: "PS",
+          lastMessage: "Rent paid for April",
+          timestamp: "Yesterday",
+          unreadCount: 0,
+        },
+        {
+          id: "6",
+          name: "David Wilson",
+          role: "Maintenance",
+          avatar: "DW",
+          lastMessage: "Inspection scheduled Fri 2 PM",
+          timestamp: "Mar 24",
+          unreadCount: 1,
+        },
+        // Tenant conversations
+        {
+          id: "7",
+          name: "Emma Thompson",
+          role: "Property Manager",
+          avatar: "ET",
+          lastMessage: "Your maintenance request has been approved",
+          timestamp: "Mar 23",
+          unreadCount: 0,
+        },
+        {
+          id: "8",
+          name: "James Brown",
+          role: "Maintenance",
+          avatar: "JB",
+          lastMessage: "We'll fix the leak tomorrow",
+          timestamp: "Mar 22",
+          unreadCount: 0,
+        },
       ];
 
       return mockConversations;
@@ -59,10 +107,10 @@ export const fetchAgentConversations = createAsyncThunk(
 );
 
 export const fetchConversationMessages = createAsyncThunk(
-  "agentMessages/fetchMessages",
+  "messages/fetchMessages",
   async (conversationId: string, { rejectWithValue }) => {
     try {
-      // TODO: REPLACE WITH ACTUAL API CALL TO GET MESSAGES 
+      // TODO: Replace with actual API call to fetch messages
       // For now, return mock data
       const mockMessages: Message[] = [
         { id: "1", text: "Hello, I need to report a leaking faucet in the kitchen.", timestamp: "Yesterday, 9:15 AM", isOutgoing: true, isRead: true },
@@ -81,10 +129,10 @@ export const fetchConversationMessages = createAsyncThunk(
 );
 
 export const sendMessage = createAsyncThunk(
-  "agentMessages/sendMessage",
+  "messages/sendMessage",
   async (messageData: { conversationId: string; text: string }, { rejectWithValue }) => {
     try {
-      // TODO: REPLACE WITH ACTUAL API CALL TO SEND MESSAGES
+      // TODO: Replace with actual API call to send message
       const newMessage: Message = {
         id: Date.now().toString(),
         text: messageData.text,
@@ -100,8 +148,8 @@ export const sendMessage = createAsyncThunk(
   }
 );
 
-export const agentMessagesSlice = createSlice({
-  name: "agentMessages",
+export const messagesSlice = createSlice({
+  name: "messages",
   initialState,
   reducers: {
     setActiveConversation(state, action: PayloadAction<string>) {
@@ -130,15 +178,15 @@ export const agentMessagesSlice = createSlice({
   extraReducers: (builder) => {
     // Fetch conversations
     builder
-      .addCase(fetchAgentConversations.pending, (state) => {
+      .addCase(fetchConversations.pending, (state) => {
         state.conversationsLoading = true;
         state.error = null;
       })
-      .addCase(fetchAgentConversations.fulfilled, (state, action) => {
+      .addCase(fetchConversations.fulfilled, (state, action) => {
         state.conversationsLoading = false;
         state.conversations = action.payload;
       })
-      .addCase(fetchAgentConversations.rejected, (state, action) => {
+      .addCase(fetchConversations.rejected, (state, action) => {
         state.conversationsLoading = false;
         state.error = action.payload as string;
       });
@@ -184,17 +232,41 @@ export const {
   clearError,
   addMessage,
   updateConversationLastMessage,
-} = agentMessagesSlice.actions;
+} = messagesSlice.actions;
 
 // Export selectors
-export const selectAgentMessages = (state: RootState) => state.agentMessages;
-export const selectConversations = (state: RootState) => state.agentMessages.conversations;
-export const selectActiveConversationId = (state: RootState) => state.agentMessages.activeConversationId;
-export const selectMessages = (state: RootState) => state.agentMessages.messages;
-export const selectMessageText = (state: RootState) => state.agentMessages.messageText;
-export const selectIsLoading = (state: RootState) => state.agentMessages.isLoading;
-export const selectConversationsLoading = (state: RootState) => state.agentMessages.conversationsLoading;
-export const selectMessagesLoading = (state: RootState) => state.agentMessages.messagesLoading;
-export const selectError = (state: RootState) => state.agentMessages.error;
+export const selectMessages = (state: RootState) => state.messages;
+export const selectAllConversations = (state: RootState) => state.messages.conversations;
+export const selectActiveConversationId = (state: RootState) => state.messages.activeConversationId;
+export const selectAllMessages = (state: RootState) => state.messages.messages;
+export const selectMessageText = (state: RootState) => state.messages.messageText;
+export const selectIsLoading = (state: RootState) => state.messages.isLoading;
+export const selectConversationsLoading = (state: RootState) => state.messages.conversationsLoading;
+export const selectMessagesLoading = (state: RootState) => state.messages.messagesLoading;
+export const selectError = (state: RootState) => state.messages.error;
 
-export default agentMessagesSlice.reducer; 
+// Role-based selectors using currentUser role
+export const selectConversationsForRole = (role: string) => (state: RootState) => {
+  const currentRole = state.currentUser.authUser?.role;
+  if (!currentRole) return [];
+  
+  // Filter conversations based on role
+  // This logic can be customized based on your business rules
+  return state.messages.conversations.filter((c: Conversation) => {
+    // For now, simple role matching - can be enhanced later
+    if (role === 'agent') {
+      return c.role === 'Property Manager' || c.role === 'Leasing Agent' || c.role === 'Maintenance Supervisor';
+    } else if (role === 'landlord') {
+      return c.role === 'Agent' || c.role === 'Tenant' || c.role === 'Maintenance';
+    } else if (role === 'tenant') {
+      return c.role === 'Property Manager' || c.role === 'Maintenance';
+    }
+    return false;
+  });
+};
+
+export const selectMessagesForCurrentUser = (state: RootState) => {
+  return state.messages.messages;
+};
+
+export default messagesSlice.reducer; 

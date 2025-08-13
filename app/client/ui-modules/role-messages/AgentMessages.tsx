@@ -3,32 +3,28 @@ import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { ConversationList } from "./components/ConversationList";
 import { ChatWindow } from "./components/ChatWindow";
 import {
-  selectConversations,
+  selectConversationsForRole,
   selectActiveConversationId,
-  selectMessages,
+  selectAllMessages,
   selectMessageText,
-  selectIsLoading,
   selectConversationsLoading,
-  selectMessagesLoading,
   selectError,
-  fetchAgentConversations,
+  fetchConversations,
   fetchConversationMessages,
   sendMessage,
   setActiveConversation,
   setMessageText,
-} from "./state/reducers/agent-messages-slice";
+} from "./state/reducers/messages-slice";
 
 export function AgentMessage(): React.JSX.Element {
   const dispatch = useAppDispatch();
   
   // Selectors
-  const conversations = useAppSelector(selectConversations);
+  const conversations = useAppSelector(selectConversationsForRole('agent'));
   const activeConversationId = useAppSelector(selectActiveConversationId);
-  const messages = useAppSelector(selectMessages);
+  const messages = useAppSelector(selectAllMessages);
   const messageText = useAppSelector(selectMessageText);
-  const isLoading = useAppSelector(selectIsLoading);
   const conversationsLoading = useAppSelector(selectConversationsLoading);
-  const messagesLoading = useAppSelector(selectMessagesLoading);
   const error = useAppSelector(selectError);
 
   // Get current user ID for fetching conversations
@@ -36,7 +32,7 @@ export function AgentMessage(): React.JSX.Element {
 
   useEffect(() => {
     if (currentUser?.userId) {
-      dispatch(fetchAgentConversations(currentUser.userId));
+      dispatch(fetchConversations(currentUser.userId));
     }
   }, [dispatch, currentUser?.userId]);
 

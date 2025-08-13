@@ -16,7 +16,7 @@ import { LandlordDashboard } from "./ui-modules/role-dashboard/landlord-dashboar
 import { LandlordCalendar } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordCalendar";
 import { LandlordTask } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordTask";
 import { LandlordProperty } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordProperty";
-import LandlordMessages from "./ui-modules/role-messages/LandlordMessages";
+import { LandlordMessages } from "./ui-modules/role-messages/LandlordMessages";
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottomNavbar";
 import { TopNavbar } from "./ui-modules/navigation-bars/TopNavbar";
 import { RoleSideNavBar } from "./ui-modules/navigation-bars/side-nav-bars/SideNavbar";
@@ -28,7 +28,7 @@ import TenantDashboard from "./ui-modules/role-dashboard/tenant-dashboard/pages/
 import TenantProperty from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantProperty";
 import { TenantCalendar } from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantCalendar";
 import TenantMaintenance from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMaintenance";
-import TenantMessages from "./ui-modules/role-messages/TenantMessages";
+import { TenantMessages } from "./ui-modules/role-messages/TenantMessages";
 import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDocument";
 import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
 import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
