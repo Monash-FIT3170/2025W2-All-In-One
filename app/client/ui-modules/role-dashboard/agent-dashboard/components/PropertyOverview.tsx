@@ -47,38 +47,19 @@ export function PropertyOverview({
       rightElement={
         <Popover>
           <PopoverTrigger asChild>
-            <button 
-              className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50"
-              type="button"
-            >
+            <button className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50">
               <span>Filter {filterStatus && `(${filterStatus})`}</span>
-              <svg 
-                className="w-4 h-4" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M19 9l-7 7-7-7" 
-                />
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
           </PopoverTrigger>
-          <PopoverContent 
-            align="end" 
-            sideOffset={8}
-            className="w-48 p-1"
-          >
+          <PopoverContent align="end" sideOffset={8} className="w-48 p-1">
             <div className="space-y-1">
               <button
                 onClick={() => setFilterStatus(null)}
                 className={`w-full text-left px-3 py-2 text-sm rounded ${
-                  !filterStatus 
-                    ? 'bg-blue-50 text-blue-800' 
-                    : 'text-gray-700 hover:bg-gray-100'
+                  !filterStatus ? 'bg-blue-50 text-blue-800' : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
                 All Statuses
@@ -89,12 +70,10 @@ export function PropertyOverview({
                   onClick={() => setFilterStatus(status)}
                   className={`w-full text-left px-3 py-2 text-sm rounded ${
                     filterStatus === status
-                      ? `${
-                          status === PropertyStatus.OCCUPIED ? 'bg-red-50 text-red-800' :
-                          status === PropertyStatus.VACANT ? 'bg-green-50 text-green-800' :
-                          status === PropertyStatus.UNDER_MAINTENANCE ? 'bg-yellow-50 text-yellow-800' :
-                          'bg-blue-50 text-blue-800'
-                        }`
+                      ? status === PropertyStatus.OCCUPIED ? 'bg-red-50 text-red-800' :
+                        status === PropertyStatus.VACANT ? 'bg-green-50 text-green-800' :
+                        status === PropertyStatus.UNDER_MAINTENANCE ? 'bg-yellow-50 text-yellow-800' :
+                        'bg-blue-50 text-blue-800'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
@@ -122,12 +101,16 @@ export function PropertyOverview({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {properties.map((property, index) => (
-                  <tr key={index} className="transition-colors hover:bg-gray-50"
-                      onClick={() => handlePropertyClick(property.propertyId)} role="button"
-                      tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && handlePropertyClick(property.propertyId)}
-                      aria-label={'View property details for property at ${property.streetnumber} ${property.streetname}'}
-                      >
+                {filteredProperties.map((property, index) => (
+                  <tr
+                    key={index}
+                    className="transition-colors hover:bg-gray-50"
+                    onClick={() => handlePropertyClick(property.propertyId)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && handlePropertyClick(property.propertyId)}
+                    aria-label={`View property details for property at ${property.streetnumber} ${property.streetname}`}
+                  >
                     <td className="px-6 py-4 text-sm">{`${property.streetnumber} ${property.streetname}`}</td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -150,12 +133,11 @@ export function PropertyOverview({
           </div>
         )}
       </div>
-
-                           <div className="mt-4">
-          <ViewAllButton onClick={handleViewAllClick}>
-            View All Properties
-          </ViewAllButton>
-        </div>
+      <div className="mt-4">
+        <ViewAllButton onClick={handleViewAllClick}>
+          View All Properties
+        </ViewAllButton>
+      </div>
     </CardWidget>
   );
 }
