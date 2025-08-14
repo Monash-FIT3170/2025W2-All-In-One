@@ -1,7 +1,14 @@
 import { create } from "domain";
 import { PropertyWithListingData } from "/app/client/library-modules/use-cases/property-listing/models/PropertyWithListingData";
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import {
+    ActionReducerMapBuilder,
+    createAsyncThunk,
+    createSlice,
+    PayloadAction,
+} from "@reduxjs/toolkit";
 import { S } from "@fullcalendar/core/internal-common";
+import { searchProperties } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
+import { getPropertyWithListingDataUseCase } from "/app/client/library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
 
 export type SearchResultState = {
     decodedQuery: string;
@@ -9,6 +16,8 @@ export type SearchResultState = {
     isLoading: boolean;
     error: string | null;
     visibleCount: number;
+    status: "idle" | "loading" | "succeeded" | "failed";
+    defaultPageSize: number;
 };
 
 const initialState: SearchResultState = {
@@ -16,9 +25,12 @@ const initialState: SearchResultState = {
     properties: [],
     isLoading: true,
     error: null,
+    status: "idle",
+    defaultPageSize: 9,
     visibleCount: 9, // default page size ( how many properties to show initially )
 };
 
+// This thunk fetches properties based on a search query
 export const fetchPropertiesByQuery = createAsyncThunk<
     PropertyWithListingData[], // Returns an array of PropertyWithListingData
     string
@@ -26,8 +38,78 @@ export const fetchPropertiesByQuery = createAsyncThunk<
     const q = decodedQuery.trim();
 
     if (!q) {
-        return [];
+        return []; // If the query is empty, return an empty array
     }
 
-    return []; // Placeholder for actual fetching logic
+    const results = await searchProperties(q); // searches properties based on query
+
+    const enrichedProperties = await Promise.all(
+        results.map(async (property) => {
+            return await getPropertyWithListingDataUseCase(property.propertyId);
+        })
+    );
+
+    return enrichedProperties;
 });
+
+const SearchResultsSlice = createSlice({
+    name: "searchResults",
+    initialState,
+    reducers: {
+        setDecodedQuery: (
+            state: SearchResultState,
+            action: PayloadAction<string>
+        ) => {
+            state.decodedQuery = action.payload;
+        },
+        resetVisibleCount: (state: SearchResultState) => {
+            state.visibleCount = state.defaultPageSize;
+        },
+        incrementVisibleCount: (state: SearchResultState) => {
+            state.visibleCount = Math.min(
+                state.visibleCount + state.defaultPageSize,
+                state.properties.length
+            );
+        },
+        clear(state: SearchResultState) {
+            state.properties = [];
+            state.error = null;
+            state.status = "idle";
+            state.visibleCount = state.defaultPageSize;
+        },
+    },
+    extraReducers: (builder: ActionReducerMapBuilder<SearchResultState>) => {
+        builder
+            .addCase(fetchPropertiesByQuery.pending, (state) => {
+                state.status = "loading";
+                state.error = null;
+                state.properties = [];
+            })
+            .addCase(fetchPropertiesByQuery.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                state.properties = action.payload;
+            })
+            .addCase(fetchPropertiesByQuery.rejected, (state, action) => {
+                state.status = "failed";
+                state.error =
+                    action.error?.message ?? "Failed to load results.";
+                state.properties = [];
+            });
+    },
+});
+
+export const {
+    setDecodedQuery,
+    resetVisibleCount,
+    incrementVisibleCount,
+    clear,
+} = SearchResultsSlice.actions;
+export default SearchResultsSlice.reducer;
+
+// selectors
+export const selectSearch = (s: { search: SearchResultState }) =>
+    s.search as SearchResultState;
+export const selectShown = (s: { search: SearchResultState }) => {
+    const { properties, visibleCount } = s.search as SearchResultState;
+    return properties.slice(0, visibleCount);
+};

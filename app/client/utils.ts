@@ -7,32 +7,28 @@ export function cn(...inputs: any[]) {
     return twMerge(clsx(inputs));
 }
 
+// builds the url and will navigate to the search results page with the query
 export function handleSearch(query: string, navigate: NavigateFunction) {
-    const cleanedQuery = query.trim();
-    if (cleanedQuery) {
-        navigate(
-            `${NavigationPath.Search}${encodeURIComponent(
-                cleanedQuery.replace(/\s+/g, "+")
-            )}`
-        );
-    }
+    const url = buildSearchUrl(query);
+    if (url) navigate(url);
+}
+
+//
+export function buildSearchUrl(q: string) {
+    const encoded = encodeSearchQuery(q);
+    return encoded ? `${NavigationPath.Search}?q=${encoded}` : null;
 }
 
 export function encodeSearchQuery(q: string) {
     const cleaned = q.trim();
     if (!cleaned) return "";
-    return encodeURIComponent(cleaned.replace(/\s+/g, "+"));
+    return encodeURIComponent(cleaned.replace(/%20/g, "+"));
 }
 
 export function decodeSearchQuery(encoded: string) {
     return decodeURIComponent(encoded || "")
-        .replace(/\+/g, " ")
+        .replace(/\+/g, "%20")
         .trim();
-}
-
-export function buildSearchUrl(q: string) {
-    const encoded = encodeSearchQuery(q);
-    return encoded ? `/search?q=${encoded}` : null;
 }
 
 export function getQParam(search: string) {
