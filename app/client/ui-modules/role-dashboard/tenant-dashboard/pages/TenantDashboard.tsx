@@ -20,11 +20,11 @@ function TenantDashboard() {
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchTenantDetails(currentUser.userId));
-
+      
       // TODO: When backend is implemented, fetch and update messages and lease status:
       // Example:
       // dispatch(setMessagesCount(actualMessagesCount));
-      // dispatch(setLeaseStatus("9 months"));
+      // dispatch(setLeaseStatus({ kind: LeaseStatusKind.Active, monthsRemaining: 9 }));
     }
   }, [dispatch, currentUser?.userId]);
 
@@ -38,10 +38,7 @@ function TenantDashboard() {
         <div className="flex-1">
           <div className="flex">
             <div className="flex-1 p-6">
-              <DashboardCards
-                rentAmount={property?.pricePerMonth}
-                tasks={tasks}
-              />
+              <DashboardCards rentAmount={property?.pricePerMonth} tasks={tasks} />
               <div className=" grid grid-cols-1 md:grid-cols-2 gap-6 px-6">
                 <div className="mt-5">
                   <UpcomingTasks tasks={tasks} currentUser={currentUser} />

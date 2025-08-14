@@ -6,8 +6,11 @@ import { TaskStatus } from "/app/shared/task-status-identifier";
 import { useAppSelector } from "../../../../store";
 import {
   selectMessagesCount,
-  selectLeaseStatus,
+  selectLeaseStatusKind,
+  selectLeaseMonthsRemaining,
+  LeaseStatusKind,
 } from "../state/tenant-dashboard-slice";
+import { startOfWeek, endOfWeek, parseISO, isWithinInterval } from "date-fns";
 
 interface DashboardCardsProps {
   rentAmount?: number;
@@ -17,34 +20,30 @@ interface DashboardCardsProps {
 function DashboardCards({ rentAmount, tasks = [] }: DashboardCardsProps) {
   // Get state values from Redux
   const messagesCount = useAppSelector(selectMessagesCount);
-  const leaseStatus = useAppSelector(selectLeaseStatus);
+  const leaseStatusKind = useAppSelector(selectLeaseStatusKind);
+  const leaseMonthsRemaining = useAppSelector(selectLeaseMonthsRemaining);
 
   // Calculate pending tasks (not completed)
-  const pendingTasks = tasks.filter(
-    (task) => task.status !== TaskStatus.COMPLETED
-  );
+  const pendingTasks = tasks.filter(t => t.status !== TaskStatus.COMPLETED);
   const pendingTasksCount = pendingTasks.length;
 
   // Calculate tasks due this week
-  const tasksDueThisWeek = pendingTasks.filter((task) => {
-    const dueDate = new Date(task.dueDate); // dueDate is in YYYY-MM-DD format
-    const today = new Date();
+  const start = startOfWeek(new Date(), { weekStartsOn: 0 }); // Sunday
+  const end = endOfWeek(new Date(), { weekStartsOn: 0 });
 
-    // Get the start of this week (Sunday)
-    const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay());
-    startOfWeek.setHours(0, 0, 0, 0);
-
-    // Get the end of this week (Saturday)
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-    endOfWeek.setHours(23, 59, 59, 999);
-
-    // Set dueDate to start of day for proper comparison
-    dueDate.setHours(0, 0, 0, 0);
-
-    return dueDate >= startOfWeek && dueDate <= endOfWeek;
+  const tasksDueThisWeek = pendingTasks.filter(t => {
+    const due = parseISO(t.dueDate); // YYYY-MM-DD
+    return isWithinInterval(due, { start, end });
   }).length;
+
+  // Determine lease display values based on enum
+  const leaseValue = leaseStatusKind === LeaseStatusKind.NotAvailable 
+    ? "N/A" 
+    : `${leaseMonthsRemaining} months`;
+  
+  const leaseSubtitle = leaseStatusKind === LeaseStatusKind.NotAvailable
+    ? "Not available yet"
+    : "Remaining on current lease";
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
@@ -56,12 +55,8 @@ function DashboardCards({ rentAmount, tasks = [] }: DashboardCardsProps) {
 
       <CardWidget
         title="Lease Status"
-        value={leaseStatus}
-        subtitle={
-          leaseStatus === "N/A"
-            ? "Not available yet"
-            : "Remaining on current lease"
-        }
+        value={leaseValue}
+        subtitle={leaseSubtitle}
       />
 
       <CardWidget
