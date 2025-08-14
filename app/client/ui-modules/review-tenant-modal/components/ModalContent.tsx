@@ -5,7 +5,7 @@ import { TenantApplicationCard } from './TenantApplicationCard';
 type ModalContentProps = {
   applications: TenantApplication[];
   onReject: (applicationId: string) => void;
-  onProgress: (applicationId: string) => void;
+  onAccept: (applicationId: string) => void;
   // onBackgroundPass: (applicationId: string) => void;
   // onBackgroundFail: (applicationId: string) => void;
   onSendToLandlord: (applicationId: string) => void;
@@ -14,7 +14,7 @@ type ModalContentProps = {
 export function ModalContent({
   applications,
   onReject,
-  onProgress,
+  onAccept,
   // onBackgroundPass,
   // onBackgroundFail,
   onSendToLandlord,
@@ -27,7 +27,7 @@ export function ModalContent({
             key={application.id}
             application={application}
             onReject={onReject}
-            onProgress={onProgress}
+            onAccept={onAccept}
             // onBackgroundPass={onBackgroundPass}
             // onBackgroundFail={onBackgroundFail}
             onSendToLandlord={onSendToLandlord}
