@@ -106,7 +106,7 @@ export function AgentCalendar(): React.JSX.Element {
         dueDate: new Date(taskData.dueDate), // Convert string to Date
         priority: taskData.priority,
         userId: currentUser.userId, // Pass the current user's ID
-        property: taskData.property, // Pass the selected property
+        propertyAddress: taskData.propertyAddress, // Pass the selected property
         propertyId: taskData.propertyId || "", // Optional property ID
       };
 
@@ -179,7 +179,7 @@ export function AgentCalendar(): React.JSX.Element {
                         )}
                         {/* Property address if exists */}
                         <p className="text-sm text-gray-700 mt-1">
-                          {task.property}
+                          {task.propertyAddress}
                         </p>
                         <div className="mt-2">
                           <span

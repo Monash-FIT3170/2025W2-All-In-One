@@ -89,7 +89,7 @@ export function AddTaskModal({
   const onFormSubmit = (data: TaskFormData) => {
     // Create task object matching Task domain model structure
     console.log("Form data:", data);
-    const selectedProperty = properties.find((p) => p.propertyId === data.property);
+    const selectedProperty = properties.find((p) => p.propertyId === data.propertyAddress);
     console.log("Selected property:", selectedProperty);
 
     const newTask: TaskData = {
@@ -97,7 +97,7 @@ export function AddTaskModal({
       description: data.description || "",
       dueDate: new Date(data.dueDate).toISOString(),
       priority: data.priority,
-      property: data.property || "",
+      propertyAddress: data.propertyAddress || "",
       propertyId: selectedProperty ? selectedProperty.propertyId : "",
       status: TaskStatus.NOTSTARTED,
     };
@@ -195,7 +195,7 @@ export function AddTaskModal({
             </Label>
             <select
               id="task-property"
-              {...register("property")}
+              {...register("propertyAddress")}
               className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <option value="">Select Property</option>
@@ -206,24 +206,6 @@ export function AddTaskModal({
               ))}
             </select>
           </div>
-          {/* Property ID (optional) */}
-          {/* <div>
-            <Label htmlFor="task-property" className="text-black font-medium">
-              Select a property ID that this task will take place in.
-            </Label>
-            <select
-              id="task-property"
-              {...register("propertyId")}
-              className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="">Select Property ID </option>
-              {properties.map((p) => (
-                <option key={p._id} value={p._id}>
-                  {`${p.propertyId}`}
-                </option>
-              ))}
-            </select>
-          </div> */}
         </form>
 
         <DialogFooter>

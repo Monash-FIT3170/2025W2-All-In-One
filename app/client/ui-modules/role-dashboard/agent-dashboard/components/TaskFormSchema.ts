@@ -8,7 +8,7 @@ export const taskFormSchema = z.object({
   description: z.string(),
   dueDate: z.string().min(1, "Due date is required"),
   priority: z.nativeEnum(TaskPriority),
-  property: z.string().optional(), // Optional property field
+  propertyAddress: z.string().optional(), // Optional property field
   propertyId: z.string().optional(), // Optional property ID field
 });
 
@@ -24,6 +24,6 @@ export const defaultTaskFormValues: TaskFormData = {
   description: "",
   dueDate: "",
   priority: TaskPriority.MEDIUM,
-  property: "",
+  propertyAddress: "",
   propertyId: "", // Optional property ID
 };

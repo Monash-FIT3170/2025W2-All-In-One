@@ -9,6 +9,6 @@ export type Task = {
   dueDate: string;
   description: string;
   priority: TaskPriority;
-  property: string;
+  propertyAddress: string;
   propertyId?: string; // Optional property ID
 };

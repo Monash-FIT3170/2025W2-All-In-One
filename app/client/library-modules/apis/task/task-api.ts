@@ -15,7 +15,7 @@ export async function apiCreateTask(taskData: {
   dueDate: Date;
   priority: TaskPriority;
   userId: string;
-  property: string;
+  propertyAddress: string;
   propertyId: string; // Optional property ID
 }): Promise<string> {
   try {
