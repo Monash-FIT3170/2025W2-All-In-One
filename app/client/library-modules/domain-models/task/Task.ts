@@ -10,5 +10,5 @@ export type Task = {
   description: string;
   priority: TaskPriority;
   propertyAddress: string;
-  propertyId?: string; // Optional property ID
+  propertyId?: string; 
 };

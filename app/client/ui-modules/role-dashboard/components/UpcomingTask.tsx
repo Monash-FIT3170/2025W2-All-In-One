@@ -133,7 +133,7 @@ function TaskItem({ task }: { task: Task }): React.JSX.Element {
         </div>
         <div>
           {/* Property address if exists */}
-          <p className="text-sm text-gray-700 mt-1">{task.property}</p>
+          <p className="text-sm text-gray-700 mt-1">{task.propertyAddress}</p>
         </div>
       </div>
     </div>

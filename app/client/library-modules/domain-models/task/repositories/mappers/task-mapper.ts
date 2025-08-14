@@ -13,6 +13,6 @@ export function mapApiTasktoTask(task: ApiTask): Task {
     description: task.description,
     priority: task.priority,
     propertyAddress: task.propertyAddress,
-    propertyId: task.propertyId, // Optional property ID
+    propertyId: task.propertyId,
   };
 }

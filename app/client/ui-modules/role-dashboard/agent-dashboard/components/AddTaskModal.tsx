@@ -89,7 +89,7 @@ export function AddTaskModal({
   const onFormSubmit = (data: TaskFormData) => {
     // Create task object matching Task domain model structure
     console.log("Form data:", data);
-    const selectedProperty = properties.find((p) => p.propertyId === data.propertyAddress);
+    const selectedProperty = properties.find((p) => p.propertyId === data.propertyId);
     console.log("Selected property:", selectedProperty);
 
     const newTask: TaskData = {
@@ -97,8 +97,10 @@ export function AddTaskModal({
       description: data.description || "",
       dueDate: new Date(data.dueDate).toISOString(),
       priority: data.priority,
-      propertyAddress: data.propertyAddress || "",
-      propertyId: selectedProperty ? selectedProperty.propertyId : "",
+      propertyAddress: selectedProperty
+    ? `${selectedProperty.streetnumber} ${selectedProperty.streetname}, ${selectedProperty.suburb}`
+    : "",
+      propertyId: data.propertyId,
       status: TaskStatus.NOTSTARTED,
     };
 
@@ -195,7 +197,7 @@ export function AddTaskModal({
             </Label>
             <select
               id="task-property"
-              {...register("propertyAddress")}
+              {...register("propertyId")}
               className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <option value="">Select Property</option>

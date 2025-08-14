@@ -16,6 +16,7 @@ import { getPropertyById } from "/app/client/library-modules/domain-models/prope
 import { UpcomingTasks } from "../../components/UpcomingTask";
 import { TaskMap, TaskMapUiState } from "../components/TaskMap";
 import { getTodayISODate } from "/app/client/library-modules/utils/date-utils";
+import { getTodayAUDate } from "/app/client/library-modules/utils/date-utils";
 
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
@@ -155,7 +156,7 @@ export function AgentCalendar(): React.JSX.Element {
                 <h2 className="text-lg font-semibold">
                   {selectedDate
                     ? selectedDate
-                    : new Date().toLocaleDateString("en-AU")}
+                    : getTodayAUDate()}
                 </h2>
                 <ul className="space-y-4 mt-2">
                   {tasks

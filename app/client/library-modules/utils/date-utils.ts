@@ -22,3 +22,7 @@ export const getISODate = (date: Date): string => {
 export const getTodayISODate = (): string => {
   return new Date().toISOString().slice(0, 10);
 };
+
+export const getTodayAUDate = (): string => {
+  return new Date().toLocaleDateString("en-AU");
+};

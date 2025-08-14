@@ -8,7 +8,6 @@ import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
 
-
 /**
  * Retrieves a task by its ID and returns it as an `ApiTask` DTO.
  *
@@ -63,24 +62,24 @@ const taskInsertMethod = {
     dueDate: Date;
     priority: TaskPriority;
     propertyAddress: string;
-    propertyId: string; // Optional property ID
+    propertyId: string;
     userId: string;
   }): Promise<string> => {
     console.log("taskInsertMethod called with:", taskData);
-    
+
     // Validate required fields - description can be empty
     if (!taskData.name || taskData.name.trim() === "") {
       throw meteorWrappedInvalidDataError(
         new InvalidDataError("Task name is required")
       );
     }
-    
+
     if (!taskData.dueDate) {
       throw meteorWrappedInvalidDataError(
         new InvalidDataError("Due date is required")
       );
     }
-    
+
     if (!taskData.priority) {
       throw meteorWrappedInvalidDataError(
         new InvalidDataError("Priority is required")
@@ -98,8 +97,8 @@ const taskInsertMethod = {
       description: taskData.description || "", // Handle empty description
       dueDate: taskData.dueDate,
       priority: taskData.priority,
-      taskPropertyAddress: taskData.propertyAddress || "", // Optional property, can be empty
-      taskPropertyId: taskData.propertyId || "", // Optional property ID, can be empty
+      taskPropertyAddress: taskData.propertyAddress,
+      taskPropertyId: taskData.propertyId,
       taskStatus: TaskStatus.NOTSTARTED, // Default status
       createdDate: new Date(),
     };
@@ -107,7 +106,7 @@ const taskInsertMethod = {
     try {
       const insertedId = await TaskCollection.insertAsync(taskDocument);
       const createdTask = await getTaskDocumentById(insertedId);
-      
+
       if (!createdTask) {
         throw new InvalidDataError("Failed to retrieve created task");
       }
@@ -115,7 +114,11 @@ const taskInsertMethod = {
       // Update the agent's task_ids array to include the new task
       console.log("Before agent update call");
       try {
-        await Meteor.call(MeteorMethodIdentifier.AGENT_UPDATE_TASKS, taskData.userId, insertedId);
+        await Meteor.callAsync(
+          MeteorMethodIdentifier.AGENT_UPDATE_TASKS,
+          taskData.userId,
+          insertedId
+        );
         console.log("Agent task_ids updated successfully");
       } catch (agentError) {
         console.warn("Failed to update agent task_ids:", agentError);
