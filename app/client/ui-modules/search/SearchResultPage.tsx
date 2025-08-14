@@ -1,6 +1,6 @@
 import React, { use, useEffect, useMemo, useState } from "react";
 import { Button } from "../theming-shadcn/Button";
-import { PropertyCard } from "./components/PropertyCard";
+import { PropertyCard } from "../guest-landing-page/components/PropertyCard";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
 import { getPropertyWithListingDataUseCase } from "../../library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
 import { PropertyWithListingData } from "../../library-modules/use-cases/property-listing/models/PropertyWithListingData";
