@@ -106,12 +106,11 @@ export function PropertyListingPage({
           }
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
           onBack={() => {
-            const from = searchParams.get("from");
-            if (from === "agent-dashboard") {
-              navigate(NavigationPath.AgentDashboard)
-            }
-            else {
-              navigate(NavigationPath.Home)
+            const from = searchParams.get("from") as EntryPoint | null;
+            if (from && from in BACK_ROUTES) {
+              navigate(BACK_ROUTES[from]);
+            } else {
+              navigate(NavigationPath.Home);
             }
           }}
           onBook={(index: number) => {
@@ -132,6 +131,14 @@ export function PropertyListingPage({
     );
   }
 }
+
+const BACK_ROUTES = {
+  "home": NavigationPath.Home,
+  "agent-dashboard": NavigationPath.AgentDashboard,
+  "agent-properties": NavigationPath.AgentProperties,
+};
+
+type EntryPoint = keyof typeof BACK_ROUTES;
 
 function ListingPageContent({
   streetNumber,
