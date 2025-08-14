@@ -1,96 +1,100 @@
 import React, { use, useEffect, useMemo, useState } from "react";
 import { Button } from "../theming-shadcn/Button";
 import { PropertyCard } from "../guest-landing-page/components/PropertyCard";
-import { Property } from "/app/client/library-modules/domain-models/property/Property";
-import { getPropertyWithListingDataUseCase } from "../../library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
-import { PropertyWithListingData } from "../../library-modules/use-cases/property-listing/models/PropertyWithListingData";
-import { searchProperties } from "../../library-modules/domain-models/property/repositories/property-repository";
 
 import { Input } from "../theming-shadcn/Input";
 import { useLocation, useNavigate } from "react-router";
-import { handleSearch } from "../../utils";
+import { getPropertyWithListingDataUseCase } from "/app/client/library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
+import { PropertyWithListingData } from "/app/client/library-modules/use-cases/property-listing/models/PropertyWithListingData";
+import { searchProperties } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
-// load up 9 properties at a time
+// load up properties in pages (handled in slice)
+
+// local helpers and constants
 const PAGE_SIZE = 9;
-
-// Utility to get the "q" param from the URL
-function getQueryParam(search: string): string {
+function encodeSearchQuery(q: string) {
+    const cleaned = q.trim();
+    if (!cleaned) return "";
+    return encodeURIComponent(cleaned.replace(/%20/g, "+"));
+}
+function decodeSearchQuery(encoded: string) {
+    return decodeURIComponent(encoded || "")
+        .replace(/\+/g, "%20")
+        .trim();
+}
+function getQParam(search: string) {
     const params = new URLSearchParams(search);
     return params.get("q") ?? "";
+}
+function buildSearchUrl(q: string) {
+    const encoded = encodeSearchQuery(q);
+    return encoded ? `/search?q=${encoded}` : null;
 }
 
 export function GuestSearchResultsPage() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [query, setQuery] = useState(getQueryParam(location.search));
+    const [searchQuery, setSearchQuery] = useState(
+        decodeSearchQuery(getQParam(location.search))
+    );
+
+    const [decodedQuery, setDecodedQuery] = useState<string>(
+        decodeSearchQuery(getQParam(location.search))
+    );
     const [properties, setProperties] = useState<PropertyWithListingData[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-    const [searchQuery, setSearchQuery] = useState(query.replace(/\+/g, " "));
+    const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
+    const [status, setStatus] = useState<
+        "idle" | "loading" | "succeeded" | "failed"
+    >("idle");
+    const [error, setError] = useState<string | null>(null);
+    const isLoading = status === "loading";
 
-    // decodes the query when URL changes
-    useEffect(() => {
-        const q = getQueryParam(location.search);
-        setQuery(q);
-        setSearchQuery(q.replace(/\+/g, " "));
-        setVisibleCount(PAGE_SIZE);
-    }, [location.search]);
-
-    // fetches the search query, runs it through the database, gets the properties and displays them
-    useEffect(() => {
-        const run = async () => {
-            // decoded query to handle spaces and special characters
-            const decodedQuery = decodeURIComponent(query || "").replace(
-                /\+/g,
-                " "
-            );
-
-            // clean up the query by trimming whitespace
-            const cleanedQuery = decodedQuery.trim();
-
-            // if the query is empty, reset properties and loading state
-            if (!cleanedQuery) {
-                setProperties([]);
-                setIsLoading(false);
-                return;
-            }
-
-            setIsLoading(true);
-
-            // try to fetch properties based on the cleaned query
-            try {
-                const results = await searchProperties(cleanedQuery);
-                const propertiesWithData: PropertyWithListingData[] =
-                    await Promise.all(
-                        results.map((property: Property) =>
-                            getPropertyWithListingDataUseCase(
-                                property.propertyId
-                            )
-                        )
-                    );
-                setProperties(propertiesWithData);
-            } catch (err) {
-                console.error("Search error:", err);
-                setProperties([]); // shows no results if there's an error
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        run();
-    }, [query]);
-
-    // Memoize the shown properties to avoid unnecessary recalculations
     const shown = useMemo(
         () => properties.slice(0, visibleCount),
         [properties, visibleCount]
     );
 
-    // Decode the query for display purposes
-    const decodedQueryForDisplay = decodeURIComponent(query || "").replace(
-        /\+/g,
-        " "
-    );
+    useEffect(() => {
+        const q = decodeSearchQuery(getQParam(location.search));
+        setSearchQuery(q);
+        setDecodedQuery(q);
+        setVisibleCount(PAGE_SIZE);
+
+        const run = async () => {
+            const trimmed = q.trim();
+            if (!trimmed) {
+                setStatus("succeeded");
+                setProperties([]);
+                setError(null);
+                return;
+            }
+            setStatus("loading");
+            setError(null);
+            try {
+                const results = await searchProperties(trimmed);
+                const enriched = await Promise.all(
+                    results.map((p) =>
+                        getPropertyWithListingDataUseCase(p.propertyId)
+                    )
+                );
+                setProperties(enriched);
+                setStatus("succeeded");
+            } catch (e: any) {
+                setStatus("failed");
+                setProperties([]);
+                setError(e?.message ?? "Failed to load results.");
+            }
+        };
+        run();
+    }, [location.search]);
+
+    const onSearch = () => {
+        const cleaned = searchQuery.trim();
+        if (!cleaned) return;
+        const url = buildSearchUrl(searchQuery);
+        if (url) navigate(url);
+    };
 
     return (
         <div className="min-h-screen bg-white text-neutral-900">
@@ -115,14 +119,7 @@ export function GuestSearchResultsPage() {
                             </div>
                             <Button
                                 className="h-12 rounded-none rounded-r-2xl px-5 bg-neutral-900 text-white hover:bg-neutral-800"
-                                onClick={() => {
-                                    const cleaned = searchQuery.trim();
-                                    if (!cleaned) return;
-                                    setVisibleCount(PAGE_SIZE);
-
-                                    // passes to a utility function to handle search
-                                    handleSearch(searchQuery, navigate);
-                                }}
+                                onClick={onSearch}
                             >
                                 Search
                             </Button>
@@ -137,7 +134,7 @@ export function GuestSearchResultsPage() {
                     {isLoading
                         ? "Loading properties…"
                         : `${properties.length} properties found for "${
-                              decodedQueryForDisplay || "—"
+                              decodedQuery || "—"
                           }"`}
                 </p>
             </div>
@@ -146,7 +143,7 @@ export function GuestSearchResultsPage() {
             <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-16">
                 {!isLoading && properties.length === 0 && (
                     <div className="text-center text-neutral-700">
-                        No results found for “{decodedQueryForDisplay}”.
+                        No results found for “{decodedQuery}”.
                     </div>
                 )}
 
@@ -168,7 +165,12 @@ export function GuestSearchResultsPage() {
                                 <Button
                                     className="h-11 px-6 rounded-xl"
                                     onClick={() =>
-                                        setVisibleCount((c) => c + PAGE_SIZE)
+                                        setVisibleCount((c) =>
+                                            Math.min(
+                                                c + PAGE_SIZE,
+                                                properties.length
+                                            )
+                                        )
                                     }
                                 >
                                     View more

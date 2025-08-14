@@ -1,4 +1,3 @@
-import { create } from "domain";
 import { PropertyWithListingData } from "/app/client/library-modules/use-cases/property-listing/models/PropertyWithListingData";
 import {
     ActionReducerMapBuilder,
@@ -6,14 +5,13 @@ import {
     createSlice,
     PayloadAction,
 } from "@reduxjs/toolkit";
-import { S } from "@fullcalendar/core/internal-common";
 import { searchProperties } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { getPropertyWithListingDataUseCase } from "/app/client/library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
+import { RootState } from "/app/client/store";
 
 export type SearchResultState = {
     decodedQuery: string;
     properties: PropertyWithListingData[];
-    isLoading: boolean;
     error: string | null;
     visibleCount: number;
     status: "idle" | "loading" | "succeeded" | "failed";
@@ -23,7 +21,6 @@ export type SearchResultState = {
 const initialState: SearchResultState = {
     decodedQuery: "",
     properties: [],
-    isLoading: true,
     error: null,
     status: "idle",
     defaultPageSize: 9,
@@ -52,7 +49,7 @@ export const fetchPropertiesByQuery = createAsyncThunk<
     return enrichedProperties;
 });
 
-const SearchResultsSlice = createSlice({
+export const searchResultsSlice = createSlice({
     name: "searchResults",
     initialState,
     reducers: {
@@ -61,6 +58,7 @@ const SearchResultsSlice = createSlice({
             action: PayloadAction<string>
         ) => {
             state.decodedQuery = action.payload;
+            state.visibleCount = state.defaultPageSize;
         },
         resetVisibleCount: (state: SearchResultState) => {
             state.visibleCount = state.defaultPageSize;
@@ -98,18 +96,17 @@ const SearchResultsSlice = createSlice({
     },
 });
 
+export const selectSearch = (s: RootState) => s.searchResults;
+
+export const selectShown = (s: RootState) => {
+    const { properties, visibleCount } = s.searchResults;
+    return properties.slice(0, visibleCount);
+};
+
 export const {
     setDecodedQuery,
     resetVisibleCount,
     incrementVisibleCount,
     clear,
-} = SearchResultsSlice.actions;
-export default SearchResultsSlice.reducer;
-
-// selectors
-export const selectSearch = (s: { search: SearchResultState }) =>
-    s.search as SearchResultState;
-export const selectShown = (s: { search: SearchResultState }) => {
-    const { properties, visibleCount } = s.search as SearchResultState;
-    return properties.slice(0, visibleCount);
-};
+} = searchResultsSlice.actions;
+export default searchResultsSlice.reducer;
