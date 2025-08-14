@@ -32,7 +32,6 @@ import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/T
 import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
 import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
 import { loadCurrentUser } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
-import { GuestSearchResultsPage } from "./ui-modules/search/SearchResultPage";
 import {
     AgentRoute,
     TenantRoute,
@@ -40,6 +39,7 @@ import {
     AuthenticatedRoute,
 } from "./ui-modules/user-authentication/components/RouteGuards";
 import { NavigationPath } from "./navigation";
+import { GuestSearchResultsPage } from "./ui-modules/search/SearchResultPage";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -47,13 +47,6 @@ function initialiseReactRoot(): void {
     const container = document.getElementById("react-target") as Container;
     const root = createRoot(container);
 
-    root.render(
-        <React.StrictMode>
-            <Provider store={store}>
-                <AppRoot />
-            </Provider>
-        </React.StrictMode>
-    );
     root.render(
         <React.StrictMode>
             <Provider store={store}>
@@ -103,6 +96,12 @@ function AppRoot(): React.JSX.Element {
                     <Route
                         path={NavigationPath.PropertyListing}
                         element={<PropertyListingPage />}
+                    />
+
+                    {/* Search routes */}
+                    <Route
+                        path={NavigationPath.Search}
+                        element={<GuestSearchResultsPage />}
                     />
 
                     {/* Agent-only routes */}

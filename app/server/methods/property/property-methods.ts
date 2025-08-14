@@ -413,14 +413,14 @@ const propertySearchMethod = {
                         { suburb: { $regex: token, $options: "i" } },
                         { postcode: { $regex: token, $options: "i" } },
                         { streetname: { $regex: token, $options: "i" } },
+                        { province: { $regex: token, $options: "i" } },
                     ],
                 })),
             };
 
             // finds properties matching the query in suburb, postcode, or streetname
-            const matchingProperties = await PropertyCollection.find(
-                mongoQuery
-            ).fetchAsync();
+            const matchingProperties =
+                await PropertyCollection.find(mongoQuery).fetchAsync();
 
             // Map the matching properties to ApiProperty DTOs
             const dtoResults = await Promise.all(
