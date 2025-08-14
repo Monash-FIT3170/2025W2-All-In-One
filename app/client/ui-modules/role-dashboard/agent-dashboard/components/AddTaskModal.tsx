@@ -22,6 +22,7 @@ import {
   PropertyOption,
 } from "./TaskFormSchema";
 import { DropdownSelect } from "../../../common/DropdownSelect";
+import { mapPropertyToOption } from "../../../../library-modules/apis/property/property-api";
 
 interface AddTaskModalProps {
   isOpen: boolean;
@@ -72,11 +73,16 @@ export function AddTaskModal({
         </DialogHeader>
         <form
           id="task-form"
-          onSubmit={handleSubmit((data: TaskFormData) => {
+          onSubmit={handleSubmit(async(data: TaskFormData) => {
+            let propertyAddress = "";
             // Find the selected property object
-            const selectedProperty = properties.find(
-              (p) => p.propertyId === data.propertyId
-            );
+
+            if (data.propertyId) {
+              const selectedProperty = await mapPropertyToOption(
+                data.propertyId
+              );
+              propertyAddress = `${selectedProperty.streetnumber} ${selectedProperty.streetname}, ${selectedProperty.suburb}`;
+            }
 
             const task: TaskData = {
               status: TaskStatus.NOTSTARTED, // default status
@@ -85,9 +91,7 @@ export function AddTaskModal({
               description: data.description,
               priority: data.priority,
               propertyId: data.propertyId || "",
-              propertyAddress: selectedProperty
-                ? `${selectedProperty.streetnumber} ${selectedProperty.streetname}, ${selectedProperty.suburb}`
-                : "", // fallback if none selected
+              propertyAddress,
             };
 
             onSubmit(task);
