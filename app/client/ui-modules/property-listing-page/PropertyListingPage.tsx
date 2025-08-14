@@ -252,24 +252,11 @@ function ListingPageContent({
           console.log(`Rejected application ${applicationId}`);
         }}
         onAccept={(applicationId: string) => {
-          console.log(`Progressed application ${applicationId}`);
+          console.log(`Accepted application ${applicationId}`);
         }}
-        // onBackgroundPass={(applicationId: string) => {
-        //   console.log(
-        //     `Background check passed for application ${applicationId}`
-        //   );
-        // }}
-        // onBackgroundFail={(applicationId: string) => {
-        //   console.log(
-        //     `Background check failed for application ${applicationId}`
-        //   );
-        // }}
-        onSendToLandlord={(applicationId: string) => {
-          console.log(`Sent application ${applicationId} to landlord`);
+        onSendToLandlord={() => {
+          console.log(`Sent applications to landlord`);
         }}
-        propertyAddress={`${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`}
-        propertyLandlordId={propertyLandlordId}
-        propertyId={propertyId}
       />
     </div>
   );

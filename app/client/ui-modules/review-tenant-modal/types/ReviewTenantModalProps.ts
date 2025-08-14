@@ -7,9 +7,9 @@ export type ReviewTenantModalProps = {
   onAccept: (applicationId: string) => void;
   // onBackgroundPass: (applicationId: string) => void;
   // onBackgroundFail: (applicationId: string) => void;
-  onSendToLandlord: (applicationId: string) => void;
-  propertyAddress?: string;
-  propertyLandlordId?: string;
-  propertyId?: string;
+  onSendToLandlord: () => void;
+  // propertyAddress?: string;
+  // propertyLandlordId?: string;
+  // propertyId?: string;
   tenantApplications?: TenantApplication[];
 }
