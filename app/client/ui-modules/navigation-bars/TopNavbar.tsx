@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { PropManagerLogoIcon } from "../theming/components/logo/PropManagerLogoIcon";
 import { PropManagerLogoText } from "../theming/components/logo/PropManagerLogoText";
@@ -9,10 +9,11 @@ import { useAppSelector, useAppDispatch } from "/app/client/store";
 import { ProfileFooter } from "../navigation-bars/side-nav-bars/components/ProfileFooter";
 import { signoutUser } from "../user-authentication/state/reducers/current-user-slice";
 import { NotificationBoard } from "../theming/components/NotificationBoard";
-import { selectTasks as selectAgentTasks, fetchAgentTasks } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
-import { selectTasks as selectTenantTasks, fetchTenantTasks } from "../role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
-import { selectTasks as selectLandlordTasks, fetchLandlordTasks } from "../role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
+import { selectTasks as selectAgentTasks } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
+import { selectTasks as selectTenantTasks } from "../role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
+import { selectTasks as selectLandlordTasks } from "../role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
 import { Role } from "/app/shared/user-role-identifier";
+import { NavigationPath } from "../../navigation";
 
 interface TopNavbarProps {
   onSideBarOpened: React.Dispatch<React.SetStateAction<boolean>>;
@@ -31,38 +32,19 @@ export function TopNavbar({
   const tenantTasks = useAppSelector(selectTenantTasks);
   const landlordTasks = useAppSelector(selectLandlordTasks);
 
-  const upcomingTasks = authUser?.role === 'agent' ? agentTasks : authUser?.role === 'tenant' ? tenantTasks : authUser?.role === 'landlord' ? landlordTasks : [];
-
-  useEffect(() => {
-    if (authUser?.userId) {
-      switch (authUser.role) {
-        case Role.AGENT:
-          dispatch(fetchAgentTasks(authUser.userId));
-          break;
-        case Role.TENANT:
-          dispatch(fetchTenantTasks(authUser.userId));
-          break;
-        case Role.LANDLORD:
-          dispatch(fetchLandlordTasks(authUser.userId));
-          break;
-        default:
-          // Handle other roles or no role if necessary
-          break;
-      }
-    }
-  }, [dispatch, authUser?.userId, authUser?.role]);
+  const upcomingTasks = authUser?.role === Role.AGENT ? agentTasks : authUser?.role === Role.TENANT ? tenantTasks : authUser?.role === Role.LANDLORD ? landlordTasks : [];
 
   const handleSignout = async () => {
     try {
       await dispatch(signoutUser()).unwrap();
-      navigate("/");
+      navigate(NavigationPath.Home);
     } catch (error) {
       console.error("Sign out failed:", error);
     }
   };
 
-  const handleGoHome = () => navigate("/");
-  const handleGoProfile = () => navigate("/profile");
+  const handleGoHome = () => navigate(NavigationPath.Home);
+  const handleGoProfile = () => navigate(NavigationPath.Profile);
 
   const [isNotificationBoardOpen, setIsNotificationBoardOpen] = useState(false);
 

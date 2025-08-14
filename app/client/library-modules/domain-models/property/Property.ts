@@ -19,4 +19,6 @@ export type Property = {
   agentId: string;
   landlordId: string;
   tenantId: string;
+  locationLatitude: number;
+  locationLongitude: number;
 }

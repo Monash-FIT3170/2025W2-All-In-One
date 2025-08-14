@@ -1,6 +1,7 @@
 import { PropertyDocument } from "../../database/property/models/PropertyDocument";
 import {
     PropertyCollection,
+    PropertyCoordinatesCollection,
     PropertyFeatureCollection,
     PropertyPriceCollection,
     PropertyStatusCollection,
@@ -23,6 +24,9 @@ import { LandlordCollection } from "../../database/user/user-collections";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
+import { PropertyCoordinateDocument } from "../../database/property/models/PropertyCoordinateDocument";
+import { getGeocode } from "../../repositories/geocode/GeocodeRepository";
+import { Geocode } from "../../repositories/geocode/models/Geocode";
 
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
@@ -154,31 +158,30 @@ async function mapPropertyDocumentToPropertyDTO(
         await getPropertyFeatureDocumentsMatchingIds(
             property.property_feature_ids
         );
-
-    const AgentDocument = property.agent_id
+    const propertyCoordinatesDocument =
+        await getPropertyCoordinateDocumentWithId(
+            property.property_coordinate_id
+        );
+    const agentDocument = property.agent_id
         ? await getAgentDocumentById(property.agent_id)
         : null; // Handle missing agent_id gracefully
-
-    const LandlordDocument = property.landlord_id
+    const landlordDocument = property.landlord_id
         ? await getLandlordDocumentById(property.landlord_id)
         : null; // Handle missing landlord_id gracefully
-
-    const TenantDocument = property.tenant_id
+    const tenantDocument = property.tenant_id
         ? await getTenantDocumentById(property.tenant_id)
         : null; // Handle missing tenant_id gracefully
 
-    if (!AgentDocument) {
+    if (!agentDocument) {
         console.warn(`Agent for Property id ${property._id} not found.`);
     }
-    if (!LandlordDocument) {
+    if (!landlordDocument) {
         console.warn(`Landlord for Property id ${property._id} not found.`);
     }
-
     //Check if I need this, as I we don't necessarily need a tenant for a property
-    if (!TenantDocument) {
+    if (!tenantDocument) {
         console.warn(`Tenant for Property id ${property._id} not found.`);
     }
-
     if (!propertyStatusDocument) {
         throw new InvalidDataError(
             `Property status for Property id ${property._id} not found.`
@@ -195,6 +198,11 @@ async function mapPropertyDocumentToPropertyDTO(
     ) {
         throw new InvalidDataError(
             `Missing property features for Property id ${property._id}.`
+        );
+    }
+    if (!propertyCoordinatesDocument) {
+        throw new InvalidDataError(
+            `Property coordinates for Property id ${property._id} not found.`
         );
     }
 
@@ -215,9 +223,11 @@ async function mapPropertyDocumentToPropertyDTO(
         features: propertyFeaturesDocuments.map((doc) => doc.name),
         type: property.type,
         area: property.area,
-        agentId: AgentDocument ? AgentDocument._id : "", // Always string
-        landlordId: LandlordDocument ? LandlordDocument._id : "", // Always string
-        tenantId: TenantDocument ? TenantDocument._id : "", // Always string
+        agentId: agentDocument ? agentDocument._id : "", // Always string
+        landlordId: landlordDocument ? landlordDocument._id : "", // Always string
+        tenantId: tenantDocument ? tenantDocument._id : "", // Always string
+        locationLatitude: propertyCoordinatesDocument.latitude,
+        locationLongitude: propertyCoordinatesDocument.longitude,
     };
 }
 
@@ -239,6 +249,12 @@ async function getPropertyFeatureDocumentsMatchingIds(
     return await PropertyFeatureCollection.find({
         _id: { $in: ids },
     }).fetchAsync();
+}
+
+async function getPropertyCoordinateDocumentWithId(
+    documentId: string
+): Promise<PropertyCoordinateDocument | undefined> {
+    return await PropertyCoordinatesCollection.findOneAsync(documentId);
 }
 
 async function getLatestPropertyPriceDocumentForProperty(
@@ -271,9 +287,17 @@ const propertyInsertMethod = {
         data: PropertyInsertData
     ): Promise<string> => {
         try {
+            const geocode = await getGeocode(
+                getAddressFromPropertyInsertData(data)
+            );
+            const newCoordinatesId =
+                await insertGeocodeIntoCoordinatesCollection(geocode);
+
             const propertyId = await PropertyCollection.insertAsync({
+                property_coordinate_id: newCoordinatesId,
                 ...data,
             });
+
             return propertyId;
         } catch (error) {
             console.error("Failed to insert property:", error);
@@ -281,6 +305,19 @@ const propertyInsertMethod = {
         }
     },
 };
+
+function getAddressFromPropertyInsertData(data: PropertyInsertData): string {
+    return `${data.streetnumber} ${data.streetname}, ${data.suburb}, ${data.province}`;
+}
+
+function insertGeocodeIntoCoordinatesCollection(
+    geocode: Geocode
+): Promise<string> {
+    return PropertyCoordinatesCollection.insertAsync({
+        latitude: geocode.latitude,
+        longitude: geocode.longitude,
+    });
+}
 
 const propertyGetByTenantIdMethod = {
     [MeteorMethodIdentifier.PROPERTY_GET_BY_TENANT_ID]: async (

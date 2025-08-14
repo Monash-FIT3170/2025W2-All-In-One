@@ -36,13 +36,13 @@ import { PropertyListingPageUiState } from "/app/client/ui-modules/property-list
 import { useSearchParams } from "react-router";
 import EditDraftListingModal from "./components/EditDraftListingModal";
 import { EditDraftListingButton } from "./components/EditDraftListingButton";
-import { PropertyForm } from "../property-form-agent/components/PropertyForm";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  formSchema,
   FormSchemaType,
 } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
+import { DynamicMap } from "../common/map/DynamicMap";
+import { SubHeading } from "../theming/components/SubHeading";
+import { BasicMarker } from "../common/map/markers/BasicMarker";
+import { PropertyMap, PropertyMapUiState } from "./components/PropertyMap";
 
 export function PropertyListingPage({
   className = "",
@@ -94,6 +94,7 @@ export function PropertyListingPage({
           propertyParkingSpaces={state.propertyParkingSpaces}
           propertyBedrooms={state.propertyBedrooms}
           propertyPrice={state.propertyPrice}
+          mapUiState={state.mapUiState}
           inspectionBookingUiStateList={state.inspectionBookingUiStateList}
           listingImageUrls={state.listingImageUrls}
           listingStatusText={state.listingStatusText}
@@ -143,6 +144,7 @@ function ListingPageContent({
   propertyParkingSpaces,
   propertyBedrooms,
   propertyPrice,
+  mapUiState,
   inspectionBookingUiStateList,
   listingImageUrls,
   listingStatusText,
@@ -174,6 +176,7 @@ function ListingPageContent({
   propertyParkingSpaces: string;
   propertyBedrooms: string;
   propertyPrice: string;
+  mapUiState: PropertyMapUiState;
   inspectionBookingUiStateList: InspectionBookingListUiState[];
   listingImageUrls: string[];
   listingStatusText: string;
@@ -222,6 +225,7 @@ function ListingPageContent({
       />
       <ListingDetails
         propertyDescription={propertyDescription}
+        mapUiState={mapUiState}
         inspectionBookingUiStateList={inspectionBookingUiStateList}
         onBook={onBook}
         propertyFeatures={propertyFeatures}
@@ -381,12 +385,14 @@ function ListingHero({
 
 function ListingDetails({
   propertyDescription,
+  mapUiState,
   inspectionBookingUiStateList,
   onBook,
   propertyFeatures,
   className = "",
 }: {
   propertyDescription: string;
+  mapUiState: PropertyMapUiState;
   inspectionBookingUiStateList: InspectionBookingListUiState[];
   onBook: (index: number) => void;
   propertyFeatures: string[];
@@ -407,7 +413,9 @@ function ListingDetails({
       </div>
 
       <div className="flex-1 flex flex-col">
-        <PropertyFeatures featuresList={propertyFeatures} />
+        <PropertyFeatures featuresList={propertyFeatures} className="mb-4" />
+        <SubHeading text="Location" className="mb-2" />
+        <PropertyMap mapUiState={mapUiState} />
       </div>
     </div>
   );
@@ -431,7 +439,7 @@ function BottomBar({
   return (
     <div
       className={twMerge(
-        "flex justify-between items-center items-center gap-2",
+        "flex justify-between items-center gap-2",
         className
       )}
     >

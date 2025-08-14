@@ -54,6 +54,13 @@ function initialiseReactRoot(): void {
             </Provider>
         </React.StrictMode>
     );
+    root.render(
+        <React.StrictMode>
+            <Provider store={store}>
+                <AppRoot />
+            </Provider>
+        </React.StrictMode>
+    );
 }
 
 function AppRoot(): React.JSX.Element {
@@ -83,22 +90,20 @@ function AppRoot(): React.JSX.Element {
                     />
                     <Route
                         path={NavigationPath.Signin}
-                        element={<AuthTabs initialTab="signin" />}
+                        element={
+                            <AuthTabs initialTab={NavigationPath.Signin} />
+                        }
                     />
                     <Route
                         path={NavigationPath.Signup}
-                        element={<AuthTabs initialTab="signup" />}
+                        element={
+                            <AuthTabs initialTab={NavigationPath.Signup} />
+                        }
                     />
                     <Route
                         path={NavigationPath.PropertyListing}
                         element={<PropertyListingPage />}
                     />
-                    <Route
-                        path={NavigationPath.Search}
-                        element={<GuestSearchResultsPage />}
-                    />
-
-                    {/* Authenticated user routes */}
 
                     {/* Agent-only routes */}
                     <Route

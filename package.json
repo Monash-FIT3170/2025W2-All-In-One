@@ -40,6 +40,7 @@
     "@tailwindcss/postcss": "^4.0.17",
     "@typespec/http-client-js": "^0.7.0",
     "@typespec/ts-http-runtime": "^0.3.0",
+    "@vis.gl/react-google-maps": "^1.5.5",
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
