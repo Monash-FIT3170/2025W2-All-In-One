@@ -11,6 +11,7 @@ import {
     selectGuestLandingPageUiState,
 } from "./state/reducers/guest-landing-page-slice";
 import { useAppDispatch, RootState } from "../../store";
+import { handleSearch } from "../../utils";
 
 export function GuestLandingPage() {
     const dispatch = useAppDispatch();
@@ -63,14 +64,7 @@ export function GuestLandingPage() {
 
                         <Button
                             onClick={() => {
-                                const cleaned = searchQuery.trim();
-                                if (cleaned) {
-                                    navigate(
-                                        `/search?q=${encodeURIComponent(
-                                            cleaned.replace(/\s+/g, "+") // replaces spaces with plus signs
-                                        )}`
-                                    );
-                                }
+                                handleSearch(searchQuery, navigate);
                             }}
                         >
                             Search

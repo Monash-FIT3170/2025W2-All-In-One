@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { use, useEffect, useMemo, useState } from "react";
 import { Button } from "../theming-shadcn/Button";
 import { PropertyCard } from "./components/PropertyCard";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
@@ -8,6 +8,7 @@ import { searchProperties } from "../../library-modules/domain-models/property/r
 
 import { Input } from "../theming-shadcn/Input";
 import { useLocation, useNavigate } from "react-router";
+import { handleSearch } from "../../utils";
 
 // load up 9 properties at a time
 const PAGE_SIZE = 9;
@@ -119,12 +120,8 @@ export function GuestSearchResultsPage() {
                                     if (!cleaned) return;
                                     setVisibleCount(PAGE_SIZE);
 
-                                    // encodes the cleaned query for URL
-                                    navigate(
-                                        `/search?q=${encodeURIComponent(
-                                            cleaned.replace(/\s+/g, "+")
-                                        )}`
-                                    );
+                                    // passes to a utility function to handle search
+                                    handleSearch(searchQuery, navigate);
                                 }}
                             >
                                 Search
