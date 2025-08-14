@@ -253,7 +253,7 @@ export const selectConversationsForRole = (role: string) => (state: RootState) =
   // Filter conversations based on role
   // This logic can be customized based on your business rules
   return state.messages.conversations.filter((c: Conversation) => {
-    // For now, simple role matching - can be enhanced later
+    // TODO: TO BE FIXED LATER!!
     if (role === 'agent') {
       return c.role === 'Property Manager' || c.role === 'Leasing Agent' || c.role === 'Maintenance Supervisor';
     } else if (role === 'landlord') {

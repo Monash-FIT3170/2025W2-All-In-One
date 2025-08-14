@@ -8,11 +8,11 @@ import { Conversation } from "../types";
 interface ConversationListProps {
   title?: string;
   conversations: Conversation[];
-  activeId?: string | null;
+  activeConversationId?: string | null;
   onSelect: (id: string) => void;
 }
 
-export function ConversationList({ title = "Messages", conversations, activeId, onSelect }: ConversationListProps) {
+export function ConversationList({ title = "Messages", conversations, activeConversationId: activeId, onSelect }: ConversationListProps) {
   return (
     <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
       <div className="p-4 border-b border-gray-200 flex-shrink-0">

@@ -16,11 +16,17 @@ import {
   setMessageText,
 } from "./state/reducers/messages-slice";
 
-export function AgentMessage(): React.JSX.Element {
+type UserRole = 'agent' | 'landlord' | 'tenant';
+
+interface MessagesPageProps {
+  role: UserRole;
+}
+
+export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
   const dispatch = useAppDispatch();
   
   // Selectors
-  const conversations = useAppSelector(selectConversationsForRole('agent'));
+  const conversations = useAppSelector(selectConversationsForRole(role));
   const activeConversationId = useAppSelector(selectActiveConversationId);
   const messages = useAppSelector(selectAllMessages);
   const messageText = useAppSelector(selectMessageText);
@@ -51,12 +57,15 @@ export function AgentMessage(): React.JSX.Element {
   };
 
   const handleSend = () => {
-    if (!messageText.trim() || !activeConversationId) return;
-    
-    dispatch(sendMessage({
-      conversationId: activeConversationId,
-      text: messageText.trim()
-    }));
+    const trimmedText = messageText.trim();
+    if (!trimmedText || !activeConversationId) return;
+
+    dispatch(
+      sendMessage({
+        conversationId: activeConversationId,
+        text: trimmedText,
+      })
+    );
   };
 
   const active = conversations.find(c => c.id === activeConversationId) || null;
@@ -86,7 +95,7 @@ export function AgentMessage(): React.JSX.Element {
       <div className="w-full max-w-[1720px] h-[calc(100vh-8rem)] bg-white rounded-xl shadow-lg flex overflow-hidden">
         <ConversationList 
           conversations={conversations} 
-          activeId={activeConversationId || undefined} 
+          activeConversationId={activeConversationId || undefined} 
           onSelect={handleSelectConversation} 
         />
         <ChatWindow
@@ -100,3 +109,5 @@ export function AgentMessage(): React.JSX.Element {
     </div>
   );
 }
+
+
