@@ -8,43 +8,56 @@ import {
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 import { AddTaskModal } from "../components/AddTaskModal";
-import { TaskData } from "../components/TaskFormSchema";
+import { PropertyOption, TaskData } from "../components/TaskFormSchema";
 import { apiCreateTask } from "/app/client/library-modules/apis/task/task-api";
 import { TaskStatus } from "/app/shared/task-status-identifier";
-import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { UpcomingTasks } from "../../components/UpcomingTask";
 import { TaskMap, TaskMapUiState } from "../components/TaskMap";
-import { getTodayISODate } from "/app/client/library-modules/utils/date-utils";
-import { getTodayAUDate } from "/app/client/library-modules/utils/date-utils";
-
+import {
+  getTodayISODate,
+  getTodayAUDate,
+} from "/app/client/library-modules/utils/date-utils";
+import { fetchPropertiesForAgent } from "../state/agent-dashboard-slice";
+import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
+  const currentAgent = useAppSelector(
+    (state) => state.currentUser.currentUser
+  ) as Agent | undefined;
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
-  const tasks = useAppSelector(selectTasks); // Retrieve tasks from Redux store
+  const tasks = useAppSelector(selectTasks);
   const loading = useAppSelector(selectIsLoading);
+
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [mapUiState, setMapUiState] = useState<TaskMapUiState>({
-    markers: [], // start with empty or populate with initial markers if you have any
-  });
+  const [properties, setProperties] = useState<PropertyOption[]>([]);
+  const [mapUiState, setMapUiState] = useState<TaskMapUiState>({ markers: [] });
+
+  // Fetch tasks for the current user
   useEffect(() => {
     if (currentUser?.userId) {
-      dispatch(fetchAgentTasks(currentUser.userId)); // Fetch tasks for the current user
-    } else {
-      console.warn("No user ID found. Please log in to view the calendar.");
+      dispatch(fetchAgentTasks(currentUser.userId));
+      console.log("Fetching agent tasks");
     }
-  }, [currentUser]);
+  }, [dispatch, currentUser?.userId]);
 
+  // Fetch properties for the agent
+  useEffect(() => {
+    if (!currentAgent?.agentId) return;
+    fetchPropertiesForAgent(currentAgent.agentId)
+      .then(setProperties)
+      .catch((err) => console.error("Failed to fetch properties:", err));
+  }, [currentAgent?.agentId]);
+
+  // Update map markers for selected date
   useEffect(() => {
     async function loadTodayMarkers() {
-      // Filter tasks to match the ones below the calendar
       const tasksForSelectedDate = tasks.filter(
         (task) => task.dueDate === (selectedDateISO || getTodayISODate())
       );
 
-      // Fetch property coordinates for each task
       const markers = await Promise.all(
         tasksForSelectedDate.map(async (task) => {
           if (!task.propertyId) return null;
@@ -54,12 +67,6 @@ export function AgentCalendar(): React.JSX.Element {
               property.locationLatitude != null &&
               property.locationLongitude != null
             ) {
-              console.log(
-                `Marker for task ${task.taskId} at property ${task.propertyId} added.`
-              );
-              console.log(
-                `Property coordinates: ${property.locationLatitude}, ${property.locationLongitude}`
-              );
               return {
                 latitude: property.locationLatitude,
                 longitude: property.locationLongitude,
@@ -87,56 +94,37 @@ export function AgentCalendar(): React.JSX.Element {
     setSelectedDateISO(iso);
   };
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
 
   const handleTaskSubmit = async (taskData: TaskData) => {
-    try {
-      if (!currentUser?.userId) {
-        console.error("No current user found");
-        return;
-      }
+    if (!currentUser?.userId) {
+      console.error("No current user found");
+      return;
+    }
 
-      // Create the task in the database
+    try {
       const apiData = {
         name: taskData.name,
         description: taskData.description,
-        dueDate: new Date(taskData.dueDate), // Convert string to Date
+        dueDate: new Date(taskData.dueDate),
         priority: taskData.priority,
-        userId: currentUser.userId, // Pass the current user's ID
-        propertyAddress: taskData.propertyAddress, // Pass the selected property
-        propertyId: taskData.propertyId || "", // Optional property ID
+        userId: currentUser.userId,
+        propertyAddress: taskData.propertyAddress,
+        propertyId: taskData.propertyId || "",
       };
 
       const createdTaskId = await apiCreateTask(apiData);
       console.log("Task created successfully with ID:", createdTaskId);
 
-      // Close the modal
       setIsModalOpen(false);
-
-      // Refresh tasks to show the new task
-      if (currentUser?.userId) {
-        dispatch(fetchAgentTasks(currentUser.userId));
-      }
+      dispatch(fetchAgentTasks(currentUser.userId));
     } catch (error) {
       console.error("Error creating task:", error);
     }
   };
 
-  useEffect(() => {
-    if (currentUser?.userId) {
-      dispatch(fetchAgentTasks(currentUser.userId)); // Pass the userId to fetchAgentTasks
-    }
-  }, [dispatch, currentUser?.userId]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen">
@@ -151,12 +139,9 @@ export function AgentCalendar(): React.JSX.Element {
                 onDateSelect={handleDateSelection}
               />
 
-              {/* Below Calendar */}
               <div className="mt-4">
                 <h2 className="text-lg font-semibold">
-                  {selectedDate
-                    ? selectedDate
-                    : getTodayAUDate()}
+                  {selectedDate ? selectedDate : getTodayAUDate()}
                 </h2>
                 <ul className="space-y-4 mt-2">
                   {tasks
@@ -178,7 +163,6 @@ export function AgentCalendar(): React.JSX.Element {
                             {task.description}
                           </p>
                         )}
-                        {/* Property address if exists */}
                         <p className="text-sm text-gray-700 mt-1">
                           {task.propertyAddress}
                         </p>
@@ -199,8 +183,7 @@ export function AgentCalendar(): React.JSX.Element {
                     ))}
                   {tasks.filter(
                     (task) =>
-                      task.dueDate ===
-                      (selectedDateISO || getTodayISODate())
+                      task.dueDate === (selectedDateISO || getTodayISODate())
                   ).length === 0 && (
                     <p className="text-gray-500 italic">
                       No tasks for this date
@@ -216,10 +199,12 @@ export function AgentCalendar(): React.JSX.Element {
           </div>
         </div>
       </div>
+
       <AddTaskModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSubmit={handleTaskSubmit}
+        properties={properties} // pass the fetched properties
       />
     </div>
   );

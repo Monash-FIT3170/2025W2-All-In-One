@@ -19,30 +19,22 @@ import {
   TaskFormData,
   TaskData,
   defaultTaskFormValues,
+  PropertyOption,
 } from "./TaskFormSchema";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { useEffect } from "react";
-import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
-import { useAppSelector } from "/app/client/store";
 
 interface AddTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (task: TaskData) => void;
-  agentId?: string;
+  properties: PropertyOption[]; // only the "address + id"
 }
 
 export function AddTaskModal({
   isOpen,
   onClose,
   onSubmit,
-  agentId,
+  properties, // passed in from parent / slice
 }: AddTaskModalProps): React.JSX.Element {
-  const currentUser = useAppSelector(
-    (state) => state.currentUser.currentUser
-  ) as Agent | undefined;
-  const resolvedAgentId = agentId ?? currentUser?.agentId;
-
   const {
     register,
     handleSubmit,
@@ -53,59 +45,9 @@ export function AddTaskModal({
     defaultValues: defaultTaskFormValues,
   });
 
-  const [properties, setProperties] = useState<
-    {
-      _id: string;
-      streetnumber: string;
-      streetname: string;
-      suburb: string;
-      propertyId: string;
-    }[]
-  >([]);
-
-  // Fetch properties names for the agent when the modal opens
-  useEffect(() => {
-    if (!resolvedAgentId) return;
-
-    // Call the Meteor method to get properties for the agent
-    Meteor.call(
-      MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID,
-      resolvedAgentId,
-      (err: Meteor.Error, result: any[]) => {
-        if (err) {
-          console.error("Failed to fetch properties:", err);
-          return;
-        }
-        setProperties(result || []);
-      }
-    );
-  }, [agentId]);
-
   const handleClose = () => {
     reset();
     onClose();
-  };
-
-  const onFormSubmit = (data: TaskFormData) => {
-    // Create task object matching Task domain model structure
-    console.log("Form data:", data);
-    const selectedProperty = properties.find((p) => p.propertyId === data.propertyId);
-    console.log("Selected property:", selectedProperty);
-
-    const newTask: TaskData = {
-      name: data.name,
-      description: data.description || "",
-      dueDate: new Date(data.dueDate).toISOString(),
-      priority: data.priority,
-      propertyAddress: selectedProperty
-    ? `${selectedProperty.streetnumber} ${selectedProperty.streetname}, ${selectedProperty.suburb}`
-    : "",
-      propertyId: data.propertyId,
-      status: TaskStatus.NOTSTARTED,
-    };
-
-    onSubmit(newTask);
-    handleClose();
   };
 
   return (
@@ -116,10 +58,28 @@ export function AddTaskModal({
             Add New Task
           </DialogTitle>
         </DialogHeader>
-
         <form
           id="task-form"
-          onSubmit={handleSubmit(onFormSubmit)}
+          onSubmit={handleSubmit((data: TaskFormData) => {
+            // Find the selected property object
+            const selectedProperty = properties.find(
+              (p) => p.propertyId === data.propertyId
+            );
+
+            const task: TaskData = {
+              status: TaskStatus.NOTSTARTED, // default status
+              name: data.name,
+              dueDate: data.dueDate,
+              description: data.description,
+              priority: data.priority,
+              propertyId: data.propertyId || "",
+              propertyAddress: selectedProperty
+                ? `${selectedProperty.streetnumber} ${selectedProperty.streetname}, ${selectedProperty.suburb}`
+                : "", // fallback if none selected
+            };
+
+            onSubmit(task);
+          })}
           className="p-4 space-y-4"
         >
           {/* Task Title */}

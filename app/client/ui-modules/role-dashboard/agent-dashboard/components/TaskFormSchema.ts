@@ -27,3 +27,11 @@ export const defaultTaskFormValues: TaskFormData = {
   propertyAddress: "",
   propertyId: "", // Optional property ID
 };
+
+export type PropertyOption = {
+  _id: string;
+  propertyId: string;    
+  streetnumber: string;
+  streetname: string;
+  suburb: string;
+};
