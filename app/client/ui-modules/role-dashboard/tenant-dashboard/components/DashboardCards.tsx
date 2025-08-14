@@ -1,12 +1,50 @@
 import React from "react";
 import { CardWidget } from "../../components/CardWidget";
 import { Progress } from "../../components/ProgressBar";
+import { Task } from "/app/client/library-modules/domain-models/task/Task";
+import { TaskStatus } from "/app/shared/task-status-identifier";
+import { useAppSelector } from "../../../../store";
+import {
+  selectMessagesCount,
+  selectLeaseStatusKind,
+  selectLeaseMonthsRemaining,
+  LeaseStatusKind,
+} from "../state/tenant-dashboard-slice";
+import { startOfWeek, endOfWeek, parseISO, isWithinInterval } from "date-fns";
 
 interface DashboardCardsProps {
   rentAmount?: number;
+  tasks?: Task[];
 }
 
-function DashboardCards({ rentAmount }: DashboardCardsProps) {
+function DashboardCards({ rentAmount, tasks = [] }: DashboardCardsProps) {
+  // Get state values from Redux
+  const messagesCount = useAppSelector(selectMessagesCount);
+  const leaseStatusKind = useAppSelector(selectLeaseStatusKind);
+  const leaseMonthsRemaining = useAppSelector(selectLeaseMonthsRemaining);
+
+  // Calculate pending tasks (not completed)
+  const pendingTasks = tasks.filter(t => t.status !== TaskStatus.COMPLETED);
+  const pendingTasksCount = pendingTasks.length;
+
+  // Calculate tasks due this week
+  const start = startOfWeek(new Date(), { weekStartsOn: 0 }); // Sunday
+  const end = endOfWeek(new Date(), { weekStartsOn: 0 });
+
+  const tasksDueThisWeek = pendingTasks.filter(t => {
+    const due = parseISO(t.dueDate); // YYYY-MM-DD
+    return isWithinInterval(due, { start, end });
+  }).length;
+
+  // Determine lease display values based on enum
+  const leaseValue = leaseStatusKind === LeaseStatusKind.NotAvailable 
+    ? "N/A" 
+    : `${leaseMonthsRemaining} months`;
+  
+  const leaseSubtitle = leaseStatusKind === LeaseStatusKind.NotAvailable
+    ? "Not available yet"
+    : "Remaining on current lease";
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
       <CardWidget
@@ -17,22 +55,28 @@ function DashboardCards({ rentAmount }: DashboardCardsProps) {
 
       <CardWidget
         title="Lease Status"
-        value="9 months"
-        subtitle="Remaining on current lease"
-      >
-        <Progress value={85} className="mt-2" />
-      </CardWidget>
+        value={leaseValue}
+        subtitle={leaseSubtitle}
+      />
 
       <CardWidget
-        title="Maintenance"
-        value="2 Active"
-        subtitle="1 scheduled for tomorrow"
+        title="Pending Tasks"
+        value={pendingTasksCount === 0 ? "0" : `${pendingTasksCount} Active`}
+        subtitle={
+          pendingTasksCount === 0
+            ? "No Pending tasks"
+            : tasksDueThisWeek > 0
+              ? `${tasksDueThisWeek} due this week`
+              : "No tasks due this week"
+        }
       />
 
       <CardWidget
         title="Messages"
-        value="3 Unread"
-        subtitle="Last message 2 hours ago"
+        value={messagesCount.toString()}
+        subtitle={
+          messagesCount === 0 ? "No new messages" : `${messagesCount} unread`
+        }
       />
     </div>
   );

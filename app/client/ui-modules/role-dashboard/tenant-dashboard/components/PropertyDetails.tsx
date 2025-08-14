@@ -5,7 +5,7 @@ import { NavigationPath } from "/app/client/navigation";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
 
 interface PropertyDetailsProps {
-  property: Property;
+  property: Property | null;
 }
 
 export function PropertyDetails({
@@ -17,9 +17,24 @@ export function PropertyDetails({
     navigate(NavigationPath.TenantProperty);
   };
 
+  // If no property, show "No Property Found" message
+  if (!property) {
+    return (
+      <div className="rounded-lg border border-gray-200 p-6 bg-white shadow-sm">
+        <h2 className="text-3xl font-bold mb-2">Property Details</h2>
+        <div className="flex flex-col items-center justify-center py-12">
+          <h3 className="text-xl font-bold mb-2">No Property Found</h3>
+          <p className="text-gray-600 text-center">
+            Please contact your landlord or agent for more information.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   // Format the full property
   const fullPropertyAddress = [
-    `${property.streetname}${property.type}`,
+    `${property.streetname}`,
     `${property.suburb}, ${property.postcode} ${property.province}`,
   ];
 
@@ -54,7 +69,7 @@ export function PropertyDetails({
         <div>
           <h3 className="text-gray-500 font-medium">Area</h3>
           <p className="text-xl font-bold">
-          {property.area}m^2`
+          {property.area} m²
           </p>
         </div>
 
