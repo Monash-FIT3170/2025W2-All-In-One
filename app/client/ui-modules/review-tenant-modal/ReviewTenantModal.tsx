@@ -1,8 +1,5 @@
 import React from 'react';
 import { ReviewTenantModalProps } from './types/ReviewTenantModalProps';
-import { TenantApplication } from './types/TenantApplication';
-import { TenantApplicationStatus } from './enums/TenantApplicationStatus';
-import { BackgroundCheckStatus } from './enums/BackgroundCheckStatus';
 import { FilterType } from './enums/FilterType';
 import { ModalHeader } from './components/ModalHeader';
 import { FilterTabs } from './components/FilterTabs';
@@ -24,10 +21,11 @@ export function ReviewTenantModal({
   onReject,
   onAccept,
   onSendToLandlord,
+  shouldShowSendToLandlordButton,
+  acceptedCount,
 }: ReviewTenantModalProps): React.JSX.Element {
   const dispatch = useAppDispatch();
   const applications = useAppSelector(selectFilteredApplications);
-  const acceptedCount = useAppSelector(selectAcceptedCount);
 
   const handleReject = (applicationId: string) => {
     dispatch(rejectTenantApplicationAsync(applicationId));
@@ -67,8 +65,8 @@ export function ReviewTenantModal({
           onSendToLandlord={handleSendToLandlord}
         />
 
-         {/* Step 1: Send accepted applicants to landlord */}
-         {acceptedCount > 0 && (
+         {/* Send accepted applicants to landlord button */}
+         {shouldShowSendToLandlordButton && (
           <div className="p-4 border-t">
             <button
               onClick={handleSendToLandlord}

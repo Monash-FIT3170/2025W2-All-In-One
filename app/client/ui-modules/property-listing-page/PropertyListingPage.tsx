@@ -25,7 +25,7 @@ import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
 import { ReviewTenantButton } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantButton";
 import { ReviewTenantModal } from "../review-tenant-modal/ReviewTenantModal";
-import { useAppDispatch } from "/app/client/store";
+import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useSelector } from "react-redux";
 import {
   load,
@@ -43,6 +43,10 @@ import { DynamicMap } from "../common/map/DynamicMap";
 import { SubHeading } from "../theming/components/SubHeading";
 import { BasicMarker } from "../common/map/markers/BasicMarker";
 import { PropertyMap, PropertyMapUiState } from "./components/PropertyMap";
+import {
+  selectAcceptedCount,
+  selectHasAcceptedApplications,
+} from "../review-tenant-modal/state/reducers/tenant-selection-slice";
 
 export function PropertyListingPage({
   className = "",
@@ -200,6 +204,10 @@ function ListingPageContent({
 }): React.JSX.Element {
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
 
+  const acceptedCount = useAppSelector(selectAcceptedCount);
+  const hasAcceptedApplications = useAppSelector(selectHasAcceptedApplications);
+  const shouldShowSendToLandlordButton = hasAcceptedApplications;
+
   return (
     <div className={className}>
       <TopBar
@@ -257,6 +265,8 @@ function ListingPageContent({
         onSendToLandlord={() => {
           console.log(`Sent applications to landlord`);
         }}
+        shouldShowSendToLandlordButton={shouldShowSendToLandlordButton}
+        acceptedCount={acceptedCount}
       />
     </div>
   );

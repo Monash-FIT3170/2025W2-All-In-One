@@ -7,7 +7,10 @@ export type ReviewTenantModalProps = {
   onAccept: (applicationId: string) => void;
   // onBackgroundPass: (applicationId: string) => void;
   // onBackgroundFail: (applicationId: string) => void;
-  onSendToLandlord: () => void;
+  onSendToLandlord: () => void; // No longer needs applicationId parameter
+  // Business logic props - moved from UI component
+  shouldShowSendToLandlordButton: boolean;
+  acceptedCount: number;
   // propertyAddress?: string;
   // propertyLandlordId?: string;
   // propertyId?: string;
