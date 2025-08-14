@@ -41,4 +41,11 @@ export enum MeteorMethodIdentifier {
   PROFILE_INSERT = "profileData.insert",
   LISTING_SUBMIT_DRAFT = "listing.submitDraft",
   PROPERTY_FEATURES_GET_ALL = "propertyFeatures.getAll",
+
+  // Tenant application methods
+  TENANT_APPLICATION_GET_BY_PROPERTY_ID = "tenantApplication.getByPropertyId",
+  TENANT_APPLICATION_GET_BY_LANDLORD_ID = "tenantApplications.getByLandlordId",
+  TENANT_APPLICATION_INSERT = "tenantApplications.insert",
+  TENANT_APPLICATION_UPDATE_STATUS = "tenantApplications.updateStatus",
+  TENANT_APPLICATION_UPDATE_MULTIPLE_STATUS = "tenantApplications.updateMultipleStatus",
 }
