@@ -1,4 +1,4 @@
-import React, { use, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../theming-shadcn/Button";
 import { PropertyCard } from "../guest-landing-page/components/PropertyCard";
 
@@ -34,43 +34,26 @@ function buildSearchUrl(q: string) {
 export function GuestSearchResultsPage() {
     const navigate = useNavigate();
     const location = useLocation();
+    const decodedUrlQuery = decodeSearchQuery(getQParam(location.search));
 
-    const [searchQuery, setSearchQuery] = useState(
-        decodeSearchQuery(getQParam(location.search))
-    );
-
-    const [decodedQuery, setDecodedQuery] = useState<string>(
-        decodeSearchQuery(getQParam(location.search))
-    );
+    const [searchQuery, setSearchQuery] = useState(decodedUrlQuery);
     const [properties, setProperties] = useState<PropertyWithListingData[]>([]);
     const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
-    const [status, setStatus] = useState<
-        "idle" | "loading" | "succeeded" | "failed"
-    >("idle");
-    const [error, setError] = useState<string | null>(null);
-    const isLoading = status === "loading";
-
-    const shown = useMemo(
-        () => properties.slice(0, visibleCount),
-        [properties, visibleCount]
-    );
+    const [loading, setLoading] = useState<boolean>(false);
+    const shown = properties.slice(0, visibleCount);
 
     useEffect(() => {
-        const q = decodeSearchQuery(getQParam(location.search));
+        const q = decodedUrlQuery;
         setSearchQuery(q);
-        setDecodedQuery(q);
         setVisibleCount(PAGE_SIZE);
 
         const run = async () => {
             const trimmed = q.trim();
             if (!trimmed) {
-                setStatus("succeeded");
                 setProperties([]);
-                setError(null);
                 return;
             }
-            setStatus("loading");
-            setError(null);
+            setLoading(true);
             try {
                 const results = await searchProperties(trimmed);
                 const enriched = await Promise.all(
@@ -79,15 +62,14 @@ export function GuestSearchResultsPage() {
                     )
                 );
                 setProperties(enriched);
-                setStatus("succeeded");
             } catch (e: any) {
-                setStatus("failed");
+                console.error("Failed to load search results:", e);
                 setProperties([]);
-                setError(e?.message ?? "Failed to load results.");
             }
+            setLoading(false);
         };
         run();
-    }, [location.search]);
+    }, [location.search, decodedUrlQuery]);
 
     const onSearch = () => {
         const cleaned = searchQuery.trim();
@@ -131,23 +113,23 @@ export function GuestSearchResultsPage() {
             {/* results */}
             <div className="mx-auto max-w-6xl px-4 sm:px-6">
                 <p className="mb-4 text-[15px] font-medium">
-                    {isLoading
+                    {loading
                         ? "Loading properties…"
                         : `${properties.length} properties found for "${
-                              decodedQuery || "—"
+                              decodedUrlQuery || "—"
                           }"`}
                 </p>
             </div>
 
             {/* property cards */}
             <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-16">
-                {!isLoading && properties.length === 0 && (
+                {!loading && properties.length === 0 && (
                     <div className="text-center text-neutral-700">
-                        No results found for “{decodedQuery}”.
+                        No results found for “{decodedUrlQuery}”.
                     </div>
                 )}
 
-                {!isLoading && properties.length > 0 && (
+                {!loading && properties.length > 0 && (
                     <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {shown.map((prop) => (
