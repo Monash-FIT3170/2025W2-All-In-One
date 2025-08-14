@@ -21,6 +21,7 @@ import {
   defaultTaskFormValues,
   PropertyOption,
 } from "./TaskFormSchema";
+import { DropdownSelect } from "../../../common/DropdownSelect";
 
 interface AddTaskModalProps {
   isOpen: boolean;
@@ -49,6 +50,17 @@ export function AddTaskModal({
     reset();
     onClose();
   };
+
+  const propertyOptions = properties.map((p) => ({
+    value: p.propertyId,
+    label: `${p.streetnumber} ${p.streetname}, ${p.suburb}`,
+  }));
+
+  const priorityOptions = [
+    { value: TaskPriority.LOW, label: "Low" },
+    { value: TaskPriority.MEDIUM, label: "Medium" },
+    { value: TaskPriority.HIGH, label: "High" },
+  ];
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -136,37 +148,22 @@ export function AddTaskModal({
 
           {/* Priority */}
           <div>
-            <Label htmlFor="task-priority" className="text-black font-medium">
-              Priority
-            </Label>
-            <select
-              id="task-priority"
-              {...register("priority")}
-              className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value={TaskPriority.LOW}>Low</option>
-              <option value={TaskPriority.MEDIUM}>Medium</option>
-              <option value={TaskPriority.HIGH}>High</option>
-            </select>
+            <DropdownSelect
+              options={priorityOptions}
+              register={register}
+              fieldName="priority"
+              label="Priority"
+            />
           </div>
 
           {/*Task Property*/}
           <div>
-            <Label htmlFor="task-property" className="text-black font-medium">
-              Select a property that this task will take place in.
-            </Label>
-            <select
-              id="task-property"
-              {...register("propertyId")}
-              className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="">Select Property</option>
-              {properties.map((p) => (
-                <option key={p._id} value={p.propertyId}>
-                  {`${p.streetnumber} ${p.streetname}, ${p.suburb}`}
-                </option>
-              ))}
-            </select>
+            <DropdownSelect
+              options={propertyOptions}
+              register={register}
+              fieldName="propertyId"
+              label="Select a property that this task will take place in."
+            />
           </div>
         </form>
 
