@@ -15,7 +15,7 @@ import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { UpcomingTasks } from "../../components/UpcomingTask";
 import { TaskMap, TaskMapUiState } from "../components/TaskMap";
-import { Property } from "/app/client/library-modules/domain-models/property/Property";
+import { getTodayISODate } from "/app/client/library-modules/utils/date-utils";
 
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
@@ -40,9 +40,7 @@ export function AgentCalendar(): React.JSX.Element {
     async function loadTodayMarkers() {
       // Filter tasks to match the ones below the calendar
       const tasksForSelectedDate = tasks.filter(
-        (task) =>
-          task.dueDate === 
-          (selectedDateISO || new Date().toISOString().slice(0, 10))
+        (task) => task.dueDate === (selectedDateISO || getTodayISODate())
       );
 
       // Fetch property coordinates for each task
@@ -55,8 +53,12 @@ export function AgentCalendar(): React.JSX.Element {
               property.locationLatitude != null &&
               property.locationLongitude != null
             ) {
-              console.log(`Marker for task ${task.taskId} at property ${task.propertyId} added.`);
-              console.log(`Property coordinates: ${property.locationLatitude}, ${property.locationLongitude}`);
+              console.log(
+                `Marker for task ${task.taskId} at property ${task.propertyId} added.`
+              );
+              console.log(
+                `Property coordinates: ${property.locationLatitude}, ${property.locationLongitude}`
+              );
               return {
                 latitude: property.locationLatitude,
                 longitude: property.locationLongitude,
@@ -159,9 +161,7 @@ export function AgentCalendar(): React.JSX.Element {
                   {tasks
                     .filter(
                       (task) =>
-                        task.dueDate ===
-                        (selectedDateISO ||
-                          new Date().toISOString().slice(0, 10))
+                        task.dueDate === (selectedDateISO || getTodayISODate())
                     )
                     .map((task, index) => (
                       <li
@@ -199,7 +199,7 @@ export function AgentCalendar(): React.JSX.Element {
                   {tasks.filter(
                     (task) =>
                       task.dueDate ===
-                      (selectedDateISO || new Date().toISOString().slice(0, 10))
+                      (selectedDateISO || getTodayISODate())
                   ).length === 0 && (
                     <p className="text-gray-500 italic">
                       No tasks for this date
