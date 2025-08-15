@@ -46,6 +46,34 @@ const agentGetMethod = {
   },
 };
 
+// -- UPDATE AGENT TASKS --
+const agentUpdateTasksMethod = {
+  [MeteorMethodIdentifier.AGENT_UPDATE_TASKS]: async (
+    userId: string,
+    taskId: string
+  ): Promise<void> => {
+    const agentDoc = await AgentCollection.findOneAsync({
+      userAccountId: userId,
+    });
+
+    if (!agentDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Agent with user ID ${userId} not found.`)
+      );
+    }
+
+    // Add the task ID to the agent's task_ids array if it doesn't already exist
+    const currentTaskIds = agentDoc.task_ids ?? [];
+    if (!currentTaskIds.includes(taskId)) {
+      const updatedTaskIds = [...currentTaskIds, taskId];
+      await AgentCollection.updateAsync(
+        { userAccountId: userId },
+        { $set: { task_ids: updatedTaskIds } }
+      );
+    }
+  },
+};
+
 async function mapAgentDocumentToDTO(agent: AgentDocument): Promise<ApiAgent> {
   const taskIds = agent.task_ids ?? [];
 
@@ -73,4 +101,5 @@ async function getTaskDocumentsMatchingIds(
 Meteor.methods({
   ...agentInsertMethod,
   ...agentGetMethod,
+  ...agentUpdateTasksMethod,
 });

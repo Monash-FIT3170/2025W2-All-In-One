@@ -9,17 +9,17 @@ import {
 } from "../state/agent-dashboard-slice";
 
 export function DashboardCards() {
-  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-  const { propertyCount, monthlyRevenue, occupancyRate, isLoading, error } =
-    useAppSelector(selectAgentDashboard);
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (currentUser && "agentId" in currentUser && currentUser.agentId) {
-      dispatch(fetchPropertyCount(currentUser.agentId));
-      dispatch(fetchPropertiesAndMetrics(currentUser.agentId));
-    }
-  }, [currentUser, dispatch]);
+    const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+    const {propertyCount, monthlyRevenue, occupancyRate, isLoading, error} = useAppSelector(selectAgentDashboard);
+    const dispatch = useAppDispatch();
+  
+  
+    useEffect(() => {
+      if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
+        dispatch(fetchPropertyCount(currentUser.agentId));
+        dispatch(fetchPropertiesAndMetrics(currentUser.agentId));
+      }
+    }, [currentUser, dispatch]);  
 
   if (isLoading) {
     return <div>Loading...</div>;

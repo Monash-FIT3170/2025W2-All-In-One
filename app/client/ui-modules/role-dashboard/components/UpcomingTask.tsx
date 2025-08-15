@@ -1,20 +1,54 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router";
 import { CardWidget } from "./CardWidget";
-import { Button } from "../../theming-shadcn/Button";
+import { ViewAllButton } from "./ViewAllButton";
 import { TaskStatus } from "/app/shared/task-status-identifier";
-import { parse, format, isToday, isTomorrow, compareAsc } from "date-fns";
+import { parse, format, isTomorrow, compareAsc } from "date-fns";
+import { Role } from "/app/shared/user-role-identifier";
+import { NavigationPath } from "../../../navigation";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
+import { UserAccount } from "/app/client/library-modules/domain-models/user/UserAccount";
 
 
-export function UpcomingTasks(props: {tasks:Task[]}): React.JSX.Element {
+export function UpcomingTasks(
+  props: {
+  tasks: Task[];
+  currentUser?: UserAccount | null;
+}): React.JSX.Element {
+  const navigate = useNavigate();
+
   // Transform tasks and sort by date
   const transformedTasks: Task[] = props.tasks
-    .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks};
+    .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks
     .sort((a, b) => {
       const dateA = parse(a.dueDate, "dd/MM/yyyy", new Date());
       const dateB = parse(b.dueDate, "dd/MM/yyyy", new Date());
       return compareAsc(dateB, dateA); // Descending orderc
     });
+
+  const handleViewAllTasks = () => {
+    const role = props.currentUser?.role;
+
+    if (!role) {
+      console.warn("No user role found");
+      return;
+    }
+
+    // Role to calendar path mapping - automatically handles new roles
+    const roleToCalendarMap: Record<string, string> = {
+      [Role.AGENT]: NavigationPath.AgentCalendar,
+      [Role.LANDLORD]: NavigationPath.LandlordCalendar,
+      [Role.TENANT]: NavigationPath.TenantCalendar,
+    };
+
+    const calendarPath = roleToCalendarMap[role];
+
+    if (calendarPath) {
+      navigate(calendarPath);
+    } else {
+      console.warn(`No calendar path defined for role: ${role}`);
+    }
+  };
 
   return (
     <CardWidget
@@ -32,9 +66,9 @@ export function UpcomingTasks(props: {tasks:Task[]}): React.JSX.Element {
         )}
       </div>
       <div className="mt-4">
-        <Button variant="ghost" className="w-full">
+        <ViewAllButton onClick={handleViewAllTasks}>
           View All Tasks
-        </Button>
+        </ViewAllButton>
       </div>
     </CardWidget>
   );
@@ -65,12 +99,14 @@ function TaskItem({ task }: { task: Task }): React.JSX.Element {
         return "bg-gray-100 text-gray-800";
     }
   };
+  const isOverdue = new Date(task.dueDate) < new Date()
 
   return (
     <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
       <div className="flex flex-col gap-1">
         <div className="flex justify-between items-start">
           <h3 className="text-lg font-medium text-gray-900">{task.name}</h3>
+          <div className="flex items-center gap-2">
           <span
             className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusStyle(
               task.status
@@ -78,12 +114,15 @@ function TaskItem({ task }: { task: Task }): React.JSX.Element {
           >
             {task.status}
           </span>
+          { isOverdue && (
+            <span className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">Overdue</span>)}
+          </div>
         </div>
         {task.description && (
           <p className="text-gray-600 text-sm">{task.description}</p>
         )}
         <div className="flex items-center gap-2 text-gray-600">
-          <span className="text-base">{task.dueDate}</span>
+          <span className="text-base">Due: {task.dueDate}</span>
           {task.priority && (
             <>
               <span className="text-gray-400">•</span>

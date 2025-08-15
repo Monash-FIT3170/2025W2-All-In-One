@@ -17,4 +17,5 @@ export type PropertyDocument = {
   agent_id: string;
   landlord_id: string;
   tenant_id: string;
+  property_coordinate_id: string;
 }

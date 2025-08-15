@@ -10,17 +10,14 @@ import {
   selectProperties,
   selectTasks,
 } from "../state/agent-dashboard-slice";
-import { cu } from "@fullcalendar/core/internal-common";
 
 export function AgentDashboard(): React.JSX.Element {
   const dispatch = useAppDispatch(); // is used to dispatch actions to the Redux store.
   const properties = useAppSelector(selectProperties); // is used to retrieve data from the Redux store.
   const tasks = useAppSelector(selectTasks);
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
-  const isLoading = useAppSelector(selectIsLoading);
-  const error = useAppSelector(selectError);
-  console.log(properties, "properties in agent dashboard");
-
+  const isLoading = useAppSelector(selectIsLoading)
+  const error = useAppSelector(selectError)
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchAgentDetails(currentUser.userId));
@@ -36,12 +33,7 @@ export function AgentDashboard(): React.JSX.Element {
           <h1 className="text-2xl font-bold mb-6">Agent Dashboard</h1>
           <DashboardCards />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <UpcomingTasks tasks={tasks} />{" "}
-            <PropertyOverview
-              properties={properties}
-              error={error}
-              isLoading={isLoading}
-            />
+            <UpcomingTasks tasks={tasks} currentUser={currentUser} /> <PropertyOverview properties={properties} error={error} isLoading={isLoading}/>
           </div>
         </div>
       </div>

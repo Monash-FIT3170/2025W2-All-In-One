@@ -38,13 +38,16 @@ jobs:
       - name: Inject AZURE_CONNECTION_STRING
         run: |
           echo "{
+            \"public\": {
+              \"GOOGLE_MAPS_API_KEY\": \"${{ secrets.GOOGLE_MAPS_API_KEY }}\"
+            },
             \"private\": {
               \"AZURE_CONNECTION_STRING\": \"${{ secrets.AZURE_CONNECTION_STRING }}\"
-              }
-            }" > settings.json 
+            }
+          }" > settings.json 
 
       - name: Deploy
         run: |
-          export PATH="/home/runner/.meteor:$PATH"
+          export PATH="$HOME/.meteor:$PATH"
           export DEPLOY_HOSTNAME=ap-southeast-2.galaxy.meteor.com
           meteor deploy 20251pm-allinone.au.meteorapp.com --settings settings.json --free --mongo

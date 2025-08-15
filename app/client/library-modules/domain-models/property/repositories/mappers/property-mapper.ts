@@ -25,7 +25,9 @@ export function mapApiPropertyToProperty(property: ApiProperty): Property {
     area: property.area,
     agentId: property.agentId,
     landlordId: property.landlordId,
-    tenantId: property.tenantId
+    tenantId: property.tenantId,
+    locationLatitude: property.locationLatitude,
+    locationLongitude: property.locationLongitude
   }
 }
 
