@@ -10,7 +10,7 @@ import {
   selectPropertyDetails,
   selectPropertyLoading,
 } from "../../tenant-dashboard/state/tenant-dashboard-slice";
-import DashboardCards from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/DashboardCards";
+import DashboardCards from "../components/TenantDashboardCard";
 
 function TenantDashboard() {
   const dispatch = useAppDispatch();
@@ -64,9 +64,7 @@ function TenantDashboard() {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
                   </div>
                 ) : transformedPropertyDetails ? (
-                  <PropertyDetails
-                    {...transformedPropertyDetails}
-                  />
+                  <PropertyDetails {...transformedPropertyDetails} />
                 ) : (
                   <div className="text-center text-gray-500">
                     No property details available

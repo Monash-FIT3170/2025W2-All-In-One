@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { UpcomingTasks } from "../../components/UpcomingTask";
 import { PropertyOverview } from "../components/PropertyOverview";
-import { DashboardCards } from "../components/DashboardCard";
+import { DashboardCards } from "../components/AgentDashboardCard";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
   fetchAgentDetails,
@@ -17,15 +17,14 @@ export function AgentDashboard(): React.JSX.Element {
   const properties = useAppSelector(selectProperties); // is used to retrieve data from the Redux store.
   const tasks = useAppSelector(selectTasks);
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
-  const isLoading = useAppSelector(selectIsLoading)
-  const error = useAppSelector(selectError)
+  const isLoading = useAppSelector(selectIsLoading);
+  const error = useAppSelector(selectError);
   console.log(properties, "properties in agent dashboard");
 
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchAgentDetails(currentUser.userId));
-    }
-    else {
+    } else {
       console.warn("No user ID found. Please log in to view the dashboard.");
     }
   }, []);
@@ -37,7 +36,12 @@ export function AgentDashboard(): React.JSX.Element {
           <h1 className="text-2xl font-bold mb-6">Agent Dashboard</h1>
           <DashboardCards />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <UpcomingTasks tasks={tasks} /> <PropertyOverview properties={properties} error={error} isLoading={isLoading}/>
+            <UpcomingTasks tasks={tasks} />{" "}
+            <PropertyOverview
+              properties={properties}
+              error={error}
+              isLoading={isLoading}
+            />
           </div>
         </div>
       </div>

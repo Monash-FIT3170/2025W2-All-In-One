@@ -1,21 +1,21 @@
-import React, { useEffect } from 'react';
-import { Progress } from '../../components/ProgressBar';
-import { CardWidget } from '../../components/CardWidget';
-import { useAppSelector, useAppDispatch } from '/app/client/store';
+import React, { useEffect } from "react";
+import { Progress } from "../../components/ProgressBar";
+import { CardWidget } from "../../components/CardWidget";
+import { useAppSelector, useAppDispatch } from "/app/client/store";
 import {
   fetchPropertyCount,
   fetchPropertiesAndMetrics,
-  selectAgentDashboard
-} from '../state/agent-dashboard-slice';
+  selectAgentDashboard,
+} from "../state/agent-dashboard-slice";
 
 export function DashboardCards() {
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-  const {propertyCount, monthlyRevenue, occupancyRate, isLoading, error} = useAppSelector(selectAgentDashboard);
+  const { propertyCount, monthlyRevenue, occupancyRate, isLoading, error } =
+    useAppSelector(selectAgentDashboard);
   const dispatch = useAppDispatch();
 
-
   useEffect(() => {
-    if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
+    if (currentUser && "agentId" in currentUser && currentUser.agentId) {
       dispatch(fetchPropertyCount(currentUser.agentId));
       dispatch(fetchPropertiesAndMetrics(currentUser.agentId));
     }
@@ -36,17 +36,10 @@ export function DashboardCards() {
         value={propertyCount.toString()}
         subtitle="+2 from last month"
       />
-      <CardWidget
-        title="Occupancy Rate"
-        value={`${occupancyRate.toFixed(2)}%`}
-      >
+      <CardWidget title="Occupancy Rate" value={`${occupancyRate.toFixed(2)}%`}>
         <Progress value={occupancyRate} className="mt-2" />
       </CardWidget>
-      <CardWidget
-        title="Pending Tasks"
-        value="7"
-        subtitle="1 due this week"
-      />
+      <CardWidget title="Pending Tasks" value="7" subtitle="1 due this week" />
       <CardWidget
         title="Monthly Revenue"
         value={`$${monthlyRevenue.toLocaleString()}`}
