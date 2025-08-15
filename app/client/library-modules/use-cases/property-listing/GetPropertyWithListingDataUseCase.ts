@@ -3,14 +3,13 @@ import { getPropertyById } from "/app/client/library-modules/domain-models/prope
 import { PropertyWithListingData } from "/app/client/library-modules/use-cases/property-listing/models/PropertyWithListingData";
 
 export async function getPropertyWithListingDataUseCase(
-  propertyId: string
+    propertyId: string
 ): Promise<PropertyWithListingData> {
-  const property = await getPropertyById(propertyId);
-  const listing = await getListingByPropertyId(propertyId);
+    const property = await getPropertyById(propertyId);
+    const listing = await getListingByPropertyId(propertyId);
 
-  return {
-    ...property,
-    ...listing
-  };
-
+    return {
+        ...property,
+        ...listing,
+    };
 }

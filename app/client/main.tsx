@@ -32,158 +32,241 @@ import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/T
 import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
 import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
 import { loadCurrentUser } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
-import { 
-  AgentRoute, 
-  TenantRoute, 
-  LandlordRoute,
-  AuthenticatedRoute 
+import {
+    AgentRoute,
+    TenantRoute,
+    LandlordRoute,
+    AuthenticatedRoute,
 } from "./ui-modules/user-authentication/components/RouteGuards";
 import { NavigationPath } from "./navigation";
+import { GuestSearchResultsPage } from "./ui-modules/search/SearchResultPage";
 
 Meteor.startup(initialiseReactRoot);
 
 function initialiseReactRoot(): void {
-  const container = document.getElementById("react-target") as Container;
-  const root = createRoot(container);
+    const container = document.getElementById("react-target") as Container;
+    const root = createRoot(container);
 
-  root.render(
-    <React.StrictMode>
-      <Provider store={store}>
-          <AppRoot />
-      </Provider>
-    </React.StrictMode>
-  );
+    root.render(
+        <React.StrictMode>
+            <Provider store={store}>
+                <AppRoot />
+            </Provider>
+        </React.StrictMode>
+    );
 }
 
 function AppRoot(): React.JSX.Element {
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
-  const dispatch = useAppDispatch();
+    const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+    const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    const userId = Meteor.userId();
-    if (userId) {
-      dispatch(loadCurrentUser(userId));
-    }
-  }, [dispatch]);
+    useEffect(() => {
+        const userId = Meteor.userId();
+        if (userId) {
+            dispatch(loadCurrentUser(userId));
+        }
+    }, [dispatch]);
 
-  return (
-    <DefaultTheme>
-      <BrowserRouter>
-        <TopNavbar onSideBarOpened={setIsSidebarOpen} />
-        <RoleSideNavBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-        <Routes>
-          {/* Public routes */}
-          <Route path={NavigationPath.Home} element={<GuestLandingPage />} />
-          <Route path={NavigationPath.Signin} element={<AuthTabs initialTab={NavigationPath.Signin} />}/>
-          <Route path={NavigationPath.Signup} element={<AuthTabs initialTab={NavigationPath.Signup} />}/>
-          <Route path={NavigationPath.PropertyListing} element={<PropertyListingPage />} />
-          
-          {/* Agent-only routes */}
-          <Route path={NavigationPath.AgentDashboard} element={
-            <AgentRoute>
-              <AgentDashboard />
-            </AgentRoute>
-          } />
-          <Route path={NavigationPath.AgentProperties} element={
-            <AgentRoute>
-              <AgentProperty />
-            </AgentRoute>
-          } />
-          <Route path={NavigationPath.AgentCalendar} element={
-            <AgentRoute>
-              <AgentCalendar />
-            </AgentRoute>
-          } />
-          <Route path={NavigationPath.AgentMessages} element={
-            <AgentRoute>
-              <AgentMessage />
-            </AgentRoute>
-          } />
-          <Route path={NavigationPath.AgentTasks} element={
-            <AgentRoute>
-              <AgentTask />
-            </AgentRoute>
-          } />
-          {/* Agent and Landlord routes */}
-          <Route path={NavigationPath.PropertyForm} element={
-            <AgentRoute>
-              <PropertyFormPage />
-            </AgentRoute>
-          } />
-          
-          {/* Landlord-only routes */}
-          <Route path={NavigationPath.LandlordDashboard} element={
-            <LandlordRoute>
-              <LandlordDashboard />
-            </LandlordRoute>
-          } />
-          <Route path={NavigationPath.LandlordProperties} element={
-            <LandlordRoute>
-              <LandlordProperty />
-            </LandlordRoute>
-          } />
-          <Route path={NavigationPath.LandlordCalendar} element={
-            <LandlordRoute>
-              <LandlordCalendar />
-            </LandlordRoute>
-          } />
-          <Route path={NavigationPath.LandlordTasks} element={
-            <LandlordRoute>
-              <LandlordTask />
-            </LandlordRoute>
-          } />
-          
-          {/* Tenant-only routes */}
-          <Route path={NavigationPath.TenantDashboard} element={
-            <TenantRoute>
-              <TenantDashboard />
-            </TenantRoute>
-          } />
-          <Route path={NavigationPath.TenantProperty} element={
-            <TenantRoute>
-              <TenantProperty />
-            </TenantRoute>
-          } />
-          <Route path={NavigationPath.TenantCalendar} element={
-            <TenantRoute>
-              <TenantCalendar />
-            </TenantRoute>
-          } />
-          <Route path={NavigationPath.TenantMaintenance} element={
-            <TenantRoute>
-              <TenantMaintenance />
-            </TenantRoute>
-          } />
-          <Route path={NavigationPath.TenantMessages} element={
-            <TenantRoute>
-              <TenantMessages />
-            </TenantRoute>
-          } />
-          <Route path={NavigationPath.TenantDocuments} element={
-            <TenantRoute>
-              <TenantDocument />
-            </TenantRoute>
-          } />
-          <Route path={NavigationPath.TenantSearchProperties} element={
-            <TenantRoute>
-              <TenantSearchProperties />
-            </TenantRoute>
-          } />
-          
-          {/* Authenticated user routes */}
-          <Route path={NavigationPath.Settings} element={
-            <AuthenticatedRoute>
-              <SettingsPage />
-            </AuthenticatedRoute>
-          } />
-          <Route path={NavigationPath.Profile} element={
-            <AuthenticatedRoute>
-              <ProfilePage />
-            </AuthenticatedRoute>
-          } />
-        </Routes>
-        <BottomNavbar />
-      </BrowserRouter>
-    </DefaultTheme>
-  );
+    return (
+        <DefaultTheme>
+            <BrowserRouter>
+                <TopNavbar onSideBarOpened={setIsSidebarOpen} />
+                <RoleSideNavBar
+                    isOpen={isSidebarOpen}
+                    onClose={() => setIsSidebarOpen(false)}
+                />
+                <Routes>
+                    {/* Public routes */}
+                    <Route
+                        path={NavigationPath.Home}
+                        element={<GuestLandingPage />}
+                    />
+                    <Route
+                        path={NavigationPath.Signin}
+                        element={
+                            <AuthTabs initialTab={NavigationPath.Signin} />
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.Signup}
+                        element={
+                            <AuthTabs initialTab={NavigationPath.Signup} />
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.PropertyListing}
+                        element={<PropertyListingPage />}
+                    />
+
+                    {/* Search routes */}
+                    <Route
+                        path={NavigationPath.Search}
+                        element={<GuestSearchResultsPage />}
+                    />
+
+                    {/* Agent-only routes */}
+                    <Route
+                        path={NavigationPath.AgentDashboard}
+                        element={
+                            <AgentRoute>
+                                <AgentDashboard />
+                            </AgentRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.AgentProperties}
+                        element={
+                            <AgentRoute>
+                                <AgentProperty />
+                            </AgentRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.AgentCalendar}
+                        element={
+                            <AgentRoute>
+                                <AgentCalendar />
+                            </AgentRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.AgentMessages}
+                        element={
+                            <AgentRoute>
+                                <AgentMessage />
+                            </AgentRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.AgentTasks}
+                        element={
+                            <AgentRoute>
+                                <AgentTask />
+                            </AgentRoute>
+                        }
+                    />
+                    {/* Agent and Landlord routes */}
+                    <Route
+                        path={NavigationPath.PropertyForm}
+                        element={
+                            <AgentRoute>
+                                <PropertyFormPage />
+                            </AgentRoute>
+                        }
+                    />
+
+                    {/* Landlord-only routes */}
+                    <Route
+                        path={NavigationPath.LandlordDashboard}
+                        element={
+                            <LandlordRoute>
+                                <LandlordDashboard />
+                            </LandlordRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.LandlordProperties}
+                        element={
+                            <LandlordRoute>
+                                <LandlordProperty />
+                            </LandlordRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.LandlordCalendar}
+                        element={
+                            <LandlordRoute>
+                                <LandlordCalendar />
+                            </LandlordRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.LandlordTasks}
+                        element={
+                            <LandlordRoute>
+                                <LandlordTask />
+                            </LandlordRoute>
+                        }
+                    />
+
+                    {/* Tenant-only routes */}
+                    <Route
+                        path={NavigationPath.TenantDashboard}
+                        element={
+                            <TenantRoute>
+                                <TenantDashboard />
+                            </TenantRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.TenantProperty}
+                        element={
+                            <TenantRoute>
+                                <TenantProperty />
+                            </TenantRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.TenantCalendar}
+                        element={
+                            <TenantRoute>
+                                <TenantCalendar />
+                            </TenantRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.TenantMaintenance}
+                        element={
+                            <TenantRoute>
+                                <TenantMaintenance />
+                            </TenantRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.TenantMessages}
+                        element={
+                            <TenantRoute>
+                                <TenantMessages />
+                            </TenantRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.TenantDocuments}
+                        element={
+                            <TenantRoute>
+                                <TenantDocument />
+                            </TenantRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.TenantSearchProperties}
+                        element={
+                            <TenantRoute>
+                                <TenantSearchProperties />
+                            </TenantRoute>
+                        }
+                    />
+
+                    {/* Authenticated user routes */}
+                    <Route
+                        path={NavigationPath.Settings}
+                        element={
+                            <AuthenticatedRoute>
+                                <SettingsPage />
+                            </AuthenticatedRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.Profile}
+                        element={
+                            <AuthenticatedRoute>
+                                <ProfilePage />
+                            </AuthenticatedRoute>
+                        }
+                    />
+                </Routes>
+                <BottomNavbar />
+            </BrowserRouter>
+        </DefaultTheme>
+    );
 }
