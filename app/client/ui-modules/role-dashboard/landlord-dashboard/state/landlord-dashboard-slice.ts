@@ -63,6 +63,7 @@ export const fetchLandlordDetails = createAsyncThunk(
     let taskDetails;
     try {
       const landlordResponse = await getLandlordById(userId);
+      const landlordId = landlordResponse?.landlordId;
       taskDetails = await Promise.all(
         landlordResponse.tasks.map(async (taskId) => {
           const task = await getTaskById(taskId);
@@ -71,7 +72,7 @@ export const fetchLandlordDetails = createAsyncThunk(
       );
       properties = await getAllPropertiesByLandlordId(userId);
 
-      const dashboardData = await fetchLandlordDashboardData(userId);
+      const dashboardData = await fetchLandlordDashboardData(landlordId);
 
       return {
         properties: properties,
@@ -148,7 +149,7 @@ export const { setLoading, setTasks, setProperties, setError } =
   landlordDashboardSlice.actions;
 
 export const selectLandlordDashboard = (state: RootState) =>
-  state.landlordDashboard;
+  state.landlordDashboard.dashboardData;
 export const selectTasks = (state: RootState) => state.landlordDashboard.tasks;
 export const selectProperties = (state: RootState) =>
   state.landlordDashboard.properties;
