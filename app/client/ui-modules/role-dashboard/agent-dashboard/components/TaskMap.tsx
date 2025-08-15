@@ -19,10 +19,15 @@ export function TaskMap({
   mapUiState: TaskMapUiState; 
   className?: string 
 }): React.JSX.Element {
+  
+  const initialMapCoordinates = mapUiState.markers.length > 0 ? {
+    initialLatitude: mapUiState.markers[0].latitude,
+    initialLongitude: mapUiState.markers[0].longitude,
+  } : undefined;
+
   return (
       <DynamicMap
-        initialLatitude={mapUiState.markers[0]?.latitude}
-        initialLongitude={mapUiState.markers[0]?.longitude}
+        initialMapCoordinates={initialMapCoordinates}
         markers={mapUiState.markers.map((marker, index) => (
           <BasicMarker
           key={index}
