@@ -9,4 +9,6 @@ export type Task = {
   dueDate: string;
   description: string;
   priority: TaskPriority;
+  propertyAddress: string;
+  propertyId?: string; 
 };

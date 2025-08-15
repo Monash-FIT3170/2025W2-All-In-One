@@ -2,13 +2,13 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "../../../../store";
 import { Meteor } from "meteor/meteor";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { getAgentById } from "/app/client/library-modules/domain-models/user/role-repositories/agent-repository";
 import { getTaskById } from "/app/client/library-modules/domain-models/task/repositories/task-repository";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { getPropertyByAgentId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
+import { PropertyOption } from "../components/TaskFormSchema";
 
 interface AgentDashboardState {
   isLoading: boolean;
@@ -104,7 +104,7 @@ export const fetchAgentTasks = createAsyncThunk(
   "agentDashboard/fetchAgentTasks",
   async (userId: string) => {
     const agentResponse = await getAgentById(userId);
-
+    console.log("fetching agent tasks");
     const taskDetails = [];
     for (const taskId of agentResponse.tasks) {
       try {
@@ -213,3 +213,25 @@ export const selectPropertiesError = (state: RootState) =>
   state.agentDashboard.propertiesError;
 
 export default agentDashboardSlice.reducer;
+
+export const fetchPropertiesForAgent = (
+  agentId: string
+): Promise<PropertyOption[]> => {
+  return new Promise((resolve, reject) => {
+    Meteor.call(MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID, agentId, (err: Meteor.Error | null, result: any[]) => {
+      if (err) {
+        reject(err);
+      } else {
+        // Map full property objects to lightweight PropertyOption[]
+        const properties: PropertyOption[] = (result || []).map(p => ({
+          _id: p._id,
+          propertyId: p.propertyId,
+          streetnumber: p.streetnumber,
+          streetname: p.streetname,
+          suburb: p.suburb,
+        }));
+        resolve(properties);
+      }
+    });
+  });
+};

@@ -9,4 +9,6 @@ export type TaskDocument = {
   dueDate: Date;
   description: string;
   priority: TaskPriority;
+  taskPropertyAddress: string;
+  taskPropertyId: string;
 }

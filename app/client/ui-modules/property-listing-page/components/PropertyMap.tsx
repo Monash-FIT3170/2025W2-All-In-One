@@ -17,8 +17,10 @@ export function PropertyMap({
 }): React.JSX.Element {
   return (
       <DynamicMap
-        initialLatitude={mapUiState.markerLatitude}
-        initialLongitude={mapUiState.markerLongitude}
+        initialMapCoordinates = {{
+          initialLatitude: mapUiState.markerLatitude,
+          initialLongitude: mapUiState.markerLongitude,
+        }}
         markers={[<BasicMarker latitude={mapUiState.markerLatitude} longitude={mapUiState.markerLongitude} />]}
         className={twMerge("w-full h-[350px]", className)}
       />

@@ -4,6 +4,8 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
 import { Meteor } from "meteor/meteor";
+import { PropertyOption } from "../../../ui-modules/role-dashboard/agent-dashboard/components/TaskFormSchema";
+import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
 export async function apiGetPropertyById(id: string): Promise<ApiProperty> {
   try {
@@ -16,6 +18,23 @@ export async function apiGetPropertyById(id: string): Promise<ApiProperty> {
     console.error(`Error fetching property with ID ${id}:`, error);
     throw error;
   }
+}
+
+
+export async function mapPropertyToOption(propertyId: string): Promise<PropertyOption> {
+  // Await the result properly
+  const property = await getPropertyById(propertyId); // property is now the resolved object
+
+  // Ensure all fields exist
+  const option: PropertyOption = {
+    _id: property.propertyId,         // assign the actual DB _id
+    propertyId: property.propertyId,
+    streetnumber: property.streetnumber,
+    streetname: property.streetname,
+    suburb: property.suburb,
+  };
+
+  return option;
 }
 
 export async function apiGetPropertyStatusId(

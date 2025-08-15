@@ -5,6 +5,8 @@ import { Button } from "../../../theming-shadcn/Button";
 import { UpcomingTasks } from "../../components/UpcomingTask";
 import { fetchTenantTasks, selectLoading, selectTasks } from "../state/tenant-dashboard-slice";
 import { TaskStatus } from "/app/shared/task-status-identifier";
+import { getTodayISODate } from "/app/client/library-modules/utils/date-utils";
+
 export function TenantCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch(); 
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
@@ -51,7 +53,7 @@ export function TenantCalendar(): React.JSX.Element {
                 </h2>
                 <ul className="space-y-4 mt-2">
                   {tasks
-                    .filter((task) => task.dueDate === (selectedDateISO || new Date().toISOString().slice(0, 10)))
+                    .filter((task) => task.dueDate === (selectedDateISO || getTodayISODate()))
                     .map((task, index) => (
                       <li key={index} className="p-4 rounded shadow bg-white border border-gray-200">
                         <p className="font-bold text-lg">{task.name}</p>
