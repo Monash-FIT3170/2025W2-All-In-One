@@ -423,8 +423,7 @@ const propertySearchMethod = {
                 await PropertyCollection.find(mongoQuery).fetchAsync();
 
             const vacantProperties = matchingProperties.filter(
-                (property) =>
-                    property.property_status_id === PropertyStatus.VACANT
+                (property) => property.property_status_id === "1" // 1 is the ID for the seeded vacant
             );
             // Map the matching properties to ApiProperty DTOs
             const dtoResults = await Promise.all(
