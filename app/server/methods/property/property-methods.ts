@@ -422,9 +422,13 @@ const propertySearchMethod = {
             const matchingProperties =
                 await PropertyCollection.find(mongoQuery).fetchAsync();
 
+            const vacantProperties = matchingProperties.filter(
+                (property) =>
+                    property.property_status_id === PropertyStatus.VACANT
+            );
             // Map the matching properties to ApiProperty DTOs
             const dtoResults = await Promise.all(
-                matchingProperties.map(mapPropertyDocumentToPropertyDTO)
+                vacantProperties.map(mapPropertyDocumentToPropertyDTO)
             );
 
             return dtoResults;
