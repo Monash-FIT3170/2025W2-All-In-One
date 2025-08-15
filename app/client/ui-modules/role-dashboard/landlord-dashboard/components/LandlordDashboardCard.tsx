@@ -23,34 +23,23 @@ export function LandlordDashboardCards({
       <CardWidget
         title="Total Properties"
         value={propertyCount.toString()}
-        subtitle={
-          statusCounts
-            ? `${statusCounts.occupied} Occupied, ${statusCounts.vacant} Vacant`
-            : "Loading..."
-        }
+        subtitle={`${statusCounts.occupied} Occupied, ${statusCounts.vacant} Vacant`}
       />
       <CardWidget
         title="Total Income"
-        value={income ? `$${income.weekly}/week` : "Loading..."}
-        subtitle={income ? `$${income.monthly}/month` : "Loading..."}
+        value={`$${income.weekly}/week`}
+        subtitle={`$${income.monthly}/month`}
       />
-      <CardWidget
-        title="Occupancy Rate"
-        value={occupancyRate !== null ? `${occupancyRate}%` : "Loading..."}
-      >
+      <CardWidget title="Occupancy Rate" value={`${occupancyRate}%`}>
         {occupancyRate !== null && (
           <Progress value={occupancyRate} className="mt-2" />
         )}
       </CardWidget>
       <CardWidget
         title="Average Rent"
-        value={
-          averageRent !== null ? `$${averageRent.rent}/month` : "Loading..."
-        }
+        value={`$${averageRent.rent}/month`}
         subtitle={
-          averageRent === null
-            ? "Loading..."
-            : averageRent.occupiedCount === 0
+          averageRent.occupiedCount === 0
             ? "No owned properties currently occupied..."
             : `Across ${averageRent.occupiedCount} occupied propert${
                 averageRent.occupiedCount === 1 ? "y" : "ies"
