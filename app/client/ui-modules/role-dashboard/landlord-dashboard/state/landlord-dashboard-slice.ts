@@ -28,7 +28,7 @@ interface LandlordDashboardState {
       occupiedCount: number;
       rent: number;
     };
-  } | null;
+  };
   error: string | null;
 }
 
@@ -36,7 +36,22 @@ const initialState: LandlordDashboardState = {
   isLoading: false,
   tasks: [],
   properties: [],
-  dashboardData: null,
+  dashboardData: {
+    propertyCount: 0,
+    statusCounts: {
+      occupied: 0,
+      vacant: 0,
+    },
+    income: {
+      weekly: 0,
+      monthly: 0,
+    },
+    occupancyRate: 0,
+    averageRent: {
+      occupiedCount: 0,
+      rent: 0,
+    },
+  },
   error: null,
 };
 

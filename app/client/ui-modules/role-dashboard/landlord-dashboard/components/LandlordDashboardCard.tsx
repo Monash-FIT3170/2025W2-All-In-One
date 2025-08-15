@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { CardWidget } from "../../components/CardWidget";
 import { Progress } from "../../components/ProgressBar";
-import { useAppSelector } from "/app/client/store";
-import { selectLandlordDashboard } from "../state/landlord-dashboard-slice";
 
-export function LandlordDashboardCards() {
-  const dashboardData = useAppSelector(selectLandlordDashboard);
+interface LandlordDashBoardProps {
+  dashboardData: {
+    propertyCount: number;
+    statusCounts: { occupied: number; vacant: number };
+    income: { weekly: number; monthly: number };
+    occupancyRate: number;
+    averageRent: { occupiedCount: number; rent: number };
+  };
+}
 
-  const propertyCount = dashboardData?.propertyCount ?? 0;
-  const statusCounts = dashboardData?.statusCounts ?? null;
-  const income = dashboardData?.income ?? null;
-  const occupancyRate = dashboardData?.occupancyRate ?? null;
-  const averageRent = dashboardData?.averageRent ?? null;
+export function LandlordDashboardCards({
+  dashboardData,
+}: LandlordDashBoardProps) {
+  const { propertyCount, statusCounts, income, occupancyRate, averageRent } =
+    dashboardData;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
