@@ -11,6 +11,7 @@ import { propertyListingSlice } from "/app/client/ui-modules/property-listing-pa
 import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
 import { currentUserSlice } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
 import { propertyFormSlice } from "./ui-modules/property-form-agent/state/reducers/property-form-slice";
+import { tenantSelectionSlice } from "./ui-modules/review-tenant-modal/state/reducers/tenant-selection-slice";
 
 export const store = configureStore({
   reducer: {
@@ -25,6 +26,7 @@ export const store = configureStore({
     signupForm: signupFormSlice.reducer,
     currentUser: currentUserSlice.reducer,
     propertyForm: propertyFormSlice.reducer,
+    tenantSelection: tenantSelectionSlice.reducer,
   },
 });
 

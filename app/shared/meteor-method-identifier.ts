@@ -1,5 +1,6 @@
 export enum MeteorMethodIdentifier {
-  TASK_INSERT = "tasks.insert",
+  TASK_INSERT_FOR_AGENT = "tasks.insertForAgent",
+  TASK_INSERT_FOR_LANDLORD = "tasks.insertForLandlord",
   TASK_GET_ALL = "tasks.getAll",
   TASK_GET = "tasks.getOne",
   TASK_GET_MULTIPLE = "tasks.getMultiple",
@@ -26,6 +27,8 @@ export enum MeteorMethodIdentifier {
   TENANT_GET = "tenants.getOne",
   LANDLORD_INSERT = "landlords.insert",
   LANDLORD_GET = "landlords.getOne",
+  LANDLORD_GET_BY_LANDLORD_ID = "landlords.getByLandlordId", // Get landlord by landlord ID (not user ID)
+  LANDLORD_UPDATE_TASKS = "landlords.updateTasks", // Adds the id of the newly created task to the landlord's task_ids
   LANDLORD_GET_ALL = "landlords.getAll", // Get All Landlords
   PROPERTY_STATUS_GET = "propertyStatus.getOne", // Find ID of property status by name
   PROPERTY_GET_BY_TENANT_ID = "property.getByTenantId",

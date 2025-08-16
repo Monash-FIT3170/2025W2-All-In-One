@@ -24,8 +24,8 @@ export function RejectButton({
   );
 }
 
-// Progress Button
-export function ProgressButton({
+// Accept Button
+export function AcceptButton({
   onClick,
   className = "",
 }: {
@@ -38,7 +38,7 @@ export function ProgressButton({
       onClick={onClick}
       className={twMerge("text-sm font-medium", className)}
     >
-      Progress
+      Accept
     </ThemedButton>
   );
 }

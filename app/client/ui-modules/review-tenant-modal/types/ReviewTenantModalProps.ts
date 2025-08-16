@@ -4,10 +4,11 @@ export type ReviewTenantModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onReject: (applicationId: string) => void;
-  onProgress: (applicationId: string) => void;
-  onBackgroundPass: (applicationId: string) => void;
-  onBackgroundFail: (applicationId: string) => void;
-  onSendToLandlord: (applicationId: string) => void;
-  propertyAddress?: string;
+  onAccept: (applicationId: string) => void;
+  // onBackgroundPass: (applicationId: string) => void;
+  // onBackgroundFail: (applicationId: string) => void;
+  onSendToLandlord: () => void;
+  shouldShowSendToLandlordButton: boolean;
+  acceptedCount: number;
   tenantApplications?: TenantApplication[];
 }

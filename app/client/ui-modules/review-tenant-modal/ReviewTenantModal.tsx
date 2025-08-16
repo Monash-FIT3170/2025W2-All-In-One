@@ -1,104 +1,50 @@
 import React from 'react';
 import { ReviewTenantModalProps } from './types/ReviewTenantModalProps';
-import { TenantApplication } from './types/TenantApplication';
-import { TenantApplicationStatus } from './enums/TenantApplicationStatus';
-import { BackgroundCheckStatus } from './enums/BackgroundCheckStatus';
 import { FilterType } from './enums/FilterType';
 import { ModalHeader } from './components/ModalHeader';
 import { FilterTabs } from './components/FilterTabs';
 import { ModalContent } from './components/ModalContent';
 import { ModalDone } from './components/ModalDone';
+import { useAppDispatch, useAppSelector } from '/app/client/store';
+import {
+  selectFilteredApplications,
+  selectAcceptedCount,
+  setFilter,
+  rejectTenantApplicationAsync,
+  acceptTenantApplicationAsync,
+  sendAcceptedApplicationsToLandlordAsync
+} from './state/reducers/tenant-selection-slice';
 
 export function ReviewTenantModal({
   isOpen,
   onClose,
   onReject,
-  onProgress,
-  onBackgroundPass,
-  onBackgroundFail,
+  onAccept,
   onSendToLandlord,
-  propertyAddress,
-  tenantApplications = [
-    // Default mock data for backward compatibility
-    {
-      id: '1',
-      name: 'Rehan W',
-      status: TenantApplicationStatus.UNDETERMINED,
-    },
-    {
-      id: '2',
-      name: 'Dylan C',
-      status: TenantApplicationStatus.UNDETERMINED,
-    },
-    {
-      id: '3',
-      name: 'Tony X',
-      status: TenantApplicationStatus.UNDETERMINED,
-    },
-    {
-      id: '4',
-      name: 'Shannon W',
-      status: TenantApplicationStatus.REJECTED,
-    },
-    {
-      id: '5',
-      name: 'Ashleigh C',
-      status: TenantApplicationStatus.ACCEPTED,
-    },
-    {
-      id: '6',
-      name: 'Maddy C',
-      status: TenantApplicationStatus.ACCEPTED,
-      backgroundCheck: BackgroundCheckStatus.PASS,
-    },
-  ],
+  shouldShowSendToLandlordButton,
+  acceptedCount,
 }: ReviewTenantModalProps): React.JSX.Element {
-  const [applications, setApplications] = React.useState<TenantApplication[]>(tenantApplications);
-
-  const [activeFilter, setActiveFilter] = React.useState<FilterType>(FilterType.ALL);
+  const dispatch = useAppDispatch();
+  const applications = useAppSelector(selectFilteredApplications);
 
   const handleReject = (applicationId: string) => {
-    setApplications(currentApplications => 
-      currentApplications.map(app => 
-        app.id === applicationId ? { ...app, status: TenantApplicationStatus.REJECTED } : app
-      )
-    );
+    dispatch(rejectTenantApplicationAsync(applicationId));
     onReject(applicationId);
   };
 
-  const handleProgress = (applicationId: string) => {
-    setApplications(currentApplications => 
-      currentApplications.map(app => 
-        app.id === applicationId ? { ...app, status: TenantApplicationStatus.ACCEPTED } : app
-      )
-    );
-    onProgress(applicationId);
+  const handleAccept = (applicationId: string) => {
+    dispatch(acceptTenantApplicationAsync(applicationId));
+    onAccept(applicationId);
   };
 
-  const handleBackgroundPass = (applicationId: string) => {
-    setApplications(currentApplications => 
-      currentApplications.map(app => 
-        app.id === applicationId ? { ...app, backgroundCheck: BackgroundCheckStatus.PASS } : app
-      )
-    );
-    onBackgroundPass(applicationId);
+  const handleSendToLandlord = () => {
+    dispatch(sendAcceptedApplicationsToLandlordAsync());
+    onSendToLandlord();
   };
 
-  const handleBackgroundFail = (applicationId: string) => {
-    setApplications(currentApplications => 
-      currentApplications.map(app => 
-        app.id === applicationId ? { ...app, backgroundCheck: BackgroundCheckStatus.FAIL } : app
-      )
-    );
-    onBackgroundFail(applicationId);
+  const handleFilterChange = (filter: FilterType) => {
+    dispatch(setFilter(filter));
   };
-
-  const filteredApplications = applications.filter(app => {
-    if (activeFilter === FilterType.ALL) return true;
-    if (activeFilter === FilterType.REJECTED) return app.status === TenantApplicationStatus.REJECTED;
-    if (activeFilter === FilterType.ACCEPTED) return app.status === TenantApplicationStatus.ACCEPTED;
-    return false;
-  });
 
   if (!isOpen) return <></>;
 
@@ -106,21 +52,31 @@ export function ReviewTenantModal({
     <div className="fixed inset-0 bg-opacity-100 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg max-w-md w-full mx-4 max-h-screen overflow-hidden shadow-xl">
         <ModalHeader onClose={onClose} />
-        
-        <FilterTabs 
-          activeFilter={activeFilter} 
-          onFilterChange={setActiveFilter} 
+
+        <FilterTabs
+          activeFilter={FilterType.ALL}
+          onFilterChange={handleFilterChange}
         />
-        
+
         <ModalContent
-          applications={filteredApplications}
+          applications={applications}
           onReject={handleReject}
-          onProgress={handleProgress}
-          onBackgroundPass={handleBackgroundPass}
-          onBackgroundFail={handleBackgroundFail}
-          onSendToLandlord={onSendToLandlord}
+          onAccept={handleAccept}
+          onSendToLandlord={handleSendToLandlord}
         />
-        
+
+         {/* Send accepted applicants to landlord button */}
+         {shouldShowSendToLandlordButton && (
+          <div className="p-4 border-t">
+            <button
+              onClick={handleSendToLandlord}
+              className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+            >
+              Send {acceptedCount} Accepted Applicant(s) to Landlord
+            </button>
+          </div>
+        )}
+
         <ModalDone onClose={onClose} />
       </div>
     </div>

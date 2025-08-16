@@ -3,23 +3,23 @@ import { TenantApplication } from '../types/TenantApplication';
 import { TenantApplicationStatus } from '../enums/TenantApplicationStatus';
 import { BackgroundCheckStatus } from '../enums/BackgroundCheckStatus';
 import { StatusBadge, BackgroundBadge } from './StatusBadges';
-import { RejectButton, ProgressButton, BackgroundPassButton, BackgroundFailButton, SendToLandlordButton } from '../../property-listing-page/components/TenantReviewButtons';
+import { RejectButton, AcceptButton, BackgroundPassButton, BackgroundFailButton, SendToLandlordButton } from '../../property-listing-page/components/TenantReviewButtons';
 
 type TenantApplicationCardProps = {
   application: TenantApplication;
   onReject: (applicationId: string) => void;
-  onProgress: (applicationId: string) => void;
-  onBackgroundPass: (applicationId: string) => void;
-  onBackgroundFail: (applicationId: string) => void;
+  onAccept: (applicationId: string) => void;
+  // onBackgroundPass: (applicationId: string) => void;
+  // onBackgroundFail: (applicationId: string) => void;
   onSendToLandlord: (applicationId: string) => void;
 }
 
 export function TenantApplicationCard({
   application,
   onReject,
-  onProgress,
-  onBackgroundPass,
-  onBackgroundFail,
+  onAccept,
+  // onBackgroundPass,
+  // onBackgroundFail,
   onSendToLandlord,
 }: TenantApplicationCardProps): React.JSX.Element {
   return (
@@ -29,32 +29,21 @@ export function TenantApplicationCard({
           <span className="font-medium text-gray-900">{application.name}</span>
           <StatusBadge status={application.status} />
         </div>
-        
-        {/* Background check badge if exists */}
+
+        {/* Background check badge if exists
         {application.backgroundCheck && (
           <div className="mb-2">
             <BackgroundBadge backgroundCheck={application.backgroundCheck} />
           </div>
-        )}
+        )} */}
 
         {/* Action buttons based on status */}
         <div className="flex gap-2">
           {application.status === TenantApplicationStatus.UNDETERMINED && (
             <>
               <RejectButton onClick={() => onReject(application.id)} />
-              <ProgressButton onClick={() => onProgress(application.id)} />
+              <AcceptButton onClick={() => onAccept(application.id)} />
             </>
-          )}
-
-          {application.status === TenantApplicationStatus.ACCEPTED && !application.backgroundCheck && (
-            <>
-              <BackgroundPassButton onClick={() => onBackgroundPass(application.id)} />
-              <BackgroundFailButton onClick={() => onBackgroundFail(application.id)} />
-            </>
-          )}
-
-          {application.status === TenantApplicationStatus.ACCEPTED && application.backgroundCheck === BackgroundCheckStatus.PASS && (
-            <SendToLandlordButton onClick={() => onSendToLandlord(application.id)} />
           )}
         </div>
       </div>
