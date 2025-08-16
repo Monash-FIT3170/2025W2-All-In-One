@@ -5,15 +5,7 @@ import { ModalHeader } from './components/ModalHeader';
 import { FilterTabs } from './components/FilterTabs';
 import { ModalContent } from './components/ModalContent';
 import { ModalDone } from './components/ModalDone';
-import { useAppDispatch, useAppSelector } from '/app/client/store';
-import {
-  selectFilteredApplications,
-  selectAcceptedCount,
-  setFilter,
-  rejectTenantApplicationAsync,
-  acceptTenantApplicationAsync,
-  sendAcceptedApplicationsToLandlordAsync
-} from './state/reducers/tenant-selection-slice';
+import { Role } from '/app/shared/user-role-identifier';
 
 export function ReviewTenantModal({
   isOpen,
@@ -23,27 +15,23 @@ export function ReviewTenantModal({
   onSendToLandlord,
   shouldShowSendToLandlordButton,
   acceptedCount,
+  userRole,
+  tenantApplications = [], // Receive applications as props instead of using useAppSelector
 }: ReviewTenantModalProps): React.JSX.Element {
-  const dispatch = useAppDispatch();
-  const applications = useAppSelector(selectFilteredApplications);
-
   const handleReject = (applicationId: string) => {
-    dispatch(rejectTenantApplicationAsync(applicationId));
     onReject(applicationId);
   };
 
   const handleAccept = (applicationId: string) => {
-    dispatch(acceptTenantApplicationAsync(applicationId));
     onAccept(applicationId);
   };
 
   const handleSendToLandlord = () => {
-    dispatch(sendAcceptedApplicationsToLandlordAsync());
     onSendToLandlord();
   };
 
   const handleFilterChange = (filter: FilterType) => {
-    dispatch(setFilter(filter));
+    console.log('Filter changed to:', filter);
   };
 
   if (!isOpen) return <></>;
@@ -59,10 +47,10 @@ export function ReviewTenantModal({
         />
 
         <ModalContent
-          applications={applications}
+          tenantApplications={tenantApplications}
           onReject={handleReject}
           onAccept={handleAccept}
-          onSendToLandlord={handleSendToLandlord}
+          userRole = {Role.AGENT}
         />
 
          {/* Send accepted applicants to landlord button */}

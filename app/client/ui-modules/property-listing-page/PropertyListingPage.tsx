@@ -46,6 +46,7 @@ import { PropertyMap, PropertyMapUiState } from "./components/PropertyMap";
 import {
   selectAcceptedCount,
   selectHasAcceptedApplications,
+  selectFilteredApplications,
 } from "../review-tenant-modal/state/reducers/tenant-selection-slice";
 
 export function PropertyListingPage({
@@ -206,6 +207,7 @@ function ListingPageContent({
 
   const acceptedCount = useAppSelector(selectAcceptedCount);
   const hasAcceptedApplications = useAppSelector(selectHasAcceptedApplications);
+  const tenantApplications = useAppSelector(selectFilteredApplications);
   const shouldShowSendToLandlordButton = hasAcceptedApplications;
 
   return (
@@ -267,6 +269,7 @@ function ListingPageContent({
         }}
         shouldShowSendToLandlordButton={shouldShowSendToLandlordButton}
         acceptedCount={acceptedCount}
+        tenantApplications={tenantApplications}
       />
     </div>
   );
