@@ -6,6 +6,15 @@ import { FilterTabs } from './components/FilterTabs';
 import { ModalContent } from './components/ModalContent';
 import { ModalDone } from './components/ModalDone';
 import { Role } from '/app/shared/user-role-identifier';
+import { useAppDispatch, useAppSelector } from '/app/client/store';
+import {
+  selectFilteredApplications,
+  selectAcceptedCount,
+  setFilter,
+  rejectTenantApplicationAsync,
+  acceptTenantApplicationAsync,
+  sendAcceptedApplicationsToLandlordAsync
+} from './state/reducers/tenant-selection-slice';
 
 export function ReviewTenantModal({
   isOpen,
@@ -18,20 +27,25 @@ export function ReviewTenantModal({
   userRole,
   tenantApplications = [], // Receive applications as props instead of using useAppSelector
 }: ReviewTenantModalProps): React.JSX.Element {
+  const dispatch = useAppDispatch();
+  const applications = useAppSelector(selectFilteredApplications);
   const handleReject = (applicationId: string) => {
+    dispatch(rejectTenantApplicationAsync(applicationId));
     onReject(applicationId);
   };
 
   const handleAccept = (applicationId: string) => {
+    dispatch(acceptTenantApplicationAsync(applicationId));
     onAccept(applicationId);
   };
 
   const handleSendToLandlord = () => {
+    dispatch(sendAcceptedApplicationsToLandlordAsync());
     onSendToLandlord();
   };
 
   const handleFilterChange = (filter: FilterType) => {
-    console.log('Filter changed to:', filter);
+    dispatch(setFilter(filter));
   };
 
   if (!isOpen) return <></>;
@@ -50,6 +64,7 @@ export function ReviewTenantModal({
           tenantApplications={tenantApplications}
           onReject={handleReject}
           onAccept={handleAccept}
+          onSendToLandlord={handleSendToLandlord}
           userRole = {Role.AGENT}
         />
 

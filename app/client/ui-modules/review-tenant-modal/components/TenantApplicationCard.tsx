@@ -11,13 +11,15 @@ type TenantApplicationCardProps = {
   application: TenantApplication;
   onReject: (applicationId: string) => void;
   onAccept: (applicationId: string) => void;
-  userRole: UserAccount["role"]
+  onSendToLandlord: (applicationId: string) => void;
+  userRole: UserAccount["role"];
 }
 
 export function TenantApplicationCard({
   application,
   onReject,
   onAccept,
+  onSendToLandlord,
   userRole,
 }: TenantApplicationCardProps): React.JSX.Element {
   return (
