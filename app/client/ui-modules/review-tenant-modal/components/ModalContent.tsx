@@ -9,7 +9,7 @@ type ModalContentProps = {
   onReject: (applicationId: string) => void;
   onAccept: (applicationId: string) => void;
   onSendToLandlord: (applicationId: string) => void;
-  userRole: UserAccount["role"]
+  userRole?: UserAccount["role"]
   // onBackgroundPass: (applicationId: string) => void;
   // onBackgroundFail: (applicationId: string) => void;
 }

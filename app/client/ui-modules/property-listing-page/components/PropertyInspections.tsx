@@ -7,6 +7,7 @@ import { Divider } from "/app/client/ui-modules/theming/components/Divider";
 import { CalendarIcon } from "/app/client/ui-modules/theming/icons/CalendarIcon";
 import { twMerge } from "tailwind-merge";
 import { SubHeading } from "/app/client/ui-modules/theming/components/SubHeading";
+import { Role } from "/app/shared/user-role-identifier";
 
 export type InspectionBookingListUiState = {
   date: string;
@@ -17,10 +18,12 @@ export type InspectionBookingListUiState = {
 export function PropertyInspections({
   bookingUiStateList,
   onBook,
+  userRole,
   className = "",
 }: {
   bookingUiStateList: InspectionBookingListUiState[];
   onBook: (index: number) => void;
+  userRole?: Role;
   className?: string;
 }): React.JSX.Element {
   return (
@@ -29,6 +32,7 @@ export function PropertyInspections({
       <InspectionBookingList
         bookingUiStateList={bookingUiStateList}
         onBook={onBook}
+        userRole={userRole}
       />
     </div>
   );
@@ -37,10 +41,12 @@ export function PropertyInspections({
 function InspectionBookingList({
   bookingUiStateList,
   onBook,
+  userRole,
   className,
 }: {
   bookingUiStateList: InspectionBookingListUiState[];
   onBook: (index: number) => void;
+  userRole?: Role;
   className?: string;
 }): React.JSX.Element {
   return (
@@ -57,6 +63,7 @@ function InspectionBookingList({
           shouldDisplayDivider={i != 0}
           index={i}
           onBook={onBook}
+          userRole={userRole}
         />
       ))}
     </div>
@@ -68,14 +75,19 @@ function BookingEntry({
   shouldDisplayDivider,
   index,
   onBook,
+  userRole,
   className = "",
 }: {
   bookingState: InspectionBookingListUiState;
   shouldDisplayDivider: boolean;
   index: number;
   onBook: (index: number) => void;
+  userRole?: Role;
   className?: string;
 }): React.JSX.Element {
+  // Only tenants can book inspections
+  const canBookInspection = userRole === Role.TENANT;
+
   return (
     <div className={twMerge("flex flex-col", className)}>
       {shouldDisplayDivider ? <Divider /> : ""}
@@ -88,7 +100,16 @@ function BookingEntry({
           className="mr-auto"
         />
         <CalendarIcon className="w-[22px] h-[20px] mr-6" />
-        <BookingButton index={index} onClick={onBook} />
+        {canBookInspection ? (
+          <BookingButton index={index} onClick={onBook} />
+        ) : (
+          <div className="text-sm text-gray-500 italic">
+            {userRole === Role.AGENT ? "Agents cannot book inspections" :
+             userRole === Role.LANDLORD ? "Landlords cannot book inspections" :
+             "Login as tenant to book"}
+             {/* Will remove this later */}
+          </div>
+        )}
       </div>
     </div>
   );

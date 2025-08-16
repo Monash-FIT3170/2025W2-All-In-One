@@ -53,6 +53,54 @@ const initialState: ReviewTenantUiState = {
   canSendToLandlord: true,
 };
 
+// Creating tenant applications
+export const createTenantApplicationAsync = createAsyncThunk(
+  "tenantSelection/createTenantApplication",
+  async (_, { getState }) => {
+    const state = getState() as RootState;
+    const { propertyId, propertyLandlordId} = state.propertyListing;
+    const { currentUser, profileData } = state.currentUser;
+
+    console.log("=== createTenantApplicationAsync called ===");
+    console.log("Property ID:", propertyId);
+    console.log("Current user:", currentUser);
+    console.log("Profile data:", profileData);
+
+    if (!currentUser) {
+      throw new Error('User must be logged in to apply');
+    }
+
+    if (!propertyId) {
+      throw new Error('Property ID is required to create application');
+    }
+
+    // Generate a unique ID for the new application
+    const applicationId = `app_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    // Get user's name from profile data or use a default
+    let applicantName: string;
+    if (profileData) {
+      applicantName = `${profileData.firstName} ${profileData.lastName}`;
+    } else if ('tenantId' in currentUser) {
+      applicantName = `Tenant ${currentUser.tenantId.slice(-4)}`;
+    } else {
+      throw new Error('Only tenants can apply for properties. Invalid user type detected.');
+    }
+
+    console.log(`Creating tenant application for ${applicantName} on property ${propertyId}`);
+
+    const result = {
+      applicationId,
+      applicantName,
+      propertyId,
+      propertyLandlordId,
+      status: TenantApplicationStatus.UNDETERMINED,
+    };
+
+    console.log("Returning result:", result);
+    return result;
+  }
+);
 
 export const rejectTenantApplicationAsync = createAsyncThunk(
   "tenantSelection/rejectTenantApplication",
@@ -158,6 +206,41 @@ export const tenantSelectionSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Create tenant application
+      .addCase(createTenantApplicationAsync.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(createTenantApplicationAsync.fulfilled, (state, action) => {
+        console.log("=== createTenantApplicationAsync.fulfilled ===");
+        console.log("Action payload:", action.payload);
+        console.log("Current applications count:", state.applications.length);
+
+        state.isLoading = false;
+        // Add new application to state
+        const newApplication: TenantApplication = {
+          id: action.payload.applicationId,
+          name: action.payload.applicantName,
+          status: action.payload.status,
+        };
+
+        console.log("Adding new application:", newApplication);
+        state.applications.push(newApplication);
+        console.log("Applications after adding:", state.applications);
+
+        // Update counts
+        tenantSelectionSlice.caseReducers.updateApplicationCounts(state);
+        console.log("Updated counts - Accepted:", state.acceptedCount, "Rejected:", state.rejectedCount, "Undetermined:", state.undeterminedCount);
+      })
+      .addCase(createTenantApplicationAsync.rejected, (state, action) => {
+        console.log("=== createTenantApplicationAsync.rejected ===");
+        console.log("Error:", action.error);
+        console.log("Error message:", action.error.message);
+
+        state.isLoading = false;
+        state.error = action.error.message || "Failed to create application";
+      })
+
       // Reject tenant application
       .addCase(rejectTenantApplicationAsync.pending, (state) => {
         state.isLoading = true;

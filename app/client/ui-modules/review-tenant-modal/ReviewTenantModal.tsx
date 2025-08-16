@@ -5,15 +5,14 @@ import { ModalHeader } from './components/ModalHeader';
 import { FilterTabs } from './components/FilterTabs';
 import { ModalContent } from './components/ModalContent';
 import { ModalDone } from './components/ModalDone';
+import { UserAccount} from '/app/client/library-modules/domain-models/user/UserAccount';
 import { Role } from '/app/shared/user-role-identifier';
-import { useAppDispatch, useAppSelector } from '/app/client/store';
+import { useAppDispatch } from '/app/client/store';
 import {
-  selectFilteredApplications,
-  selectAcceptedCount,
-  setFilter,
   rejectTenantApplicationAsync,
   acceptTenantApplicationAsync,
-  sendAcceptedApplicationsToLandlordAsync
+  sendAcceptedApplicationsToLandlordAsync,
+  setFilter,
 } from './state/reducers/tenant-selection-slice';
 
 export function ReviewTenantModal({
@@ -28,7 +27,7 @@ export function ReviewTenantModal({
   tenantApplications = [], // Receive applications as props instead of using useAppSelector
 }: ReviewTenantModalProps): React.JSX.Element {
   const dispatch = useAppDispatch();
-  const applications = useAppSelector(selectFilteredApplications);
+
   const handleReject = (applicationId: string) => {
     dispatch(rejectTenantApplicationAsync(applicationId));
     onReject(applicationId);
@@ -64,8 +63,11 @@ export function ReviewTenantModal({
           tenantApplications={tenantApplications}
           onReject={handleReject}
           onAccept={handleAccept}
-          onSendToLandlord={handleSendToLandlord}
-          userRole = {Role.AGENT}
+          onSendToLandlord={(applicationId: string) => {
+            // This could be used for individual application actions if needed
+            console.log(`Send individual application ${applicationId} to landlord`);
+          }}
+          userRole={userRole}
         />
 
          {/* Send accepted applicants to landlord button */}

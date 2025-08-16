@@ -47,7 +47,9 @@ import {
   selectAcceptedCount,
   selectHasAcceptedApplications,
   selectFilteredApplications,
+  createTenantApplicationAsync,
 } from "../review-tenant-modal/state/reducers/tenant-selection-slice";
+import { Role } from "/app/shared/user-role-identifier";
 
 export function PropertyListingPage({
   className = "",
@@ -60,6 +62,12 @@ export function PropertyListingPage({
   const state: PropertyListingPageUiState = useSelector(
     selectPropertyListingUiState
   );
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const profileData = useAppSelector((state) => state.currentUser.profileData);
+  const authUser = useAppSelector((state) => state.currentUser.authUser);
+
+  // Track inspection bookings for the current user
+  const [bookedInspections, setBookedInspections] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (!propertyId) {
@@ -73,11 +81,9 @@ export function PropertyListingPage({
 
   if (state.shouldShowLoadingState) {
     return (
-      <>
-        <ListingPageContentLoadingSkeleton
-          className={twMerge("p-5", className)}
-        />
-      </>
+      <ListingPageContentLoadingSkeleton
+        className={twMerge("p-5", className)}
+      />
     );
   } else {
     return (
@@ -112,14 +118,49 @@ export function PropertyListingPage({
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
           propertyLandlordId={state.propertyLandlordId}
           propertyId={state.propertyId}
+          currentUser={currentUser}
+          authUser={authUser}
           onBack={() => {
             console.log("back button pressed");
           }}
           onBook={(index: number) => {
             console.log(`booking button ${index} pressed`);
+            // Track that this user has booked this inspection
+            setBookedInspections(prev => new Set(prev).add(index));
           }}
-          onApply={() => {
-            console.log("applied!");
+          onApply={async () => {
+            console.log("Apply button clicked!");
+            console.log("Booked inspections:", bookedInspections);
+            console.log("Current user:", currentUser);
+            console.log("Profile data:", profileData);
+
+        // Only tenants can apply for properties
+        if (authUser && authUser.role !== Role.TENANT) {
+          alert("Only tenants can apply for properties.");
+          return;
+        }
+
+            // Check if user has booked an inspection before applying
+            if (bookedInspections.size > 0 && currentUser) {
+              try {
+                console.log("Creating tenant application...");
+                // Create tenant application
+                const result = await dispatch(createTenantApplicationAsync()).unwrap();
+                console.log("Tenant application created successfully:", result);
+
+
+                alert("Application submitted successfully! Your application will be reviewed by the agent.");
+              } catch (error) {
+                console.error("Failed to create tenant application:", error);
+                alert("Failed to submit application. Please try again.");
+              }
+            } else if (!currentUser) {
+              console.log("User must be logged in to apply");
+              alert("Please log in to apply for this property.");
+            } else {
+              console.log("User must book an inspection before applying");
+              alert("Please book an inspection before applying for this property.");
+            }
           }}
           onContactAgent={() => console.log("contacting agent!")}
           onSubmitDraftListing={() => {
@@ -162,6 +203,8 @@ function ListingPageContent({
   shouldDisplayEditListingButton,
   propertyLandlordId,
   propertyId,
+  currentUser,
+  authUser,
   onBack,
   onBook,
   onApply,
@@ -196,6 +239,8 @@ function ListingPageContent({
   shouldDisplayEditListingButton: boolean;
   propertyLandlordId: string;
   propertyId: string;
+  currentUser: any;
+  authUser: any;
   onBack: () => void;
   onBook: (index: number) => void;
   onApply: () => void;
@@ -208,6 +253,7 @@ function ListingPageContent({
   const acceptedCount = useAppSelector(selectAcceptedCount);
   const hasAcceptedApplications = useAppSelector(selectHasAcceptedApplications);
   const tenantApplications = useAppSelector(selectFilteredApplications);
+  const isCreatingApplication = useAppSelector((state) => state.tenantSelection.isLoading);
   const shouldShowSendToLandlordButton = hasAcceptedApplications;
 
   return (
@@ -237,6 +283,8 @@ function ListingPageContent({
         listingImageUrls={listingImageUrls}
         onApply={onApply}
         onContactAgent={onContactAgent}
+        isApplying={isCreatingApplication}
+        userRole={authUser?.role}
         className="mb-6"
       />
       <ListingDetails
@@ -245,6 +293,7 @@ function ListingPageContent({
         inspectionBookingUiStateList={inspectionBookingUiStateList}
         onBook={onBook}
         propertyFeatures={propertyFeatures}
+        userRole={authUser?.role}
         className="mb-6"
       />
       <BottomBar
@@ -270,6 +319,7 @@ function ListingPageContent({
         shouldShowSendToLandlordButton={shouldShowSendToLandlordButton}
         acceptedCount={acceptedCount}
         tenantApplications={tenantApplications}
+        userRole={Role.AGENT}
       />
     </div>
   );
@@ -333,6 +383,8 @@ function ListingHero({
   listingImageUrls,
   onApply,
   onContactAgent,
+  isApplying,
+  userRole,
 }: {
   className?: string;
   streetNumber: string;
@@ -352,6 +404,8 @@ function ListingHero({
   listingImageUrls: string[];
   onApply: () => void;
   onContactAgent: () => void;
+  isApplying: boolean;
+  userRole: Role | undefined;
 }): React.JSX.Element {
   return (
     <div className={twMerge("flex", className)}>
@@ -383,7 +437,7 @@ function ListingHero({
           className="w-full mb-8"
         />
         <div className="flex">
-          <ApplyButton onClick={onApply} className="mr-4" />
+          <ApplyButton onClick={onApply} isLoading={isApplying} userRole={userRole} className="mr-4" />
           <ContactAgentButton onClick={onContactAgent} />
         </div>
       </div>
@@ -397,6 +451,7 @@ function ListingDetails({
   inspectionBookingUiStateList,
   onBook,
   propertyFeatures,
+  userRole,
   className = "",
 }: {
   propertyDescription: string;
@@ -404,6 +459,7 @@ function ListingDetails({
   inspectionBookingUiStateList: InspectionBookingListUiState[];
   onBook: (index: number) => void;
   propertyFeatures: string[];
+  userRole: Role | undefined;
   className?: string;
 }): React.JSX.Element {
   return (
@@ -416,6 +472,7 @@ function ListingDetails({
         <PropertyInspections
           bookingUiStateList={inspectionBookingUiStateList}
           onBook={onBook}
+          userRole={userRole}
           className="w-full"
         />
       </div>

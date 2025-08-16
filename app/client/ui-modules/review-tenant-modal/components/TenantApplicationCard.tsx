@@ -12,7 +12,7 @@ type TenantApplicationCardProps = {
   onReject: (applicationId: string) => void;
   onAccept: (applicationId: string) => void;
   onSendToLandlord: (applicationId: string) => void;
-  userRole: UserAccount["role"];
+  userRole?: UserAccount["role"];
 }
 
 export function TenantApplicationCard({
