@@ -1,4 +1,5 @@
 import { TenantApplication } from './TenantApplication';
+import { UserAccount } from '/app/client/library-modules/domain-models/user/UserAccount';
 
 export type ReviewTenantModalProps = {
   isOpen: boolean;
@@ -10,5 +11,6 @@ export type ReviewTenantModalProps = {
   onSendToLandlord: () => void;
   shouldShowSendToLandlordButton: boolean;
   acceptedCount: number;
+  userRole?: UserAccount["role"]
   tenantApplications?: TenantApplication[];
 }
