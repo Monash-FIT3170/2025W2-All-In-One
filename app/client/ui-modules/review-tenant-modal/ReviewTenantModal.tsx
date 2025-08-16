@@ -7,12 +7,13 @@ import { ModalContent } from './components/ModalContent';
 import { ModalDone } from './components/ModalDone';
 import { UserAccount} from '/app/client/library-modules/domain-models/user/UserAccount';
 import { Role } from '/app/shared/user-role-identifier';
-import { useAppDispatch } from '/app/client/store';
+import { useAppDispatch, useAppSelector } from '/app/client/store';
 import {
   rejectTenantApplicationAsync,
   acceptTenantApplicationAsync,
   sendAcceptedApplicationsToLandlordAsync,
   setFilter,
+  selectActiveFilter,
 } from './state/reducers/tenant-selection-slice';
 
 export function ReviewTenantModal({
@@ -22,11 +23,12 @@ export function ReviewTenantModal({
   onAccept,
   onSendToLandlord,
   shouldShowSendToLandlordButton,
-  acceptedCount,
+  acceptedApplicantCount,
   userRole,
   tenantApplications = [], // Receive applications as props instead of using useAppSelector
 }: ReviewTenantModalProps): React.JSX.Element {
   const dispatch = useAppDispatch();
+  const activeFilter = useAppSelector(selectActiveFilter);
 
   const handleReject = (applicationId: string) => {
     dispatch(rejectTenantApplicationAsync(applicationId));
@@ -50,12 +52,12 @@ export function ReviewTenantModal({
   if (!isOpen) return <></>;
 
   return (
-    <div className="fixed inset-0 bg-opacity-100 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg max-w-md w-full mx-4 max-h-screen overflow-hidden shadow-xl">
+    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-md w-full max-h-screen overflow-hidden shadow-2xl">
         <ModalHeader onClose={onClose} />
 
         <FilterTabs
-          activeFilter={FilterType.ALL}
+          activeFilter={activeFilter}
           onFilterChange={handleFilterChange}
         />
 
@@ -72,12 +74,12 @@ export function ReviewTenantModal({
 
          {/* Send accepted applicants to landlord button */}
          {shouldShowSendToLandlordButton && (
-          <div className="p-4 border-t">
+          <div className="p-4 border-t bg-gray-50">
             <button
               onClick={handleSendToLandlord}
-              className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
-              Send {acceptedCount} Accepted Applicant(s) to Landlord
+              Send {acceptedApplicantCount} Accepted Applicant(s) to Landlord
             </button>
           </div>
         )}
