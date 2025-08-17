@@ -4,12 +4,31 @@ import { Property } from "/app/client/library-modules/domain-models/property/Pro
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { getLandlordById } from "/app/client/library-modules/domain-models/user/role-repositories/landlord-repository";
 import { getTaskById } from "/app/client/library-modules/domain-models/task/repositories/task-repository";
-import { getAllPropertiesByLandlordId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
+import {
+  fetchLandlordDashboardData,
+  getAllPropertiesByLandlordId,
+} from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
 interface LandlordDashboardState {
   isLoading: boolean;
   properties: Property[];
   tasks: Task[];
+  dashboardData: {
+    propertyCount: number;
+    statusCounts: {
+      occupied: number;
+      vacant: number;
+    };
+    income: {
+      weekly: number;
+      monthly: number;
+    };
+    occupancyRate: number;
+    averageRent: {
+      occupiedCount: number;
+      rent: number;
+    };
+  };
   error: string | null;
 }
 
@@ -17,6 +36,22 @@ const initialState: LandlordDashboardState = {
   isLoading: false,
   tasks: [],
   properties: [],
+  dashboardData: {
+    propertyCount: 0,
+    statusCounts: {
+      occupied: 0,
+      vacant: 0,
+    },
+    income: {
+      weekly: 0,
+      monthly: 0,
+    },
+    occupancyRate: 0,
+    averageRent: {
+      occupiedCount: 0,
+      rent: 0,
+    },
+  },
   error: null,
 };
 
@@ -34,29 +69,40 @@ export const fetchLandlordTasks = createAsyncThunk(
       throw new Error("Failed to fetch landlord tasks");
     }
   }
-)
+);
 
 export const fetchLandlordDetails = createAsyncThunk(
   "landlordDashboard/fetchLandlordDetails",
   async (userId: string) => {
     let properties;
     let taskDetails;
-    try{
+    try {
       const landlordResponse = await getLandlordById(userId);
-      properties = await getAllPropertiesByLandlordId(landlordResponse.landlordId);  
-      taskDetails = await Promise.all(landlordResponse.tasks.map( (taskId) => {
-        return getTaskById(taskId);
-      }));
-      
-    return {
-      properties: properties,
-      taskDetails: taskDetails,
-    };
-  } catch (error) {
+      const landlordId = landlordResponse?.landlordId;
+      properties = await getAllPropertiesByLandlordId(
+        landlordResponse.landlordId
+      );
+      taskDetails = await Promise.all(
+        landlordResponse.tasks.map((taskId) => {
+          return getTaskById(taskId);
+        })
+      );
+      const dashboardData = await fetchLandlordDashboardData(landlordId);
+
+      return {
+        properties: properties,
+        taskDetails: taskDetails,
+        propertyCount: dashboardData.totalPropertyCount,
+        statusCounts: dashboardData.propertyStatusCounts,
+        income: dashboardData.totalIncome,
+        occupancyRate: dashboardData.occupancyRate,
+        averageRent: dashboardData.averageRent,
+      };
+    } catch (error) {
       console.error("Error fetching landlord details:", error);
       throw new Meteor.Error("Failed to fetch landlord properties");
+    }
   }
-}
 );
 
 export const landlordDashboardSlice = createSlice({
@@ -88,11 +134,18 @@ export const landlordDashboardSlice = createSlice({
         state.isLoading = false;
         state.tasks = action.payload.taskDetails || [];
         state.properties = action.payload.properties || [];
+        state.dashboardData = {
+          propertyCount: action.payload.propertyCount,
+          statusCounts: action.payload.statusCounts,
+          income: action.payload.income,
+          occupancyRate: action.payload.occupancyRate,
+          averageRent: action.payload.averageRent,
+        };
       })
       .addCase(fetchLandlordDetails.rejected, (state) => {
         state.isLoading = false;
       })
-      .addCase(fetchLandlordTasks.pending, (state) => { 
+      .addCase(fetchLandlordTasks.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(fetchLandlordTasks.fulfilled, (state, action) => {
@@ -110,7 +163,7 @@ export const { setLoading, setTasks, setProperties, setError } =
   landlordDashboardSlice.actions;
 
 export const selectLandlordDashboard = (state: RootState) =>
-  state.landlordDashboard;
+  state.landlordDashboard.dashboardData;
 export const selectTasks = (state: RootState) => state.landlordDashboard.tasks;
 export const selectProperties = (state: RootState) =>
   state.landlordDashboard.properties;
