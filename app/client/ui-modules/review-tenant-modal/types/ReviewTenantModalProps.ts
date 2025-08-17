@@ -10,7 +10,7 @@ export type ReviewTenantModalProps = {
   // onBackgroundFail: (applicationId: string) => void;
   onSendToLandlord: () => void;
   shouldShowSendToLandlordButton: boolean;
-  acceptedCount: number;
+  acceptedApplicantCount: number;
   userRole?: UserAccount["role"]
   tenantApplications?: TenantApplication[];
 }

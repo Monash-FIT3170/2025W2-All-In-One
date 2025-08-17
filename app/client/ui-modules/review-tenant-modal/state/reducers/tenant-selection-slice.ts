@@ -7,50 +7,15 @@ import { ReviewTenantUiState } from "../ReviewTenantUiState";
 import { apiCreateTaskForLandlord } from "/app/client/library-modules/apis/task/task-api";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
 
-// Mock data
+// Mock data - now organized by property
 const initialState: ReviewTenantUiState = {
-  applications: [
-    {
-      id: '1',
-      name: 'Rehan W',
-      status: TenantApplicationStatus.UNDETERMINED,
-    },
-    {
-      id: '2',
-      name: 'Dylan C',
-      status: TenantApplicationStatus.UNDETERMINED,
-    },
-    {
-      id: '3',
-      name: 'Tony X',
-      status: TenantApplicationStatus.UNDETERMINED,
-    },
-    {
-      id: '4',
-      name: 'Shannon W',
-      status: TenantApplicationStatus.REJECTED,
-    },
-    {
-      id: '5',
-      name: 'Ashleigh C',
-      status: TenantApplicationStatus.ACCEPTED,
-    },
-    {
-      id: '6',
-      name: 'Maddy C',
-      status: TenantApplicationStatus.ACCEPTED,
-    },
-  ],
+  applicationsByProperty: {},
+
   activeFilter: FilterType.ALL,
   isLoading: false,
   error: null,
   currentStep: 1,
   isModalOpen: false,
-  acceptedCount: 2,
-  rejectedCount: 1,
-  undeterminedCount: 3,
-  hasAcceptedApplications: true,
-  canSendToLandlord: true,
 };
 
 // Creating tenant applications
@@ -131,14 +96,21 @@ export const sendAcceptedApplicationsToLandlordAsync = createAsyncThunk(
   async (_, { getState }) => {
     const state = getState() as RootState;
     const { propertyId, propertyLandlordId, streetNumber, street, suburb, province, postcode } = state.propertyListing;
-    const { applications } = state.tenantSelection;
+    const { applicationsByProperty } = state.tenantSelection;
+
+    if (!propertyId) {
+      throw new Error('Property ID is required to send applications to landlord');
+    }
 
     if (!propertyLandlordId) {
       throw new Error('Property landlord ID is required to send tenant to landlord');
     }
 
+    // Get tenant applications for the specific property
+    const propertyApplications = applicationsByProperty[propertyId] || [];
+
     // Check if there are any accepted applications
-    const acceptedApplications = applications.filter((app: TenantApplication) =>
+    const acceptedApplications = propertyApplications.filter((app: TenantApplication) =>
       app.status === TenantApplicationStatus.ACCEPTED
     );
 
@@ -164,6 +136,7 @@ export const sendAcceptedApplicationsToLandlordAsync = createAsyncThunk(
 
     return {
       success: true,
+      propertyId,
       acceptedApplications: acceptedApplications.map((app: TenantApplication) => app.id),
       applicationCount: acceptedApplications.length
     };
@@ -175,9 +148,7 @@ export const tenantSelectionSlice = createSlice({
   name: "tenantSelection",
   initialState,
   reducers: {
-    setApplications: (state, action) => {
-      state.applications = action.payload;
-    },
+
     setFilter: (state, action) => {
       state.activeFilter = action.payload;
     },
@@ -190,19 +161,7 @@ export const tenantSelectionSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    updateApplicationCounts: (state) => {
-      state.acceptedCount = state.applications.filter(
-        (app: TenantApplication) => app.status === TenantApplicationStatus.ACCEPTED
-      ).length;
-      state.rejectedCount = state.applications.filter(
-        (app: TenantApplication) => app.status === TenantApplicationStatus.REJECTED
-      ).length;
-      state.undeterminedCount = state.applications.filter(
-        (app: TenantApplication) => app.status === TenantApplicationStatus.UNDETERMINED
-      ).length;
-      state.hasAcceptedApplications = state.acceptedCount > 0;
-      state.canSendToLandlord = state.hasAcceptedApplications;
-    },
+
   },
   extraReducers: (builder) => {
     builder
@@ -214,7 +173,10 @@ export const tenantSelectionSlice = createSlice({
       .addCase(createTenantApplicationAsync.fulfilled, (state, action) => {
         console.log("=== createTenantApplicationAsync.fulfilled ===");
         console.log("Action payload:", action.payload);
-        console.log("Current applications count:", state.applications.length);
+
+        const { propertyId } = action.payload;
+        const propertyApplications = state.applicationsByProperty[propertyId] || [];
+        console.log("Current applications count for property:", propertyApplications.length);
 
         state.isLoading = false;
         // Add new application to state
@@ -225,12 +187,16 @@ export const tenantSelectionSlice = createSlice({
         };
 
         console.log("Adding new application:", newApplication);
-        state.applications.push(newApplication);
-        console.log("Applications after adding:", state.applications);
 
-        // Update counts
-        tenantSelectionSlice.caseReducers.updateApplicationCounts(state);
-        console.log("Updated counts - Accepted:", state.acceptedCount, "Rejected:", state.rejectedCount, "Undetermined:", state.undeterminedCount);
+        // Initialize property array if it doesn't exist
+        if (!state.applicationsByProperty[propertyId]) {
+          state.applicationsByProperty[propertyId] = [];
+        }
+
+        state.applicationsByProperty[propertyId].push(newApplication);
+        console.log("Applications after adding:", state.applicationsByProperty[propertyId]);
+
+        console.log("Application added successfully to property:", propertyId);
       })
       .addCase(createTenantApplicationAsync.rejected, (state, action) => {
         console.log("=== createTenantApplicationAsync.rejected ===");
@@ -248,14 +214,25 @@ export const tenantSelectionSlice = createSlice({
       })
       .addCase(rejectTenantApplicationAsync.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Update application status in state
-        state.applications = state.applications.map((app: TenantApplication) =>
-          app.id === action.payload.applicationId
-            ? { ...app, status: TenantApplicationStatus.REJECTED }
-            : app
-        );
-        // Update counts
-        tenantSelectionSlice.caseReducers.updateApplicationCounts(state);
+        // Find the property that contains this application
+        const { applicationId } = action.payload;
+        let propertyId: string | null = null;
+
+        for (const [pid, applications] of Object.entries(state.applicationsByProperty)) {
+          if (applications.some(app => app.id === applicationId)) {
+            propertyId = pid;
+            break;
+          }
+        }
+
+        if (propertyId) {
+          // Update application status in state
+          state.applicationsByProperty[propertyId] = state.applicationsByProperty[propertyId].map((app: TenantApplication) =>
+            app.id === applicationId
+              ? { ...app, status: TenantApplicationStatus.REJECTED }
+              : app
+          );
+        }
       })
       .addCase(rejectTenantApplicationAsync.rejected, (state, action) => {
         state.isLoading = false;
@@ -269,14 +246,25 @@ export const tenantSelectionSlice = createSlice({
       })
       .addCase(acceptTenantApplicationAsync.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Update application status in state
-        state.applications = state.applications.map((app: TenantApplication) =>
-          app.id === action.payload.applicationId
-            ? { ...app, status: TenantApplicationStatus.ACCEPTED }
-            : app
-        );
-        // Update counts
-        tenantSelectionSlice.caseReducers.updateApplicationCounts(state);
+        // Find the property that contains this application
+        const { applicationId } = action.payload;
+        let propertyId: string | null = null;
+
+        for (const [pid, applications] of Object.entries(state.applicationsByProperty)) {
+          if (applications.some(app => app.id === applicationId)) {
+            propertyId = pid;
+            break;
+          }
+        }
+
+        if (propertyId) {
+          // Update application status in state
+          state.applicationsByProperty[propertyId] = state.applicationsByProperty[propertyId].map((app: TenantApplication) =>
+            app.id === applicationId
+              ? { ...app, status: TenantApplicationStatus.ACCEPTED }
+              : app
+          );
+        }
       })
       .addCase(acceptTenantApplicationAsync.rejected, (state, action) => {
         state.isLoading = false;
@@ -290,15 +278,18 @@ export const tenantSelectionSlice = createSlice({
       })
       .addCase(sendAcceptedApplicationsToLandlordAsync.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Update all accepted applications to landlord review status
-        state.applications = state.applications.map((app: TenantApplication) =>
-          app.status === TenantApplicationStatus.ACCEPTED
-            ? { ...app, status: TenantApplicationStatus.LANDLORD_REVIEW, step: 2 }
-            : app
-        );
-        state.currentStep = 2;
-        // Update counts
-        tenantSelectionSlice.caseReducers.updateApplicationCounts(state);
+        // Get the property ID from the action payload or find it from accepted applications
+        const { propertyId } = action.payload;
+
+        if (propertyId && state.applicationsByProperty[propertyId]) {
+          // Update all accepted applications to landlord review status for this property
+          state.applicationsByProperty[propertyId] = state.applicationsByProperty[propertyId].map((app: TenantApplication) =>
+            app.status === TenantApplicationStatus.ACCEPTED
+              ? { ...app, status: TenantApplicationStatus.LANDLORD_REVIEW, step: 2 }
+              : app
+          );
+          state.currentStep = 2;
+        }
       })
       .addCase(sendAcceptedApplicationsToLandlordAsync.rejected, (state, action) => {
         state.isLoading = false;
@@ -309,31 +300,53 @@ export const tenantSelectionSlice = createSlice({
 
 
 export const {
-  setApplications,
   setFilter,
   setCurrentStep,
   setModalOpen,
   clearError,
-  updateApplicationCounts
 } = tenantSelectionSlice.actions;
 
 
 export const selectTenantSelectionState = (state: RootState) => state.tenantSelection;
-export const selectApplications = (state: RootState) => state.tenantSelection.applications;
+export const selectApplicationsByProperty = (state: RootState) => state.tenantSelection.applicationsByProperty;
 export const selectActiveFilter = (state: RootState) => state.tenantSelection.activeFilter;
 export const selectIsLoading = (state: RootState) => state.tenantSelection.isLoading;
 export const selectError = (state: RootState) => state.tenantSelection.error;
 export const selectCurrentStep = (state: RootState) => state.tenantSelection.currentStep;
 export const selectIsModalOpen = (state: RootState) => state.tenantSelection.isModalOpen;
-export const selectAcceptedCount = (state: RootState) => state.tenantSelection.acceptedCount;
-export const selectRejectedCount = (state: RootState) => state.tenantSelection.rejectedCount;
-export const selectUndeterminedCount = (state: RootState) => state.tenantSelection.undeterminedCount;
-export const selectHasAcceptedApplications = (state: RootState) => state.tenantSelection.hasAcceptedApplications;
-export const selectCanSendToLandlord = (state: RootState) => state.tenantSelection.canSendToLandlord;
 
+// Helper selector to get applications for a specific property
+export const selectApplicationsForProperty = (state: RootState, propertyId: string) => {
+  return state.tenantSelection.applicationsByProperty[propertyId] || [];
+};
 
-export const selectFilteredApplications = (state: RootState) => {
-  const { applications, activeFilter } = state.tenantSelection;
+// Property-specific count selectors
+export const selectAcceptedApplicantCountForProperty = (state: RootState, propertyId: string) => {
+  const applications = selectApplicationsForProperty(state, propertyId);
+  return applications.filter((app: TenantApplication) => app.status === TenantApplicationStatus.ACCEPTED).length;
+};
+
+export const selectRejectedApplicantCountForProperty = (state: RootState, propertyId: string) => {
+  const applications = selectApplicationsForProperty(state, propertyId);
+  return applications.filter((app: TenantApplication) => app.status === TenantApplicationStatus.REJECTED).length;
+};
+
+export const selectUndeterminedApplicantCountForProperty = (state: RootState, propertyId: string) => {
+  const applications = selectApplicationsForProperty(state, propertyId);
+  return applications.filter((app: TenantApplication) => app.status === TenantApplicationStatus.UNDETERMINED).length;
+};
+
+export const selectHasAcceptedApplicationsForProperty = (state: RootState, propertyId: string) => {
+  return selectAcceptedApplicantCountForProperty(state, propertyId) > 0;
+};
+
+export const selectCanSendToLandlordForProperty = (state: RootState, propertyId: string) => {
+  return selectHasAcceptedApplicationsForProperty(state, propertyId);
+};
+
+export const selectFilteredApplications = (state: RootState, propertyId: string) => {
+  const applications = selectApplicationsForProperty(state, propertyId);
+  const { activeFilter } = state.tenantSelection;
 
   switch (activeFilter) {
     case FilterType.ALL:

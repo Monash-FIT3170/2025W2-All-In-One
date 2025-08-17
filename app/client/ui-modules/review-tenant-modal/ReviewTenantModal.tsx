@@ -5,8 +5,6 @@ import { ModalHeader } from './components/ModalHeader';
 import { FilterTabs } from './components/FilterTabs';
 import { ModalContent } from './components/ModalContent';
 import { ModalDone } from './components/ModalDone';
-import { UserAccount} from '/app/client/library-modules/domain-models/user/UserAccount';
-import { Role } from '/app/shared/user-role-identifier';
 import { useAppDispatch, useAppSelector } from '/app/client/store';
 import {
   rejectTenantApplicationAsync,
@@ -25,11 +23,10 @@ export function ReviewTenantModal({
   shouldShowSendToLandlordButton,
   acceptedApplicantCount,
   userRole,
-  tenantApplications = [], // Receive applications as props instead of using useAppSelector
+  tenantApplications = [], // Receive applications as props
 }: ReviewTenantModalProps): React.JSX.Element {
   const dispatch = useAppDispatch();
-  const activeFilter = useAppSelector(selectActiveFilter);
-
+  const activeFilter = useAppSelector(selectActiveFilter)
   const handleReject = (applicationId: string) => {
     dispatch(rejectTenantApplicationAsync(applicationId));
     onReject(applicationId);
@@ -52,8 +49,8 @@ export function ReviewTenantModal({
   if (!isOpen) return <></>;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full max-h-screen overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 bg-opacity-100 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg max-w-md w-full mx-4 max-h-screen overflow-hidden shadow-xl">
         <ModalHeader onClose={onClose} />
 
         <FilterTabs
@@ -66,7 +63,7 @@ export function ReviewTenantModal({
           onReject={handleReject}
           onAccept={handleAccept}
           onSendToLandlord={(applicationId: string) => {
-            // This could be used for individual application actions if needed
+            // This could be used for individual applications
             console.log(`Send individual application ${applicationId} to landlord`);
           }}
           userRole={userRole}
@@ -74,10 +71,10 @@ export function ReviewTenantModal({
 
          {/* Send accepted applicants to landlord button */}
          {shouldShowSendToLandlordButton && (
-          <div className="p-4 border-t bg-gray-50">
+          <div className="p-4 border-t">
             <button
               onClick={handleSendToLandlord}
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
             >
               Send {acceptedApplicantCount} Accepted Applicant(s) to Landlord
             </button>

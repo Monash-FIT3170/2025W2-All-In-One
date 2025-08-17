@@ -44,8 +44,8 @@ import { SubHeading } from "../theming/components/SubHeading";
 import { BasicMarker } from "../common/map/markers/BasicMarker";
 import { PropertyMap, PropertyMapUiState } from "./components/PropertyMap";
 import {
-  selectAcceptedCount,
-  selectHasAcceptedApplications,
+  selectAcceptedApplicantCountForProperty,
+  selectHasAcceptedApplicationsForProperty,
   selectFilteredApplications,
   createTenantApplicationAsync,
 } from "../review-tenant-modal/state/reducers/tenant-selection-slice";
@@ -249,12 +249,12 @@ function ListingPageContent({
   className?: string;
 }): React.JSX.Element {
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
-
-  const acceptedCount = useAppSelector(selectAcceptedCount);
-  const hasAcceptedApplications = useAppSelector(selectHasAcceptedApplications);
-  const tenantApplications = useAppSelector(selectFilteredApplications);
+  const acceptedApplicantCount = useAppSelector((state) => selectAcceptedApplicantCountForProperty(state, propertyId));
+  const hasAcceptedApplications = useAppSelector((state) => selectHasAcceptedApplicationsForProperty(state, propertyId));
+  const tenantApplications = useAppSelector((state) => selectFilteredApplications(state, propertyId));
   const isCreatingApplication = useAppSelector((state) => state.tenantSelection.isLoading);
   const shouldShowSendToLandlordButton = hasAcceptedApplications;
+
 
   return (
     <div className={className}>
@@ -317,9 +317,9 @@ function ListingPageContent({
           console.log(`Sent applications to landlord`);
         }}
         shouldShowSendToLandlordButton={shouldShowSendToLandlordButton}
-        acceptedCount={acceptedCount}
+        acceptedApplicantCount={acceptedApplicantCount}
         tenantApplications={tenantApplications}
-        userRole={Role.AGENT}
+        userRole={authUser?.role}
       />
     </div>
   );
