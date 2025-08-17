@@ -56,53 +56,6 @@ const propertyGetMethod = {
     },
 };
 
-const propertyGetCountLandlordMethod = {
-    [MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_COUNT]: async (
-        landlordId: string
-    ): Promise<number> => {
-        return await PropertyCollection.find({
-            landlord_id: landlordId,
-        }).countAsync();
-    },
-};
-
-const propertyGetStatusCountsLandlordMethod = {
-    [MeteorMethodIdentifier.PROPERTY_LANDLORD_GET_STATUS_COUNTS]: async (
-        landlordId: string
-    ): Promise<{ occupied: number; vacant: number }> => {
-        // get status IDs for occupied/vacant
-        const occupiedStatus = await PropertyStatusCollection.findOneAsync({
-            name: PropertyStatus.OCCUPIED,
-        });
-        const vacantStatus = await PropertyStatusCollection.findOneAsync({
-            name: PropertyStatus.VACANT,
-        });
-
-        if (!occupiedStatus || !vacantStatus) {
-            throw new Meteor.Error(
-                "status-not-found",
-                "Could not find occupied or vacant status IDs"
-            );
-        }
-
-        // count properties of each status
-        const occupiedCount = await PropertyCollection.find({
-            landlord_id: landlordId,
-            property_status_id: occupiedStatus._id,
-        }).countAsync();
-
-        const vacantCount = await PropertyCollection.find({
-            landlord_id: landlordId,
-            property_status_id: vacantStatus._id,
-        }).countAsync();
-
-        return {
-            occupied: occupiedCount,
-            vacant: vacantCount,
-        };
-    },
-};
-
 const propertyGetCountMethod = {
     [MeteorMethodIdentifier.PROPERTY_GET_COUNT]: async (
         agentId: string
@@ -390,6 +343,14 @@ const updatePropertyData = {
     },
 };
 
+
+// This method is used to search for properties based on a query given by the user
+// It breaks up the query into tokens such as "Cranbourne VIC 3977" becomes ["Cranbourne", "VIC", "3977"] 
+// It then uses the tokens to search for vacant properties in the database
+// It returns an array of ApiProperty DTOs
+// If there is an error, it throws an InvalidDataError
+// The method is wrapped in a Meteor method so it can be called from the client
+
 const propertySearchMethod = {
     //
     [MeteorMethodIdentifier.PROPERTY_SEARCH]: async (
@@ -518,4 +479,5 @@ Meteor.methods({
   ...updatePropertyData,
   ...getLandlordDashboardMethod,
   ...propertyGetAllMethod,
+  ...propertySearchMethod,
 });

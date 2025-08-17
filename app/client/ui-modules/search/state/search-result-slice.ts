@@ -57,8 +57,11 @@ export const searchResultsSlice = createSlice({
             state: SearchResultState,
             action: PayloadAction<string>
         ) => {
-            state.decodedQuery = action.payload;
-            state.visibleCount = state.defaultPageSize;
+            // added check to prevent unnecessary re-renders
+            if (state.decodedQuery !== action.payload) {
+                state.decodedQuery = action.payload;
+                state.visibleCount = state.defaultPageSize;
+            }
         },
         resetVisibleCount: (state: SearchResultState) => {
             state.visibleCount = state.defaultPageSize;
