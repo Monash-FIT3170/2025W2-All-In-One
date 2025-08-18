@@ -47,10 +47,27 @@ export function TopNavbar({
   const handleGoProfile = () => navigate(NavigationPath.Profile);
 
   const [isNotificationBoardOpen, setIsNotificationBoardOpen] = useState(false);
+  const notificationRef = React.useRef<HTMLDivElement>(null);
 
   const toggleNotificationBoard = () => {
     setIsNotificationBoardOpen((prev) => !prev);
   };
+
+  React.useEffect(() => {
+    if (!isNotificationBoardOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target as Node)
+      ) {
+        setIsNotificationBoardOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isNotificationBoardOpen]);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
@@ -81,7 +98,7 @@ export function TopNavbar({
                 className="text-gray-600 cursor-pointer"
                 onClick={toggleNotificationBoard}
               />
-              <div className="relative">
+              <div className="relative" ref={notificationRef}>
                 {/* Notification Board */}
                 <NotificationBoard
                   open={isNotificationBoardOpen}
