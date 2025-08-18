@@ -38,6 +38,10 @@ export function AgentCalendar(): React.JSX.Element {
   const [properties, setProperties] = useState<PropertyOption[]>([]);
   const [mapUiState, setMapUiState] = useState<TaskMapUiState>({ markers: [] });
 
+  useEffect(() => {
+    setMapUiState({ markers });
+  }, [markers]);
+
   // Fetch tasks for the current user
   useEffect(() => {
     if (currentUser?.userId) {
@@ -55,45 +59,14 @@ export function AgentCalendar(): React.JSX.Element {
   }, [currentAgent?.agentId]);
 
   // Update map markers for selected date
-  useEffect(() => {
-    async function loadTodayMarkers() {
-      const tasksForSelectedDate = tasks.filter(
-        (task) => task.dueDate === (selectedDateISO || getTodayISODate())
-      );
-
-      const markers = await Promise.all(
-        tasksForSelectedDate.map(async (task) => {
-          if (!task.propertyId) return null;
-          try {
-            const property = await getPropertyById(task.propertyId);
-            if (
-              property.locationLatitude != null &&
-              property.locationLongitude != null
-            ) {
-              return {
-                latitude: property.locationLatitude,
-                longitude: property.locationLongitude,
-              };
-            }
-          } catch (err) {
-            console.error(`Error fetching property ${task.propertyId}:`, err);
-          }
-          return null;
-        })
-      );
-
-      setMapUiState({
-        markers: markers.filter(
-          (m): m is { latitude: number; longitude: number } => m !== null
-        ),
-      });
-    }
-
-    loadTodayMarkers();
-  }, [tasks, selectedDateISO]);
 
   useEffect(() => {
-    dispatch(fetchMarkersForDate({ tasks, selectedDateISO: selectedDateISO ?? undefined }));
+    dispatch(
+      fetchMarkersForDate({
+        tasks,
+        selectedDateISO: selectedDateISO ?? undefined,
+      })
+    );
   }, [tasks, selectedDateISO, dispatch]);
 
   // Handle date selection from the calendar
