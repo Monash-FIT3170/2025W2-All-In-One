@@ -7,7 +7,7 @@ import {
   selectPropertyDetails,
   fetchTenantDetails,
 } from "../../tenant-dashboard/state/tenant-dashboard-slice";
-import DashboardCards from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/DashboardCards";
+import DashboardCards from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/TenantDashboardCard";
 import PropertyDetails from "../components/PropertyDetails";
 
 function TenantDashboard() {

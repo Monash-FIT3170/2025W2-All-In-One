@@ -8,11 +8,10 @@ export enum MeteorMethodIdentifier {
   PROPERTY_GET = "properties.getOne",
   PROPERTY_GET_ALL = "properties.getAll",
   PROPERTY_GET_COUNT = "properties.getCount",
-  PROPERTY_GET_ALL_BY_AGENT_ID = "properties.getAllByAgentId", // Fetches all properties managed by an agent by their userID  
+  PROPERTY_GET_ALL_BY_AGENT_ID = "properties.getAllByAgentId", // Fetches all properties managed by an agent by their userID
   PROPERTY_INSERT = "properties.insert", // Inserts property into property collection
   PROPERTY_PRICE_INSERT = "properties.insertPrice", // Inserts property price into property price collection
-  PROPERTY_LANDLORD_GET_COUNT = "properties.getCountLandlord",
-  PROPERTY_LANDLORD_GET_STATUS_COUNTS = "properties.getStatusCountsLandlord",
+  GET_LANDLORD_DASHBOARD = "properties.getLandlordDashboard", // Fetch all data analytics required for landlord dashboard
   LISTING_GET_FOR_PROPERTY = "listings.getForProperty", //Get listing document from property id
   LISTING_STATUS_GET_BY_NAME = "listings.getStatusByName", // Get listing status document by name
   LISTING_GET_ALL_LISTED = "listings.getAllListed",
