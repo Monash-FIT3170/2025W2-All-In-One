@@ -1,32 +1,41 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux"; 
+import { useSelector } from "react-redux";
 
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import Ripple from "./animations/Ripple";
 import { Button } from "../theming-shadcn/Button";
 import { Input } from "../theming-shadcn/Input";
-import { PropertyCard } from "./components/PropertyCard"; 
+import { PropertyCard } from "./components/PropertyCard";
 import {
     fetchPropertiesAndListings,
-    selectGuestLandingPageUiState
+    selectGuestLandingPageUiState,
 } from "./state/reducers/guest-landing-page-slice";
 import { useAppDispatch, RootState } from "../../store";
-
+import { handleSearch } from "../../utils";
 
 export function GuestLandingPage() {
     const dispatch = useAppDispatch();
-    const { properties: listedProperties, isLoading, error } = useSelector(
-        (state: RootState) => selectGuestLandingPageUiState(state)
-    );
+    const {
+        properties: listedProperties,
+        isLoading,
+        error,
+    } = useSelector((state: RootState) => selectGuestLandingPageUiState(state));
 
     const [visibleCount, setVisibleCount] = useState(3);
+    const [searchQuery, setSearchQuery] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
         dispatch(fetchPropertiesAndListings({ skip: 0, limit: 3 }));
     }, [dispatch]);
 
     const handleViewMore = () => {
-        dispatch(fetchPropertiesAndListings({ skip: listedProperties.length, limit: 3 }));
+        dispatch(
+            fetchPropertiesAndListings({
+                skip: listedProperties.length,
+                limit: 3,
+            })
+        );
         setVisibleCount(visibleCount + 3);
     };
 
@@ -39,24 +48,48 @@ export function GuestLandingPage() {
             <div className="relative flex flex-col items-center justify-center min-h-[80vh] bg-white overflow-hidden px-4">
                 <Ripple />
                 <div className="relative z-10 text-center">
-                    <h1 className="geist-extrabold text-[70px]">Find your perfect rental home</h1>
-                    <p className="geist-light text-[18px]">Search thousands of rental properties in your area</p>
+                    <h1 className="geist-extrabold text-[70px]">
+                        Find your perfect rental home
+                    </h1>
+                    <p className="geist-light text-[18px]">
+                        Search thousands of rental properties in your area
+                    </p>
                     <div className="flex justify-center gap-4">
-                        <Input type="Search" placeholder="Enter a postcode or suburb" />
-                        <Link to="/">
-                            <Button>Search</Button>
-                        </Link>
+                        <Input
+                            type="Search"
+                            placeholder="Enter a postcode or suburb"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+
+                        <Button
+                            onClick={() => {
+                                handleSearch(searchQuery, navigate);
+                            }}
+                        >
+                            Search
+                        </Button>
                     </div>
                     <div className="py-10 text-center">
-                        {(error || listedProperties.length === 0) ? (
-                            <div>No properties found at the moment. Please check back later!</div>
+                        {error || listedProperties.length === 0 ? (
+                            <div>
+                                No properties found at the moment. Please check
+                                back later!
+                            </div>
                         ) : (
                             <>
-                                <h2 className="text-xl font-semibold mb-6">Featured Rental Properties</h2>
+                                <h2 className="text-xl font-semibold mb-6">
+                                    Featured Rental Properties
+                                </h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-items-center px-4">
-                                    {listedProperties.map((prop) => (
-                                        <PropertyCard key={prop.propertyId} {...prop} />
-                                    ))}
+                                    {listedProperties
+                                        .slice(0, visibleCount)
+                                        .map((prop) => (
+                                            <PropertyCard
+                                                key={prop.propertyId}
+                                                {...prop}
+                                            />
+                                        ))}
                                 </div>
                                 {listedProperties.length % 3 === 0 && (
                                     <div className="mt-6">
@@ -67,7 +100,7 @@ export function GuestLandingPage() {
                                 )}
                             </>
                         )}
-                            </div>
+                    </div>
                 </div>
             </div>
         </div>

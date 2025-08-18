@@ -11,30 +11,32 @@ import { propertyListingSlice } from "/app/client/ui-modules/property-listing-pa
 import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
 import { currentUserSlice } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
 import { propertyFormSlice } from "./ui-modules/property-form-agent/state/reducers/property-form-slice";
+import { searchResultsSlice } from "./ui-modules/search/state/search-result-slice";
 
 export const store = configureStore({
-  reducer: {
-    agentDashboard: agentDashboardSlice.reducer,
-    tenantDashboard: tenantDashboardSlice.reducer,
-    guestLandingPage: guestLandingPageSlice.reducer,
-    settingsPage: settingsPageSlice.reducer,
-    landlordDashboard: landlordDashboardSlice.reducer,
-    profile: profileSlice.reducer,
-    signinForm: signinFormSlice.reducer,
-    propertyListing: propertyListingSlice.reducer,
-    signupForm: signupFormSlice.reducer,
-    currentUser: currentUserSlice.reducer,
-    propertyForm: propertyFormSlice.reducer,
-  },
+    reducer: {
+        agentDashboard: agentDashboardSlice.reducer,
+        tenantDashboard: tenantDashboardSlice.reducer,
+        guestLandingPage: guestLandingPageSlice.reducer,
+        settingsPage: settingsPageSlice.reducer,
+        landlordDashboard: landlordDashboardSlice.reducer,
+        profile: profileSlice.reducer,
+        signinForm: signinFormSlice.reducer,
+        propertyListing: propertyListingSlice.reducer,
+        signupForm: signupFormSlice.reducer,
+        currentUser: currentUserSlice.reducer,
+        propertyForm: propertyFormSlice.reducer,
+        searchResults: searchResultsSlice.reducer,
+    },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 export type AppThunk<ThunkReturnType = void> = ThunkAction<
-  ThunkReturnType,
-  RootState,
-  unknown,
-  Action
+    ThunkReturnType,
+    RootState,
+    unknown,
+    Action
 >;
 
 // Add type-safe hooks
