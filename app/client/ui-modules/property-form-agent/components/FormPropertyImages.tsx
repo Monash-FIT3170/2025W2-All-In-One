@@ -6,17 +6,14 @@ import {
   FormItem,
   FormMessage,
 } from "../../theming-shadcn/Form";
-import { CloudUpload, Paperclip, X, GripVertical } from "lucide-react";
+import { CloudUpload, X } from "lucide-react";
 import {
   FileUploader,
-  FileUploaderContent,
-  FileUploaderItem,
   FileInput,
 } from "../../theming-shadcn/FileUpload";
 import { FormSchemaType } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
-import { Button } from "../../theming-shadcn/Button";
 
 export default function FormPropertyImages({
   form,
@@ -42,38 +39,31 @@ export default function FormPropertyImages({
     }
   }, []);
 
-  // Updates form when files states changes i.e. submitting file
+  // Updates form when files state changes
   useEffect(() => {
     if (files) {
       form.setValue("images", files, { shouldValidate: true });
       
-      // Create preview URLs for new items, keeping existing URLs as is
+      // Create preview URLs for files, keeping existing URLs as is
       const newPreviewUrls = files.map(item => {
         if (typeof item === 'string') {
-          return item; // existing URL
+          return item; // Existing URL
         } else {
-          return URL.createObjectURL(item); // new file
+          return URL.createObjectURL(item); // New file
         }
       });
       
-      // Clean up old URLs that are no longer needed (only object URLs)
+      // Clean up old URLs that are no longer needed
       previewUrls.forEach(url => {
-        if (url.startsWith('blob:')) {
-          const stillNeeded = newPreviewUrls.some(newUrl => newUrl === url);
-          if (!stillNeeded) {
-            URL.revokeObjectURL(url);
-          }
+        if (!newPreviewUrls.includes(url)) {
+          URL.revokeObjectURL(url);
         }
       });
       
       setPreviewUrls(newPreviewUrls);
     } else {
       // Clean up URLs when files are cleared
-      previewUrls.forEach(url => {
-        if (url.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
-        }
-      });
+      previewUrls.forEach(url => URL.revokeObjectURL(url));
       setPreviewUrls([]);
     }
   }, [files]);
@@ -82,9 +72,7 @@ export default function FormPropertyImages({
   useEffect(() => {
     return () => {
       previewUrls.forEach(url => {
-        if (url.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
-        }
+        URL.revokeObjectURL(url);
       });
     };
   }, []);
@@ -143,21 +131,21 @@ export default function FormPropertyImages({
 
   // Handle new file uploads
   const handleNewFiles = (allFiles: File[] | null) => {
-  // If no files, preserve only URLs (existing images)
-  if (!allFiles || allFiles.length === 0) {
-    if (files) {
-      const urlsOnly = files.filter(f => typeof f === 'string');
-      setFiles(urlsOnly.length > 0 ? urlsOnly : null);
-    } else {
-      setFiles(null);
+    // If no files, preserve only URLs (existing images)
+    if (!allFiles || allFiles.length === 0) {
+      if (files) {
+        const urlsOnly = files.filter(f => typeof f === 'string');
+        setFiles(urlsOnly.length > 0 ? urlsOnly : null);
+      } else {
+        setFiles(null);
+      }
+      return;
     }
-    return;
-  }
 
-  // Preserve URLs, replace Files with new selection
-  const urlsOnly = files ? files.filter(f => typeof f === 'string') : [];
-  setFiles([...urlsOnly, ...allFiles]);
-};
+    // Preserve URLs, replace Files with new selection
+    const urlsOnly = files ? files.filter(f => typeof f === 'string') : [];
+    setFiles([...urlsOnly, ...allFiles]);
+  };
 
   return (
     <div className="border border-gray-200 w-full p-7 rounded-md mb-3">
@@ -227,13 +215,6 @@ export default function FormPropertyImages({
                           onDragEnd={handleDragEnd}
                           onDragLeave={() => setDraggedOver(null)}
                         >
-                          {/* Drag Handle */}
-                          <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <div className="bg-black bg-opacity-50 rounded p-1 cursor-move h-6 w-6 flex items-center justify-center">
-                              <GripVertical className="w-4 h-4 text-white" />
-                            </div>
-                          </div>
-
                           {/* Remove Button */}
                           <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
