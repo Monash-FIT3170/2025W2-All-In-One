@@ -65,7 +65,9 @@ const propertyGetCountMethod = {
 		}).countAsync();
 	},
 };
-
+// This method is used to get all properties for a specific agent\
+// It returns a promise that resolves to an array of ApiProperty objects
+//
 const propertyGetListMethod = {
 	[MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID]: async (
 		agentId: string
