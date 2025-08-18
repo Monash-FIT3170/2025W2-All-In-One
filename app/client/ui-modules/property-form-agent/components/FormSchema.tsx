@@ -16,7 +16,7 @@ export const formSchema = z.object({
   space: z.coerce.number().min(1, { message: "Please fill out field" }),
   description: z.string().min(1, { message: "Please fill out field" }),
   property_feature_ids: z.array(z.string()),
-  images: z.array(z.instanceof(File)).min(0, { message: "At least one image is required" }),
+  images: z.array(z.union([z.instanceof(File), z.string()])).min(0, { message: "At least one image is required" }),
   available_dates: z.coerce.date(),
   lease_term: z.string().min(1, { message: "Lease term is required" }),
   show_contact_boolean: z.boolean().optional(),

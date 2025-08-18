@@ -23,26 +23,57 @@ export default function FormPropertyImages({
 }: {
   form: UseFormReturn<FormSchemaType>;
 }) {
-  const [files, setFiles] = useState<File[] | null>(null);
+  const [files, setFiles] = useState<(File | string)[] | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [draggedOver, setDraggedOver] = useState<number | null>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+
+  // Initialize with existing images from form
+  useEffect(() => {
+    const existingImages = form.getValues("images");
+    if (existingImages && existingImages.length > 0) {
+      setFiles(existingImages);
+      
+      // Create preview URLs - for existing URLs, use them directly; for files, create object URLs
+      const newPreviewUrls = existingImages.map(item => 
+        typeof item === 'string' ? item : URL.createObjectURL(item)
+      );
+      setPreviewUrls(newPreviewUrls);
+    }
+  }, []);
 
   // Updates form when files states changes i.e. submitting file
   useEffect(() => {
     if (files) {
       form.setValue("images", files, { shouldValidate: true });
       
-      // Create preview URLs for new files
-      const newPreviewUrls = files.map(file => URL.createObjectURL(file));
+      // Create preview URLs for new items, keeping existing URLs as is
+      const newPreviewUrls = files.map(item => {
+        if (typeof item === 'string') {
+          return item; // existing URL
+        } else {
+          return URL.createObjectURL(item); // new file
+        }
+      });
       
-      // Clean up old URLs
-      previewUrls.forEach(url => URL.revokeObjectURL(url));
+      // Clean up old URLs that are no longer needed (only object URLs)
+      previewUrls.forEach(url => {
+        if (url.startsWith('blob:')) {
+          const stillNeeded = newPreviewUrls.some(newUrl => newUrl === url);
+          if (!stillNeeded) {
+            URL.revokeObjectURL(url);
+          }
+        }
+      });
       
       setPreviewUrls(newPreviewUrls);
     } else {
       // Clean up URLs when files are cleared
-      previewUrls.forEach(url => URL.revokeObjectURL(url));
+      previewUrls.forEach(url => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
       setPreviewUrls([]);
     }
   }, [files]);
@@ -50,7 +81,11 @@ export default function FormPropertyImages({
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      previewUrls.forEach(url => URL.revokeObjectURL(url));
+      previewUrls.forEach(url => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
     };
   }, []);
 
@@ -106,6 +141,45 @@ export default function FormPropertyImages({
     setDraggedOver(null);
   };
 
+  // Handle new file uploads
+  const handleNewFiles = (allFiles: File[] | null) => {
+    if (allFiles && allFiles.length > 0) {
+      // The FileUploader gives us all files it currently holds
+      // We need to check what's actually new compared to our current state
+      const currentFiles = files || [];
+      
+      // Count how many File objects we currently have (not URLs)
+      const currentFileCount = currentFiles.filter(f => f instanceof File).length;
+      
+      // If the FileUploader has more files than we have File objects,
+      // then the difference are the new files
+      if (allFiles.length > currentFileCount) {
+        // Take only the newly added files (the difference)
+        const newFilesOnly = allFiles.slice(currentFileCount);
+        // Append to existing files (which may include URLs and previous Files)
+        const updatedFiles = [...currentFiles, ...newFilesOnly];
+        setFiles(updatedFiles);
+      } else if (allFiles.length === 0) {
+        // If FileUploader is empty, clear everything
+        setFiles(null);
+      }
+      // If allFiles.length <= currentFileCount, it means files were removed
+      // In this case, we trust the FileUploader's state
+      else if (allFiles.length < currentFileCount) {
+        // Preserve URL strings, replace File objects with what FileUploader has
+        const urlsOnly = currentFiles.filter(f => typeof f === 'string');
+        const updatedFiles = [...urlsOnly, ...allFiles];
+        setFiles(updatedFiles.length > 0 ? updatedFiles : null);
+      }
+    } else {
+      // If no files provided, only clear File objects, keep URLs
+      if (files) {
+        const urlsOnly = files.filter(f => typeof f === 'string');
+        setFiles(urlsOnly.length > 0 ? urlsOnly : null);
+      }
+    }
+  };
+
   return (
     <div className="border border-gray-200 w-full p-7 rounded-md mb-3">
       <FormHeading
@@ -119,8 +193,8 @@ export default function FormPropertyImages({
           <FormItem>
             <FormControl>
               <FileUploader
-                value={files}
-                onValueChange={setFiles}
+                value={files?.filter(f => f instanceof File) as File[] || null}
+                onValueChange={handleNewFiles}
                 dropzoneOptions={dropZoneConfig}
                 className="relative bg-background rounded-lg p-2"
               >
@@ -152,9 +226,14 @@ export default function FormPropertyImages({
                       </p>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {files.map((file, index) => (
+                      {files.map((item, index) => {
+                        const isFile = item instanceof File;
+                        const displayName = isFile ? item.name : `Image ${index + 1}`;
+                        const displaySize = isFile ? `${Math.round(item.size / 1024)} KB` : 'Existing image';
+                        
+                        return (
                         <div
-                          key={`${file.name}-${index}`}
+                          key={isFile ? `${item.name}-${index}` : `url-${index}`}
                           className={`relative group border rounded-lg overflow-hidden bg-white shadow-sm transition-all duration-200 cursor-move ${
                             draggedIndex === index ? 'opacity-50 scale-95 rotate-2' : ''
                           } ${
@@ -199,10 +278,10 @@ export default function FormPropertyImages({
                           {/* File Name */}
                           <div className="p-2 bg-gray-50">
                             <p className="text-xs text-gray-600 truncate">
-                              {file.name}
+                              {displayName}
                             </p>
                             <p className="text-xs text-gray-400">
-                              {Math.round(file.size / 1024)} KB
+                              {displaySize}
                             </p>
                           </div>
 
@@ -211,7 +290,8 @@ export default function FormPropertyImages({
                             {index + 1}
                           </div>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}

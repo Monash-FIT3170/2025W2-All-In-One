@@ -483,7 +483,7 @@ function ListingModalEditor({
     bathroom_number: Number(state.propertyBathrooms),
     space: Number(state.areaValue),
     description: state.propertyDescription,
-    images: [],
+    images: state.listingImageUrls || [], // Include existing images from the listing
     available_dates: new Date(),
     lease_term: "12_months",
     show_contact_boolean: true,
