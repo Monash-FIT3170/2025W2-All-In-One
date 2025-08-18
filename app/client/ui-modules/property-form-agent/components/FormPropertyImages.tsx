@@ -143,42 +143,21 @@ export default function FormPropertyImages({
 
   // Handle new file uploads
   const handleNewFiles = (allFiles: File[] | null) => {
-    if (allFiles && allFiles.length > 0) {
-      // The FileUploader gives us all files it currently holds
-      // We need to check what's actually new compared to our current state
-      const currentFiles = files || [];
-      
-      // Count how many File objects we currently have (not URLs)
-      const currentFileCount = currentFiles.filter(f => f instanceof File).length;
-      
-      // If the FileUploader has more files than we have File objects,
-      // then the difference are the new files
-      if (allFiles.length > currentFileCount) {
-        // Take only the newly added files (the difference)
-        const newFilesOnly = allFiles.slice(currentFileCount);
-        // Append to existing files (which may include URLs and previous Files)
-        const updatedFiles = [...currentFiles, ...newFilesOnly];
-        setFiles(updatedFiles);
-      } else if (allFiles.length === 0) {
-        // If FileUploader is empty, clear everything
-        setFiles(null);
-      }
-      // If allFiles.length <= currentFileCount, it means files were removed
-      // In this case, we trust the FileUploader's state
-      else if (allFiles.length < currentFileCount) {
-        // Preserve URL strings, replace File objects with what FileUploader has
-        const urlsOnly = currentFiles.filter(f => typeof f === 'string');
-        const updatedFiles = [...urlsOnly, ...allFiles];
-        setFiles(updatedFiles.length > 0 ? updatedFiles : null);
-      }
+  // If no files, preserve only URLs (existing images)
+  if (!allFiles || allFiles.length === 0) {
+    if (files) {
+      const urlsOnly = files.filter(f => typeof f === 'string');
+      setFiles(urlsOnly.length > 0 ? urlsOnly : null);
     } else {
-      // If no files provided, only clear File objects, keep URLs
-      if (files) {
-        const urlsOnly = files.filter(f => typeof f === 'string');
-        setFiles(urlsOnly.length > 0 ? urlsOnly : null);
-      }
+      setFiles(null);
     }
-  };
+    return;
+  }
+
+  // Preserve URLs, replace Files with new selection
+  const urlsOnly = files ? files.filter(f => typeof f === 'string') : [];
+  setFiles([...urlsOnly, ...allFiles]);
+};
 
   return (
     <div className="border border-gray-200 w-full p-7 rounded-md mb-3">
