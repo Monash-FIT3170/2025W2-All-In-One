@@ -18,10 +18,6 @@ export function mapApiProfileDataToProfileData(
     workAddress: profileData.workAddress,
     workPhone: profileData.workPhone,
     profilePicture: profileData.profilePicture,
-    carMake: profileData.carMake,
-    carModel: profileData.carModel,
-    carYear: profileData.carYear,
-    carPlate: profileData.carPlate,
   };
 }
 
@@ -42,9 +38,5 @@ export function mapProfileDataToApiProfileData(
     workAddress: profileData.workAddress,
     workPhone: profileData.workPhone,
     profilePicture: profileData.profilePicture,
-    carMake: profileData.carMake,
-    carModel: profileData.carModel,
-    carYear: profileData.carYear,
-    carPlate: profileData.carPlate,
   };
 }
