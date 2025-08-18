@@ -4,6 +4,7 @@ import {
   selectTasks,
   selectIsLoading,
   fetchAgentTasks,
+  selectMarkers,
 } from "../state/agent-dashboard-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
@@ -20,6 +21,7 @@ import {
 } from "/app/client/library-modules/utils/date-utils";
 import { fetchPropertiesForAgent } from "../state/agent-dashboard-slice";
 import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
+import { fetchMarkersForDate } from "../state/agent-dashboard-slice";
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const currentAgent = useAppSelector(
@@ -28,6 +30,7 @@ export function AgentCalendar(): React.JSX.Element {
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
   const tasks = useAppSelector(selectTasks);
   const loading = useAppSelector(selectIsLoading);
+  const markers = useAppSelector(selectMarkers);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
@@ -89,6 +92,11 @@ export function AgentCalendar(): React.JSX.Element {
     loadTodayMarkers();
   }, [tasks, selectedDateISO]);
 
+  useEffect(() => {
+    dispatch(fetchMarkersForDate({ tasks, selectedDateISO: selectedDateISO ?? undefined }));
+  }, [tasks, selectedDateISO, dispatch]);
+
+  // Handle date selection from the calendar
   const handleDateSelection = (formatted: string, iso: string) => {
     setSelectedDate(formatted);
     setSelectedDateISO(iso);
