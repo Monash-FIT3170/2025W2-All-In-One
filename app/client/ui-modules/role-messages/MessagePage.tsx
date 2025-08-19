@@ -15,6 +15,7 @@ import {
   setActiveConversation,
   setMessageText,
 } from "./state/reducers/messages-slice";
+import { useMessagingSubscriptions } from "./hooks/useMessagingSubscriptions";
 
 type UserRole = 'agent' | 'landlord' | 'tenant';
 
@@ -36,17 +37,22 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
   // Get current user ID for fetching conversations
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
 
+  // Use real-time subscriptions for live messaging
+  const { conversationsReady, messagesReady } = useMessagingSubscriptions(activeConversationId);
+
+  // Initial fetch for conversations (fallback for when subscriptions aren't ready)
   useEffect(() => {
-    if (currentUser?.userId) {
+    if (currentUser?.userId && !conversationsReady) {
       dispatch(fetchConversations());
     }
-  }, [dispatch, currentUser?.userId]);
+  }, [dispatch, currentUser?.userId, conversationsReady]);
 
+  // Initial fetch for messages (fallback for when subscriptions aren't ready)
   useEffect(() => {
-    if (activeConversationId) {
+    if (activeConversationId && !messagesReady) {
       dispatch(fetchConversationMessages(activeConversationId));
     }
-  }, [dispatch, activeConversationId]);
+  }, [dispatch, activeConversationId, messagesReady]);
 
   const handleSelectConversation = (conversationId: string) => {
     dispatch(setActiveConversation(conversationId));

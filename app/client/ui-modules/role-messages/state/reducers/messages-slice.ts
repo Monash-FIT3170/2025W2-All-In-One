@@ -4,6 +4,7 @@ import { MessagesState } from "../MessagesPageUIState";
 import { Conversation, Message } from "../../types";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { ConversationDocument } from "/app/server/database/messaging/models/ConversationDocument";
+import { MessageDocument } from "/app/server/database/messaging/models/MessageDocument";
 import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
 import { Tenant } from "/app/client/library-modules/domain-models/user/Tenant";
@@ -324,14 +325,46 @@ export const fetchConversations = createAsyncThunk(
 
 export const fetchConversationMessages = createAsyncThunk(
   "messages/fetchMessages",
-  async (conversationId: string, { rejectWithValue }) => {
+  async (conversationId: string, { getState, rejectWithValue }) => {
     try {
-      // TODO: Replace with actual API call to fetch messages
-      // For now, return empty array since conversations are new and have no messages yet
-      const messages: Message[] = [];
+      const state = getState() as RootState;
+      const currentUser = state.currentUser.currentUser;
+      const authUser = state.currentUser.authUser;
+
+      if (!authUser || !currentUser) {
+        return rejectWithValue("User is not authenticated");
+      }
+
+      // Fetch messages from server
+      const messageDocuments: MessageDocument[] = await Meteor.callAsync(
+        MeteorMethodIdentifier.MESSAGES_GET_FOR_CONVERSATION,
+        conversationId
+      );
+
+      // Determine current user's ID for isOutgoing logic
+      let currentUserId: string;
+      if (authUser.role === Role.AGENT) {
+        const agent = currentUser as Agent;
+        currentUserId = agent.agentId;
+      } else if (authUser.role === Role.TENANT) {
+        const tenant = currentUser as Tenant;
+        currentUserId = tenant.tenantId;
+      } else {
+        return rejectWithValue("Unsupported user role");
+      }
+
+      // Convert MessageDocument[] to Message[] for UI
+      const messages: Message[] = messageDocuments.map(doc => ({
+        id: doc._id,
+        text: doc.text,
+        timestamp: new Date(doc.timestamp).toLocaleString(),
+        isOutgoing: doc.senderId === currentUserId,
+        isRead: doc.isRead,
+      }));
 
       return { conversationId, messages };
     } catch (error) {
+      console.error("Error fetching messages:", error);
       return rejectWithValue("Failed to fetch messages");
     }
   }
@@ -339,11 +372,46 @@ export const fetchConversationMessages = createAsyncThunk(
 
 export const sendMessage = createAsyncThunk(
   "messages/sendMessage",
-  async (messageData: { conversationId: string; text: string }, { rejectWithValue }) => {
+  async (messageData: { conversationId: string; text: string }, { getState, rejectWithValue }) => {
     try {
-      // TODO: Replace with actual API call to send message
+      const state = getState() as RootState;
+      const currentUser = state.currentUser.currentUser;
+      const authUser = state.currentUser.authUser;
+
+      if (!authUser || !currentUser) {
+        return rejectWithValue("User is not authenticated");
+      }
+
+      // Determine sender ID and role based on current user
+      let senderId: string;
+      let senderRole: string;
+
+      if (authUser.role === Role.AGENT) {
+        const agent = currentUser as Agent;
+        senderId = agent.agentId;
+        senderRole = 'agent';
+      } else if (authUser.role === Role.TENANT) {
+        const tenant = currentUser as Tenant;
+        senderId = tenant.tenantId;
+        senderRole = 'tenant';
+      } else {
+        return rejectWithValue("Unsupported user role");
+      }
+
+      // Send message via Meteor method
+      const messageId = await Meteor.callAsync(
+        MeteorMethodIdentifier.MESSAGE_INSERT,
+        {
+          conversationId: messageData.conversationId,
+          text: messageData.text,
+          senderId,
+          senderRole,
+        }
+      );
+
+      // Create UI message object for immediate feedback
       const newMessage: Message = {
-        id: Date.now().toString(),
+        id: messageId,
         text: messageData.text,
         timestamp: new Date().toLocaleString(),
         isOutgoing: true,
@@ -352,6 +420,7 @@ export const sendMessage = createAsyncThunk(
 
       return { conversationId: messageData.conversationId, message: newMessage };
     } catch (error) {
+      console.error("Error sending message:", error);
       return rejectWithValue("Failed to send message");
     }
   }
@@ -382,6 +451,47 @@ export const messagesSlice = createSlice({
         conversation.lastMessage = action.payload.message;
         conversation.timestamp = action.payload.timestamp;
       }
+    },
+    // New actions for pub/sub integration
+    setConversationsFromSubscription(state, action: PayloadAction<ConversationDocument[]>) {
+      // Convert ConversationDocument[] to Conversation[] for UI
+      const uiConversations: Conversation[] = action.payload.map(doc => {
+        const getAvatar = (name: string) => {
+          const parts = name.split(' ');
+          return parts.length > 1 
+            ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+            : `${parts[0][0]}${parts[0][1] || ''}`.toUpperCase();
+        };
+
+        // For now, use basic conversion - this can be enhanced with profile data
+        const name = `User ${doc.tenantId?.slice(-4) || doc.agentId?.slice(-4) || 'Unknown'}`;
+        
+        return {
+          id: doc._id,
+          name,
+          role: doc.tenantId ? "Tenant" : doc.agentId ? "Agent" : "User",
+          avatar: getAvatar(name),
+          lastMessage: doc.lastMessage?.text || "No messages yet",
+          timestamp: doc.lastMessage?.timestamp 
+            ? new Date(doc.lastMessage.timestamp).toLocaleString()
+            : new Date(doc.createdAt).toLocaleString(),
+          unreadCount: 0, // Will be calculated based on current user
+        };
+      });
+      
+      state.conversations = uiConversations;
+    },
+    setMessagesFromSubscription(state, action: PayloadAction<{ conversationId: string; messages: MessageDocument[] }>) {
+      // Convert MessageDocument[] to Message[] for UI
+      const uiMessages: Message[] = action.payload.messages.map(doc => ({
+        id: doc._id,
+        text: doc.text,
+        timestamp: new Date(doc.timestamp).toLocaleString(),
+        isOutgoing: false, // Will be determined based on current user
+        isRead: doc.isRead,
+      }));
+      
+      state.messages = uiMessages;
     },
   },
   extraReducers: (builder) => {
@@ -441,6 +551,8 @@ export const {
   clearError,
   addMessage,
   updateConversationLastMessage,
+  setConversationsFromSubscription,
+  setMessagesFromSubscription,
 } = messagesSlice.actions;
 
 // Export selectors

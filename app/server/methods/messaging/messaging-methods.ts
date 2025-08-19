@@ -2,7 +2,7 @@ import { Meteor } from "meteor/meteor";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { MessageDocument } from "../../database/messaging/models/MessageDocument";
 import { ConversationDocument } from "../../database/messaging/models/ConversationDocument";
-import { ConversationCollection } from "../../database/messaging/messaging-collections";
+import { ConversationCollection, MessageCollection } from "../../database/messaging/messaging-collections";
 
 // Simple database method to get conversations for an agent
 const getConversationsForAgentMethod = {
@@ -48,9 +48,13 @@ const getMessagesForConversationMethod = {
     conversationId: string
   ): Promise<MessageDocument[]> => {
     try {
-      // TODO: For now, return empty array since we're just setting up the structure
-      // This will be implemented when we add actual message functionality
-      return [];
+      // Get all messages for the conversation, sorted by timestamp
+      const messages = await MessageCollection.find(
+        { conversationId },
+        { sort: { timestamp: 1 } }
+      ).fetchAsync();
+      
+      return messages;
     } catch (error) {
       console.error("Error in getMessagesForConversationMethod:", error);
       throw error;
@@ -64,9 +68,38 @@ const sendMessageMethod = {
     messageData: { conversationId: string; text: string; senderId: string; senderRole: string }
   ): Promise<string> => {
     try {
-      // TODO: For now, just return a mock message ID
-      // This will be implemented when we add actual message functionality
-      return `msg_${Date.now()}`;
+      const now = new Date();
+      
+      // Create the new message
+      const newMessage: Omit<MessageDocument, '_id'> = {
+        conversationId: messageData.conversationId,
+        senderId: messageData.senderId,
+        senderRole: messageData.senderRole as 'agent' | 'landlord' | 'tenant',
+        text: messageData.text,
+        timestamp: now,
+        isRead: false,
+      };
+
+      // Insert the message
+      const messageId = await MessageCollection.insertAsync(newMessage);
+
+      // Update the conversation's last message and timestamp
+      await ConversationCollection.updateAsync(
+        { _id: messageData.conversationId },
+        {
+          $set: {
+            lastMessage: {
+              text: messageData.text,
+              timestamp: now,
+              senderId: messageData.senderId,
+            },
+            updatedAt: now,
+          },
+        }
+      );
+
+      console.log(`✅ Inserted new message with ID: ${messageId}`);
+      return messageId;
     } catch (error) {
       console.error("Error in sendMessageMethod:", error);
       throw error;
