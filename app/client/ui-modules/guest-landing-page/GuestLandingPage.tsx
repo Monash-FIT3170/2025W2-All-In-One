@@ -21,22 +21,22 @@ export function GuestLandingPage() {
         error,
     } = useSelector((state: RootState) => selectGuestLandingPageUiState(state));
 
-    const [visibleCount, setVisibleCount] = useState(3);
+    const [visibleCount, setVisibleCount] = useState(6);
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
-        dispatch(fetchPropertiesAndListings({ skip: 0, limit: 3 }));
+        dispatch(fetchPropertiesAndListings({ skip: 0, limit: 10 }));
     }, [dispatch]);
 
     const handleViewMore = () => {
         dispatch(
             fetchPropertiesAndListings({
                 skip: listedProperties.length,
-                limit: 3,
+                limit: 6,
             })
         );
-        setVisibleCount(visibleCount + 3);
+        setVisibleCount(visibleCount + 6);
     };
 
     if (isLoading) {
@@ -91,7 +91,7 @@ export function GuestLandingPage() {
                                             />
                                         ))}
                                 </div>
-                                {listedProperties.length % 3 === 0 && (
+                                {listedProperties.length > visibleCount && (
                                     <div className="mt-6">
                                         <Button onClick={handleViewMore}>
                                             View More
