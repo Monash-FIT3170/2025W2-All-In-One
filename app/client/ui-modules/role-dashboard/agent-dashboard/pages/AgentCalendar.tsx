@@ -9,8 +9,8 @@ import {
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 import { AddTaskModal } from "../components/AddTaskModal";
+import { apiCreateTaskForAgent } from "/app/client/library-modules/apis/task/task-api";
 import { PropertyOption, TaskData } from "../components/TaskFormSchema";
-import { apiCreateTask } from "/app/client/library-modules/apis/task/task-api";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { UpcomingTasks } from "../../components/UpcomingTask";
@@ -95,7 +95,7 @@ export function AgentCalendar(): React.JSX.Element {
         propertyId: taskData.propertyId || "",
       };
 
-      const createdTaskId = await apiCreateTask(apiData);
+      const createdTaskId = await apiCreateTaskForAgent(apiData);
       console.log("Task created successfully with ID:", createdTaskId);
 
       setIsModalOpen(false);

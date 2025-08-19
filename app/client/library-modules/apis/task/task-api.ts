@@ -9,7 +9,7 @@ export async function apiGetTaskById(id: string): Promise<ApiTask> {
   return fetchedTask;
 }
 
-export async function apiCreateTask(taskData: {
+export async function apiCreateTaskForAgent(taskData: {
   name: string;
   description: string;
   dueDate: Date;
@@ -19,10 +19,25 @@ export async function apiCreateTask(taskData: {
   propertyId: string; 
 }): Promise<string> {
   try {
-    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT, taskData);
+    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT_FOR_AGENT, taskData);
     return result;
   } catch (error) {
     console.error("Failed to create task:", error);
+    throw error;
+  }
+}
+export async function apiCreateTaskForLandlord(taskData: {
+  name: string;
+  description: string;
+  dueDate: Date;
+  priority: TaskPriority;
+  landlordId: string;
+}): Promise<string> {
+  try {
+    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT_FOR_LANDLORD, taskData);
+    return result;
+  } catch (error) {
+    console.error("Failed to create landlord task:", error);
     throw error;
   }
 }

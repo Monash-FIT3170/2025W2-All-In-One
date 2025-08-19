@@ -17,6 +17,10 @@ export async function apiGetLandlord(userId: string): Promise<ApiLandlord> {
   return await Meteor.callAsync(MeteorMethodIdentifier.LANDLORD_GET, userId);
 }
 
+export async function apiGetLandlordByLandlordId(landlordId: string): Promise<ApiLandlord> {
+  return await Meteor.callAsync(MeteorMethodIdentifier.LANDLORD_GET_BY_LANDLORD_ID, landlordId);
+}
+
 export async function apiGetAllLandlords(): Promise<ApiLandlord[]> {
   return await Meteor.callAsync(MeteorMethodIdentifier.LANDLORD_GET_ALL);
 }
