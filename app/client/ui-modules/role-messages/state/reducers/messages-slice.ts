@@ -2,8 +2,6 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../../store";
 import { MessagesState } from "../MessagesPageUIState";
 import { Conversation, Message } from "../../types";
-import { Meteor } from "meteor/meteor";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 const initialState: MessagesState = {
   isLoading: false,
@@ -16,200 +14,93 @@ const initialState: MessagesState = {
   messagesLoading: false,
 };
 
-// Helper functions to separate concerns
-const createErrorConversation = (id: string, name: string, message: string, avatar: string): Conversation => ({
-  id,
-  name,
-  role: "Info",
-  avatar,
-  lastMessage: message,
-  timestamp: "Error",
-  unreadCount: 0,
-});
-
-const createConversationFromProfile = (
-  id: string,
-  profile: any,
-  role: "Landlord" | "Tenant",
-  isNew: boolean = false
-): Conversation => ({
-  id,
-  name: `${profile.firstName} ${profile.lastName}`,
-  role,
-  avatar: `${profile.firstName?.[0] || role[0]}${profile.lastName?.[0] || role[1]}`,
-  lastMessage: isNew ? "Start conversation" : "No messages yet",
-  timestamp: isNew ? "New" : "No messages",
-  unreadCount: 0,
-});
-
-const createConversationFromExisting = (
-  conv: any,
-  profile: any,
-  role: "Landlord" | "Tenant",
-  userId: string
-): Conversation => ({
-  id: conv._id,
-  name: `${profile.firstName} ${profile.lastName}`,
-  role,
-  avatar: `${profile.firstName?.[0] || role[0]}${profile.lastName?.[0] || role[1]}`,
-  lastMessage: conv.lastMessage?.text || "No messages yet",
-  timestamp: conv.lastMessage?.timestamp 
-    ? new Date(conv.lastMessage.timestamp).toLocaleString() 
-    : "New",
-  unreadCount: conv.unreadCounts?.[userId] || 0,
-});
-
-// Async thunk for getting agent data
-const getAgentData = async (userId: string) => {
-  const agent = await Meteor.callAsync(MeteorMethodIdentifier.AGENT_GET, userId);
-  if (!agent || !agent.agentId) {
-    throw new Error("Agent profile not found");
-  }
-  return agent;
-};
-
-// Async thunk for getting properties
-const getPropertiesForAgent = async (agentId: string) => {
-  const properties = await Meteor.callAsync(
-    MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID,
-    agentId
-  );
-  if (properties.length === 0) {
-    throw new Error("No properties found");
-  }
-  return properties;
-};
-
-// Async thunk for getting user profiles
-const getUserProfiles = async (landlordIds: string[], tenantIds: string[]) => {
-  const [landlords, tenants] = await Promise.all([
-    Promise.all(
-      landlordIds.map(async (id) => {
-        try {
-          const profile = await Meteor.callAsync(MeteorMethodIdentifier.PROFILE_GET_BY_LANDLORD_ID, id);
-          return { landlordId: id, profile };
-        } catch (error) {
-          return null;
-        }
-      })
-    ),
-    Promise.all(
-      tenantIds.map(async (id) => {
-        try {
-          const profile = await Meteor.callAsync(MeteorMethodIdentifier.PROFILE_GET_BY_TENANT_ID, id);
-          return { tenantId: id, profile };
-        } catch (error) {
-          return null;
-        }
-      })
-    )
-  ]);
-
-  return {
-    landlords: landlords.filter(Boolean),
-    tenants: tenants.filter(Boolean)
-  };
-};
-
-// Async thunk for building conversations
-const buildConversationsList = (
-  existingConversations: any[],
-  landlords: any[],
-  tenants: any[],
-  userId: string
-): Conversation[] => {
-  const conversations: Conversation[] = [];
-
-  // Add existing conversations
-  for (const conv of existingConversations) {
-    if (conv.landlordId) {
-      const landlordData = landlords.find(l => l?.landlordId === conv.landlordId);
-      if (landlordData?.profile) {
-        conversations.push(createConversationFromExisting(conv, landlordData.profile, "Landlord", userId));
-      }
-    }
-    
-    if (conv.tenantId) {
-      const tenantData = tenants.find(t => t?.tenantId === conv.tenantId);
-      if (tenantData?.profile) {
-        conversations.push(createConversationFromExisting(conv, tenantData.profile, "Tenant", userId));
-      }
-    }
-  }
-
-  // Add new conversations for users without existing conversations
-  const existingLandlordIds = existingConversations.map((c: any) => c.landlordId).filter(Boolean);
-  const existingTenantIds = existingConversations.map((c: any) => c.tenantId).filter(Boolean);
-
-  // Add new landlord conversations
-  for (const landlordData of landlords) {
-    if (landlordData && !existingLandlordIds.includes(landlordData.landlordId)) {
-      conversations.push(
-        createConversationFromProfile(
-          `new_landlord_${landlordData.landlordId}`,
-          landlordData.profile,
-          "Landlord",
-          true
-        )
-      );
-    }
-  }
-
-  // Add new tenant conversations
-  for (const tenantData of tenants) {
-    if (tenantData && !existingTenantIds.includes(tenantData.tenantId)) {
-      conversations.push(
-        createConversationFromProfile(
-          `new_tenant_${tenantData.tenantId}`,
-          tenantData.profile,
-          "Tenant",
-          true
-        )
-      );
-    }
-  }
-
-  return conversations;
-};
-
-// Main async thunk - now much cleaner
+// Async thunks
 export const fetchConversations = createAsyncThunk(
   "messages/fetchConversations",
   async (userId: string, { rejectWithValue }) => {
     try {
-      // Step 1: Get agent data
-      const agent = await getAgentData(userId);
-      const agentId = agent.agentId;
+      // TODO: Replace with actual API call to fetch conversations
+      // For now, return mock data for all roles
+      const mockConversations: Conversation[] = [
+        // Agent conversations
+        {
+          id: "1",
+          name: "John Smith",
+          role: "Property Manager",
+          avatar: "JS",
+          lastMessage: "I'll schedule the maintenance visit",
+          timestamp: "10:30 AM",
+          unreadCount: 2,
+        },
+        {
+          id: "2",
+          name: "Sarah Johnson",
+          role: "Leasing Agent",
+          avatar: "SJ",
+          lastMessage: "Your lease renewal documents are",
+          timestamp: "Yesterday",
+          unreadCount: 1,
+        },
+        {
+          id: "3",
+          name: "Michael Chen",
+          role: "Maintenance Supervisor",
+          avatar: "MC",
+          lastMessage: "The repair has been completed. Please",
+          timestamp: "Mar 25",
+          unreadCount: 0,
+        },
+        // Landlord conversations
+        {
+          id: "4",
+          name: "Alex Carter",
+          role: "Agent",
+          avatar: "AC",
+          lastMessage: "Tenant application received",
+          timestamp: "09:20 AM",
+          unreadCount: 0,
+        },
+        {
+          id: "5",
+          name: "Priya Singh",
+          role: "Tenant",
+          avatar: "PS",
+          lastMessage: "Rent paid for April",
+          timestamp: "Yesterday",
+          unreadCount: 0,
+        },
+        {
+          id: "6",
+          name: "David Wilson",
+          role: "Maintenance",
+          avatar: "DW",
+          lastMessage: "Inspection scheduled Fri 2 PM",
+          timestamp: "Mar 24",
+          unreadCount: 1,
+        },
+        // Tenant conversations
+        {
+          id: "7",
+          name: "Emma Thompson",
+          role: "Property Manager",
+          avatar: "ET",
+          lastMessage: "Your maintenance request has been approved",
+          timestamp: "Mar 23",
+          unreadCount: 0,
+        },
+        {
+          id: "8",
+          name: "James Brown",
+          role: "Maintenance",
+          avatar: "JB",
+          lastMessage: "We'll fix the leak tomorrow",
+          timestamp: "Mar 22",
+          unreadCount: 0,
+        },
+      ];
 
-      // Step 2: Get properties
-      let properties;
-      try {
-        properties = await getPropertiesForAgent(agentId);
-      } catch (error) {
-        return [createErrorConversation("no_properties", "No properties", "You don't have any properties to manage yet", "NP")];
-      }
-
-      // Step 3: Extract unique user IDs
-      const landlordIds = [...new Set(properties.map((p: any) => p.landlordId).filter(Boolean))];
-      const tenantIds = [...new Set(properties.map((p: any) => p.tenantId).filter(Boolean))];
-
-      if (landlordIds.length === 0 && tenantIds.length === 0) {
-        return [createErrorConversation("no_contacts", "No contacts", "Your properties don't have landlords or tenants assigned", "NC")];
-      }
-
-      // Step 4: Get existing conversations and user profiles in parallel
-      const [existingConversations, { landlords, tenants }] = await Promise.all([
-        Meteor.callAsync(MeteorMethodIdentifier.CONVERSATIONS_GET_FOR_AGENT, agentId),
-        getUserProfiles(landlordIds as string[], tenantIds as string[])
-      ]);
-
-      // Step 5: Build final conversations list
-      const conversations = buildConversationsList(existingConversations, landlords, tenants, userId);
-
-      console.log("🎉 Final conversations list:", conversations);
-      return conversations;
+      return mockConversations;
     } catch (error) {
-      console.error("Error fetching conversations:", error);
       return rejectWithValue("Failed to fetch conversations");
     }
   }
@@ -220,43 +111,14 @@ export const fetchConversationMessages = createAsyncThunk(
   async (conversationId: string, { rejectWithValue }) => {
     try {
       // TODO: Replace with actual API call to fetch messages
-      // For now, return hardcoded mock data to make UI work
+      // For now, return mock data
       const mockMessages: Message[] = [
-        { 
-          id: "1", 
-          text: "Hello, I need to report a leaking faucet in the kitchen.", 
-          timestamp: "Yesterday, 9:15 AM", 
-          isOutgoing: true, 
-          isRead: true 
-        },
-        { 
-          id: "2", 
-          text: "Thank you for reporting this. When would be a good time for a maintenance visit?", 
-          timestamp: "Yesterday, 9:45 AM", 
-          isOutgoing: false, 
-          isRead: false 
-        },
-        { 
-          id: "3", 
-          text: "I'm available tomorrow morning or afternoon.", 
-          timestamp: "Yesterday, 10:15 AM", 
-          isOutgoing: true, 
-          isRead: true 
-        },
-        { 
-          id: "4", 
-          text: "Perfect! I'll schedule the maintenance visit for tomorrow at 10 AM.", 
-          timestamp: "10:30 AM", 
-          isOutgoing: false, 
-          isRead: false 
-        },
-        { 
-          id: "5", 
-          text: "Great, thank you for the quick response!", 
-          timestamp: "10:31 AM", 
-          isOutgoing: true, 
-          isRead: true 
-        },
+        { id: "1", text: "Hello, I need to report a leaking faucet in the kitchen.", timestamp: "Yesterday, 9:15 AM", isOutgoing: true, isRead: true },
+        { id: "2", text: "Thank you for reporting this. When would be a good time for a maintenance visit?", timestamp: "Yesterday, 9:45 AM", isOutgoing: false, isRead: false },
+        { id: "3", text: "I'm available tomorrow morning or afternoon.", timestamp: "Yesterday, 10:15 AM", isOutgoing: true, isRead: true },
+        { id: "4", text: "Please let me know if that works for you.", timestamp: "10:31 AM", isOutgoing: false, isRead: false },
+        { id: "5", text: "I'll schedule the maintenance visit for tomorrow at 10 AM.", timestamp: "10:30 AM", isOutgoing: false, isRead: false },
+        { id: "6", text: "I'll schedule the maintenance visit.", timestamp: "10:30 AM", isOutgoing: false, isRead: false },
       ];
 
       return { conversationId, messages: mockMessages };
@@ -383,49 +245,28 @@ export const selectConversationsLoading = (state: RootState) => state.messages.c
 export const selectMessagesLoading = (state: RootState) => state.messages.messagesLoading;
 export const selectError = (state: RootState) => state.messages.error;
 
-// Fixed role-based selector - now returns all conversations for agents
+// Role-based selectors using currentUser role
 export const selectConversationsForRole = (role: string) => (state: RootState) => {
-  const conversations = state.messages.conversations;
+  const currentRole = state.currentUser.authUser?.role;
+  if (!currentRole) return [];
   
-  // If no conversations are loaded, return some hardcoded ones for development/testing
-  if (conversations.length === 0) {
-    return [
-      {
-        id: "hardcoded_1",
-        name: "John Smith",
-        role: "Landlord",
-        avatar: "JS",
-        lastMessage: "Thanks for the quick response about the maintenance request.",
-        timestamp: "2 hours ago",
-        unreadCount: 1,
-      },
-      {
-        id: "hardcoded_2",
-        name: "Sarah Johnson",
-        role: "Tenant",
-        avatar: "SJ",
-        lastMessage: "When can we schedule the property inspection?",
-        timestamp: "Yesterday",
-        unreadCount: 0,
-      },
-      {
-        id: "hardcoded_3",
-        name: "Mike Wilson",
-        role: "Landlord",
-        avatar: "MW",
-        lastMessage: "The new tenant application looks good.",
-        timestamp: "3 days ago",
-        unreadCount: 2,
-      },
-    ];
-  }
-  
-  // Return actual conversations if they exist
-  return conversations;
+  // Filter conversations based on role
+  // This logic can be customized based on your business rules
+  return state.messages.conversations.filter((c: Conversation) => {
+    // TODO: TO BE FIXED LATER!!
+    if (role === 'agent') {
+      return c.role === 'Property Manager' || c.role === 'Leasing Agent' || c.role === 'Maintenance Supervisor';
+    } else if (role === 'landlord') {
+      return c.role === 'Agent' || c.role === 'Tenant' || c.role === 'Maintenance';
+    } else if (role === 'tenant') {
+      return c.role === 'Property Manager' || c.role === 'Maintenance';
+    }
+    return false;
+  });
 };
 
 export const selectMessagesForCurrentUser = (state: RootState) => {
   return state.messages.messages;
 };
 
-export default messagesSlice.reducer;
+export default messagesSlice.reducer; 
