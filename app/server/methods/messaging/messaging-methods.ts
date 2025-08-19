@@ -72,6 +72,17 @@ const insertConversationMethod = {
     }
   ): Promise<string> => {
     try {
+      // Check if conversation already exists to prevent duplicates
+      const existingConversation = await ConversationCollection.findOneAsync({
+        agentId: conversationData.agentId,
+        tenantId: conversationData.tenantId
+      });
+
+      if (existingConversation) {
+        console.log(`⚠️ Conversation already exists between agent ${conversationData.agentId} and tenant ${conversationData.tenantId}`);
+        return existingConversation._id;
+      }
+
       const newConversation: Omit<ConversationDocument, '_id'> = {
         agentId: conversationData.agentId,
         landlordId: conversationData.landlordId,

@@ -2,6 +2,11 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../../store";
 import { MessagesState } from "../MessagesPageUIState";
 import { Conversation, Message } from "../../types";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { ConversationDocument } from "/app/server/database/messaging/models/ConversationDocument";
+import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
+import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
+import { Role } from "/app/shared/user-role-identifier";
 
 const initialState: MessagesState = {
   isLoading: false,
@@ -14,93 +19,169 @@ const initialState: MessagesState = {
   messagesLoading: false,
 };
 
+// Helper function to convert ConversationDocument to UI Conversation
+const convertConversationDocumentToUIConversation = (
+  doc: ConversationDocument,
+  tenantProfile?: any
+): Conversation => {
+  // Generate avatar from name
+  const getAvatar = (name: string) => {
+    const parts = name.split(' ');
+    return parts.length > 1 
+      ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+      : `${parts[0][0]}${parts[0][1] || ''}`.toUpperCase();
+  };
+
+  // Use real tenant name from profile if available
+  const name = tenantProfile 
+    ? `${tenantProfile.firstName} ${tenantProfile.lastName}`.trim()
+    : `Tenant ${doc.tenantId?.slice(-4) || 'Unknown'}`;
+  
+  return {
+    id: doc._id,
+    name,
+    role: "Tenant", // For agent conversations, the other party is typically a tenant
+    avatar: getAvatar(name),
+    lastMessage: doc.lastMessage?.text || "No messages yet",
+    timestamp: doc.lastMessage?.timestamp 
+      ? new Date(doc.lastMessage.timestamp).toLocaleString()
+      : new Date(doc.createdAt).toLocaleString(),
+    unreadCount: doc.unreadCounts[doc.agentId] || 0,
+  };
+};
+
 // Async thunks
 export const fetchConversations = createAsyncThunk(
   "messages/fetchConversations",
-  async (userId: string, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
-      // TODO: Replace with actual API call to fetch conversations
-      // For now, return mock data for all roles
-      const mockConversations: Conversation[] = [
-        // Agent conversations
-        {
-          id: "1",
-          name: "John Smith",
-          role: "Property Manager",
-          avatar: "JS",
-          lastMessage: "I'll schedule the maintenance visit",
-          timestamp: "10:30 AM",
-          unreadCount: 2,
-        },
-        {
-          id: "2",
-          name: "Sarah Johnson",
-          role: "Leasing Agent",
-          avatar: "SJ",
-          lastMessage: "Your lease renewal documents are",
-          timestamp: "Yesterday",
-          unreadCount: 1,
-        },
-        {
-          id: "3",
-          name: "Michael Chen",
-          role: "Maintenance Supervisor",
-          avatar: "MC",
-          lastMessage: "The repair has been completed. Please",
-          timestamp: "Mar 25",
-          unreadCount: 0,
-        },
-        // Landlord conversations
-        {
-          id: "4",
-          name: "Alex Carter",
-          role: "Agent",
-          avatar: "AC",
-          lastMessage: "Tenant application received",
-          timestamp: "09:20 AM",
-          unreadCount: 0,
-        },
-        {
-          id: "5",
-          name: "Priya Singh",
-          role: "Tenant",
-          avatar: "PS",
-          lastMessage: "Rent paid for April",
-          timestamp: "Yesterday",
-          unreadCount: 0,
-        },
-        {
-          id: "6",
-          name: "David Wilson",
-          role: "Maintenance",
-          avatar: "DW",
-          lastMessage: "Inspection scheduled Fri 2 PM",
-          timestamp: "Mar 24",
-          unreadCount: 1,
-        },
-        // Tenant conversations
-        {
-          id: "7",
-          name: "Emma Thompson",
-          role: "Property Manager",
-          avatar: "ET",
-          lastMessage: "Your maintenance request has been approved",
-          timestamp: "Mar 23",
-          unreadCount: 0,
-        },
-        {
-          id: "8",
-          name: "James Brown",
-          role: "Maintenance",
-          avatar: "JB",
-          lastMessage: "We'll fix the leak tomorrow",
-          timestamp: "Mar 22",
-          unreadCount: 0,
-        },
-      ];
+      const state = getState() as RootState;
+      const currentUser = state.currentUser.currentUser;
+      const authUser = state.currentUser.authUser;
 
-      return mockConversations;
+      // Check if user is an agent
+      if (!authUser || authUser.role !== Role.AGENT || !currentUser) {
+        return rejectWithValue("User is not an agent or not authenticated");
+      }
+
+      const agent = currentUser as Agent;
+      const agentId = agent.agentId;
+
+      // Step 2.1: Get agent conversations by agent id
+      const existingConversations: ConversationDocument[] = await Meteor.callAsync(
+        MeteorMethodIdentifier.CONVERSATIONS_GET_FOR_AGENT,
+        agentId
+      );
+
+      // Step 2.2: Get tenant connections (properties managed by this agent)
+      const agentProperties: ApiProperty[] = await Meteor.callAsync(
+        MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID,
+        agentId
+      );
+
+      // Extract unique tenant IDs from properties
+      const tenantConnections = new Set<string>();
+      agentProperties.forEach(property => {
+        if (property.tenantId && property.tenantId.trim() !== '') {
+          tenantConnections.add(property.tenantId);
+        }
+      });
+
+      // Step 3: Compare tenant connections against existing conversations
+      const existingConversationTenantIds = new Set<string>();
+      existingConversations.forEach(conversation => {
+        if (conversation.tenantId) {
+          existingConversationTenantIds.add(conversation.tenantId);
+        }
+      });
+
+      // Find tenants that don't have conversations yet
+      const tenantsWithoutConversations = Array.from(tenantConnections).filter(
+        tenantId => !existingConversationTenantIds.has(tenantId)
+      );
+
+      // Step 4.2: Create new conversations for tenants without conversations
+      const newConversations: ConversationDocument[] = [];
+      
+      for (const tenantId of tenantsWithoutConversations) {
+        try {
+          // Find the property for this tenant to get additional context
+          const property = agentProperties.find(p => p.tenantId === tenantId);
+          
+          const newConversationData = {
+            agentId: agentId,
+            tenantId: tenantId,
+            propertyId: property?.propertyId || undefined,
+            landlordId: property?.landlordId || undefined,
+            unreadCounts: {
+              [agentId]: 0,
+              [tenantId]: 0
+            }
+          };
+
+          // The server method now handles duplicate checking, so we can call it directly
+          const conversationId = await Meteor.callAsync(
+            MeteorMethodIdentifier.CONVERSATION_INSERT,
+            newConversationData
+          );
+
+          // Only add to newConversations if it's actually a new conversation
+          // (server returns existing ID if conversation already exists)
+          const isNewConversation = !existingConversations.some(conv => conv._id === conversationId);
+          
+          if (isNewConversation) {
+            const newConversation: ConversationDocument = {
+              _id: conversationId,
+              agentId: agentId,
+              tenantId: tenantId,
+              propertyId: property?.propertyId,
+              landlordId: property?.landlordId,
+              unreadCounts: newConversationData.unreadCounts,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            };
+
+            newConversations.push(newConversation);
+          }
+        } catch (error) {
+          console.error(`Failed to create conversation for tenant ${tenantId}:`, error);
+          // Continue with other tenants even if one fails
+        }
+      }
+
+      // Step 4: Combine existing and new conversations
+      const allConversations = [...existingConversations, ...newConversations];
+
+      // Fetch tenant profiles for all conversations to get real names
+      const tenantProfiles = new Map<string, any>();
+      const uniqueTenantIds = [...new Set(allConversations.map(c => c.tenantId).filter(Boolean))];
+      
+      await Promise.all(
+        uniqueTenantIds.map(async (tenantId) => {
+          try {
+            const profile = await Meteor.callAsync(
+              MeteorMethodIdentifier.PROFILE_GET_BY_TENANT_ID,
+              tenantId
+            );
+            tenantProfiles.set(tenantId!, profile);
+          } catch (error) {
+            console.error(`Failed to fetch profile for tenant ${tenantId}:`, error);
+            // Continue without profile data for this tenant
+          }
+        })
+      );
+
+      // Convert to UI format with real tenant names
+      const uiConversations: Conversation[] = allConversations.map(doc => 
+        convertConversationDocumentToUIConversation(
+          doc, 
+          doc.tenantId ? tenantProfiles.get(doc.tenantId) : undefined
+        )
+      );
+
+      return uiConversations;
     } catch (error) {
+      console.error("Error fetching conversations:", error);
       return rejectWithValue("Failed to fetch conversations");
     }
   }
@@ -111,17 +192,10 @@ export const fetchConversationMessages = createAsyncThunk(
   async (conversationId: string, { rejectWithValue }) => {
     try {
       // TODO: Replace with actual API call to fetch messages
-      // For now, return mock data
-      const mockMessages: Message[] = [
-        { id: "1", text: "Hello, I need to report a leaking faucet in the kitchen.", timestamp: "Yesterday, 9:15 AM", isOutgoing: true, isRead: true },
-        { id: "2", text: "Thank you for reporting this. When would be a good time for a maintenance visit?", timestamp: "Yesterday, 9:45 AM", isOutgoing: false, isRead: false },
-        { id: "3", text: "I'm available tomorrow morning or afternoon.", timestamp: "Yesterday, 10:15 AM", isOutgoing: true, isRead: true },
-        { id: "4", text: "Please let me know if that works for you.", timestamp: "10:31 AM", isOutgoing: false, isRead: false },
-        { id: "5", text: "I'll schedule the maintenance visit for tomorrow at 10 AM.", timestamp: "10:30 AM", isOutgoing: false, isRead: false },
-        { id: "6", text: "I'll schedule the maintenance visit.", timestamp: "10:30 AM", isOutgoing: false, isRead: false },
-      ];
+      // For now, return empty array since conversations are new and have no messages yet
+      const messages: Message[] = [];
 
-      return { conversationId, messages: mockMessages };
+      return { conversationId, messages };
     } catch (error) {
       return rejectWithValue("Failed to fetch messages");
     }
@@ -250,23 +324,23 @@ export const selectConversationsForRole = (role: string) => (state: RootState) =
   const currentRole = state.currentUser.authUser?.role;
   if (!currentRole) return [];
   
-  // Filter conversations based on role
-  // This logic can be customized based on your business rules
-  return state.messages.conversations.filter((c: Conversation) => {
-    // TODO: TO BE FIXED LATER!!
-    if (role === 'agent') {
-      return c.role === 'Property Manager' || c.role === 'Leasing Agent' || c.role === 'Maintenance Supervisor';
-    } else if (role === 'landlord') {
-      return c.role === 'Agent' || c.role === 'Tenant' || c.role === 'Maintenance';
-    } else if (role === 'tenant') {
-      return c.role === 'Property Manager' || c.role === 'Maintenance';
-    }
-    return false;
-  });
+  // For agents, return all conversations (they are already filtered by agent in fetchConversations)
+  // For other roles, we can add specific filtering logic later
+  if (role === 'agent' && currentRole === Role.AGENT) {
+    return state.messages.conversations;
+  } else if (role === 'landlord' && currentRole === Role.LANDLORD) {
+    // TODO: Implement landlord conversation filtering
+    return state.messages.conversations;
+  } else if (role === 'tenant' && currentRole === Role.TENANT) {
+    // TODO: Implement tenant conversation filtering
+    return state.messages.conversations;
+  }
+  
+  return [];
 };
 
 export const selectMessagesForCurrentUser = (state: RootState) => {
   return state.messages.messages;
 };
 
-export default messagesSlice.reducer; 
+export default messagesSlice.reducer;

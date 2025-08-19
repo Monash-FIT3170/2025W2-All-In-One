@@ -38,7 +38,7 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
 
   useEffect(() => {
     if (currentUser?.userId) {
-      dispatch(fetchConversations(currentUser.userId));
+      dispatch(fetchConversations());
     }
   }, [dispatch, currentUser?.userId]);
 
@@ -109,5 +109,3 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
     </div>
   );
 }
-
-
