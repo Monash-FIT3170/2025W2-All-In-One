@@ -62,8 +62,14 @@ export default function FormPropertyImages({
       
       setPreviewUrls(newPreviewUrls);
     } else {
+      // When files is null (all images deleted), set form to empty array
+      form.setValue("images", [], { shouldValidate: true });
       // Clean up URLs when files are cleared
-      previewUrls.forEach(url => URL.revokeObjectURL(url));
+      previewUrls.forEach(url => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
       setPreviewUrls([]);
     }
   }, [files]);
