@@ -105,6 +105,16 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
         messages, 
         currentUserId 
       }));
+      
+      // Update conversation tile with latest message
+      if (messages.length > 0) {
+        const latestMessage = messages[messages.length - 1];
+        dispatch(updateConversationLastMessage({
+          conversationId: activeConversationId,
+          message: latestMessage.text,
+          timestamp: new Date(latestMessage.timestamp).toLocaleString()
+        }));
+      }
     }
   }, [messages, messagesReady, activeConversationId, dispatch, currentUserId]);
 

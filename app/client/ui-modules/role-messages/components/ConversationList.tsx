@@ -14,7 +14,7 @@ interface ConversationListProps {
 
 export function ConversationList({ title = "Messages", conversations, activeConversationId: activeId, onSelect }: ConversationListProps) {
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+    <div className="w-96 bg-white border-r border-gray-200 flex flex-col">
       <div className="p-4 border-b border-gray-200 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">{title}</h1>
@@ -66,4 +66,4 @@ export function ConversationList({ title = "Messages", conversations, activeConv
       </div>
     </div>
   );
-} 
+}

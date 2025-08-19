@@ -546,7 +546,15 @@ export const messagesSlice = createSlice({
         // Add message immediately for instant feedback, subscription will sync later
         state.messages.push(action.payload.message);
         state.messageText = "";
-        console.log('📤 Message sent successfully, added to UI immediately');
+        
+        // Update the conversation tile's last message in real-time
+        const conversation = state.conversations.find(c => c.id === action.payload.conversationId);
+        if (conversation) {
+          conversation.lastMessage = action.payload.message.text;
+          conversation.timestamp = action.payload.message.timestamp;
+        }
+        
+        console.log('📤 Message sent successfully, added to UI immediately and updated conversation tile');
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.isLoading = false;
