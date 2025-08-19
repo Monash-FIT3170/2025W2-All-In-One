@@ -454,6 +454,13 @@ export const messagesSlice = createSlice({
     },
     // New actions for pub/sub integration
     setConversationsFromSubscription(state, action: PayloadAction<ConversationDocument[]>) {
+      // Don't override conversations if they're already loaded with proper profile data
+      // The subscription is mainly for real-time updates, not initial loading
+      if (state.conversations.length > 0) {
+        console.log('🔄 Redux: Conversations already loaded with profile data, skipping subscription override');
+        return;
+      }
+      
       // Convert ConversationDocument[] to Conversation[] for UI
       const uiConversations: Conversation[] = action.payload.map(doc => {
         const getAvatar = (name: string) => {
@@ -463,7 +470,7 @@ export const messagesSlice = createSlice({
             : `${parts[0][0]}${parts[0][1] || ''}`.toUpperCase();
         };
 
-        // For now, use basic conversion - this can be enhanced with profile data
+        // Use basic conversion as fallback - proper names should come from fetchConversations
         const name = `User ${doc.tenantId?.slice(-4) || doc.agentId?.slice(-4) || 'Unknown'}`;
         
         return {
@@ -481,16 +488,19 @@ export const messagesSlice = createSlice({
       
       state.conversations = uiConversations;
     },
-    setMessagesFromSubscription(state, action: PayloadAction<{ conversationId: string; messages: MessageDocument[] }>) {
+    setMessagesFromSubscription(state, action: PayloadAction<{ conversationId: string; messages: MessageDocument[]; currentUserId?: string }>) {
+      console.log('🔄 Redux: setMessagesFromSubscription called with', action.payload.messages.length, 'messages');
+      
       // Convert MessageDocument[] to Message[] for UI
       const uiMessages: Message[] = action.payload.messages.map(doc => ({
         id: doc._id,
         text: doc.text,
         timestamp: new Date(doc.timestamp).toLocaleString(),
-        isOutgoing: false, // Will be determined based on current user
+        isOutgoing: action.payload.currentUserId ? doc.senderId === action.payload.currentUserId : false,
         isRead: doc.isRead,
       }));
       
+      console.log('🔄 Redux: Setting', uiMessages.length, 'UI messages');
       state.messages = uiMessages;
     },
   },
@@ -533,8 +543,10 @@ export const messagesSlice = createSlice({
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
         state.isLoading = false;
+        // Add message immediately for instant feedback, subscription will sync later
         state.messages.push(action.payload.message);
         state.messageText = "";
+        console.log('📤 Message sent successfully, added to UI immediately');
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.isLoading = false;

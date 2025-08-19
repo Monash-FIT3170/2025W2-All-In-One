@@ -2,118 +2,81 @@ import { Meteor } from "meteor/meteor";
 import { ConversationCollection } from "../database/messaging/messaging-collections";
 import { MessageCollection } from "../database/messaging/messaging-collections";
 import { Role } from "/app/shared/user-role-identifier";
-import { UserAccountCollection } from "../database/user/user-collections";
-import { AgentCollection } from "../database/user/user-collections";
-import { TenantCollection } from "../database/user/user-collections";
-import { LandlordCollection } from "../database/user/user-collections";
-import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
-import { Tenant } from "/app/client/library-modules/domain-models/user/Tenant";
-import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 
-// Helper function to get user role and role ID
-async function getUserRoleInfo(userId: string): Promise<{ role: Role; roleId: string } | null> {
-  try {
-    // Get user account to determine role
-    const userAccount = await UserAccountCollection.findOneAsync({ userId });
-    if (!userAccount) {
-      return null;
-    }
-
-    const role = userAccount.role;
-    let roleId: string;
-
-    // Get the specific role document to get the role ID
-    if (role === Role.AGENT) {
-      const agent = await AgentCollection.findOneAsync({ userAccountId: userId });
-      if (!agent) return null;
-      roleId = agent._id; // Use _id as the role ID
-    } else if (role === Role.TENANT) {
-      const tenant = await TenantCollection.findOneAsync({ userAccountId: userId });
-      if (!tenant) return null;
-      roleId = tenant._id; // Use _id as the role ID
-    } else if (role === Role.LANDLORD) {
-      const landlord = await LandlordCollection.findOneAsync({ userAccountId: userId });
-      if (!landlord) return null;
-      roleId = landlord._id; // Use _id as the role ID
-    } else {
-      return null;
-    }
-
-    return { role, roleId };
-  } catch (error) {
-    console.error("Error getting user role info:", error);
-    return null;
-  }
-}
-
-// Publication for conversations based on user role
-Meteor.publish("conversations", async function() {
-  if (!this.userId) {
+// Publication for conversations based on role and roleId
+Meteor.publish("conversations", async function(role: Role, roleId: string) {
+  console.log('🔔 SERVER: conversations publication called for role:', role, 'roleId:', roleId);
+  
+  if (!role || !roleId) {
+    console.log('🔔 SERVER: No role or roleId provided, returning ready');
     return this.ready();
   }
-
-  const userInfo = await getUserRoleInfo(this.userId);
-  if (!userInfo) {
-    return this.ready();
-  }
-
-  const { role, roleId } = userInfo;
 
   // Return conversations based on user role
   if (role === Role.AGENT) {
-    return ConversationCollection.find({ agentId: roleId });
+    const cursor = ConversationCollection.find({ agentId: roleId });
+    const count = await ConversationCollection.find({ agentId: roleId }).countAsync();
+    console.log('🔔 SERVER: Returning', count, 'conversations for agent:', roleId);
+    return cursor;
   } else if (role === Role.TENANT) {
-    return ConversationCollection.find({ tenantId: roleId });
+    const cursor = ConversationCollection.find({ tenantId: roleId });
+    const count = await ConversationCollection.find({ tenantId: roleId }).countAsync();
+    console.log('🔔 SERVER: Returning', count, 'conversations for tenant:', roleId);
+    return cursor;
   } else if (role === Role.LANDLORD) {
-    return ConversationCollection.find({ landlordId: roleId });
+    const cursor = ConversationCollection.find({ landlordId: roleId });
+    const count = await ConversationCollection.find({ landlordId: roleId }).countAsync();
+    console.log('🔔 SERVER: Returning', count, 'conversations for landlord:', roleId);
+    return cursor;
   }
 
+  console.log('🔔 SERVER: Unknown role, returning ready');
   return this.ready();
 });
 
 // Publication for messages in a specific conversation
-Meteor.publish("messages", async function(conversationId: string) {
-  if (!this.userId || !conversationId) {
+Meteor.publish("messages", async function(conversationId: string, role: Role, roleId: string) {
+  console.log('💬 SERVER: messages publication called for conversation:', conversationId, 'role:', role, 'roleId:', roleId);
+  
+  if (!conversationId || !role || !roleId) {
+    console.log('💬 SERVER: Missing required parameters, returning ready');
     return this.ready();
   }
-
-  const userInfo = await getUserRoleInfo(this.userId);
-  if (!userInfo) {
-    return this.ready();
-  }
-
-  const { role, roleId } = userInfo;
 
   // Check if user is part of this conversation
   const conversation = await ConversationCollection.findOneAsync(conversationId);
   if (!conversation) {
+    console.log('💬 SERVER: Conversation not found:', conversationId);
     return this.ready();
   }
+
+  console.log('💬 SERVER: Found conversation:', conversation);
 
   const hasAccess = 
     (role === Role.AGENT && conversation.agentId === roleId) ||
     (role === Role.TENANT && conversation.tenantId === roleId) ||
     (role === Role.LANDLORD && conversation.landlordId === roleId);
 
+  console.log('💬 SERVER: Access check - role:', role, 'roleId:', roleId, 'hasAccess:', hasAccess);
+  console.log('💬 SERVER: Conversation agentId:', conversation.agentId, 'tenantId:', conversation.tenantId);
+
   if (!hasAccess) {
+    console.log('💬 SERVER: No access to conversation, returning ready');
     return this.ready();
   }
 
-  return MessageCollection.find({ conversationId });
+  const cursor = MessageCollection.find({ conversationId });
+  const count = await MessageCollection.find({ conversationId }).countAsync();
+  console.log('💬 SERVER: Returning', count, 'messages for conversation:', conversationId);
+  
+  return cursor;
 });
 
 // Publication for real-time conversation updates (last message, unread counts)
-Meteor.publish("conversationUpdates", async function() {
-  if (!this.userId) {
+Meteor.publish("conversationUpdates", function(role: Role, roleId: string) {
+  if (!role || !roleId) {
     return this.ready();
   }
-
-  const userInfo = await getUserRoleInfo(this.userId);
-  if (!userInfo) {
-    return this.ready();
-  }
-
-  const { role, roleId } = userInfo;
 
   // Return conversations with only essential fields for real-time updates
   if (role === Role.AGENT) {
