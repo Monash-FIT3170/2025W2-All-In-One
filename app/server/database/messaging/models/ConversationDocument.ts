@@ -1,9 +1,8 @@
 export type ConversationDocument = {
   _id: string;
-  participants: {
-    userId: string;
-    role: 'agent' | 'landlord' | 'tenant';
-  }[];
+  agentId: string; // The agent managing the conversation
+  landlordId?: string; // The landlord (if property-related)
+  tenantId?: string; // The tenant (if property-related)
   propertyId?: string; // Reference to property if property-related
   lastMessage?: {
     text: string;
