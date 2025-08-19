@@ -2,7 +2,7 @@ import React from 'react';
 import { TaskStatus } from '/app/shared/task-status-identifier';
 import { parse, format, compareAsc } from "date-fns";
 import { Task } from '/app/client/library-modules/domain-models/task/Task';
-
+import { useRef, useEffect } from 'react';
 
 interface NotificationBoardProps {
   open: boolean;
@@ -11,9 +11,9 @@ interface NotificationBoardProps {
 }
 
 export function NotificationBoard({ open, onClose, tasks }: NotificationBoardProps) {
-  const popupRef = React.useRef<HTMLDivElement>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) return;
     function handleClickOutside(event: MouseEvent) {
       if (
