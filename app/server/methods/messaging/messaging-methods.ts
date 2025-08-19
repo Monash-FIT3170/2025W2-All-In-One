@@ -23,6 +23,25 @@ const getConversationsForAgentMethod = {
   },
 };
 
+// Simple database method to get conversations for a tenant
+const getConversationsForTenantMethod = {
+  [MeteorMethodIdentifier.CONVERSATIONS_GET_FOR_TENANT]: async (
+    tenantId: string
+  ): Promise<ConversationDocument[]> => {
+    try {
+      // Get conversations where tenant is the tenantId
+      const conversations = await ConversationCollection.find({
+        tenantId: tenantId
+      }).fetchAsync();
+      
+      return conversations;
+    } catch (error) {
+      console.error("Error in getConversationsForTenantMethod:", error);
+      throw error;
+    }
+  },
+};
+
 // Get messages for a specific conversation
 const getMessagesForConversationMethod = {
   [MeteorMethodIdentifier.MESSAGES_GET_FOR_CONVERSATION]: async (
@@ -106,6 +125,7 @@ const insertConversationMethod = {
 
 Meteor.methods({
   ...getConversationsForAgentMethod,
+  ...getConversationsForTenantMethod,
   ...getMessagesForConversationMethod,
   ...sendMessageMethod,
   ...insertConversationMethod,
