@@ -9,13 +9,14 @@ import { DefaultTheme } from "./ui-modules/theming/themes/DefaultTheme";
 import { GuestLandingPage } from "./ui-modules/guest-landing-page/GuestLandingPage";
 import { AgentDashboard } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentDashboard";
 import { AgentCalendar } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentCalendar";
-import { AgentMessage } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentMessage";
+import { AgentMessagePage } from "./ui-modules/role-messages/AgentMessagePage";
 import { AgentTask } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentTask";
 import { AgentProperty } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentProperty";
 import { LandlordDashboard } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordDashboard";
 import { LandlordCalendar } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordCalendar";
 import { LandlordTask } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordTask";
 import { LandlordProperty } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordProperty";
+import { LandlordMessagePage } from "./ui-modules/role-messages/LandlordMessagePage";
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottomNavbar";
 import { TopNavbar } from "./ui-modules/navigation-bars/TopNavbar";
 import { RoleSideNavBar } from "./ui-modules/navigation-bars/side-nav-bars/SideNavbar";
@@ -27,7 +28,7 @@ import TenantDashboard from "./ui-modules/role-dashboard/tenant-dashboard/pages/
 import TenantProperty from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantProperty";
 import { TenantCalendar } from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantCalendar";
 import TenantMaintenance from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMaintenance";
-import TenantMessages from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMessages";
+import { TenantMessagePage } from "./ui-modules/role-messages/TenantMessagePage";
 import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDocument";
 import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
 import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
@@ -133,7 +134,7 @@ function AppRoot(): React.JSX.Element {
                         path={NavigationPath.AgentMessages}
                         element={
                             <AgentRoute>
-                                <AgentMessage />
+                                <AgentMessagePage />
                             </AgentRoute>
                         }
                     />
@@ -188,6 +189,11 @@ function AppRoot(): React.JSX.Element {
                             </LandlordRoute>
                         }
                     />
+          <Route path={NavigationPath.LandlordMessages} element={
+            <LandlordRoute>
+              <LandlordMessagePage />
+            </LandlordRoute>
+          } />
 
                     {/* Tenant-only routes */}
                     <Route
@@ -226,7 +232,7 @@ function AppRoot(): React.JSX.Element {
                         path={NavigationPath.TenantMessages}
                         element={
                             <TenantRoute>
-                                <TenantMessages />
+                                <TenantMessagePage />
                             </TenantRoute>
                         }
                     />
