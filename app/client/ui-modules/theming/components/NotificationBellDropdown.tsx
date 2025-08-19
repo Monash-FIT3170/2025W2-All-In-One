@@ -4,13 +4,13 @@ import { parse, format, compareAsc } from "date-fns";
 import { Task } from '/app/client/library-modules/domain-models/task/Task';
 import { useRef, useEffect } from 'react';
 
-interface NotificationBoardProps {
+interface NotificationDropdownProps {
   open: boolean;
   onClose: () => void;
   tasks: Task[];
 }
 
-export function NotificationBoard({ open, onClose, tasks }: NotificationBoardProps) {
+export function NotificationBellDropdown({ open, onClose, tasks }: NotificationDropdownProps) {
   const popupRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
