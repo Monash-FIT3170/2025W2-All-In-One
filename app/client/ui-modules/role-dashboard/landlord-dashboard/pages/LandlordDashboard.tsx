@@ -8,18 +8,19 @@ import {
   selectTasks,
   selectProperties,
   fetchLandlordDetails,
+  selectLandlordDashboard,
 } from "../state/landlord-dashboard-slice";
 
 export function LandlordDashboard(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const properties = useAppSelector(selectProperties);
   const tasks = useAppSelector(selectTasks);
+  const dashboardData = useAppSelector(selectLandlordDashboard);
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchLandlordDetails(currentUser.userId));
-    }
-    else{
+    } else {
       console.warn("No user ID found. Please log in to view the dashboard.");
     }
   }, [currentUser]);
@@ -29,7 +30,7 @@ export function LandlordDashboard(): React.JSX.Element {
       <div className="flex">
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-bold mb-6">Landlord Dashboard</h1>
-          <LandlordDashboardCards />
+          <LandlordDashboardCards dashboardData={dashboardData} />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <MyProperties properties={properties} />
             <UpcomingTasks tasks={tasks} currentUser={currentUser}/>

@@ -12,7 +12,7 @@ import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboa
 import { currentUserSlice } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
 import { propertyFormSlice } from "./ui-modules/property-form-agent/state/reducers/property-form-slice";
 import { tenantSelectionSlice } from "./ui-modules/review-tenant-modal/state/reducers/tenant-selection-slice";
-
+import { searchResultsSlice } from "./ui-modules/search/state/search-result-slice";
 export const store = configureStore({
   reducer: {
     agentDashboard: agentDashboardSlice.reducer,
@@ -26,6 +26,7 @@ export const store = configureStore({
     signupForm: signupFormSlice.reducer,
     currentUser: currentUserSlice.reducer,
     propertyForm: propertyFormSlice.reducer,
+    searchResults: searchResultsSlice.reducer,
     tenantSelection: tenantSelectionSlice.reducer,
   },
 });
@@ -33,10 +34,10 @@ export const store = configureStore({
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 export type AppThunk<ThunkReturnType = void> = ThunkAction<
-  ThunkReturnType,
-  RootState,
-  unknown,
-  Action
+    ThunkReturnType,
+    RootState,
+    unknown,
+    Action
 >;
 
 // Add type-safe hooks

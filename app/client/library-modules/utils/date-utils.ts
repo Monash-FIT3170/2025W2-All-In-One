@@ -14,3 +14,15 @@ export function getFormattedTimeStringFromDate(date: Date): string {
 
   return timeString;
 }
+
+export const getISODate = (date: Date): string => {
+  return date.toISOString().slice(0, 10);
+};
+
+export const getTodayISODate = (): string => {
+  return new Date().toISOString().slice(0, 10);
+};
+
+export const getTodayAUDate = (): string => {
+  return new Date().toLocaleDateString("en-AU");
+};
