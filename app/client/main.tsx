@@ -15,7 +15,7 @@ import { AgentProperty } from "./ui-modules/role-dashboard/agent-dashboard/pages
 import { LandlordDashboard } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordDashboard";
 import { LandlordCalendar } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordCalendar";
 import { LandlordTask } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordTask";
-import { LandlordProperty } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordProperty";
+import { LandlordProperties } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordProperties";
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottomNavbar";
 import { TopNavbar } from "./ui-modules/navigation-bars/TopNavbar";
 import { RoleSideNavBar } from "./ui-modules/navigation-bars/side-nav-bars/SideNavbar";
@@ -119,7 +119,7 @@ function AppRoot(): React.JSX.Element {
           } />
           <Route path={NavigationPath.LandlordProperties} element={
             <LandlordRoute>
-              <LandlordProperty />
+              <LandlordProperties />
             </LandlordRoute>
           } />
           <Route path={NavigationPath.LandlordCalendar} element={

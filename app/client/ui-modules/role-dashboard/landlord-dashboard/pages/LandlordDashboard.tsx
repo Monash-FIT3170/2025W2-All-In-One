@@ -24,7 +24,7 @@ export function LandlordDashboard(): React.JSX.Element {
       console.warn("No user ID found. Please log in to view the dashboard.");
     }
   }, [currentUser]);
-
+  
   return (
     <div className="min-h-screen">
       <div className="flex">
