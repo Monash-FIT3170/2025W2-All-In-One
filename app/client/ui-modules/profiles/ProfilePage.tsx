@@ -17,7 +17,6 @@ import { Button } from "../theming-shadcn/Button";
 import { PersonalInfoCard } from "./components/PersonalInfoCard";
 import { ContactInfoCard } from "./components/ContactInfoCard";
 import { EmploymentInfoCard } from "./components/EmploymentInfoCard";
-import { VehicleInfoCard } from "./components/VehicleInfoCard";
 import { current } from "@reduxjs/toolkit";
 import { uploadFileHandler } from "../../library-modules/apis/azure/blob-api";
 import { Role } from "/app/shared/user-role-identifier";
@@ -86,7 +85,6 @@ export function ProfilePage(): React.JSX.Element {
         { Component: PersonalInfoCard, key: "personal" },
         { Component: ContactInfoCard, key: "contact" },
         { Component: EmploymentInfoCard, key: "employment" },
-        { Component: VehicleInfoCard, key: "vehicle" },
     ];
 
     return (
@@ -174,9 +172,7 @@ export function ProfilePage(): React.JSX.Element {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-                        <div className="col-span-full flex justify-end"></div>
-
+                    <div className="grid grid-cols-1 gap-6 mb-6">
                         {cards.map(({ Component, key }) => (
                             <Component
                                 key={key}

@@ -12,7 +12,9 @@ import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboa
 import { currentUserSlice } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
 import { propertyFormSlice } from "./ui-modules/property-form-agent/state/reducers/property-form-slice";
 import { tenantSelectionSlice } from "./ui-modules/review-tenant-modal/state/reducers/tenant-selection-slice";
+import { messagesSlice } from "./ui-modules/role-messages/state/reducers/messages-slice";
 import { searchResultsSlice } from "./ui-modules/search/state/search-result-slice";
+
 export const store = configureStore({
   reducer: {
     agentDashboard: agentDashboardSlice.reducer,
@@ -28,6 +30,7 @@ export const store = configureStore({
     propertyForm: propertyFormSlice.reducer,
     searchResults: searchResultsSlice.reducer,
     tenantSelection: tenantSelectionSlice.reducer,
+    messages: messagesSlice.reducer,
   },
 });
 
