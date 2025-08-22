@@ -13,17 +13,20 @@ export type InspectionBookingListUiState = {
   date: string;
   startingTime: string;
   endingTime: string;
+  isBooked?: boolean;
 };
 
 export function PropertyInspections({
   bookingUiStateList,
   onBook,
   userRole,
+  bookedInspections,
   className = "",
 }: {
   bookingUiStateList: InspectionBookingListUiState[];
   onBook: (index: number) => void;
   userRole?: Role;
+  bookedInspections?: Set<number>;
   className?: string;
 }): React.JSX.Element {
   return (
@@ -33,6 +36,7 @@ export function PropertyInspections({
         bookingUiStateList={bookingUiStateList}
         onBook={onBook}
         userRole={userRole}
+        bookedInspections={bookedInspections}
       />
     </div>
   );
@@ -42,11 +46,13 @@ function InspectionBookingList({
   bookingUiStateList,
   onBook,
   userRole,
+  bookedInspections,
   className,
 }: {
   bookingUiStateList: InspectionBookingListUiState[];
   onBook: (index: number) => void;
   userRole?: Role;
+  bookedInspections?: Set<number>;
   className?: string;
 }): React.JSX.Element {
   return (
@@ -56,16 +62,20 @@ function InspectionBookingList({
         className
       )}
     >
-      {bookingUiStateList.map((state, i) => (
-        <BookingEntry
-          key={`${state.date}${state.startingTime}`}
-          bookingState={state}
-          shouldDisplayDivider={i != 0}
-          index={i}
-          onBook={onBook}
-          userRole={userRole}
-        />
-      ))}
+      {bookingUiStateList.map((state, i) => {
+        const isBooked = bookedInspections?.has(i) || false;
+        return (
+          <BookingEntry
+            key={`${state.date}${state.startingTime}`}
+            bookingState={{ ...state, isBooked }}
+            shouldDisplayDivider={i != 0}
+            index={i}
+            onBook={onBook}
+            userRole={userRole}
+            bookedInspections={bookedInspections}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -76,6 +86,7 @@ function BookingEntry({
   index,
   onBook,
   userRole,
+  bookedInspections,
   className = "",
 }: {
   bookingState: InspectionBookingListUiState;
@@ -83,10 +94,13 @@ function BookingEntry({
   index: number;
   onBook: (index: number) => void;
   userRole?: Role;
+  bookedInspections?: Set<number>;
   className?: string;
 }): React.JSX.Element {
   // Only tenants can book inspections
   const canBookInspection = userRole === Role.TENANT;
+  const isBooked = bookingState.isBooked || false;
+  const hasAnyBooking = bookedInspections && bookedInspections.size > 0;
 
   return (
     <div className={twMerge("flex flex-col", className)}>
@@ -101,7 +115,14 @@ function BookingEntry({
         />
         <CalendarIcon className="w-[22px] h-[20px] mr-6" />
         {canBookInspection ? (
-          <BookingButton index={index} onClick={onBook} />
+          isBooked ? (
+            <BookingButton index={index} onClick={onBook} isBooked={true} />
+          ) : hasAnyBooking ? (
+            // Hide button for unbooked inspections when any inspection is booked
+            null
+          ) : (
+            <BookingButton index={index} onClick={onBook} isBooked={false} />
+          )
         ) : (
           <div className="text-sm text-gray-500 italic">
             {userRole === Role.AGENT ? "Agents cannot book inspections" :
@@ -137,12 +158,26 @@ function BookingDateTime({
 function BookingButton({
   index,
   onClick,
+  isBooked,
   className = "",
 }: {
   index: number;
   onClick: (index: number) => void;
+  isBooked: boolean;
   className?: string;
 }): React.JSX.Element {
+  if (isBooked) {
+    return (
+      <ThemedButton
+        variant={ThemedButtonVariant.TERTIARY}
+        onClick={() => {}} // No-op function for booked state
+        className={twMerge("w-[117px] h-[36px] opacity-50 cursor-not-allowed", className)}
+      >
+        Booked
+      </ThemedButton>
+    );
+  }
+
   return (
     <ThemedButton
       variant={ThemedButtonVariant.TERTIARY}

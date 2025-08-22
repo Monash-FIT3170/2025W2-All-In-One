@@ -168,6 +168,7 @@ export function PropertyListingPage({
             // Change value of "1" later to property ID
             dispatch(submitDraftListingAsync(state.propertyId));
           }}
+          bookedInspections={bookedInspections}
           className={twMerge("p-5", className)}
         />
       </>
@@ -210,6 +211,7 @@ function ListingPageContent({
   onApply,
   onContactAgent,
   onSubmitDraftListing,
+  bookedInspections,
   className = "",
 }: {
   streetNumber: string;
@@ -246,6 +248,7 @@ function ListingPageContent({
   onApply: () => void;
   onContactAgent: () => void;
   onSubmitDraftListing: () => void;
+  bookedInspections?: Set<number>;
   className?: string;
 }): React.JSX.Element {
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
@@ -294,6 +297,7 @@ function ListingPageContent({
         onBook={onBook}
         propertyFeatures={propertyFeatures}
         userRole={authUser?.role}
+        bookedInspections={bookedInspections}
         className="mb-6"
       />
       <BottomBar
@@ -452,6 +456,7 @@ function ListingDetails({
   onBook,
   propertyFeatures,
   userRole,
+  bookedInspections,
   className = "",
 }: {
   propertyDescription: string;
@@ -460,6 +465,7 @@ function ListingDetails({
   onBook: (index: number) => void;
   propertyFeatures: string[];
   userRole: Role | undefined;
+  bookedInspections?: Set<number>;
   className?: string;
 }): React.JSX.Element {
   return (
@@ -473,6 +479,7 @@ function ListingDetails({
           bookingUiStateList={inspectionBookingUiStateList}
           onBook={onBook}
           userRole={userRole}
+          bookedInspections={bookedInspections}
           className="w-full"
         />
       </div>
