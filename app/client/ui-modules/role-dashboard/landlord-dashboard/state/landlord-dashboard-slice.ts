@@ -8,10 +8,16 @@ import {
   fetchLandlordDashboardData,
   getAllPropertiesByLandlordId,
 } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
+import { getListingByPropertyId } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
+
+// Type for Property with image URLs
+export type PropertyWithImages = Property & {
+  imageUrls: string[];
+};
 
 interface LandlordDashboardState {
   isLoading: boolean;
-  properties: Property[];
+  properties: PropertyWithImages[];
   tasks: Task[];
   dashboardData: {
     propertyCount: number;
@@ -79,9 +85,29 @@ export const fetchLandlordDetails = createAsyncThunk(
     try {
       const landlordResponse = await getLandlordById(userId);
       const landlordId = landlordResponse?.landlordId;
-      properties = await getAllPropertiesByLandlordId(
-        landlordResponse.landlordId
+      
+      // Fetch properties
+      properties = await getAllPropertiesByLandlordId(landlordResponse.landlordId);
+      
+      // Fetch images for each property
+      const propertiesWithImages = await Promise.all(
+        properties.map(async (property): Promise<PropertyWithImages> => {
+          try {
+            const listing = await getListingByPropertyId(property.propertyId);
+            return {
+              ...property,
+              imageUrls: listing.image_urls || []
+            };
+          } catch (error) {
+            console.warn(`No listing found for property ${property.propertyId}`);
+            return {
+              ...property,
+              imageUrls: []
+            };
+          }
+        })
       );
+      
       taskDetails = await Promise.all(
         landlordResponse.tasks.map((taskId) => {
           return getTaskById(taskId);
@@ -90,7 +116,7 @@ export const fetchLandlordDetails = createAsyncThunk(
       const dashboardData = await fetchLandlordDashboardData(landlordId);
 
       return {
-        properties: properties,
+        properties: propertiesWithImages,
         taskDetails: taskDetails,
         propertyCount: dashboardData.totalPropertyCount,
         statusCounts: dashboardData.propertyStatusCounts,
@@ -118,7 +144,7 @@ export const landlordDashboardSlice = createSlice({
     ) => {
       state.tasks = action.payload;
     },
-    setProperties: (state, action: PayloadAction<Property[]>) => {
+    setProperties: (state, action: PayloadAction<PropertyWithImages[]>) => {
       state.properties = action.payload;
     },
     setError: (state, action: PayloadAction<string | null>) => {

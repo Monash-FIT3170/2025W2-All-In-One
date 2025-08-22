@@ -3,12 +3,14 @@ import { useAppDispatch, useAppSelector } from "../../../../store";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { selectProperties, fetchLandlordDetails } from "../state/landlord-dashboard-slice";
-import PropertyCard from "../components/PropertyCard";
+import PropertyCard from "../../components/PropertyCard";
 
 export function LandlordProperties(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const properties = useAppSelector(selectProperties);
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
+
+  console.log(properties);
   
   
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,7 +27,6 @@ export function LandlordProperties(): React.JSX.Element {
     { label: "All", value: "All" },
     { label: "Occupied", value: PropertyStatus.OCCUPIED },
     { label: "Vacant", value: PropertyStatus.VACANT },
-    { label: "Maintenance", value: PropertyStatus.UNDER_MAINTENANCE },
   ];
 
   // Filter and search properties
@@ -55,7 +56,10 @@ export function LandlordProperties(): React.JSX.Element {
     <div className="min-h-screen bg-gray-50">
       <div className="flex">
         <div className="flex-1 p-6">
-          <h1 className="text-2xl font-bold mb-6">Properties You Own</h1>
+          {/* Header with title */}
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold">Properties You Own</h1>
+          </div>
           
           {/* Search and Filter Section */}
           <div className="flex items-center gap-4 mb-6 bg-white p-4 rounded-lg shadow-sm">
