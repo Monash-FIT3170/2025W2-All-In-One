@@ -181,10 +181,6 @@ async function tempSeedProfileData(): Promise<void> {
       workAddress: "Jungle Biome",
       workPhone: "0122 222 123",
       profilePicture: "img.com",
-      carMake: "Toyota",
-      carModel: "Prius",
-      carYear: "2000",
-      carPlate: "DXW003",
     });
   }
   if ((await PropertyCollection.find().countAsync()) === 0) {
@@ -193,7 +189,7 @@ async function tempSeedProfileData(): Promise<void> {
     const statuses = [
       { _id: "1", name: PropertyStatus.VACANT },
       { _id: "2", name: PropertyStatus.OCCUPIED },
-      { _id: "3", name: PropertyStatus.CLOSED},
+      { _id: "3", name: PropertyStatus.VACANT},
     ];
 
 		// Add new status if it doesn't exist
@@ -626,6 +622,8 @@ async function tempSeedTaskData(): Promise<void> {
       dueDate: new Date("2025-05-19T10:00:00Z"),
       description: "Meet with the client to discuss the property listing process and gather necessary information.",
       priority: TaskPriority.HIGH,
+      taskPropertyAddress: "", 
+      taskPropertyId: "", 
     });
 
     TaskCollection.insertAsync({
@@ -636,6 +634,8 @@ async function tempSeedTaskData(): Promise<void> {
       dueDate: new Date("2025-05-27T10:00:00Z"),
       description: "Check in with the client to provide updates and address any questions.",
       priority: TaskPriority.MEDIUM,
+      taskPropertyAddress: "", 
+      taskPropertyId: "", 
     });
     await TaskCollection.insertAsync({
       _id: "3",
@@ -645,6 +645,8 @@ async function tempSeedTaskData(): Promise<void> {
       dueDate: new Date("2025-05-28T10:00:00Z"),
       description: "Review the list of agent approved candidates and pick one.",
       priority: TaskPriority.MEDIUM,
+      taskPropertyAddress: "", 
+      taskPropertyId: "", 
     });
     await TaskCollection.insertAsync({
       _id: "4",
@@ -654,6 +656,8 @@ async function tempSeedTaskData(): Promise<void> {
       dueDate: new Date("2025-05-27T10:00:00Z"),
       description: "Attend a property listing meeting with agent.",
       priority: TaskPriority.MEDIUM,
+      taskPropertyAddress: "", 
+      taskPropertyId: "", 
     });
     await TaskCollection.insertAsync({
       _id: "5",
@@ -663,6 +667,8 @@ async function tempSeedTaskData(): Promise<void> {
       dueDate: new Date("2025-05-27T10:00:00Z"),
       description: "Attend the annual inspection.",
       priority: TaskPriority.MEDIUM,
+      taskPropertyAddress: "", 
+      taskPropertyId: "", 
     });
     await TaskCollection.insertAsync({
       _id: "6",
@@ -672,6 +678,8 @@ async function tempSeedTaskData(): Promise<void> {
       dueDate: new Date("2025-05-27T10:00:00Z"),
       description: "Sign the rental agreement which has had the rent increased by 5%.",
       priority: TaskPriority.MEDIUM,
+      taskPropertyAddress: "", 
+      taskPropertyId: "", 
     });
 
 		console.log("Tasks seeded successfully.");
@@ -716,7 +724,7 @@ async function permSeedListingStatusData(): Promise<void> {
 		});
 		await ListingStatusCollection.insertAsync({
 			_id: "3",
-			name: ListingStatus.TENANT_SELECTION,
+			name: ListingStatus.CLOSED,
 		});
 		await ListingStatusCollection.insertAsync({
 			_id: "4",

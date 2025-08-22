@@ -27,7 +27,7 @@ export function AgentProperty(): React.JSX.Element {
     ListingStatus.DRAFT,  
     PropertyStatus.VACANT,  
     PropertyStatus.OCCUPIED,
-    PropertyStatus.CLOSED,   
+    ListingStatus.CLOSED,   
   ];
   useEffect(() => {
     // Fetch agent properties when the component mounts
@@ -100,10 +100,10 @@ export function AgentProperty(): React.JSX.Element {
                       switch (statusFilter) {
                         case ListingStatus.DRAFT:
                         case ListingStatus.LISTED:
+                        case ListingStatus.CLOSED:
                           matchesStatus = listingStatus === statusFilter;
                           break;
                         case PropertyStatus.OCCUPIED:
-                        case PropertyStatus.CLOSED:
                           matchesStatus = propertyStatus === statusFilter; // filter already uppercase for property statuses
                           break;
                         default:
