@@ -49,6 +49,5 @@ export enum MeteorMethodIdentifier {
   TENANT_APPLICATION_GET_BY_LANDLORD_ID = "tenantApplications.getByLandlordId",
   TENANT_APPLICATION_INSERT = "tenantApplications.insert",
   TENANT_APPLICATION_UPDATE_STATUS = "tenantApplications.updateStatus",
-  TENANT_APPLICATION_UPDATE_MULTIPLE_STATUS = "tenantApplications.updateMultipleStatus",
   PROPERTY_SEARCH = "PROPERTY_SEARCH",
 }

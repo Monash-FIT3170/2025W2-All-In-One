@@ -25,7 +25,7 @@ const tenantApplicationGetByPropertyIdMethod = {
   [MeteorMethodIdentifier.TENANT_APPLICATION_GET_BY_PROPERTY_ID]: async (
     propertyId: string
   ): Promise<ApiTenantApplication[]> => {
-    const applications = await TenantApplicationCollection.findAsync({ propertyId });
+    const applications = await TenantApplicationCollection.find({ propertyId }).fetchAsync();
     return applications.map(mapTenantApplicationDocumentToDTO);
   },
 };
@@ -35,7 +35,7 @@ const tenantApplicationGetByLandlordIdMethod = {
   [MeteorMethodIdentifier.TENANT_APPLICATION_GET_BY_LANDLORD_ID]: async (
     landlordId: string
   ): Promise<ApiTenantApplication[]> => {
-    const applications = await TenantApplicationCollection.findAsync({ landlordId });
+    const applications = await TenantApplicationCollection.find({ landlordId }).fetchAsync();
     return applications.map(mapTenantApplicationDocumentToDTO);
   },
 };
@@ -67,34 +67,9 @@ const tenantApplicationInsertMethod = {
   },
 };
 
-// UPDATE TENANT APPLICATION STATUS
+// UPDATE TENANT APPLICATIONS STATUS
 const tenantApplicationUpdateStatusMethod = {
   [MeteorMethodIdentifier.TENANT_APPLICATION_UPDATE_STATUS]: async (
-    applicationId: string,
-    status: string,
-    step: number,
-    taskId?: string
-  ): Promise<void> => {
-    const updateData: any = {
-      status,
-      step,
-      updatedAt: new Date(),
-    };
-
-    if (taskId) {
-      updateData.taskId = taskId;
-    }
-
-    await TenantApplicationCollection.updateAsync(
-      { _id: applicationId },
-      { $set: updateData }
-    );
-  },
-};
-
-// UPDATE MULTIPLE TENANT APPLICATIONS STATUS
-const tenantApplicationUpdateMultipleStatusMethod = {
-  [MeteorMethodIdentifier.TENANT_APPLICATION_UPDATE_MULTIPLE_STATUS]: async (
     applicationIds: string[],
     status: string,
     step: number,
@@ -122,5 +97,4 @@ Meteor.methods({
   ...tenantApplicationGetByLandlordIdMethod,
   ...tenantApplicationInsertMethod,
   ...tenantApplicationUpdateStatusMethod,
-  ...tenantApplicationUpdateMultipleStatusMethod,
 });

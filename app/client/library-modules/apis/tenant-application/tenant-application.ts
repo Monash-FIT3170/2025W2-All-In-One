@@ -37,30 +37,23 @@ export async function apiGetTenantApplicationsByLandlordId(landlordId: string): 
     }
   }
 
-  export async function apiUpdateTenantApplicationStatus(
-    applicationId: string,
+  export async function apiUpdateTenantApplicationStatuses(
+    applicationIds: string | string[],
     status: string,
     step: number,
     taskId?: string
   ): Promise<void> {
     try {
-      await Meteor.callAsync(MeteorMethodIdentifier.TENANT_APPLICATION_UPDATE_STATUS, applicationId, status, step, taskId);
-    } catch (error) {
-      console.error('Failed to update tenant application status:', error);
-      throw error;
-    }
-  }
+      // Convert single ID to array for consistency
+      const ids = Array.isArray(applicationIds) ? applicationIds : [applicationIds];
 
-  export async function apiUpdateMultipleTenantApplicationStatus(
-    applicationIds: string[],
-    status: string,
-    step: number,
-    taskId?: string
-  ): Promise<void> {
-    try {
-      await Meteor.callAsync(MeteorMethodIdentifier.TENANT_APPLICATION_UPDATE_MULTIPLE_STATUS, applicationIds, status, step, taskId);
+      if (ids.length === 0) {
+        throw new Error('No application IDs provided');
+      }
+
+      await Meteor.callAsync(MeteorMethodIdentifier.TENANT_APPLICATION_UPDATE_STATUS, ids, status, step, taskId);
     } catch (error) {
-      console.error('Failed to update multiple tenant application statuses:', error);
+      console.error('Failed to update tenant application status(es):', error);
       throw error;
     }
   }

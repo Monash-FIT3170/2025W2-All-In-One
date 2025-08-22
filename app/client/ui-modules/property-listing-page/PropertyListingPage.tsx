@@ -252,10 +252,12 @@ function ListingPageContent({
   className?: string;
 }): React.JSX.Element {
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
+
   const acceptedApplicantCount = useAppSelector((state) => selectAcceptedApplicantCountForProperty(state, propertyId));
   const hasAcceptedApplications = useAppSelector((state) => selectHasAcceptedApplicationsForProperty(state, propertyId));
   const tenantApplications = useAppSelector((state) => selectFilteredApplications(state, propertyId));
   const isCreatingApplication = useAppSelector((state) => state.tenantSelection.isLoading);
+
   const shouldShowSendToLandlordButton = hasAcceptedApplications;
 
 
