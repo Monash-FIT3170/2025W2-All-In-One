@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ReviewTenantModalProps } from './types/ReviewTenantModalProps';
 import { FilterType } from './enums/FilterType';
 import { ModalHeader } from './components/ModalHeader';
@@ -14,7 +14,7 @@ import {
   selectActiveFilter,
 } from './state/reducers/tenant-selection-slice';
 
-export function ReviewTenantModal({
+export const ReviewTenantModal = React.memo(({
   isOpen,
   onClose,
   onReject,
@@ -24,27 +24,30 @@ export function ReviewTenantModal({
   acceptedApplicantCount,
   userRole,
   tenantApplications = [], // Receive applications as props
-}: ReviewTenantModalProps): React.JSX.Element {
+}: ReviewTenantModalProps): React.JSX.Element => {
   const dispatch = useAppDispatch();
-  const activeFilter = useAppSelector(selectActiveFilter)
-  const handleReject = (applicationId: string) => {
+  const activeFilter = useAppSelector(selectActiveFilter);
+  const isLoading = useAppSelector((state) => state.tenantSelection.isLoading);
+  const error = useAppSelector((state) => state.tenantSelection.error);
+
+  const handleReject = useCallback((applicationId: string) => {
     dispatch(rejectTenantApplicationAsync(applicationId));
     onReject(applicationId);
-  };
+  }, [dispatch, onReject]);
 
-  const handleAccept = (applicationId: string) => {
+  const handleAccept = useCallback((applicationId: string) => {
     dispatch(acceptTenantApplicationAsync(applicationId));
     onAccept(applicationId);
-  };
+  }, [dispatch, onAccept]);
 
-  const handleSendToLandlord = () => {
+  const handleSendToLandlord = useCallback(() => {
     dispatch(sendAcceptedApplicationsToLandlordAsync());
     onSendToLandlord();
-  };
+  }, [dispatch, onSendToLandlord]);
 
-  const handleFilterChange = (filter: FilterType) => {
+  const handleFilterChange = useCallback((filter: FilterType) => {
     dispatch(setFilter(filter));
-  };
+  }, [dispatch]);
 
   if (!isOpen) return <></>;
 
@@ -58,14 +61,24 @@ export function ReviewTenantModal({
           onFilterChange={handleFilterChange}
         />
 
+        {/* Error Display */}
+        {error && (
+          <div className="px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded mx-4 mb-2">
+            {error}
+          </div>
+        )}
+
+        {/* Loading Overlay */}
+        {isLoading && (
+          <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+            <div className="text-gray-600">Processing...</div>
+          </div>
+        )}
+
         <ModalContent
           tenantApplications={tenantApplications}
           onReject={handleReject}
           onAccept={handleAccept}
-          onSendToLandlord={(applicationId: string) => {
-            // This could be used for individual applications
-            console.log(`Send individual application ${applicationId} to landlord`);
-          }}
           userRole={userRole}
         />
 
@@ -74,7 +87,8 @@ export function ReviewTenantModal({
           <div className="p-4 border-t">
             <button
               onClick={handleSendToLandlord}
-              className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+              disabled={isLoading}
+              className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               Send {acceptedApplicantCount} Accepted Applicant(s) to Landlord
             </button>
@@ -85,4 +99,4 @@ export function ReviewTenantModal({
       </div>
     </div>
   );
-}
+});

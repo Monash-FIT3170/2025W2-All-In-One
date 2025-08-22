@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { TenantApplication } from '../types/TenantApplication';
 import { TenantApplicationStatus } from '../enums/TenantApplicationStatus';
-import { BackgroundCheckStatus } from '../enums/BackgroundCheckStatus';
-import { StatusBadge, BackgroundBadge } from './StatusBadges';
-import { RejectButton, AcceptButton, BackgroundPassButton, BackgroundFailButton, SendToLandlordButton } from '../../property-listing-page/components/TenantReviewButtons';
+import { StatusBadge } from './StatusBadges';
+import { RejectButton, AcceptButton } from '../../property-listing-page/components/TenantReviewButtons';
 import { UserAccount } from '/app/client/library-modules/domain-models/user/UserAccount';
 import { Role } from '/app/shared/user-role-identifier';
 
@@ -11,17 +10,23 @@ type TenantApplicationCardProps = {
   application: TenantApplication;
   onReject: (applicationId: string) => void;
   onAccept: (applicationId: string) => void;
-  onSendToLandlord: (applicationId: string) => void;
   userRole?: UserAccount["role"];
 }
 
-export function TenantApplicationCard({
+export const TenantApplicationCard = React.memo(({
   application,
   onReject,
   onAccept,
-  onSendToLandlord,
   userRole,
-}: TenantApplicationCardProps): React.JSX.Element {
+}: TenantApplicationCardProps): React.JSX.Element => {
+  const handleReject = useCallback(() => {
+    onReject(application.id);
+  }, [onReject, application.id]);
+
+  const handleAccept = useCallback(() => {
+    onAccept(application.id);
+  }, [onAccept, application.id]);
+
   return (
     <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
       <div className="flex flex-col flex-1">
@@ -41,8 +46,8 @@ export function TenantApplicationCard({
         <div className="flex gap-2">
           {application.status === TenantApplicationStatus.UNDETERMINED && (
             <>
-              <RejectButton onClick={() => onReject(application.id)} />
-              <AcceptButton onClick={() => onAccept(application.id)} />
+              <RejectButton onClick={handleReject} />
+              <AcceptButton onClick={handleAccept} />
             </>
           )}
 
@@ -59,4 +64,4 @@ export function TenantApplicationCard({
       </div>
     </div>
   );
-}
+});
