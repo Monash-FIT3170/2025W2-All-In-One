@@ -423,4 +423,12 @@ export const selectFilteredApplications = (state: RootState, propertyId: string)
   }
 };
 
+// Check if current user has already applied for the property (to disable apply button)
+export const selectHasCurrentUserApplied = (state: RootState, propertyId: string, currentUserName?: string) => {
+  if (!currentUserName) return false;
+
+  const applications = selectApplicationsForProperty(state, propertyId);
+  return applications.some((app: TenantApplication) => app.name === currentUserName);
+};
+
 export default tenantSelectionSlice.reducer;

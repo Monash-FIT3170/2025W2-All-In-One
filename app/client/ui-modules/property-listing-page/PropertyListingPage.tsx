@@ -47,6 +47,7 @@ import {
   selectAcceptedApplicantCountForProperty,
   selectHasAcceptedApplicationsForProperty,
   selectFilteredApplications,
+  selectHasCurrentUserApplied,
   createTenantApplicationAsync,
 } from "../review-tenant-modal/state/reducers/tenant-selection-slice";
 import { Role } from "/app/shared/user-role-identifier";
@@ -120,6 +121,7 @@ export function PropertyListingPage({
           propertyId={state.propertyId}
           currentUser={currentUser}
           authUser={authUser}
+          profileData={profileData}
           onBack={() => {
             console.log("back button pressed");
           }}
@@ -206,6 +208,7 @@ function ListingPageContent({
   propertyId,
   currentUser,
   authUser,
+  profileData,
   onBack,
   onBook,
   onApply,
@@ -243,6 +246,7 @@ function ListingPageContent({
   propertyId: string;
   currentUser: any;
   authUser: any;
+  profileData: any;
   onBack: () => void;
   onBook: (index: number) => void;
   onApply: () => void;
@@ -257,6 +261,10 @@ function ListingPageContent({
   const hasAcceptedApplications = useAppSelector((state) => selectHasAcceptedApplicationsForProperty(state, propertyId));
   const tenantApplications = useAppSelector((state) => selectFilteredApplications(state, propertyId));
   const isCreatingApplication = useAppSelector((state) => state.tenantSelection.isLoading);
+
+  // Get current user's name for checking if they've already applied
+  const currentUserName = profileData ? `${profileData.firstName} ${profileData.lastName}` : undefined;
+  const hasCurrentUserApplied = useAppSelector((state) => selectHasCurrentUserApplied(state, propertyId, currentUserName));
 
   const shouldShowSendToLandlordButton = hasAcceptedApplications;
 
@@ -290,6 +298,7 @@ function ListingPageContent({
         onContactAgent={onContactAgent}
         isApplying={isCreatingApplication}
         userRole={authUser?.role}
+        hasApplied={hasCurrentUserApplied}
         className="mb-6"
       />
       <ListingDetails
@@ -391,6 +400,7 @@ function ListingHero({
   onContactAgent,
   isApplying,
   userRole,
+  hasApplied,
 }: {
   className?: string;
   streetNumber: string;
@@ -412,6 +422,7 @@ function ListingHero({
   onContactAgent: () => void;
   isApplying: boolean;
   userRole: Role | undefined;
+  hasApplied: boolean;
 }): React.JSX.Element {
   return (
     <div className={twMerge("flex", className)}>
@@ -443,7 +454,7 @@ function ListingHero({
           className="w-full mb-8"
         />
         <div className="flex">
-          <ApplyButton onClick={onApply} isLoading={isApplying} userRole={userRole} className="mr-4" />
+          <ApplyButton onClick={onApply} isLoading={isApplying} userRole={userRole} hasApplied={hasApplied} className="mr-4" />
           <ContactAgentButton onClick={onContactAgent} />
         </div>
       </div>

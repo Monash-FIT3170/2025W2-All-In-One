@@ -11,21 +11,26 @@ export function ApplyButton({
   className="",
   isLoading = false,
   userRole,
+  hasApplied = false,
 }: {
   onClick: () => void;
   className?: string;
   isLoading?: boolean;
   userRole?: Role;
+  hasApplied?: boolean;
 }): React.JSX.Element {
-  // Determine button text based on user role
+  // Determine button text based on user role and application status
   let buttonText = "Apply";
-  let isDisabled = isLoading;
+  let isDisabled = isLoading || hasApplied;
 
   if (userRole === Role.AGENT) {
     buttonText = "Agents cannot apply";
     isDisabled = true;
   } else if (userRole === Role.LANDLORD) {
     buttonText = "Landlords cannot apply";
+    isDisabled = true;
+  } else if (hasApplied) {
+    buttonText = "Already Applied";
     isDisabled = true;
   } else if (isLoading) {
     buttonText = "Applying...";
@@ -35,7 +40,11 @@ export function ApplyButton({
     <ThemedButton
       variant={ThemedButtonVariant.SECONDARY}
       onClick={isDisabled ? () => {} : onClick}
-      className={twMerge("w-[128px]", className)}
+      className={twMerge(
+        "w-[128px]",
+        isDisabled && hasApplied ? "opacity-50 cursor-not-allowed" : "",
+        className
+      )}
     >
       <span className="text-[14px]">
         {buttonText}
