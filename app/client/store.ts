@@ -1,5 +1,6 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import { agentDashboardSlice } from "./ui-modules/role-dashboard/agent-dashboard/state/agent-dashboard-slice";
+import { agentPropertySlice } from "./ui-modules/role-dashboard/agent-dashboard/state/agent-property-slice";
 import { landlordDashboardSlice } from "./ui-modules/role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
 import { guestLandingPageSlice } from "./ui-modules/guest-landing-page/state/reducers/guest-landing-page-slice";
 import { settingsPageSlice } from "./ui-modules/settings-page/state/reducers/settings-page-slice";
@@ -15,6 +16,7 @@ import { propertyFormSlice } from "./ui-modules/property-form-agent/state/reduce
 export const store = configureStore({
   reducer: {
     agentDashboard: agentDashboardSlice.reducer,
+    agentProperties: agentPropertySlice.reducer,
     tenantDashboard: tenantDashboardSlice.reducer,
     guestLandingPage: guestLandingPageSlice.reducer,
     settingsPage: settingsPageSlice.reducer,

@@ -33,6 +33,7 @@ import { PropertyStatus } from "../shared/api-models/property/PropertyStatus";
 import "/app/server/methods/property/property-features/property-features-methods";
 import { ListingStatus } from "../shared/api-models/property-listing/ListingStatus";
 import { PropertyDocument } from "./database/property/models/PropertyDocument";
+import { TaskPriority } from "../shared/task-priority-identifier";
 
 let globalAgent: ApiAgent;
 let globalTenant: ApiTenant;
@@ -177,7 +178,7 @@ async function tempSeedProfileData(): Promise<void> {
     const statuses = [
       { _id: "1", name: PropertyStatus.VACANT },
       { _id: "2", name: PropertyStatus.OCCUPIED },
-      { _id: "3", name: PropertyStatus.UNDER_MAINTENANCE },
+      { _id: "3", name: PropertyStatus.CLOSED},
     ];
 
     // Add new status if it doesn't exist
@@ -597,7 +598,7 @@ async function tempSeedTaskData(): Promise<void> {
       createdDate: new Date("2025-04-12T10:00:00Z"),
       dueDate: new Date("2025-05-19T10:00:00Z"),
       description: "Meet with the client to discuss the property listing process and gather necessary information.",
-      priority: "High",
+      priority: TaskPriority.HIGH,
     });
 
     TaskCollection.insertAsync({
@@ -607,7 +608,7 @@ async function tempSeedTaskData(): Promise<void> {
       createdDate: new Date("2025-04-20T10:00:00Z"),
       dueDate: new Date("2025-05-27T10:00:00Z"),
       description: "Check in with the client to provide updates and address any questions.",
-      priority: "Medium",
+      priority: TaskPriority.MEDIUM,
     });
     await TaskCollection.insertAsync({
       _id: "3",
@@ -616,7 +617,7 @@ async function tempSeedTaskData(): Promise<void> {
       createdDate: new Date("2025-04-20T10:00:00Z"),
       dueDate: new Date("2025-05-28T10:00:00Z"),
       description: "Review the list of agent approved candidates and pick one.",
-      priority: "Medium",
+      priority: TaskPriority.MEDIUM,
     });
     await TaskCollection.insertAsync({
       _id: "4",
@@ -625,7 +626,7 @@ async function tempSeedTaskData(): Promise<void> {
       createdDate: new Date("2025-04-20T10:00:00Z"),
       dueDate: new Date("2025-05-27T10:00:00Z"),
       description: "Attend a property listing meeting with agent.",
-      priority: "Medium",
+      priority: TaskPriority.MEDIUM,
     });
     await TaskCollection.insertAsync({
       _id: "5",
@@ -634,7 +635,7 @@ async function tempSeedTaskData(): Promise<void> {
       createdDate: new Date("2025-04-20T10:00:00Z"),
       dueDate: new Date("2025-05-27T10:00:00Z"),
       description: "Attend the annual inspection.",
-      priority: "Medium",
+      priority: TaskPriority.MEDIUM,
     });
     await TaskCollection.insertAsync({
       _id: "6",
@@ -643,7 +644,7 @@ async function tempSeedTaskData(): Promise<void> {
       createdDate: new Date("2025-04-20T10:00:00Z"),
       dueDate: new Date("2025-05-27T10:00:00Z"),
       description: "Sign the rental agreement which has had the rent increased by 5%.",
-      priority: "Medium",
+      priority: TaskPriority.MEDIUM,
     });
 
     console.log("Tasks seeded successfully.");

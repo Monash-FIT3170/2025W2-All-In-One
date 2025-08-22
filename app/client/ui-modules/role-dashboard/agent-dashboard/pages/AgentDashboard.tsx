@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import { UpcomingTasks } from "../../components/UpcomingTask";
 import { PropertyOverview } from "../components/PropertyOverview";
 import { DashboardCards } from "../components/DashboardCard";
@@ -10,6 +9,8 @@ import {
   selectProperties,
   selectTasks,
 } from "../state/agent-dashboard-slice";
+import { useEffect } from "react";
+import React from "react";
 
 export function AgentDashboard(): React.JSX.Element {
   const dispatch = useAppDispatch(); // is used to dispatch actions to the Redux store.
