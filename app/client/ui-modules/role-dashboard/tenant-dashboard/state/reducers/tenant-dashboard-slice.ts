@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../../../../store";
+import { RootState } from "../../../../../store";
 import { getPropertyByTenantId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { getTenantById } from "/app/client/library-modules/domain-models/user/role-repositories/tenant-repository";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
