@@ -20,7 +20,7 @@ export default function FormPropertyImages({
 }: {
   form: UseFormReturn<FormSchemaType>;
 }) {
-  const [files, setFiles] = useState<(File | string)[] | null>(null);
+  const [files, setFiles] = useState<(File | string)[] | null>(null); // Contains files (new images) and URLs (existing images)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [draggedOver, setDraggedOver] = useState<number | null>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
@@ -94,6 +94,7 @@ export default function FormPropertyImages({
     if (files) {
       const newFiles = files.filter((_, index) => index !== indexToRemove);
       setFiles(newFiles.length > 0 ? newFiles : null);
+      console.log("DELETED: Photo deleted. Updated files:", newFiles.length > 0 ? newFiles : null);
     }
   };
 
@@ -125,6 +126,7 @@ export default function FormPropertyImages({
     newFiles.splice(dropIndex, 0, draggedFile);
     
     setFiles(newFiles);
+    console.log("REORDERED: Photos reordered. Updated files:", newFiles);
     setDraggedIndex(null);
     setDraggedOver(null);
   };
@@ -141,16 +143,21 @@ export default function FormPropertyImages({
     if (!allFiles || allFiles.length === 0) {
       if (files) {
         const urlsOnly = files.filter(f => typeof f === 'string');
-        setFiles(urlsOnly.length > 0 ? urlsOnly : null);
+        const result = urlsOnly.length > 0 ? urlsOnly : null;
+        setFiles(result);
+        console.log("CLEARED: All new files cleared. Updated files:", result);
       } else {
         setFiles(null);
+        console.log("CLEARED: No files to clear. Updated files:", null);
       }
       return;
     }
 
     // Preserve URLs, replace Files with new selection
     const urlsOnly = files ? files.filter(f => typeof f === 'string') : [];
-    setFiles([...urlsOnly, ...allFiles]);
+    const result = [...urlsOnly, ...allFiles];
+    setFiles(result);
+    console.log("ADDED: New files added. Updated files:", result);
   };
 
   return (
