@@ -21,68 +21,15 @@ export default function FormPropertyImages({
 }: {
   form: UseFormReturn<FormSchemaType>;
 }) {
-  const [files, setFiles] = useState<(File | string)[] | null>(null); // Contains files (new images) and URLs (existing images)
+  const [files, setFiles] = useState<(File | string)[] | null>(form.getValues("images")); // Contains files (new images) and URLs (existing images)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [draggedOver, setDraggedOver] = useState<number | null>(null);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-
-  // Initialize with existing images from form
-  useEffect(() => {
-    const existingImages = form.getValues("images");
-    if (existingImages && existingImages.length > 0) {
-      setFiles(existingImages);
-      
-      // Create preview URLs - for existing URLs, use them directly; for files, create object URLs
-      const newPreviewUrls = existingImages.map(item => 
-        typeof item === 'string' ? item : URL.createObjectURL(item)
-      );
-      setPreviewUrls(newPreviewUrls);
-    }
-  }, []);
 
   // Updates form when files state changes
   useEffect(() => {
-    if (files) {
-      form.setValue("images", files, { shouldValidate: true });
-      
-      // Create preview URLs for files, keeping existing URLs as is
-      const newPreviewUrls = files.map(item => {
-        if (typeof item === 'string') {
-          return item; // Existing URL
-        } else {
-          return URL.createObjectURL(item); // New file
-        }
-      });
-      
-      // Clean up old URLs that are no longer needed
-      previewUrls.forEach(url => {
-        if (!newPreviewUrls.includes(url)) {
-          URL.revokeObjectURL(url);
-        }
-      });
-      
-      setPreviewUrls(newPreviewUrls);
-    } else {
-      // When files is null (all images deleted), set form to empty array
-      form.setValue("images", [], { shouldValidate: true });
-      // Clean up URLs when files are cleared
-      previewUrls.forEach(url => {
-        if (url.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
-        }
-      });
-      setPreviewUrls([]);
-    }
+    form.setValue("images", files || [], { shouldValidate: true });
+    console.log("FORM UPDATE: Form images updated:", files);
   }, [files]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      previewUrls.forEach(url => {
-        URL.revokeObjectURL(url);
-      });
-    };
-  }, []);
 
   const dropZoneConfig = {
     maxFiles: 20,
@@ -140,23 +87,28 @@ export default function FormPropertyImages({
 
   // Handle new file uploads
   const handleNewFiles = (allFiles: File[] | null) => {
-    // If no files, preserve only URLs (existing images)
-    if (!allFiles || allFiles.length === 0) {
-      if (files) {
-        const urlsOnly = files.filter(f => typeof f === 'string');
-        const result = urlsOnly.length > 0 ? urlsOnly : null;
-        setFiles(result);
-        console.log("CLEARED: All new files cleared. Updated files:", result);
-      } else {
-        setFiles(null);
-        console.log("CLEARED: No files to clear. Updated files:", null);
-      }
+    if (!allFiles) {
+      console.log("Unexpected null files");
       return;
     }
-
-    // Preserve URLs, replace Files with new selection
-    const urlsOnly = files ? files.filter(f => typeof f === 'string') : [];
-    const result = [...urlsOnly, ...allFiles];
+    
+    // Check if any of the allFiles already exist in our current files
+    const currentFiles = files || [];
+    const existingFileNames = currentFiles
+      .filter(f => f instanceof File)
+      .map(f => (f as File).name);
+    
+    // Separate truly new files from re-uploaded existing files
+    const newFiles = allFiles.filter(file => !existingFileNames.includes(file.name));
+    
+    if (newFiles.length === 0) {
+      // No new files, this might be a re-upload of existing files
+      console.log("No new files detected, keeping current arrangement");
+      return;
+    }
+    
+    // Keep existing files (URLs and File objects) and add only additional new files
+    const result = [...currentFiles, ...newFiles];
     setFiles(result);
     console.log("ADDED: New files added. Updated files:", result);
   };
@@ -199,7 +151,6 @@ export default function FormPropertyImages({
                 {files && files.length > 0 && (
                   <ImagePreviewGrid
                     files={files}
-                    previewUrls={previewUrls}
                     draggedIndex={draggedIndex}
                     draggedOver={draggedOver}
                     onRemoveFile={removeFile}

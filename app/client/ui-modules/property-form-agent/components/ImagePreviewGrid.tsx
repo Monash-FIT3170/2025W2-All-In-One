@@ -1,10 +1,9 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 
 interface ImagePreviewGridProps {
   files: (File | string)[];
-  previewUrls: string[];
   draggedIndex: number | null;
   draggedOver: number | null;
   onRemoveFile: (index: number) => void;
@@ -17,7 +16,6 @@ interface ImagePreviewGridProps {
 
 export default function ImagePreviewGrid({
   files,
-  previewUrls,
   draggedIndex,
   draggedOver,
   onRemoveFile,
@@ -27,6 +25,45 @@ export default function ImagePreviewGrid({
   onDragEnd,
   onDragLeave,
 }: ImagePreviewGridProps) {
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+
+  // Generate preview URLs whenever files change
+  useEffect(() => {
+    if (files && files.length > 0) {
+      const newPreviewUrls = files.map(item => 
+        typeof item === 'string' ? item : URL.createObjectURL(item)
+      );
+      
+      // Clean up old blob URLs that are no longer needed
+      previewUrls.forEach(url => {
+        if (!newPreviewUrls.includes(url) && url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+      
+      setPreviewUrls(newPreviewUrls);
+    } else {
+      // Clean up all blob URLs when no files
+      previewUrls.forEach(url => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+      setPreviewUrls([]);
+    }
+  }, [files]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach(url => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, []);
+
   return (
     <div className="mt-4">
       <div className="flex justify-between items-center mb-3">
