@@ -21,15 +21,15 @@ export default function FormPropertyImages({
 }: {
   form: UseFormReturn<FormSchemaType>;
 }) {
-  const [files, setFiles] = useState<(File | string)[] | null>(form.getValues("images")); // Contains files (new images) and URLs (existing images)
+  const [currentImages, setCurrentImages] = useState<(File | string)[] | null>(form.getValues("images")); // Contains files (new images) and URLs (existing images)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [draggedOver, setDraggedOver] = useState<number | null>(null);
 
   // Updates form when files state changes
   useEffect(() => {
-    form.setValue("images", files || [], { shouldValidate: true });
-    console.log("FORM UPDATE: Form images updated:", files);
-  }, [files]);
+    form.setValue("images", currentImages || [], { shouldValidate: true });
+    console.log("FORM UPDATE: Form images updated:", currentImages);
+  }, [currentImages]);
 
   const dropZoneConfig = {
     maxFiles: 20,
@@ -39,9 +39,9 @@ export default function FormPropertyImages({
 
   // Handle file removal
   const removeFile = (indexToRemove: number) => {
-    if (files) {
-      const newFiles = files.filter((_, index) => index !== indexToRemove);
-      setFiles(newFiles.length > 0 ? newFiles : null);
+    if (currentImages) {
+      const newFiles = currentImages.filter((_, index) => index !== indexToRemove);
+      setCurrentImages(newFiles.length > 0 ? newFiles : null);
       console.log("DELETED: Photo deleted. Updated files:", newFiles.length > 0 ? newFiles : null);
     }
   };
@@ -62,9 +62,9 @@ export default function FormPropertyImages({
   const handleDrop = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
     
-    if (draggedIndex === null || !files) return;
+    if (draggedIndex === null || !currentImages) return;
 
-    const newFiles = [...files];
+    const newFiles = [...currentImages];
     const draggedFile = newFiles[draggedIndex];
     
     // Remove the dragged item
@@ -73,7 +73,7 @@ export default function FormPropertyImages({
     // Insert at new position
     newFiles.splice(dropIndex, 0, draggedFile);
     
-    setFiles(newFiles);
+    setCurrentImages(newFiles);
     console.log("REORDERED: Photos reordered. Updated files:", newFiles);
     setDraggedIndex(null);
     setDraggedOver(null);
@@ -93,7 +93,7 @@ export default function FormPropertyImages({
     }
     
     // Check if any of the allFiles already exist in our current files
-    const currentFiles = files || [];
+    const currentFiles = currentImages || [];
     const existingFileNames = currentFiles
       .filter(f => f instanceof File)
       .map(f => (f as File).name);
@@ -109,7 +109,7 @@ export default function FormPropertyImages({
     
     // Keep existing files (URLs and File objects) and add only additional new files
     const result = [...currentFiles, ...newFiles];
-    setFiles(result);
+    setCurrentImages(result);
     console.log("ADDED: New files added. Updated files:", result);
   };
 
@@ -126,7 +126,7 @@ export default function FormPropertyImages({
           <FormItem>
             <FormControl>
               <FileUploader
-                value={files?.filter(f => f instanceof File) as File[] || null}
+                value={currentImages?.filter(f => f instanceof File) as File[] || null}
                 onValueChange={handleNewFiles}
                 dropzoneOptions={dropZoneConfig}
                 className="relative bg-background rounded-lg p-2"
@@ -148,9 +148,9 @@ export default function FormPropertyImages({
                 </FileInput>
 
                 {/* Image Previews with Drag and Drop */}
-                {files && files.length > 0 && (
+                {currentImages && currentImages.length > 0 && (
                   <ImagePreviewGrid
-                    files={files}
+                    files={currentImages}
                     draggedIndex={draggedIndex}
                     draggedOver={draggedOver}
                     onRemoveFile={removeFile}
