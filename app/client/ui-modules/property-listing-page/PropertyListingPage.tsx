@@ -24,7 +24,7 @@ import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonI
 import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
 import { ReviewTenantButton } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantButton";
-import { ReviewTenantModal } from "../review-tenant-modal/ReviewTenantModal";
+import { TenantSelectionModal } from "/app/client/ui-modules/tenant-selection/TenantSelectionModal";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useSelector } from "react-redux";
 import {
@@ -32,6 +32,7 @@ import {
   selectPropertyListingUiState,
   submitDraftListingAsync,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
+
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import { useSearchParams } from "react-router";
 import EditDraftListingModal from "./components/EditDraftListingModal";
@@ -49,7 +50,7 @@ import {
   selectFilteredApplications,
   selectHasCurrentUserApplied,
   createTenantApplicationAsync,
-} from "../review-tenant-modal/state/reducers/tenant-selection-slice";
+} from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { Role } from "/app/shared/user-role-identifier";
 
 export function PropertyListingPage({
@@ -67,7 +68,7 @@ export function PropertyListingPage({
   const profileData = useAppSelector((state) => state.currentUser.profileData);
   const authUser = useAppSelector((state) => state.currentUser.authUser);
 
-  // Track inspection bookings for the current user
+  // Track inspection bookings for the current user (temporary solution before setting up DB)
   const [bookedInspections, setBookedInspections] = useState<Set<number>>(new Set());
 
   useEffect(() => {
@@ -79,6 +80,7 @@ export function PropertyListingPage({
     console.log(`Loading property with ID: ${propertyId}`);
     dispatch(load(propertyId));
   }, []);
+
 
   if (state.shouldShowLoadingState) {
     return (
@@ -127,7 +129,7 @@ export function PropertyListingPage({
           }}
           onBook={(index: number) => {
             console.log(`booking button ${index} pressed`);
-            // Track that this user has booked this inspection
+            // Track that this user has booked this inspection (local state only)
             setBookedInspections(prev => new Set(prev).add(index));
           }}
           onApply={async () => {
@@ -319,7 +321,7 @@ function ListingPageContent({
         onReviewTenant={() => setIsReviewTenantModalOpen(true)}
       />
 
-      <ReviewTenantModal
+      <TenantSelectionModal
         isOpen={isReviewTenantModalOpen}
         onClose={() => setIsReviewTenantModalOpen(false)}
         onReject={(applicationId: string) => {

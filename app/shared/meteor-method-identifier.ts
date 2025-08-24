@@ -50,9 +50,6 @@ export enum MeteorMethodIdentifier {
   TENANT_APPLICATION_INSERT = "tenantApplications.insert",
   TENANT_APPLICATION_UPDATE_STATUS = "tenantApplications.updateStatus",
 
-  // Inspection booking methods
-  INSPECTION_BOOKING_INSERT = "inspectionBookings.insert",
-  INSPECTION_BOOKING_GET_BY_PROPERTY_AND_TENANT = "inspectionBookings.getByPropertyAndTenant",
-  INSPECTION_BOOKING_DELETE = "inspectionBookings.delete",
+
   PROPERTY_SEARCH = "PROPERTY_SEARCH",
 }

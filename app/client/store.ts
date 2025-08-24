@@ -15,7 +15,7 @@ import { propertyFormSlice } from "./ui-modules/property-form-agent/state/reduce
 import { tenantSelectionSlice } from "./ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { messagesSlice } from "./ui-modules/role-messages/state/reducers/messages-slice";
 import { searchResultsSlice } from "./ui-modules/search/state/search-result-slice";
-import { inspectionBookingSlice } from "./ui-modules/inspection-booking/state/reducers/inspection-booking-slice";
+
 
 // Enable MapSet plugin for Immer to handle Set and Map objects
 enableMapSet();
@@ -35,8 +35,7 @@ export const store = configureStore({
     propertyForm: propertyFormSlice.reducer,
     searchResults: searchResultsSlice.reducer,
     tenantSelection: tenantSelectionSlice.reducer,
-    messages: messagesSlice.reducer,
-    inspectionBooking: inspectionBookingSlice.reducer,
+    messages: messagesSlice.reducer
   },
 });
 

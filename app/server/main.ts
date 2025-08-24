@@ -4,7 +4,7 @@ import "./methods/task/task-methods";
 import "./methods/property/property-methods";
 import "./methods/property-listing/listing-methods";
 import "./methods/tenant-application/tenant-application-method";
-import "./methods/inspection-booking/inspection-booking-method";
+
 import {
 	PropertyCollection,
 	PropertyCoordinatesCollection,
@@ -30,6 +30,7 @@ import {
 	AgentCollection,
 	UserAccountCollection,
 } from "/app/server/database/user/user-collections";
+import { TenantApplicationCollection } from "./database/tenant/collections/TenantApplicationCollection";
 import { TenantCollection } from "./database/user/user-collections";
 import { Role } from "../shared/user-role-identifier";
 import { TaskStatus } from "../shared/task-status-identifier";
@@ -51,6 +52,8 @@ let globalTenant: ApiTenant;
 let globalLandlord: ApiLandlord;
 
 Meteor.startup(async () => {
+	await removeTenantApplicationsOnly();
+
 	await removeAllCollections();
 	// await tempSeedPropertyStatusData();
 	await permSeedListingStatusData();
@@ -745,6 +748,12 @@ async function removeAllCollections(): Promise<void> {
 	await ListingCollection.removeAsync({});
 	await ListingStatusCollection.removeAsync({});
 	await TaskCollection.removeAsync({});
+}
+
+async function removeTenantApplicationsOnly(): Promise<void> {
+	console.log("Removing tenant applications only...");
+	await TenantApplicationCollection.removeAsync({});
+	console.log("Tenant applications removed successfully.");
 }
 async function permSeedPropertyFeaturesData(): Promise<void> {
 	const features = [

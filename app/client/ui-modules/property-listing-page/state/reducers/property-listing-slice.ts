@@ -4,15 +4,13 @@ import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listi
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import { getPropertyWithListingDataUseCase } from "/app/client/library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
 import { submitDraftListingUseCase } from "/app/client/library-modules/use-cases/property-listing/SubmitDraftListingUseCase";
-import {
-  getFormattedDateStringFromDate,
-  getFormattedTimeStringFromDate,
-} from "/app/client/library-modules/utils/date-utils";
+
+import { LoadPropertyWithTenantApplicationsUseCase } from "/app/client/library-modules/use-cases/property-listing/LoadPropertyWithTenantApplicationsUseCase";
 import { RootState } from "/app/client/store";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
-import { getAllLandlords } from "/app/client/library-modules/domain-models/user/role-repositories/landlord-repository";
-import { loadTenantApplicationsForPropertyAsync } from "../../../review-tenant-modal/state/reducers/tenant-selection-slice";
+
+import { loadTenantApplicationsForPropertyAsync } from "../../../tenant-selection/state/reducers/tenant-selection-slice";
 
 const initialState: PropertyListingPageUiState = {
   propertyId: "",
@@ -99,11 +97,11 @@ export const propertyListingSlice = createSlice({
         markerLatitude: action.payload.locationLatitude,
         markerLongitude: action.payload.locationLongitude,
       }
-      state.inspectionBookingUiStateList = action.payload.inspections.map(
+            state.inspectionBookingUiStateList = action.payload.inspections.map(
         (inspection) => ({
-          date: getFormattedDateStringFromDate(inspection.start_time),
-          startingTime: getFormattedTimeStringFromDate(inspection.start_time),
-          endingTime: getFormattedTimeStringFromDate(inspection.end_time),
+          date: inspection.start_time.split('T')[0], // Extract date part from ISO string
+          startingTime: inspection.start_time.split('T')[1].split('.')[0], // Extract time part from ISO string
+          endingTime: inspection.end_time.split('T')[1].split('.')[0], // Extract time part from ISO string
         })
       );
       state.listingImageUrls = action.payload.image_urls;
@@ -205,26 +203,14 @@ function getListingStatusPillVariant(status: string): ListingStatusPillVariant {
 export const load = createAsyncThunk(
   "propertyListing/load",
   async (propertyId: string, { dispatch }) => {
-    const propertyWithListingData = await getPropertyWithListingDataUseCase(
-      propertyId
-    );
-    const landlords: Landlord[] = await getAllLandlords();
+    const useCase = new LoadPropertyWithTenantApplicationsUseCase();
+    const result = await useCase.execute(propertyId);
 
-    // Only load tenant applications for properties that are listed or in tenant selection/approval process
-    const shouldLoadTenantApplications = [
-      ListingStatus.LISTED,
-      ListingStatus.TENANT_SELECTION,
-      ListingStatus.TENANT_APPROVAL
-    ].includes(propertyWithListingData.listing_status as ListingStatus);
-
-    if (shouldLoadTenantApplications) {
-      console.log(`Loading tenant applications for ${propertyWithListingData.listing_status} property ${propertyId}`);
+    if (result.shouldLoadTenantApplications) {
       dispatch(loadTenantApplicationsForPropertyAsync(propertyId));
-    } else {
-      console.log(`Skipping tenant application load for ${propertyWithListingData.listing_status} property ${propertyId}`);
     }
 
-    return { ...propertyWithListingData, landlords };
+    return { ...result.propertyWithListingData, landlords: result.landlords };
   }
 );
 
