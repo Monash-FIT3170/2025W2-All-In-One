@@ -25,3 +25,11 @@ export enum NavigationPath {
     TenantDocuments = "/tenant-documents",
     TenantSearchProperties = "/tenant-search-properties",
 }
+
+export const BACK_ROUTES = {
+  "home": NavigationPath.Home,
+  "agent-dashboard": NavigationPath.AgentDashboard,
+  "agent-properties": NavigationPath.AgentProperties,
+};
+
+export type EntryPoint = keyof typeof BACK_ROUTES;
