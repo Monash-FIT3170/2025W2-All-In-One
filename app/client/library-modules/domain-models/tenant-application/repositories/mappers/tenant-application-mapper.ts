@@ -1,17 +1,17 @@
 import { TenantApplication } from "../../TenantApplication";
 import { ApiTenantApplication } from "/app/shared/api-models/tenant/ApiTenantApplication";
 
-export function mapApiTenantApplicationToTenantApplication(apiTenantApplication: ApiTenantApplication): TenantApplication {
+export function mapApiTenantApplicationToTenantApplication(tenantApplication: ApiTenantApplication): TenantApplication {
   return {
-    id: apiTenantApplication.id,
-    propertyId: apiTenantApplication.propertyId,
-    applicantName: apiTenantApplication.applicantName,
-    status: apiTenantApplication.status,
-    step: apiTenantApplication.step,
-    createdAt: apiTenantApplication.createdAt,
-    updatedAt: apiTenantApplication.updatedAt,
-    agentId: apiTenantApplication.agentId,
-    landlordId: apiTenantApplication.landlordId,
-    taskId: apiTenantApplication.taskId,
+    id: tenantApplication.id,
+    propertyId: tenantApplication.propertyId,
+    applicantName: tenantApplication.applicantName,
+    status: tenantApplication.status,
+    step: tenantApplication.step,
+    createdAt: tenantApplication.createdAt,
+    updatedAt: tenantApplication.updatedAt,
+    agentId: tenantApplication.agentId,
+    landlordId: tenantApplication.landlordId,
+    taskId: tenantApplication.taskId,
   }
 }

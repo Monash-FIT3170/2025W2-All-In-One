@@ -13,6 +13,7 @@ export type TenantApplication = {
   taskId?: string;
 };
 
+// min data required to create new tenant application
 export type TenantApplicationInsertData = {
   propertyId: string;
   applicantName: string;

@@ -10,5 +10,4 @@ export type TenantSelectionUiState = {
   isLoading: boolean;
   error: string | null;
   currentStep: number;
-  isModalOpen: boolean;
 };

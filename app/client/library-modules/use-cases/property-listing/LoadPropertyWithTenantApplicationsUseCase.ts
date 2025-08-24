@@ -10,18 +10,9 @@ export interface LoadPropertyWithTenantApplicationsResult {
   shouldLoadTenantApplications: boolean;
 }
 
-/**
- * Use case for loading property data with conditional tenant application loading
- *
- * This encapsulates the business logic for determining when tenant applications
- * should be loaded based on the property's listing status.
- */
+// Determine if tenant applications should be loaded
 export class LoadPropertyWithTenantApplicationsUseCase {
-  /**
-   * Determines if tenant applications should be loaded based on listing status
-   * @param listingStatus - The current listing status
-   * @returns True if tenant applications should be loaded
-   */
+
   private shouldLoadTenantApplications(listingStatus: ListingStatus): boolean {
     return [
       ListingStatus.LISTED,
@@ -30,11 +21,6 @@ export class LoadPropertyWithTenantApplicationsUseCase {
     ].includes(listingStatus);
   }
 
-  /**
-   * Executes the use case to load property data and determine tenant application loading
-   * @param propertyId - The property ID to load
-   * @returns Promise that resolves to the load result with tenant application loading decision
-   */
   async execute(propertyId: string): Promise<LoadPropertyWithTenantApplicationsResult> {
     // Load property and listing data
     const propertyWithListingData = await getPropertyWithListingDataUseCase(propertyId);

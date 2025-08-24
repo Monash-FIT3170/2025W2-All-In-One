@@ -52,7 +52,7 @@ let globalTenant: ApiTenant;
 let globalLandlord: ApiLandlord;
 
 Meteor.startup(async () => {
-	await removeTenantApplicationsOnly();
+	await removeTenantApplicationsData();
 
 	await removeAllCollections();
 	// await tempSeedPropertyStatusData();
@@ -750,8 +750,8 @@ async function removeAllCollections(): Promise<void> {
 	await TaskCollection.removeAsync({});
 }
 
-async function removeTenantApplicationsOnly(): Promise<void> {
-	console.log("Removing tenant applications only...");
+async function removeTenantApplicationsData(): Promise<void> {
+	console.log("Removing tenant applications data...");
 	await TenantApplicationCollection.removeAsync({});
 	console.log("Tenant applications removed successfully.");
 }
