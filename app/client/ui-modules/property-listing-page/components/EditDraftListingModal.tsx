@@ -68,59 +68,42 @@ export default function EditDraftListingModal(
 
     // Handle image updates
     if (values.images && values.images.length > 0) {
-      let finalImageUrls: string[] = [];
+      // Upload new files and get their URLs (uploadFilesHandler handles dev vs prod)
+      const newFiles: File[] = values.images.filter(item => item instanceof File);
+      let newFileUrls: string[] = [];
+      
+      if (newFiles.length > 0) {
+        try {
+          const uploadResults = await uploadFilesHandler(newFiles, BlobNamePrefix.PROPERTY);
+          newFileUrls = getImageUrlsFromUploadResults(uploadResults);
+        } catch (error) {
+          console.error("Failed to upload new images:", error);
+          // Continue without new images if upload fails
+        }
+      }
 
-      if (Meteor.isDevelopment) {
-        // In development mode, handle File objects differently to avoid dummy URLs
-        finalImageUrls = values.images.map(item => {
-          if (typeof item === 'string') {
-            // Existing URL - keep as is
-            return item;
-          } else {
-            // File object - create a blob URL for development preview
-            // In a real app, you'd want to upload these, but for development
-            // we'll skip to avoid dummy URL replacement
-            return URL.createObjectURL(item);
-          }
-        });
-      } else {
-        // Production mode - actually upload files
-        const newFiles: File[] = values.images.filter(item => item instanceof File);
-        let newFileUrls: string[] = [];
-        
-        if (newFiles.length > 0) {
-          try {
-            const uploadResults = await uploadFilesHandler(newFiles, BlobNamePrefix.PROPERTY);
-            newFileUrls = getImageUrlsFromUploadResults(uploadResults);
-          } catch (error) {
-            console.error("Failed to upload new images:", error);
-            // Continue without new images if upload fails
+      // Create a mapping from File objects to their uploaded URLs
+      const fileToUrlMap = new Map<File, string>();
+      newFiles.forEach((file, index) => {
+        if (newFileUrls[index]) {
+          fileToUrlMap.set(file, newFileUrls[index]);
+        }
+      });
+
+      // Preserve the user's ordering by converting the ordered array
+      const finalImageUrls: string[] = [];
+      values.images.forEach(item => {
+        if (typeof item === 'string') {
+          // Existing URL - keep as is
+          finalImageUrls.push(item);
+        } else {
+          // File object - use its uploaded URL if available
+          const uploadedUrl = fileToUrlMap.get(item);
+          if (uploadedUrl) {
+            finalImageUrls.push(uploadedUrl);
           }
         }
-
-        // Create a mapping from File objects to their uploaded URLs
-        const fileToUrlMap = new Map<File, string>();
-        newFiles.forEach((file, index) => {
-          if (newFileUrls[index]) {
-            fileToUrlMap.set(file, newFileUrls[index]);
-          }
-        });
-
-        // Preserve the user's ordering by converting the ordered array
-        values.images.forEach(item => {
-          if (typeof item === 'string') {
-            // Existing URL - keep as is
-            finalImageUrls.push(item);
-          } else {
-            // File object - use its uploaded URL if available
-            const uploadedUrl = fileToUrlMap.get(item);
-            if (uploadedUrl) {
-              finalImageUrls.push(uploadedUrl);
-            }
-            // If upload failed, skip this image
-          }
-        });
-      }
+      });
 
       // Update the listing with the ordered image URLs
       try {
