@@ -1,7 +1,7 @@
 import { TenantApplication } from "../types/TenantApplication";
 import { FilterType } from "../enums/FilterType";
 
-export type ReviewTenantUiState = {
+export type TenantSelectionUiState = {
   // Property specific applications: { propertyId: TenantApplication[] }
   applicationsByProperty: Record<string, TenantApplication[]>;
 

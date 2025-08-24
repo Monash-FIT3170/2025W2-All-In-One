@@ -4,6 +4,7 @@ import "./methods/task/task-methods";
 import "./methods/property/property-methods";
 import "./methods/property-listing/listing-methods";
 import "./methods/tenant-application/tenant-application-method";
+import "./methods/inspection-booking/inspection-booking-method";
 import {
 	PropertyCollection,
 	PropertyCoordinatesCollection,

@@ -1,7 +1,7 @@
 import { TenantApplication } from './TenantApplication';
 import { UserAccount } from '/app/client/library-modules/domain-models/user/UserAccount';
 
-export type ReviewTenantModalProps = {
+export type TenantSelectionModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onReject: (applicationId: string) => void;

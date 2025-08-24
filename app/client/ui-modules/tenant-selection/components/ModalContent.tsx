@@ -9,8 +9,6 @@ type ModalContentProps = {
   onReject: (applicationId: string) => void;
   onAccept: (applicationId: string) => void;
   userRole?: UserAccount["role"];
-  // onBackgroundPass: (applicationId: string) => void;
-  // onBackgroundFail: (applicationId: string) => void;
 }
 
 export function ModalContent({
@@ -18,8 +16,6 @@ export function ModalContent({
   onReject,
   onAccept,
   userRole,
-  // onBackgroundPass,
-  // onBackgroundFail,
 }: ModalContentProps): React.JSX.Element {
   return (
     <div className="overflow-y-auto max-h-96 px-4 py-2">

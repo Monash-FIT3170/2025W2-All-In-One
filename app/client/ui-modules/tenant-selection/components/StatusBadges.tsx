@@ -1,13 +1,8 @@
 import React from 'react';
-import { TenantApplicationStatus } from '../enums/TenantApplicationStatus';
-import { BackgroundCheckStatus } from '../enums/BackgroundCheckStatus';
+import { TenantApplicationStatus } from '/app/shared/api-models/tenant/TenantApplicationStatus';
 
 type StatusBadgeProps = {
   status: TenantApplicationStatus;
-}
-
-type BackgroundBadgeProps = {
-  backgroundCheck?: BackgroundCheckStatus;
 }
 
 export function StatusBadge({ status }: StatusBadgeProps): React.JSX.Element | null {
@@ -53,21 +48,4 @@ export function StatusBadge({ status }: StatusBadgeProps): React.JSX.Element | n
   }
 }
 
-export function BackgroundBadge({ backgroundCheck }: BackgroundBadgeProps): React.JSX.Element | null {
-  switch (backgroundCheck) {
-    case BackgroundCheckStatus.PASS:
-      return (
-        <span className="px-2 py-1 bg-green-500 text-white text-xs font-medium rounded">
-          BACKGROUND PASS
-        </span>
-      );
-    case BackgroundCheckStatus.FAIL:
-      return (
-        <span className="px-2 py-1 bg-red-500 text-white text-xs font-medium rounded">
-          BACKGROUND FAIL
-        </span>
-      );
-    default:
-      return null;
-  }
-}
+

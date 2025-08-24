@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { TenantApplication } from '../types/TenantApplication';
-import { TenantApplicationStatus } from '../enums/TenantApplicationStatus';
+import { TenantApplicationStatus } from '/app/shared/api-models/tenant/TenantApplicationStatus';
 import { StatusBadge } from './StatusBadges';
 import { RejectButton, AcceptButton } from '../../property-listing-page/components/TenantReviewButtons';
 import { UserAccount } from '/app/client/library-modules/domain-models/user/UserAccount';
@@ -13,19 +13,19 @@ type TenantApplicationCardProps = {
   userRole?: UserAccount["role"];
 }
 
-export const TenantApplicationCard = React.memo(({
+export const TenantApplicationCard = ({
   application,
   onReject,
   onAccept,
   userRole,
 }: TenantApplicationCardProps): React.JSX.Element => {
-  const handleReject = useCallback(() => {
+  const handleReject = () => {
     onReject(application.id);
-  }, [onReject, application.id]);
+  };
 
-  const handleAccept = useCallback(() => {
+  const handleAccept = () => {
     onAccept(application.id);
-  }, [onAccept, application.id]);
+  };
 
   return (
     <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
@@ -35,12 +35,7 @@ export const TenantApplicationCard = React.memo(({
           <StatusBadge status={application.status} />
         </div>
 
-        {/* Background check badge if exists
-        {application.backgroundCheck && (
-          <div className="mb-2">
-            <BackgroundBadge backgroundCheck={application.backgroundCheck} />
-          </div>
-        )} */}
+
 
         {/* Action buttons based on status */}
         <div className="flex gap-2">
@@ -64,4 +59,4 @@ export const TenantApplicationCard = React.memo(({
       </div>
     </div>
   );
-});
+}

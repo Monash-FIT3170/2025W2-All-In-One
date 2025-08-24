@@ -3,14 +3,26 @@ import { TenantApplicationCollection } from '../../database/tenant/collections/T
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 import { TenantApplicationDocument } from '../../database/tenant/models/TenantApplicationDocument';
 import { ApiTenantApplication } from '/app/shared/api-models/tenant/ApiTenantApplication';
+import { TenantApplicationStatus } from '/app/shared/api-models/tenant/TenantApplicationStatus';
+import { InvalidDataError } from '/app/server/errors/InvalidDataError';
+import { meteorWrappedInvalidDataError } from '/app/server/utils/error-utils';
 
-// Helper function to map document to API model
-function mapTenantApplicationDocumentToDTO(doc: TenantApplicationDocument): ApiTenantApplication {
+
+async function mapTenantApplicationDocumentToDTO(
+  doc: TenantApplicationDocument
+): Promise<ApiTenantApplication> {
+  // Validate and convert status string to enum
+  if (!Object.values(TenantApplicationStatus).includes(doc.status as TenantApplicationStatus)) {
+    throw new InvalidDataError(
+      `Invalid tenant application status '${doc.status}' for application id ${doc._id}`
+    );
+  }
+
   return {
     id: doc._id,
     propertyId: doc.propertyId,
     applicantName: doc.applicantName,
-    status: doc.status,
+    status: doc.status as TenantApplicationStatus,
     step: doc.step,
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
@@ -25,8 +37,20 @@ const tenantApplicationGetByPropertyIdMethod = {
   [MeteorMethodIdentifier.TENANT_APPLICATION_GET_BY_PROPERTY_ID]: async (
     propertyId: string
   ): Promise<ApiTenantApplication[]> => {
-    const applications = await TenantApplicationCollection.find({ propertyId }).fetchAsync();
-    return applications.map(mapTenantApplicationDocumentToDTO);
+    try {
+
+      const applications = await TenantApplicationCollection.find({ propertyId }).fetchAsync();
+
+      const applicationDTOs = await Promise.all(
+        applications.map((application) =>
+          mapTenantApplicationDocumentToDTO(application)
+        )
+      );
+      return applicationDTOs;
+    } catch (error) {
+      console.error("Error in tenantApplicationGetByPropertyIdMethod:", error);
+      throw meteorWrappedInvalidDataError(error as InvalidDataError);
+    }
   },
 };
 
@@ -35,8 +59,20 @@ const tenantApplicationGetByLandlordIdMethod = {
   [MeteorMethodIdentifier.TENANT_APPLICATION_GET_BY_LANDLORD_ID]: async (
     landlordId: string
   ): Promise<ApiTenantApplication[]> => {
-    const applications = await TenantApplicationCollection.find({ landlordId }).fetchAsync();
-    return applications.map(mapTenantApplicationDocumentToDTO);
+    try {
+
+      const applications = await TenantApplicationCollection.find({ landlordId }).fetchAsync();
+
+      const applicationDTOs = await Promise.all(
+        applications.map((application) =>
+          mapTenantApplicationDocumentToDTO(application)
+        )
+      );
+      return applicationDTOs;
+    } catch (error) {
+      console.error("Error in tenantApplicationGetByLandlordIdMethod:", error);
+      throw meteorWrappedInvalidDataError(error as InvalidDataError);
+    }
   },
 };
 
@@ -50,20 +86,27 @@ const tenantApplicationInsertMethod = {
       landlordId: string;
     }
   ): Promise<string> => {
-    const now = new Date();
-    const applicationDoc: Omit<TenantApplicationDocument, '_id'> = {
-      propertyId: applicationData.propertyId,
-      applicantName: applicationData.applicantName,
-      status: 'undetermined',
-      step: 1,
-      createdAt: now,
-      updatedAt: now,
-      agentId: applicationData.agentId,
-      landlordId: applicationData.landlordId,
-    };
+    try {
+      const now = new Date();
 
-    const insertedId = await TenantApplicationCollection.insertAsync(applicationDoc);
-    return insertedId;
+      const applicationDoc: Omit<TenantApplicationDocument, '_id'> = {
+        propertyId: applicationData.propertyId,
+        applicantName: applicationData.applicantName,
+        status: 'undetermined',
+        step: 1,
+        createdAt: now,
+        updatedAt: now,
+        agentId: applicationData.agentId,
+        landlordId: applicationData.landlordId,
+      };
+
+      const insertedId = await TenantApplicationCollection.insertAsync(applicationDoc);
+
+      return insertedId;
+    } catch (error) {
+      console.error("Error in tenantApplicationInsertMethod:", error);
+      throw meteorWrappedInvalidDataError(error as InvalidDataError);
+    }
   },
 };
 
@@ -75,20 +118,25 @@ const tenantApplicationUpdateStatusMethod = {
     step: number,
     taskId?: string
   ): Promise<void> => {
-    const updateData: any = {
-      status,
-      step,
-      updatedAt: new Date(),
-    };
+    try {
+      const updateData: any = {
+        status,
+        step,
+        updatedAt: new Date(),
+      };
 
-    if (taskId) {
-      updateData.taskId = taskId;
+      if (taskId) {
+        updateData.taskId = taskId;
+      }
+
+      await TenantApplicationCollection.updateAsync(
+        { _id: { $in: applicationIds } },
+        { $set: updateData }
+      );
+    } catch (error) {
+      console.error("Error in tenantApplicationUpdateStatusMethod:", error);
+      throw meteorWrappedInvalidDataError(error as InvalidDataError);
     }
-
-    await TenantApplicationCollection.updateAsync(
-      { _id: { $in: applicationIds } },
-      { $set: updateData }
-    );
   },
 };
 

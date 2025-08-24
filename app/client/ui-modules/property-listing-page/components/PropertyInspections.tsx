@@ -114,10 +114,11 @@ function BookingEntry({
           className="mr-auto"
         />
         <CalendarIcon className="w-[22px] h-[20px] mr-6" />
-        {canBookInspection ? (
-          isBooked ? (
-            <BookingButton index={index} onClick={onBook} isBooked={true} />
-          ) : hasAnyBooking ? (
+        {isBooked ? (
+          // Show booked state regardless of user role
+          <BookingButton index={index} onClick={onBook} isBooked={true} />
+        ) : canBookInspection ? (
+          hasAnyBooking ? (
             // Hide button for unbooked inspections when any inspection is booked
             null
           ) : (

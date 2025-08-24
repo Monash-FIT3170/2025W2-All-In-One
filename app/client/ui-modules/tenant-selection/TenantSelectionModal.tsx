@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import { ReviewTenantModalProps } from './types/ReviewTenantModalProps';
+import React from 'react';
+import { TenantSelectionModalProps } from './types/TenantSelectionModalProps';
 import { FilterType } from './enums/FilterType';
 import { ModalHeader } from './components/ModalHeader';
 import { FilterTabs } from './components/FilterTabs';
@@ -14,7 +14,7 @@ import {
   selectActiveFilter,
 } from './state/reducers/tenant-selection-slice';
 
-export const ReviewTenantModal = React.memo(({
+export const TenantSelectionModal = ({
   isOpen,
   onClose,
   onReject,
@@ -24,30 +24,30 @@ export const ReviewTenantModal = React.memo(({
   acceptedApplicantCount,
   userRole,
   tenantApplications = [], // Receive applications as props
-}: ReviewTenantModalProps): React.JSX.Element => {
+}: TenantSelectionModalProps): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const activeFilter = useAppSelector(selectActiveFilter);
   const isLoading = useAppSelector((state) => state.tenantSelection.isLoading);
   const error = useAppSelector((state) => state.tenantSelection.error);
 
-  const handleReject = useCallback((applicationId: string) => {
+  const handleReject = (applicationId: string) => {
     dispatch(rejectTenantApplicationAsync(applicationId));
     onReject(applicationId);
-  }, [dispatch, onReject]);
+  };
 
-  const handleAccept = useCallback((applicationId: string) => {
+  const handleAccept = (applicationId: string) => {
     dispatch(acceptTenantApplicationAsync(applicationId));
     onAccept(applicationId);
-  }, [dispatch, onAccept]);
+  };
 
-  const handleSendToLandlord = useCallback(() => {
+  const handleSendToLandlord = () => {
     dispatch(sendAcceptedApplicationsToLandlordAsync());
     onSendToLandlord();
-  }, [dispatch, onSendToLandlord]);
+  };
 
-  const handleFilterChange = useCallback((filter: FilterType) => {
+  const handleFilterChange = (filter: FilterType) => {
     dispatch(setFilter(filter));
-  }, [dispatch]);
+  };
 
   if (!isOpen) return <></>;
 
@@ -99,4 +99,4 @@ export const ReviewTenantModal = React.memo(({
       </div>
     </div>
   );
-});
+}

@@ -1,4 +1,5 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
+import { enableMapSet } from 'immer';
 import { agentDashboardSlice } from "./ui-modules/role-dashboard/agent-dashboard/state/agent-dashboard-slice";
 import { landlordDashboardSlice } from "./ui-modules/role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
 import { guestLandingPageSlice } from "./ui-modules/guest-landing-page/state/reducers/guest-landing-page-slice";
@@ -11,9 +12,13 @@ import { propertyListingSlice } from "/app/client/ui-modules/property-listing-pa
 import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
 import { currentUserSlice } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
 import { propertyFormSlice } from "./ui-modules/property-form-agent/state/reducers/property-form-slice";
-import { tenantSelectionSlice } from "./ui-modules/review-tenant-modal/state/reducers/tenant-selection-slice";
+import { tenantSelectionSlice } from "./ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { messagesSlice } from "./ui-modules/role-messages/state/reducers/messages-slice";
 import { searchResultsSlice } from "./ui-modules/search/state/search-result-slice";
+import { inspectionBookingSlice } from "./ui-modules/inspection-booking/state/reducers/inspection-booking-slice";
+
+// Enable MapSet plugin for Immer to handle Set and Map objects
+enableMapSet();
 
 export const store = configureStore({
   reducer: {
@@ -31,6 +36,7 @@ export const store = configureStore({
     searchResults: searchResultsSlice.reducer,
     tenantSelection: tenantSelectionSlice.reducer,
     messages: messagesSlice.reducer,
+    inspectionBooking: inspectionBookingSlice.reducer,
   },
 });
 
