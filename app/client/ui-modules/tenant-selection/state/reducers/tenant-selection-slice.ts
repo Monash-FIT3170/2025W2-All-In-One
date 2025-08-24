@@ -84,6 +84,68 @@ export const acceptTenantApplicationAsync = createAsyncThunk(
   }
 );
 
+export const sendAcceptedApplicationsToLandlordAsync = createAsyncThunk(
+  "tenantSelection/sendAcceptedApplicationsToLandlord",
+  async (_, { getState }) => {
+    const state = getState() as RootState;
+    const { propertyId, propertyLandlordId, streetNumber, street, suburb, province, postcode } = state.propertyListing;
+    const { applicationsByProperty } = state.tenantSelection;
+
+    if (!propertyId) {
+      throw new Error('Property ID is required to send applications to landlord');
+    }
+
+    if (!propertyLandlordId) {
+      throw new Error('Property landlord ID is required to send tenant to landlord');
+    }
+
+    // Get tenant applications for the specific property
+    const propertyApplications = applicationsByProperty[propertyId] || [];
+
+    // Check if there are any accepted applications
+    const acceptedApplications = propertyApplications.filter((app: TenantApplication) =>
+      app.status === TenantApplicationStatus.ACCEPTED
+    );
+
+    if (acceptedApplications.length === 0) {
+      throw new Error('No accepted applications to send to landlord');
+    }
+
+    // Create task for landlord
+    const taskName = `Review ${acceptedApplications.length} Tenant Application(s)`;
+    const taskDescription = `Review ${acceptedApplications.length} accepted tenant application(s) for property at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}. Applicants: ${acceptedApplications.map((app: TenantApplication) => app.name).join(', ')}`;
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 7);
+
+    // Create task for landlord
+    const taskResult = await apiCreateTaskForLandlord({
+      name: taskName,
+      description: taskDescription,
+      dueDate: dueDate,
+      priority: TaskPriority.MEDIUM,
+      landlordId: propertyLandlordId,
+    });
+
+    // Update all accepted applications to LANDLORD_REVIEW status
+    const acceptedApplicationIds = acceptedApplications.map((app: TenantApplication) => app.id);
+    await updateTenantApplicationStatus(
+      acceptedApplicationIds,
+      TenantApplicationStatus.LANDLORD_REVIEW,
+      2,
+      taskResult // Passes the task ID to link applications to the task
+    );
+
+    console.log(`Successfully sent ${acceptedApplications.length} application(s) to landlord ${propertyLandlordId} for property ${propertyId}`);
+
+    return {
+      success: true,
+      propertyId,
+      acceptedApplications: acceptedApplicationIds,
+      applicationCount: acceptedApplications.length,
+      taskId: taskResult
+    };
+  }
+);
 export const loadTenantApplicationsForPropertyAsync = createAsyncThunk(
   "tenantSelection/loadTenantApplicationsForProperty",
   async (propertyId: string) => {
@@ -201,12 +263,12 @@ export const {
   clearError,
 } = tenantSelectionSlice.actions;
 
-// Essential selectors only
 export const selectTenantSelectionState = (state: RootState) => state.tenantSelection;
 export const selectApplicationsByProperty = (state: RootState) => state.tenantSelection.applicationsByProperty;
 export const selectActiveFilter = (state: RootState) => state.tenantSelection.activeFilter;
 export const selectIsLoading = (state: RootState) => state.tenantSelection.isLoading;
 export const selectError = (state: RootState) => state.tenantSelection.error;
+
 
 export const selectApplicationsForProperty = (state: RootState, propertyId: string) => {
   return state.tenantSelection.applicationsByProperty[propertyId] || [];
@@ -237,6 +299,12 @@ export const selectHasCurrentUserApplied = (state: RootState, propertyId: string
   if (!currentUserName) return false;
   const applications = selectApplicationsForProperty(state, propertyId);
   return applications.some((app: TenantApplication) => app.name === currentUserName);
+};
+
+// Property-specific count selector
+export const selectAcceptedApplicantCountForProperty = (state: RootState, propertyId: string) => {
+  const applications = selectApplicationsForProperty(state, propertyId);
+  return applications.filter((app: TenantApplication) => app.status === TenantApplicationStatus.ACCEPTED).length;
 };
 
 export default tenantSelectionSlice.reducer;
