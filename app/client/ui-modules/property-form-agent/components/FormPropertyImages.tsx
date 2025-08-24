@@ -6,7 +6,7 @@ import {
   FormItem,
   FormMessage,
 } from "../../theming-shadcn/Form";
-import { CloudUpload, X } from "lucide-react";
+import { CloudUpload } from "lucide-react";
 import {
   FileUploader,
   FileInput,
@@ -14,6 +14,7 @@ import {
 import { FormSchemaType } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
+import ImagePreviewGrid from "./ImagePreviewGrid";
 
 export default function FormPropertyImages({
   form,
@@ -196,77 +197,18 @@ export default function FormPropertyImages({
 
                 {/* Image Previews with Drag and Drop */}
                 {files && files.length > 0 && (
-                  <div className="mt-4">
-                    <div className="flex justify-between items-center mb-3">
-                      <p className="text-sm font-medium">
-                        {files.length} image{files.length > 1 ? 's' : ''} uploaded
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Drag images to reorder
-                      </p>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {files.map((item, index) => {
-                        const isFile = item instanceof File;
-                        const displayName = isFile ? item.name : `Image ${index + 1}`;
-                        const displaySize = isFile ? `${Math.round(item.size / 1024)} KB` : 'Existing image';
-                        
-                        return (
-                        <div
-                          key={isFile ? `${item.name}-${index}` : `url-${index}`}
-                          className={`relative group border rounded-lg overflow-hidden bg-white shadow-sm transition-all duration-200 cursor-move ${
-                            draggedIndex === index ? 'opacity-50 scale-95 rotate-2' : ''
-                          } ${
-                            draggedOver === index && draggedIndex !== index 
-                              ? 'border-blue-500 border-2 scale-105 shadow-lg' 
-                              : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
-                          }`}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, index)}
-                          onDragOver={(e) => handleDragOver(e, index)}
-                          onDrop={(e) => handleDrop(e, index)}
-                          onDragEnd={handleDragEnd}
-                          onDragLeave={() => setDraggedOver(null)}
-                        >
-                          {/* Remove Button */}
-                          <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              type="button"
-                              className="bg-red-500 hover:bg-red-600 rounded p-1 h-6 w-6 flex items-center justify-center transition-colors"
-                              onClick={() => removeFile(index)}
-                            >
-                              <X className="w-3 h-3 text-white" />
-                            </button>
-                          </div>
-
-                          {/* Image Preview */}
-                          <div className="aspect-square">
-                            <img
-                              src={previewUrls[index]}
-                              alt={`Preview ${index + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-
-                          {/* File Name */}
-                          <div className="p-2 bg-gray-50">
-                            <p className="text-xs text-gray-600 truncate">
-                              {displayName}
-                            </p>
-                            <p className="text-xs text-gray-400">
-                              {displaySize}
-                            </p>
-                          </div>
-
-                          {/* Order indicator */}
-                          <div className="absolute bottom-2 right-2 bg-blue-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-medium">
-                            {index + 1}
-                          </div>
-                        </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                  <ImagePreviewGrid
+                    files={files}
+                    previewUrls={previewUrls}
+                    draggedIndex={draggedIndex}
+                    draggedOver={draggedOver}
+                    onRemoveFile={removeFile}
+                    onDragStart={handleDragStart}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    onDragEnd={handleDragEnd}
+                    onDragLeave={() => setDraggedOver(null)}
+                  />
                 )}
               </FileUploader>
             </FormControl>
