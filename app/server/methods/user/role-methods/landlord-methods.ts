@@ -8,6 +8,7 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiLandlord } from "../../../../shared/api-models/user/api-roles/ApiLandlord";
 import { TaskDocument } from "/app/server/database/task/models/TaskDocument";
 import { TaskCollection } from "/app/server/database/task/task-collections";
+
 //INSERT LANDLORD
 const landlordInsertMethod = {
   [MeteorMethodIdentifier.LANDLORD_INSERT]: async (
@@ -43,6 +44,54 @@ const landlordGetMethod = {
   },
 };
 
+//GET LANDLORD BY LANDLORD ID
+// This method is used to get a landlord by its landlord ID (from associated property)
+const landlordGetByLandlordIdMethod = {
+  [MeteorMethodIdentifier.LANDLORD_GET_BY_LANDLORD_ID]: async (
+    landlordId: string
+  ): Promise<ApiLandlord> => {
+    const landlordDoc = await LandlordCollection.findOneAsync({
+      _id: landlordId,
+    });
+
+    if (!landlordDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Landlord with landlord ID ${landlordId} not found.`)
+      );
+    }
+
+    return mapLandlordDocumentToDTO(landlordDoc);
+  },
+};
+
+//UPDATE LANDLORD TASKS
+// This method adds a new task ID to the landlord's task_ids array
+const landlordUpdateTasksMethod = {
+  [MeteorMethodIdentifier.LANDLORD_UPDATE_TASKS]: async (
+    landlordId: string,
+    taskId: string
+  ): Promise<void> => {
+    const landlordDoc = await LandlordCollection.findOneAsync({
+      _id: landlordId,
+    });
+
+    if (!landlordDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Landlord with landlord ID ${landlordId} not found.`)
+      );
+    }
+
+    const currentTaskIds = landlordDoc.task_ids || [];
+    const updatedTaskIds = [...currentTaskIds, taskId];
+
+    await LandlordCollection.updateAsync(
+      { _id: landlordId },
+      { $set: { task_ids: updatedTaskIds } }
+    );
+  },
+};
+
+
 const landlordGetAllMethod = {
   [MeteorMethodIdentifier.LANDLORD_GET_ALL]: async (): Promise<
     ApiLandlord[]
@@ -51,6 +100,7 @@ const landlordGetAllMethod = {
     return await Promise.all(landlords.map(mapLandlordDocumentToDTO));
   },
 };
+
 async function mapLandlordDocumentToDTO(
   landlord: LandlordDocument
 ): Promise<ApiLandlord> {
@@ -69,15 +119,17 @@ async function mapLandlordDocumentToDTO(
 }
 
 async function getTaskDocumentsMatchingIds(
-  ids: string[]
+  taskIds: string[]
 ): Promise<TaskDocument[]> {
   return await TaskCollection.find({
-    _id: { $in: ids },
+    _id: { $in: taskIds },
   }).fetchAsync();
 }
 
 Meteor.methods({
   ...landlordInsertMethod,
   ...landlordGetMethod,
+  ...landlordGetByLandlordIdMethod,
+  ...landlordUpdateTasksMethod,
   ...landlordGetAllMethod,
 });

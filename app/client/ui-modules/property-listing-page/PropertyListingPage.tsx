@@ -25,7 +25,7 @@ import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
 import { ReviewTenantButton } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantButton";
 import { ReviewTenantModal } from "../review-tenant-modal/ReviewTenantModal";
-import { useAppDispatch } from "/app/client/store";
+import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useSelector } from "react-redux";
 import {
   load,
@@ -43,6 +43,10 @@ import { DynamicMap } from "../common/map/DynamicMap";
 import { SubHeading } from "../theming/components/SubHeading";
 import { BasicMarker } from "../common/map/markers/BasicMarker";
 import { PropertyMap, PropertyMapUiState } from "./components/PropertyMap";
+import {
+  selectAcceptedCount,
+  selectHasAcceptedApplications,
+} from "../review-tenant-modal/state/reducers/tenant-selection-slice";
 
 export function PropertyListingPage({
   className = "",
@@ -105,6 +109,8 @@ export function PropertyListingPage({
             state.shouldDisplayReviewTenantButton
           }
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
+          propertyLandlordId={state.propertyLandlordId}
+          propertyId={state.propertyId}
           onBack={() => {
             console.log("back button pressed");
           }}
@@ -153,6 +159,8 @@ function ListingPageContent({
   shouldDisplaySubmitDraftButton,
   shouldDisplayReviewTenantButton,
   shouldDisplayEditListingButton,
+  propertyLandlordId,
+  propertyId,
   onBack,
   onBook,
   onApply,
@@ -185,6 +193,8 @@ function ListingPageContent({
   shouldDisplaySubmitDraftButton: boolean;
   shouldDisplayReviewTenantButton: boolean;
   shouldDisplayEditListingButton: boolean;
+  propertyLandlordId: string;
+  propertyId: string;
   onBack: () => void;
   onBook: (index: number) => void;
   onApply: () => void;
@@ -193,6 +203,10 @@ function ListingPageContent({
   className?: string;
 }): React.JSX.Element {
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
+
+  const acceptedCount = useAppSelector(selectAcceptedCount);
+  const hasAcceptedApplications = useAppSelector(selectHasAcceptedApplications);
+  const shouldShowSendToLandlordButton = hasAcceptedApplications;
 
   return (
     <div className={className}>
@@ -245,23 +259,14 @@ function ListingPageContent({
         onReject={(applicationId: string) => {
           console.log(`Rejected application ${applicationId}`);
         }}
-        onProgress={(applicationId: string) => {
-          console.log(`Progressed application ${applicationId}`);
+        onAccept={(applicationId: string) => {
+          console.log(`Accepted application ${applicationId}`);
         }}
-        onBackgroundPass={(applicationId: string) => {
-          console.log(
-            `Background check passed for application ${applicationId}`
-          );
+        onSendToLandlord={() => {
+          console.log(`Sent applications to landlord`);
         }}
-        onBackgroundFail={(applicationId: string) => {
-          console.log(
-            `Background check failed for application ${applicationId}`
-          );
-        }}
-        onSendToLandlord={(applicationId: string) => {
-          console.log(`Sent application ${applicationId} to landlord`);
-        }}
-        propertyAddress={`${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`}
+        shouldShowSendToLandlordButton={shouldShowSendToLandlordButton}
+        acceptedCount={acceptedCount}
       />
     </div>
   );
