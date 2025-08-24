@@ -42,6 +42,7 @@ import { SubHeading } from "../theming/components/SubHeading";
 import { BasicMarker } from "../common/map/markers/BasicMarker";
 import { PropertyMap, PropertyMapUiState } from "./components/PropertyMap";
 import { NavigationPath } from "../../navigation";
+import { BACK_ROUTES, EntryPoint  } from "../../navigation";
 
 export function PropertyListingPage({
   className = "",
@@ -131,14 +132,6 @@ export function PropertyListingPage({
     );
   }
 }
-
-const BACK_ROUTES = {
-  "home": NavigationPath.Home,
-  "agent-dashboard": NavigationPath.AgentDashboard,
-  "agent-properties": NavigationPath.AgentProperties,
-};
-
-type EntryPoint = keyof typeof BACK_ROUTES;
 
 function ListingPageContent({
   streetNumber,
