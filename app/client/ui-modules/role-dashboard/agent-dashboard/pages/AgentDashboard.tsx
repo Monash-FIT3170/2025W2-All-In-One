@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { UpcomingTasks } from "../../components/UpcomingTask";
 import { PropertyOverview } from "../components/PropertyOverview";
-import { DashboardCards } from "../components/DashboardCard";
+import { DashboardCards } from "../components/AgentDashboardCard";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
   fetchAgentDetails,
@@ -21,8 +21,7 @@ export function AgentDashboard(): React.JSX.Element {
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchAgentDetails(currentUser.userId));
-    }
-    else {
+    } else {
       console.warn("No user ID found. Please log in to view the dashboard.");
     }
   }, []);

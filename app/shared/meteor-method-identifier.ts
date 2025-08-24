@@ -1,5 +1,6 @@
 export enum MeteorMethodIdentifier {
-  TASK_INSERT = "tasks.insert",
+  TASK_INSERT_FOR_AGENT = "tasks.insertForAgent",
+  TASK_INSERT_FOR_LANDLORD = "tasks.insertForLandlord",
   TASK_GET_ALL = "tasks.getAll",
   TASK_GET = "tasks.getOne",
   TASK_GET_MULTIPLE = "tasks.getMultiple",
@@ -8,9 +9,10 @@ export enum MeteorMethodIdentifier {
   PROPERTY_GET = "properties.getOne",
   PROPERTY_GET_ALL = "properties.getAll",
   PROPERTY_GET_COUNT = "properties.getCount",
-  PROPERTY_GET_ALL_BY_AGENT_ID = "properties.getAllByAgentId", // Fetches all properties managed by an agent by their userID  
+  PROPERTY_GET_ALL_BY_AGENT_ID = "properties.getAllByAgentId", // Fetches all properties managed by an agent by their userID
   PROPERTY_INSERT = "properties.insert", // Inserts property into property collection
   PROPERTY_PRICE_INSERT = "properties.insertPrice", // Inserts property price into property price collection
+  GET_LANDLORD_DASHBOARD = "properties.getLandlordDashboard", // Fetch all data analytics required for landlord dashboard
   PROPERTY_LANDLORD_GET_COUNT = "properties.getCountLandlord",
   PROPERTY_LANDLORD_GET_STATUS_COUNTS = "properties.getStatusCountsLandlord",
   LISTING_GET_FOR_PROPERTY = "listings.getForProperty", //Get listing document from property id
@@ -27,6 +29,8 @@ export enum MeteorMethodIdentifier {
   TENANT_GET = "tenants.getOne",
   LANDLORD_INSERT = "landlords.insert",
   LANDLORD_GET = "landlords.getOne",
+  LANDLORD_GET_BY_LANDLORD_ID = "landlords.getByLandlordId", // Get landlord by landlord ID (not user ID)
+  LANDLORD_UPDATE_TASKS = "landlords.updateTasks", // Adds the id of the newly created task to the landlord's task_ids
   LANDLORD_GET_ALL = "landlords.getAll", // Get All Landlords
   PROPERTY_STATUS_GET = "propertyStatus.getOne", // Find ID of property status by name
   PROPERTY_GET_BY_TENANT_ID = "property.getByTenantId",
@@ -38,4 +42,5 @@ export enum MeteorMethodIdentifier {
   PROFILE_INSERT = "profileData.insert",
   LISTING_SUBMIT_DRAFT = "listing.submitDraft",
   PROPERTY_FEATURES_GET_ALL = "propertyFeatures.getAll",
+  PROPERTY_SEARCH = "PROPERTY_SEARCH",
 }

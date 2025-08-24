@@ -12,8 +12,4 @@ export type ProfileData = {
   workAddress: string;
   workPhone: string;
   profilePicture: string;
-  carMake: string;
-  carModel: string;
-  carYear: string;
-  carPlate: string;
 };
