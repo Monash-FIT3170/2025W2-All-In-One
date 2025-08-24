@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import { RootState } from "/app/client/store";
 import { TenantApplication } from "../../types/TenantApplication";
-import { TenantApplicationStatus } from "/app/shared/api-models/tenant/TenantApplicationStatus";
+import { TenantApplicationStatus } from "../../../../../shared/api-models/tenant-application/TenantApplicationStatus";
 import { FilterType } from "../../enums/FilterType";
 import { TenantSelectionUiState } from "../TenantSelectionUiState";
 import { apiCreateTaskForLandlord } from "/app/client/library-modules/apis/task/task-api";

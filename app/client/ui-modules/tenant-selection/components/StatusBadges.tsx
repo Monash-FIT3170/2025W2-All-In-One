@@ -1,5 +1,5 @@
 import React from 'react';
-import { TenantApplicationStatus } from '/app/shared/api-models/tenant/TenantApplicationStatus';
+import { TenantApplicationStatus } from '../../../../shared/api-models/tenant-application/TenantApplicationStatus';
 
 type StatusBadgeProps = {
   status: TenantApplicationStatus;

@@ -1,5 +1,5 @@
 import { TenantApplication } from "../../TenantApplication";
-import { ApiTenantApplication } from "/app/shared/api-models/tenant/ApiTenantApplication";
+import { ApiTenantApplication } from "../../../../../../shared/api-models/tenant-application/ApiTenantApplication";
 
 export function mapApiTenantApplicationToTenantApplication(tenantApplication: ApiTenantApplication): TenantApplication {
   return {

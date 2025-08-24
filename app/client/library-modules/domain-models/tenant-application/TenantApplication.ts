@@ -1,4 +1,4 @@
-import { TenantApplicationStatus } from "/app/shared/api-models/tenant/TenantApplicationStatus";
+import { TenantApplicationStatus } from "../../../../shared/api-models/tenant-application/TenantApplicationStatus";
 
 export type TenantApplication = {
   id: string;

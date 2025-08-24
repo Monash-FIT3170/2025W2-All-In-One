@@ -1,6 +1,6 @@
 import React from 'react';
 import { TenantApplication } from '../types/TenantApplication';
-import { TenantApplicationStatus } from '/app/shared/api-models/tenant/TenantApplicationStatus';
+import { TenantApplicationStatus } from '../../../../shared/api-models/tenant-application/TenantApplicationStatus';
 import { StatusBadge } from './StatusBadges';
 import { RejectButton, AcceptButton } from '../../property-listing-page/components/TenantReviewButtons';
 import { UserAccount } from '/app/client/library-modules/domain-models/user/UserAccount';

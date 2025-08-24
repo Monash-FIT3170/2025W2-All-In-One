@@ -6,7 +6,7 @@ import {
 } from "/app/client/library-modules/apis/tenant-application/tenant-application";
 import { TenantApplication, TenantApplicationInsertData } from "../TenantApplication";
 import { mapApiTenantApplicationToTenantApplication } from "./mappers/tenant-application-mapper";
-import { TenantApplicationStatus } from "/app/shared/api-models/tenant/TenantApplicationStatus";
+import { TenantApplicationStatus } from "../../../../../shared/api-models/tenant-application/TenantApplicationStatus";
 
 // Get tenant applications for a specific property
 export async function getTenantApplicationsByPropertyId(propertyId: string): Promise<TenantApplication[]> {

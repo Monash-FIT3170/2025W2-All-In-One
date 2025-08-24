@@ -2,8 +2,8 @@ import { Meteor } from 'meteor/meteor';
 import { TenantApplicationCollection } from '../../database/tenant/collections/TenantApplicationCollection';
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
 import { TenantApplicationDocument } from '../../database/tenant/models/TenantApplicationDocument';
-import { ApiTenantApplication } from '/app/shared/api-models/tenant/ApiTenantApplication';
-import { TenantApplicationStatus } from '/app/shared/api-models/tenant/TenantApplicationStatus';
+import { ApiTenantApplication } from '../../../shared/api-models/tenant-application/ApiTenantApplication';
+import { TenantApplicationStatus } from '../../../shared/api-models/tenant-application/TenantApplicationStatus';
 import { InvalidDataError } from '/app/server/errors/InvalidDataError';
 import { meteorWrappedInvalidDataError } from '/app/server/utils/error-utils';
 

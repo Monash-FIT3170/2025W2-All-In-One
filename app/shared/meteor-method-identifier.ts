@@ -51,5 +51,7 @@ export enum MeteorMethodIdentifier {
   TENANT_APPLICATION_UPDATE_STATUS = "tenantApplications.updateStatus",
 
 
+
+
   PROPERTY_SEARCH = "PROPERTY_SEARCH",
 }

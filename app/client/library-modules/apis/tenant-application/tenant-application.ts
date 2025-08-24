@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { MeteorMethodIdentifier } from '/app/shared/meteor-method-identifier';
-import { ApiTenantApplication } from '/app/shared/api-models/tenant/ApiTenantApplication';
+import { ApiTenantApplication } from '../../../../shared/api-models/tenant-application/ApiTenantApplication';
 
 export async function apiGetTenantApplicationsByPropertyId(propertyId: string): Promise<ApiTenantApplication[]> {
   try {
