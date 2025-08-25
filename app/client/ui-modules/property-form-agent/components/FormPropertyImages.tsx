@@ -6,30 +6,30 @@ import {
   FormItem,
   FormMessage,
 } from "../../theming-shadcn/Form";
-import { CloudUpload, Paperclip } from "lucide-react";
+import { CloudUpload } from "lucide-react";
 import {
   FileUploader,
-  FileUploaderContent,
-  FileUploaderItem,
   FileInput,
 } from "../../theming-shadcn/FileUpload";
 import { FormSchemaType } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
+import ImagePreviewGrid from "./ImagePreviewGrid";
 
 export default function FormPropertyImages({
   form,
 }: {
   form: UseFormReturn<FormSchemaType>;
 }) {
-  const [files, setFiles] = useState<File[] | null>(null);
+  const [currentImages, setCurrentImages] = useState<(File | string)[] | null>(form.getValues("images")); // Contains files (new images) and URLs (existing images)
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [draggedOver, setDraggedOver] = useState<number | null>(null);
 
-  // Updates form when files states changes i.e. submitting file
+  // Updates form when files state changes
   useEffect(() => {
-    if (files) {
-      form.setValue("images", files, { shouldValidate: true });
-    }
-  }, [files]);
+    form.setValue("images", currentImages || [], { shouldValidate: true });
+    console.log("FORM UPDATE: Form images updated:", currentImages);
+  }, [currentImages]);
 
   const dropZoneConfig = {
     maxFiles: 20,
@@ -37,11 +37,87 @@ export default function FormPropertyImages({
     multiple: true,
   };
 
+  // Handle file removal
+  const removeFile = (indexToRemove: number) => {
+    if (currentImages) {
+      const newFiles = currentImages.filter((_, index) => index !== indexToRemove);
+      setCurrentImages(newFiles.length > 0 ? newFiles : null);
+      console.log("DELETED: Photo deleted. Updated files:", newFiles.length > 0 ? newFiles : null);
+    }
+  };
+
+  // Handle drag start
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  // Handle drag over
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDraggedOver(index);
+  };
+
+  // Handle drop
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    
+    if (draggedIndex === null || !currentImages) return;
+
+    const newFiles = [...currentImages];
+    const draggedFile = newFiles[draggedIndex];
+    
+    // Remove the dragged item
+    newFiles.splice(draggedIndex, 1);
+    
+    // Insert at new position
+    newFiles.splice(dropIndex, 0, draggedFile);
+    
+    setCurrentImages(newFiles);
+    console.log("REORDERED: Photos reordered. Updated files:", newFiles);
+    setDraggedIndex(null);
+    setDraggedOver(null);
+  };
+
+  // Handle drag end
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDraggedOver(null);
+  };
+
+  // Handle new file uploads
+  const handleNewFiles = (allFiles: File[] | null) => {
+    if (!allFiles) {
+      console.log("Unexpected null files");
+      return;
+    }
+    
+    // Check if any of the allFiles already exist in our current files
+    const currentFiles = currentImages || [];
+    const existingFileNames = currentFiles
+      .filter(f => f instanceof File)
+      .map(f => (f as File).name);
+    
+    // Separate truly new files from re-uploaded existing files
+    const newFiles = allFiles.filter(file => !existingFileNames.includes(file.name));
+    
+    if (newFiles.length === 0) {
+      // No new files, this might be a re-upload of existing files
+      console.log("No new files detected, keeping current arrangement");
+      return;
+    }
+    
+    // Keep existing files (URLs and File objects) and add only additional new files
+    const result = [...currentFiles, ...newFiles];
+    setCurrentImages(result);
+    console.log("ADDED: New files added. Updated files:", result);
+  };
+
   return (
-    <div className="border border-(--divider-color) w-full p-7 rounded-md mb-3">
+    <div className="border border-gray-200 w-full p-7 rounded-md mb-3">
       <FormHeading
         title="Property Images"
-        subtitle="Upload high-quality images of the property"
+        subtitle="Upload high-quality images of the property. Drag to reorder."
       />
       <FormField
         control={form.control}
@@ -50,8 +126,8 @@ export default function FormPropertyImages({
           <FormItem>
             <FormControl>
               <FileUploader
-                value={files}
-                onValueChange={setFiles}
+                value={currentImages?.filter(f => f instanceof File) as File[] || null}
+                onValueChange={handleNewFiles}
                 dropzoneOptions={dropZoneConfig}
                 className="relative bg-background rounded-lg p-2"
               >
@@ -70,16 +146,21 @@ export default function FormPropertyImages({
                     </p>
                   </div>
                 </FileInput>
-                <FileUploaderContent>
-                  {files &&
-                    files.length > 0 &&
-                    files.map((file, i) => (
-                      <FileUploaderItem key={i} index={i}>
-                        <Paperclip className="h-4 w-4 stroke-current" />
-                        <span>{file.name}</span>
-                      </FileUploaderItem>
-                    ))}
-                </FileUploaderContent>
+
+                {/* Image Previews with Drag and Drop */}
+                {currentImages && currentImages.length > 0 && (
+                  <ImagePreviewGrid
+                    files={currentImages}
+                    draggedIndex={draggedIndex}
+                    draggedOver={draggedOver}
+                    onRemoveFile={removeFile}
+                    onDragStart={handleDragStart}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    onDragEnd={handleDragEnd}
+                    onDragLeave={() => setDraggedOver(null)}
+                  />
+                )}
               </FileUploader>
             </FormControl>
             <FormMessage />

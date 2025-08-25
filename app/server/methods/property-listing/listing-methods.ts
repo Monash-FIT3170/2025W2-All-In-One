@@ -235,10 +235,54 @@ const getListingStatusIdByName = {
   },
 };
 
+const updatePropertyListingImages = {
+  [MeteorMethodIdentifier.LISTING_UPDATE_IMAGES]: async (
+    propertyId: string,
+    imageUrls: string[]
+  ): Promise<{ success: boolean; propertyId: string }> => {
+    try {
+      // Find the listing for this property
+      const listing = await getListingDocumentAssociatedWithProperty(propertyId);
+
+      if (!listing) {
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(
+            `No listing found for property with Id ${propertyId}`
+          )
+        );
+      }
+
+      // Update the listing images
+      const result = await ListingCollection.updateAsync(
+        { property_id: propertyId },
+        {
+          $set: {
+            image_urls: imageUrls,
+          },
+        }
+      );
+
+      if (result === 0) {
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(
+            `Failed to update listing images for property ${propertyId}`
+          )
+        );
+      }
+
+      return { success: true, propertyId };
+    } catch (error) {
+      console.error("Error updating listing images:", error);
+      throw error;
+    }
+  },
+};
+
 Meteor.methods({
   ...getListingForProperty,
   ...insertDraftListingDocumentForProperty,
   ...getListingStatusIdByName,
   ...submitDraftListing,
   ...getAllListedListings,
+  ...updatePropertyListingImages,
 });
