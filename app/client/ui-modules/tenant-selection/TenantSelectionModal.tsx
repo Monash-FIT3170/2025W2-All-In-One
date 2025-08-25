@@ -1,5 +1,6 @@
 import React from 'react';
 import { TenantSelectionModalProps } from './types/TenantSelectionModalProps';
+import { Role } from '/app/shared/user-role-identifier';
 import { FilterType } from './enums/FilterType';
 import { ModalHeader } from './components/ModalHeader';
 import { FilterTabs } from './components/FilterTabs';
@@ -8,21 +9,21 @@ import { ModalDone } from './components/ModalDone';
 import { useAppDispatch, useAppSelector } from '/app/client/store';
 import {
   sendAcceptedApplicationsToLandlordAsync,
+  sendApprovedApplicationsToAgentAsync,
   setFilter,
   selectActiveFilter,
 } from './state/reducers/tenant-selection-slice';
 
-export const TenantSelectionModal = ({
-  isOpen,
-  onClose,
-  onReject,
-  onAccept,
-  onSendToLandlord,
-  shouldShowSendToLandlordButton,
-  acceptedApplicantCount,
-  userRole,
-  tenantApplications = [], // Receive applications as props
-}: TenantSelectionModalProps): React.JSX.Element => {
+export const TenantSelectionModal = (
+  props: TenantSelectionModalProps
+): React.JSX.Element => {
+  const {
+    isOpen,
+    onClose,
+    onReject,
+    onAccept,
+    tenantApplications = [],
+  } = props;
   const dispatch = useAppDispatch();
   const activeFilter = useAppSelector(selectActiveFilter);
   const isLoading = useAppSelector((state) => state.tenantSelection.isLoading);
@@ -37,8 +38,17 @@ export const TenantSelectionModal = ({
   };
 
   const handleSendToLandlord = () => {
-    dispatch(sendAcceptedApplicationsToLandlordAsync());
-    onSendToLandlord();
+    if (props.role === Role.AGENT) {
+      dispatch(sendAcceptedApplicationsToLandlordAsync());
+      props.onSendToLandlord();
+    }
+  };
+
+  const handleSendToAgent = () => {
+    if (props.role === Role.LANDLORD) {
+      dispatch(sendApprovedApplicationsToAgentAsync());
+      props.onSendToAgent();
+    }
   };
 
   const handleFilterChange = (filter: FilterType) => {
@@ -75,18 +85,31 @@ export const TenantSelectionModal = ({
           tenantApplications={tenantApplications}
           onReject={handleReject}
           onAccept={handleAccept}
-          userRole={userRole}
+          userRole={props.role}
         />
 
-         {/* Send accepted applicants to landlord button */}
-         {shouldShowSendToLandlordButton && (
+         {/* Agent-only button */}
+         {props.role === Role.AGENT && props.shouldShowSendToLandlordButton && (
           <div className="p-4 border-t">
             <button
               onClick={handleSendToLandlord}
               disabled={isLoading}
               className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              Send {acceptedApplicantCount} Accepted Applicant(s) to Landlord
+              Send {props.acceptedApplicantCount} Accepted Applicant(s) to Landlord
+            </button>
+          </div>
+        )}
+
+        {/* Landlord-only button */}
+        {props.role === Role.LANDLORD && props.shouldShowSendToAgentButton && (
+          <div className="p-4 border-t">
+            <button
+              onClick={handleSendToAgent}
+              disabled={isLoading}
+              className="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              Send {props.landlordApprovedApplicantCount} Approved Applicant(s) to Agent for Background Check
             </button>
           </div>
         )}
