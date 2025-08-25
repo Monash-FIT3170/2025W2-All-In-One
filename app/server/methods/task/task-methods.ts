@@ -179,6 +179,8 @@ const taskInsertForLandlordMethod = {
       description: taskData.description || "",
       dueDate: taskData.dueDate,
       priority: taskData.priority,
+      taskPropertyAddress: "",
+      taskPropertyId: "",
       taskStatus: TaskStatus.NOTSTARTED,
       createdDate: new Date(),
     };
@@ -197,6 +199,93 @@ const taskInsertForLandlordMethod = {
       } catch (landlordError) {
         console.error("Landlord not found for ID:", taskData.landlordId);
         throw new Error("Landlord not found - cannot send tenant application");
+      }
+
+      return insertedId;
+    } catch (error) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Failed to create task: ${error}`)
+      );
+    }
+  },
+};
+
+/**
+ * Creates a new task for either AGENT or LANDLORD via a single entry point and returns the task ID.
+ */
+const taskInsertUniversalMethod = {
+  [MeteorMethodIdentifier.TASK_INSERT]: async (taskData: {
+    name: string;
+    description: string;
+    dueDate: Date;
+    priority: TaskPriority;
+    propertyAddress: string;
+    propertyId: string;
+    userType: "agent" | "landlord";
+    userId: string;
+  }): Promise<string> => {
+    console.log("taskInsertUniversalMethod called with:", taskData);
+
+    // Validate required fields
+    if (!taskData.name || taskData.name.trim() === "") {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("Task name is required")
+      );
+    }
+    if (!taskData.dueDate) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("Due date is required")
+      );
+    }
+    if (!taskData.priority) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("Priority is required")
+      );
+    }
+    if (!taskData.userId) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("Assignee user ID is required")
+      );
+    }
+    if (!taskData.propertyAddress || !taskData.propertyId) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("Property context (address and id) is required")
+      );
+    }
+
+    const taskDocument: Omit<TaskDocument, "_id"> = {
+      name: taskData.name.trim(),
+      description: taskData.description || "",
+      dueDate: taskData.dueDate,
+      priority: taskData.priority,
+      taskPropertyAddress: taskData.propertyAddress,
+      taskPropertyId: taskData.propertyId,
+      taskStatus: TaskStatus.NOTSTARTED,
+      createdDate: new Date(),
+    };
+
+    try {
+      const insertedId = await TaskCollection.insertAsync(taskDocument);
+      const createdTask = await getTaskDocumentById(insertedId);
+
+      if (!createdTask) {
+        throw new InvalidDataError("Failed to retrieve created task");
+      }
+
+      if (taskData.userType === "agent") {
+        await Meteor.callAsync(
+          MeteorMethodIdentifier.AGENT_UPDATE_TASKS,
+          taskData.userId,
+          insertedId
+        );
+      } else if (taskData.userType === "landlord") {
+        await Meteor.callAsync(
+          MeteorMethodIdentifier.LANDLORD_UPDATE_TASKS,
+          taskData.userId,
+          insertedId
+        );
+      } else {
+        throw new InvalidDataError("Unsupported assignee type");
       }
 
       return insertedId;
@@ -238,6 +327,7 @@ async function getTaskDocumentById(
 
 Meteor.methods({
   ...taskGetMethod,
+  ...taskInsertUniversalMethod,
   ...taskInsertForAgentMethod,
   ...taskInsertForLandlordMethod
 });

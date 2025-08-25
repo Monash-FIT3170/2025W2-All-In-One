@@ -38,15 +38,13 @@ export const TenantSelectionModal = (
   };
 
   const handleSendToLandlord = () => {
-    if (props.role === Role.AGENT) {
-      dispatch(sendAcceptedApplicationsToLandlordAsync());
+    if (props.role === Role.AGENT) {;
       props.onSendToLandlord();
     }
   };
 
   const handleSendToAgent = () => {
     if (props.role === Role.LANDLORD) {
-      dispatch(sendApprovedApplicationsToAgentAsync());
       props.onSendToAgent();
     }
   };

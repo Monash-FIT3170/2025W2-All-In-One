@@ -52,9 +52,11 @@ const agentUpdateTasksMethod = {
     userId: string,
     taskId: string
   ): Promise<void> => {
-    const agentDoc = await AgentCollection.findOneAsync({
-      userAccountId: userId,
-    });
+    // Try resolve by userAccountId first, then fallback to agent _id
+    let agentDoc = await AgentCollection.findOneAsync({ userAccountId: userId });
+    if (!agentDoc) {
+      agentDoc = await AgentCollection.findOneAsync({ _id: userId });
+    }
 
     if (!agentDoc) {
       throw meteorWrappedInvalidDataError(
@@ -67,7 +69,7 @@ const agentUpdateTasksMethod = {
     if (!currentTaskIds.includes(taskId)) {
       const updatedTaskIds = [...currentTaskIds, taskId];
       await AgentCollection.updateAsync(
-        { userAccountId: userId },
+        { _id: agentDoc._id },
         { $set: { task_ids: updatedTaskIds } }
       );
     }

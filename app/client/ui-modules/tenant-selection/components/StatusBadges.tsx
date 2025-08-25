@@ -43,6 +43,19 @@ export function StatusBadge({ status }: StatusBadgeProps): React.JSX.Element | n
           LANDLORD REJECTED
         </span>
       );
+    case TenantApplicationStatus.BACKGROUND_CHECK_PENDING:
+      return (
+        <span className="px-2 py-1 bg-amber-200 text-amber-800 text-xs font-medium rounded">
+          BACKGROUND CHECK PENDING
+        </span>
+      );
+    case TenantApplicationStatus.BACKGROUND_CHECK_FAILED:
+      return (
+        <span className="px-2 py-1 bg-red-300 text-red-800 text-xs font-medium rounded">
+          BACKGROUND CHECK FAILED
+        </span>
+      );
+
     default:
       return null;
   }

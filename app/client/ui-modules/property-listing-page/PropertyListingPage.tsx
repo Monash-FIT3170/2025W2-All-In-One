@@ -59,6 +59,9 @@ import {
   sendAcceptedApplicationsToLandlordAsync,
   selectLandlordApprovedApplicantCountForProperty,
   selectHasLandlordApprovedApplicationsForProperty,
+  agentBackgroundCheckFailedAsync,
+  agentBackgroundCheckPassedAsync,
+  selectApplicationsForProperty
 } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { Role } from "/app/shared/user-role-identifier";
 
@@ -302,11 +305,22 @@ function ListingPageContent({
   const shouldShowSendToLandlordButton = hasAcceptedApplications && authUser?.role === Role.AGENT;
   const shouldShowSendToAgentButton = hasLandlordApprovedApplications && authUser?.role === Role.LANDLORD;;
 
+  const allApplications = useAppSelector((state) =>
+    selectApplicationsForProperty(state as any, propertyId)
+  );
+
+  const getStep = (id: string) =>
+    allApplications.find((a) => a.id === id)?.step;
+
   const handleAccept = async (applicationId: string) => {
     try {
-      if (authUser?.role === Role.LANDLORD) {
+      const currentStep = getStep(applicationId)
+      if (authUser?.role === Role.LANDLORD && currentStep === 2) {
         await dispatch(landlordApproveTenantApplicationAsync(applicationId)).unwrap();
         console.log(`Landlord approved application ${applicationId}`);
+      } else if (authUser?.role === Role.AGENT && currentStep === 3) {
+        await dispatch(agentBackgroundCheckPassedAsync(applicationId)).unwrap();
+        console.log(`Background check passed ${applicationId}`)
       } else {
         await dispatch(acceptTenantApplicationAsync(applicationId)).unwrap();
         console.log(`Accepted application ${applicationId}`);
@@ -318,9 +332,13 @@ function ListingPageContent({
 
   const handleReject = async (applicationId: string) => {
     try {
-      if (authUser?.role === Role.LANDLORD) {
+      const currentStep = getStep(applicationId)
+      if (authUser?.role === Role.LANDLORD && currentStep === 2) {
         await dispatch(landlordRejectTenantApplicationAsync(applicationId)).unwrap();
         console.log(`Landlord rejected application ${applicationId}`);
+      } else if (authUser?.role === Role.AGENT && currentStep === 3) {
+        await dispatch(agentBackgroundCheckFailedAsync(applicationId)).unwrap();
+        console.log(`Background check failed ${applicationId}`)
       } else {
         await dispatch(rejectTenantApplicationAsync(applicationId)).unwrap();
         console.log(`Rejected application ${applicationId}`);

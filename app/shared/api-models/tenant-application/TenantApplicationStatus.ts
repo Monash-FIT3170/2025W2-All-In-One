@@ -5,6 +5,7 @@ export enum TenantApplicationStatus {
   LANDLORD_REVIEW = 'landlord_review',      // Step 2: Sent to landlord for review
   LANDLORD_APPROVED = 'landlord_approved',  // Step 2: Landlord approves for background check
   LANDLORD_REJECTED = 'landlord_rejected',  // Step 2: Landlord rejects
+  BACKGROUND_CHECK_PENDING = 'background_check_pending',  // Step 3: Agent background check pending
   BACKGROUND_CHECK_PASSED = 'background_check_passed',  // Step 3: Agent background check passed
   BACKGROUND_CHECK_FAILED = 'background_check_failed',  // Step 3: Agent background check failed
   FINAL_APPROVED = 'final_approved',        // Step 4: Landlord final approval

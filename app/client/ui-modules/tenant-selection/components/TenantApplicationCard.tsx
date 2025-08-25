@@ -2,7 +2,7 @@ import React from 'react';
 import { TenantApplication } from '../types/TenantApplication';
 import { TenantApplicationStatus } from '../../../../shared/api-models/tenant-application/TenantApplicationStatus';
 import { StatusBadge } from './StatusBadges';
-import { RejectButton, AcceptButton } from '../../property-listing-page/components/TenantReviewButtons';
+import { RejectButton, AcceptButton, BackgroundFailButton, BackgroundPassButton } from '../../property-listing-page/components/TenantReviewButtons';
 import { UserAccount } from '/app/client/library-modules/domain-models/user/UserAccount';
 import { Role } from '/app/shared/user-role-identifier';
 
@@ -33,7 +33,9 @@ export const TenantApplicationCard = ({
   const canLandlordReview = userRole === Role.LANDLORD &&
     application.status === TenantApplicationStatus.LANDLORD_REVIEW;
 
-  const canReview = canAgentReview || canLandlordReview;
+  const canAgentBackgroundCheck = userRole === Role.AGENT &&
+    application.status === TenantApplicationStatus.BACKGROUND_CHECK_PENDING;
+
   return (
     <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
       <div className="flex flex-col flex-1">
@@ -44,16 +46,33 @@ export const TenantApplicationCard = ({
 
 
 
-        {/* Action buttons based on status */}
+        {/* Action buttons for based on status */}
         <div className="flex gap-2">
-          {application.status === TenantApplicationStatus.UNDETERMINED && (
+          {/* Agent review actions */}
+          {canAgentReview && (
             <>
               <RejectButton onClick={handleReject} />
               <AcceptButton onClick={handleAccept} />
             </>
           )}
 
-          {/* Status messages for different states */}
+          {/* Landlord review actions */}
+          {canLandlordReview && (
+            <>
+              <RejectButton onClick={handleReject} />
+              <AcceptButton onClick={handleAccept} />
+            </>
+          )}
+
+          {/* Agent background check actions */}
+          {canAgentBackgroundCheck && (
+            <>
+              <BackgroundFailButton onClick={handleReject} />
+              <BackgroundPassButton onClick={handleAccept} />
+            </>
+          )}
+
+          {/* Status messages for different states
           {userRole === Role.LANDLORD && application.status === TenantApplicationStatus.ACCEPTED && (
             <div className="text-sm text-gray-500">
               Accepted by agent - ready for your review
@@ -87,6 +106,12 @@ export const TenantApplicationCard = ({
           {userRole === Role.AGENT && application.status === TenantApplicationStatus.LANDLORD_REJECTED && (
             <div className="text-sm text-red-600">
               ✗ Rejected by landlord
+            </div>
+          )} */}
+
+          {application.status == TenantApplicationStatus.BACKGROUND_CHECK_PENDING && (
+            <div className ="text-sm text-amber-600">
+              Background check pending
             </div>
           )}
         </div>
