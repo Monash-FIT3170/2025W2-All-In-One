@@ -55,6 +55,10 @@ import {
   landlordRejectTenantApplicationAsync,
   acceptTenantApplicationAsync,
   rejectTenantApplicationAsync,
+  sendApprovedApplicationsToAgentAsync,
+  sendAcceptedApplicationsToLandlordAsync,
+  selectLandlordApprovedApplicantCountForProperty,
+  selectHasLandlordApprovedApplicationsForProperty,
 } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { Role } from "/app/shared/user-role-identifier";
 
@@ -280,16 +284,23 @@ function ListingPageContent({
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
   const dispatch = useAppDispatch();
 
-  const acceptedApplicantCount = useAppSelector((state) => selectAcceptedApplicantCountForProperty(state, propertyId));
-  const hasAcceptedApplications = useAppSelector((state) => selectHasAcceptedApplicationsForProperty(state, propertyId));
+
   const tenantApplications = useAppSelector((state) => selectFilteredApplications(state, propertyId));
   const isCreatingApplication = useAppSelector((state) => state.tenantSelection.isLoading);
+
+  const acceptedApplicantCount = useAppSelector((state) => selectAcceptedApplicantCountForProperty(state, propertyId));
+  const hasAcceptedApplications = useAppSelector((state) => selectHasAcceptedApplicationsForProperty(state, propertyId));
 
   // Get current user's name for checking if they've already applied
   const currentUserName = profileData ? `${profileData.firstName} ${profileData.lastName}` : undefined;
   const hasCurrentUserApplied = useAppSelector((state) => selectHasCurrentUserApplied(state, propertyId, currentUserName));
 
+  // Step 2 selectors for landlord approved applications
+  const hasLandlordApprovedApplications = useAppSelector((state) => selectHasLandlordApprovedApplicationsForProperty(state, propertyId));
+  const landlordApprovedApplicantCount = useAppSelector((state) => selectLandlordApprovedApplicantCountForProperty(state, propertyId));
+
   const shouldShowSendToLandlordButton = hasAcceptedApplications && authUser?.role === Role.AGENT;
+  const shouldShowSendToAgentButton = hasLandlordApprovedApplications && authUser?.role === Role.LANDLORD;;
 
   const handleAccept = async (applicationId: string) => {
     try {
@@ -316,6 +327,23 @@ function ListingPageContent({
       }
     } catch (error) {
       console.error("Failed to reject application:", error);
+    }
+  };
+  const handleSendToLandlord = async () => {
+    try {
+      await dispatch(sendAcceptedApplicationsToLandlordAsync()).unwrap();
+      console.log("Successfully sent applications to landlord");
+    } catch (error) {
+      console.error("Failed to send applications to landlord:", error);
+    }
+  };
+
+  const handleSendToAgent = async () => {
+    try {
+      await dispatch(sendApprovedApplicationsToAgentAsync()).unwrap();
+      console.log("Successfully sent applications to agent");
+    } catch (error) {
+      console.error("Failed to send applications to agent:", error);
     }
   };
 
@@ -369,23 +397,32 @@ function ListingPageContent({
         onReviewTenant={() => setIsReviewTenantModalOpen(true)}
       />
 
-      <TenantSelectionModal
-        isOpen={isReviewTenantModalOpen}
-        onClose={() => setIsReviewTenantModalOpen(false)}
-        onReject={(applicationId: string) => {
-          console.log(`Rejected application ${applicationId}`);
-        }}
-        onAccept={(applicationId: string) => {
-          console.log(`Accepted application ${applicationId}`);
-        }}
-        onSendToLandlord={() => {
-          console.log(`Sent applications to landlord`);
-        }}
-        shouldShowSendToLandlordButton={shouldShowSendToLandlordButton}
-        acceptedApplicantCount={acceptedApplicantCount}
-        tenantApplications={tenantApplications}
-        userRole={authUser?.role}
-      />
+      {authUser?.role === Role.AGENT && (
+        <TenantSelectionModal
+          role={Role.AGENT}
+          isOpen={isReviewTenantModalOpen}
+          onClose={() => setIsReviewTenantModalOpen(false)}
+          onReject={handleReject}
+          onAccept={handleAccept}
+          onSendToLandlord={handleSendToLandlord}
+          shouldShowSendToLandlordButton={shouldShowSendToLandlordButton}
+          acceptedApplicantCount={acceptedApplicantCount}
+          tenantApplications={tenantApplications}
+        />
+      )}
+      {authUser?.role === Role.LANDLORD && (
+        <TenantSelectionModal
+          role={Role.LANDLORD}
+          isOpen={isReviewTenantModalOpen}
+          onClose={() => setIsReviewTenantModalOpen(false)}
+          onReject={handleReject}
+          onAccept={handleAccept}
+          onSendToAgent={handleSendToAgent}
+          shouldShowSendToAgentButton={shouldShowSendToAgentButton}
+          landlordApprovedApplicantCount={landlordApprovedApplicantCount}
+          tenantApplications={tenantApplications}
+        />
+      )}
     </div>
   );
 }
