@@ -50,6 +50,11 @@ import {
   selectFilteredApplications,
   selectHasCurrentUserApplied,
   createTenantApplicationAsync,
+  loadTenantApplicationsForPropertyAsync,
+  landlordApproveTenantApplicationAsync,
+  landlordRejectTenantApplicationAsync,
+  acceptTenantApplicationAsync,
+  rejectTenantApplicationAsync,
 } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { Role } from "/app/shared/user-role-identifier";
 
@@ -72,6 +77,8 @@ export function PropertyListingPage({
   // Track inspection bookings for the current user (temporary solution before setting up DB)
   const [bookedInspections, setBookedInspections] = useState<Set<number>>(new Set());
 
+
+
   useEffect(() => {
     if (!propertyId) {
       console.log("Property ID is not provided, loading default property");
@@ -82,6 +89,13 @@ export function PropertyListingPage({
     dispatch(load(propertyId));
   }, []);
 
+
+  // Load tenant applications when property loads
+  useEffect(() => {
+    if (propertyId && authUser) {
+      dispatch(loadTenantApplicationsForPropertyAsync(propertyId));
+    }
+  }, [propertyId, authUser]);
 
   if (state.shouldShowLoadingState) {
     return (
@@ -264,6 +278,7 @@ function ListingPageContent({
   className?: string;
 }): React.JSX.Element {
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
+  const dispatch = useAppDispatch();
 
   const acceptedApplicantCount = useAppSelector((state) => selectAcceptedApplicantCountForProperty(state, propertyId));
   const hasAcceptedApplications = useAppSelector((state) => selectHasAcceptedApplicationsForProperty(state, propertyId));
@@ -274,8 +289,35 @@ function ListingPageContent({
   const currentUserName = profileData ? `${profileData.firstName} ${profileData.lastName}` : undefined;
   const hasCurrentUserApplied = useAppSelector((state) => selectHasCurrentUserApplied(state, propertyId, currentUserName));
 
-  const shouldShowSendToLandlordButton = hasAcceptedApplications;
+  const shouldShowSendToLandlordButton = hasAcceptedApplications && authUser?.role === Role.AGENT;
 
+  const handleAccept = async (applicationId: string) => {
+    try {
+      if (authUser?.role === Role.LANDLORD) {
+        await dispatch(landlordApproveTenantApplicationAsync(applicationId)).unwrap();
+        console.log(`Landlord approved application ${applicationId}`);
+      } else {
+        await dispatch(acceptTenantApplicationAsync(applicationId)).unwrap();
+        console.log(`Accepted application ${applicationId}`);
+      }
+    } catch (error) {
+      console.error("Failed to accept application:", error);
+    }
+  };
+
+  const handleReject = async (applicationId: string) => {
+    try {
+      if (authUser?.role === Role.LANDLORD) {
+        await dispatch(landlordRejectTenantApplicationAsync(applicationId)).unwrap();
+        console.log(`Landlord rejected application ${applicationId}`);
+      } else {
+        await dispatch(rejectTenantApplicationAsync(applicationId)).unwrap();
+        console.log(`Rejected application ${applicationId}`);
+      }
+    } catch (error) {
+      console.error("Failed to reject application:", error);
+    }
+  };
 
   return (
     <div className={className}>

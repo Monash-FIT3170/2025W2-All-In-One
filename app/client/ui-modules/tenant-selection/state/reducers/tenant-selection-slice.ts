@@ -68,6 +68,8 @@ export const createTenantApplicationAsync = createAsyncThunk(
   }
 );
 
+
+// Agent reject tenant application (Step 1)
 export const rejectTenantApplicationAsync = createAsyncThunk(
   "tenantSelection/rejectTenantApplication",
   async (applicationId: string) => {
@@ -76,6 +78,7 @@ export const rejectTenantApplicationAsync = createAsyncThunk(
   }
 );
 
+// Agent accept tenant application (Step 1)
 export const acceptTenantApplicationAsync = createAsyncThunk(
   "tenantSelection/acceptTenantApplication",
   async (applicationId: string) => {
@@ -83,6 +86,26 @@ export const acceptTenantApplicationAsync = createAsyncThunk(
     return { applicationId, status: TenantApplicationStatus.ACCEPTED };
   }
 );
+
+
+// Landlord approve tenant application (Step 2)
+export const landlordApproveTenantApplicationAsync = createAsyncThunk(
+  "tenantSelection/landlordApproveTenantApplication",
+  async (applicationId: string) => {
+    await updateTenantApplicationStatus([applicationId], TenantApplicationStatus.LANDLORD_APPROVED, 2);
+    return { applicationId, status: TenantApplicationStatus.LANDLORD_APPROVED };
+  }
+);
+
+// Landlord reject tenant application (Step 2)
+export const landlordRejectTenantApplicationAsync = createAsyncThunk(
+  "tenantSelection/landlordRejectTenantApplication",
+  async (applicationId: string) => {
+    await updateTenantApplicationStatus([applicationId], TenantApplicationStatus.LANDLORD_REJECTED, 2);
+    return { applicationId, status: TenantApplicationStatus.LANDLORD_REJECTED };
+  }
+);
+
 
 export const sendAcceptedApplicationsToLandlordAsync = createAsyncThunk(
   "tenantSelection/sendAcceptedApplicationsToLandlord",
@@ -237,6 +260,34 @@ export const tenantSelectionSlice = createSlice({
         state.error = action.error.message || "Failed to accept application";
       })
 
+      // Landlord approve tenant application
+      .addCase(landlordApproveTenantApplicationAsync.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(landlordApproveTenantApplicationAsync.fulfilled, (state, action) => {
+        state.isLoading = false;
+        updateApplicationStatus(state, action.payload.applicationId, TenantApplicationStatus.LANDLORD_APPROVED);
+      })
+      .addCase(landlordApproveTenantApplicationAsync.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || "Failed to approve application";
+      })
+
+      // Landlord reject tenant application
+      .addCase(landlordRejectTenantApplicationAsync.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(landlordRejectTenantApplicationAsync.fulfilled, (state, action) => {
+        state.isLoading = false;
+        updateApplicationStatus(state, action.payload.applicationId, TenantApplicationStatus.LANDLORD_REJECTED);
+      })
+      .addCase(landlordRejectTenantApplicationAsync.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || "Failed to reject application";
+      })
+
       // Load tenant applications for property
       .addCase(loadTenantApplicationsForPropertyAsync.pending, (state) => {
         state.isLoading = true;
@@ -287,9 +338,11 @@ export const selectFilteredApplications = (state: RootState, propertyId: string)
     case FilterType.ALL:
       return applications;
     case FilterType.REJECTED:
-      return applications.filter((app: TenantApplication) => app.status === TenantApplicationStatus.REJECTED);
+      return applications.filter((app: TenantApplication) =>
+        app.status === TenantApplicationStatus.REJECTED || app.status === TenantApplicationStatus.LANDLORD_REJECTED);
     case FilterType.ACCEPTED:
-      return applications.filter((app: TenantApplication) => app.status === TenantApplicationStatus.ACCEPTED);
+      return applications.filter((app: TenantApplication) =>
+        app.status === TenantApplicationStatus.ACCEPTED || app.status === TenantApplicationStatus.LANDLORD_APPROVED);
     default:
       return applications;
   }

@@ -27,6 +27,13 @@ export const TenantApplicationCard = ({
     onAccept(application.id);
   };
 
+  const canAgentReview = userRole === Role.AGENT &&
+    application.status === TenantApplicationStatus.UNDETERMINED;
+
+  const canLandlordReview = userRole === Role.LANDLORD &&
+    application.status === TenantApplicationStatus.LANDLORD_REVIEW;
+
+  const canReview = canAgentReview || canLandlordReview;
   return (
     <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
       <div className="flex flex-col flex-1">
@@ -46,13 +53,40 @@ export const TenantApplicationCard = ({
             </>
           )}
 
-          {/* Landlords can see applications but not modify them */}
-          {userRole === Role.LANDLORD && (
+          {/* Status messages for different states */}
+          {userRole === Role.LANDLORD && application.status === TenantApplicationStatus.ACCEPTED && (
             <div className="text-sm text-gray-500">
-              {application.status === TenantApplicationStatus.LANDLORD_REVIEW &&
-                'Ready for your review'}
-              {application.status === TenantApplicationStatus.ACCEPTED &&
-                'Accepted by agent'}
+              Accepted by agent - ready for your review
+            </div>
+          )}
+
+          {userRole === Role.LANDLORD && application.status === TenantApplicationStatus.LANDLORD_APPROVED && (
+            <div className="text-sm text-green-600">
+              ✓ Approved by you
+            </div>
+          )}
+
+          {userRole === Role.LANDLORD && application.status === TenantApplicationStatus.LANDLORD_REJECTED && (
+            <div className="text-sm text-red-600">
+              ✗ Rejected by you
+            </div>
+          )}
+
+          {userRole === Role.AGENT && application.status === TenantApplicationStatus.LANDLORD_REVIEW && (
+            <div className="text-sm text-blue-600">
+              Sent to landlord for review
+            </div>
+          )}
+
+          {userRole === Role.AGENT && application.status === TenantApplicationStatus.LANDLORD_APPROVED && (
+            <div className="text-sm text-green-600">
+              ✓ Approved by landlord
+            </div>
+          )}
+
+          {userRole === Role.AGENT && application.status === TenantApplicationStatus.LANDLORD_REJECTED && (
+            <div className="text-sm text-red-600">
+              ✗ Rejected by landlord
             </div>
           )}
         </div>

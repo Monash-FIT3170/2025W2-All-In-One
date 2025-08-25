@@ -7,8 +7,6 @@ import { ModalContent } from './components/ModalContent';
 import { ModalDone } from './components/ModalDone';
 import { useAppDispatch, useAppSelector } from '/app/client/store';
 import {
-  rejectTenantApplicationAsync,
-  acceptTenantApplicationAsync,
   sendAcceptedApplicationsToLandlordAsync,
   setFilter,
   selectActiveFilter,
@@ -31,12 +29,10 @@ export const TenantSelectionModal = ({
   const error = useAppSelector((state) => state.tenantSelection.error);
 
   const handleReject = (applicationId: string) => {
-    dispatch(rejectTenantApplicationAsync(applicationId));
     onReject(applicationId);
   };
 
   const handleAccept = (applicationId: string) => {
-    dispatch(acceptTenantApplicationAsync(applicationId));
     onAccept(applicationId);
   };
 
