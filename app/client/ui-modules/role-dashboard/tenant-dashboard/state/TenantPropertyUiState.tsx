@@ -6,6 +6,7 @@ import { InspectionBookingListUiState } from "/app/client/ui-modules/property-li
 
 export type TenantPropertyUiState = {
   propertyId: string;
+    // propertyAgentId: string;
   propertyLandlordId: string;
   streetNumber: string;
   street: string;

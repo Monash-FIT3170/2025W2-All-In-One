@@ -12,9 +12,12 @@ import { RootState } from "/app/client/store";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { getAllLandlords } from "/app/client/library-modules/domain-models/user/role-repositories/landlord-repository";
+import { getAgentById } from "/app/client/library-modules/domain-models/user/role-repositories/agent-repository";
+import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
 const initialState: TenantPropertyUiState = {
   propertyId: "",
+  // propertyAgentId: "",
   propertyLandlordId: "",
   streetNumber: "",
   street: "",
@@ -69,6 +72,7 @@ export const tenantPropertySlice = createSlice({
     });
     builder.addCase(load.fulfilled, (state, action) => {
       state.propertyId = action.payload.propertyId;
+      // state.propertyAgentId = action.payload.agentId;
       state.propertyLandlordId = action.payload.landlordId;
       state.propertyId = action.payload.propertyId;
       state.streetNumber = action.payload.streetnumber;
@@ -200,6 +204,18 @@ function getListingStatusPillVariant(status: string): ListingStatusPillVariant {
       return ListingStatusPillVariant.DRAFT;
   }
 }
+
+// export const fetchPropertyAgent = createAsyncThunk(
+//   "propertyListing/fetchPropertyAgent",
+//   async (propertyAgentId: string, { rejectWithValue }) => {
+//     try {
+//       // propertyAgentId = (await getPropertyById(propertyId)).agentId;
+//       return await getAgentById(propertyAgentId);
+//     } catch (err) {
+//       return rejectWithValue("Failed to fetch property agent");
+//     }
+//   }
+// )
 
 export const load = createAsyncThunk(
   "propertyListing/load",

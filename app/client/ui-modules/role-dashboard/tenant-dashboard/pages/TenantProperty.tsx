@@ -218,7 +218,7 @@ function ListingPageContent({
     <div className={className}>
       <TopBar
         listingStatusText={listingStatusText}
-        listingStatusPillVariant={listingStatusPillVariant}
+        // listingStatusPillVariant={listingStatusPillVariant}
         shouldDisplayListingStatus={shouldDisplayListingStatus}
         onBack={onBack}
         className="mb-3"
@@ -251,15 +251,15 @@ function ListingPageContent({
         propertyFeatures={propertyFeatures}
         className="mb-6"
       />
-      <BottomBar
+      {/* <BottomBar
         shouldDisplaySubmitDraftButton={shouldDisplaySubmitDraftButton}
         shouldDisplayReviewTenantButton={shouldDisplayReviewTenantButton}
         shouldDisplayEditListingButton={shouldDisplayEditListingButton}
         onSubmitDraftListing={onSubmitDraftListing}
         onReviewTenant={() => setIsReviewTenantModalOpen(true)}
-      />
+      /> */}
 
-      <ReviewTenantModal
+      {/* <ReviewTenantModal
         isOpen={isReviewTenantModalOpen}
         onClose={() => setIsReviewTenantModalOpen(false)}
         onReject={(applicationId: string) => {
@@ -273,7 +273,7 @@ function ListingPageContent({
         }}
         shouldShowSendToLandlordButton={shouldShowSendToLandlordButton}
         acceptedCount={acceptedCount}
-      />
+      /> */}
     </div>
   );
 }
@@ -288,13 +288,13 @@ function ListingPageContentLoadingSkeleton({
 
 function TopBar({
   listingStatusText,
-  listingStatusPillVariant,
+  // listingStatusPillVariant,
   shouldDisplayListingStatus,
   onBack,
   className = "",
 }: {
   listingStatusText: string;
-  listingStatusPillVariant: ListingStatusPillVariant;
+  // listingStatusPillVariant: ListingStatusPillVariant;
   shouldDisplayListingStatus: boolean;
   onBack: () => void;
   className?: string;
@@ -307,12 +307,12 @@ function TopBar({
         onClick={onBack}
         className="mr-auto"
       />
-      {shouldDisplayListingStatus && (
-        <ListingStatusPill
-          text={listingStatusText}
-          variant={listingStatusPillVariant}
-        />
-      )}
+      {/* {shouldDisplayListingStatus && (
+        // <ListingStatusPill
+        //   text={listingStatusText}
+        //   variant={listingStatusPillVariant}
+        // />
+      )} */}
     </div>
   );
 }
@@ -432,88 +432,88 @@ function ListingDetails({
   );
 }
 
-function BottomBar({
-  shouldDisplaySubmitDraftButton,
-  shouldDisplayReviewTenantButton,
-  shouldDisplayEditListingButton,
-  onSubmitDraftListing,
-  onReviewTenant,
-  className = "",
-}: {
-  shouldDisplaySubmitDraftButton: boolean;
-  shouldDisplayReviewTenantButton: boolean;
-  shouldDisplayEditListingButton: boolean;
-  onSubmitDraftListing: () => void;
-  onReviewTenant: () => void;
-  className?: string;
-}): React.JSX.Element {
-  return (
-    <div
-      className={twMerge(
-        "flex justify-between items-center gap-2",
-        className
-      )}
-    >
-      {/* Left side - Review Tenant Button */}
-      <div className="flex">
-        {shouldDisplayReviewTenantButton && (
-          <ReviewTenantButton onClick={onReviewTenant} />
-        )}
-      </div>
+// function BottomBar({
+//   shouldDisplaySubmitDraftButton,
+//   shouldDisplayReviewTenantButton,
+//   shouldDisplayEditListingButton,
+//   onSubmitDraftListing,
+//   onReviewTenant,
+//   className = "",
+// }: {
+//   shouldDisplaySubmitDraftButton: boolean;
+//   shouldDisplayReviewTenantButton: boolean;
+//   shouldDisplayEditListingButton: boolean;
+//   onSubmitDraftListing: () => void;
+//   onReviewTenant: () => void;
+//   className?: string;
+// }): React.JSX.Element {
+//   return (
+//     <div
+//       className={twMerge(
+//         "flex justify-between items-center gap-2",
+//         className
+//       )}
+//     >
+//       {/* Left side - Review Tenant Button */}
+//       <div className="flex">
+//         {shouldDisplayReviewTenantButton && (
+//           <ReviewTenantButton onClick={onReviewTenant} />
+//         )}
+//       </div>
 
-      <div className="flex">
-        {shouldDisplayEditListingButton && <ListingModalEditor />}
-        {shouldDisplaySubmitDraftButton && (
-          <SubmitDraftListingButton onClick={onSubmitDraftListing} />
-        )}
-      </div>
-    </div>
-  );
-}
+//       <div className="flex">
+//         {shouldDisplayEditListingButton && <ListingModalEditor />}
+//         {shouldDisplaySubmitDraftButton && (
+//           <SubmitDraftListingButton onClick={onSubmitDraftListing} />
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
 
-function ListingModalEditor({
-  className = "",
-}: {
-  className?: string;
-}): React.JSX.Element {
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const toggleModal = () => setIsModalOpen(!isModalOpen);
-  const state: TenantPropertyUiState = useSelector(
-    selectTenantPropertyUiState
-  );
+// function ListingModalEditor({
+//   className = "",
+// }: {
+//   className?: string;
+// }): React.JSX.Element {
+//   const [isModalOpen, setIsModalOpen] = React.useState(false);
+//   const toggleModal = () => setIsModalOpen(!isModalOpen);
+//   const state: TenantPropertyUiState = useSelector(
+//     selectTenantPropertyUiState
+//   );
 
-  const listingInfo: FormSchemaType = {
-    landlord: state.propertyLandlordId,
-    property_type: state.propertyType.toLowerCase(), // Ensure property type matches dropdown options (house or apartment)
-    address: `${state.streetNumber} ${state.street}`,
-    city: state.suburb,
-    state: state.province,
-    postal_code: state.postcode,
-    apartment_number: "",
-    bedroom_number: Number(state.propertyBedrooms),
-    bathroom_number: Number(state.propertyBathrooms),
-    space: Number(state.areaValue),
-    description: state.propertyDescription,
-    images: [],
-    available_dates: new Date(),
-    lease_term: "12_months",
-    show_contact_boolean: true,
-    suburb: state.suburb,
-    address_number: state.streetNumber,
-    monthly_rent: Number(state.propertyPrice),
-    property_feature_ids: []
-  };
+//   const listingInfo: FormSchemaType = {
+//     landlord: state.propertyLandlordId,
+//     property_type: state.propertyType.toLowerCase(), // Ensure property type matches dropdown options (house or apartment)
+//     address: `${state.streetNumber} ${state.street}`,
+//     city: state.suburb,
+//     state: state.province,
+//     postal_code: state.postcode,
+//     apartment_number: "",
+//     bedroom_number: Number(state.propertyBedrooms),
+//     bathroom_number: Number(state.propertyBathrooms),
+//     space: Number(state.areaValue),
+//     description: state.propertyDescription,
+//     images: [],
+//     available_dates: new Date(),
+//     lease_term: "12_months",
+//     show_contact_boolean: true,
+//     suburb: state.suburb,
+//     address_number: state.streetNumber,
+//     monthly_rent: Number(state.propertyPrice),
+//     property_feature_ids: []
+//   };
 
-  return (
-    <>
-      <EditDraftListingButton onClick={toggleModal} />
-      <EditDraftListingModal
-        isOpen={isModalOpen}
-        toggle={toggleModal}
-        propertyForm={listingInfo}
-        landlords={state.landlords}
-        propertyId={state.propertyId}
-      />
-    </>
-  );
-}
+//   return (
+//     <>
+//       <EditDraftListingButton onClick={toggleModal} />
+//       <EditDraftListingModal
+//         isOpen={isModalOpen}
+//         toggle={toggleModal}
+//         propertyForm={listingInfo}
+//         landlords={state.landlords}
+//         propertyId={state.propertyId}
+//       />
+//     </>
+//   );
+// }
