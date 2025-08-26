@@ -14,6 +14,8 @@ import { useNavigate } from "react-router";
 import { NavigationPath } from "../../navigation";
 import { PropertyFormMode } from "./enum/PropertyFormMode";
 import { unwrapResult } from "@reduxjs/toolkit";
+import { BackLink } from "../theming/components/BackLink";
+import { BackButtonIcon } from "../theming/icons/BackButtonIcon";
 
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
@@ -49,15 +51,14 @@ export function PropertyFormPage() {
   return (
     <div className="mt-6 ml-10">
       <div className="flex flex-col items-start">
-        <button
-          onClick={onClick}
-          className="flex items-center text-[#71717A] mb-2 gap-2 text-sm hover:underline"
-        >
-          <ArrowLeftIcon className="scale-75" />
-          <span className="text-md">Back to Properties</span>
-        </button>
+        <BackLink
+        label="Back to properties"
+        backButtonIcon={<BackButtonIcon/>}
+        onClick={() => navigator("/")}
+        className="mr-auto"
+        />
         <div>
-          <h1 className="text-2xl font-bold mb-1">Property Listing</h1>
+          <h1 className="text-2xl font-bold mb-1 mt-4">Property Listing</h1>
           <h3 className="text-sm text-[#71717A]">
             Create a new rental property listing for a landlord
           </h3>
