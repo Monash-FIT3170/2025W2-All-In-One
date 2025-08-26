@@ -12,12 +12,62 @@ import { RootState } from "/app/client/store";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { getAllLandlords } from "/app/client/library-modules/domain-models/user/role-repositories/landlord-repository";
-import { getAgentById } from "/app/client/library-modules/domain-models/user/role-repositories/agent-repository";
-import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
+import { Agent } from '/app/client/library-modules/domain-models/user/Agent';
+import { ProfileData } from '/app/client/library-modules/domain-models/user/ProfileData';
+import { getAgentById } from '/app/client/library-modules/domain-models/user/role-repositories/agent-repository';
+import { getProfileDataById } from '/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository';
+import { getPropertyById } from '/app/client/library-modules/domain-models/property/repositories/property-repository';
 
-const initialState: TenantPropertyUiState = {
+interface TenantPropertyState {
+  propertyId: string;
+  propertyAgentId: string;
+  propertyLandlordId: string;
+  streetNumber: string;
+  street: string;
+  suburb: string;
+  province: string;
+  postcode: string;
+  summaryDescription: string;
+  areaValue: number;
+  propertyStatusText: string;
+  propertyStatusPillVariant: PropertyStatusPillVariant;
+  propertyDescription: string;
+  propertyFeatures: string[];
+  propertyType: string;
+  propertyLandArea: string;
+  propertyBathrooms: string;
+  propertyParkingSpaces: string;
+  propertyBedrooms: string;
+  propertyPrice: string;
+  mapUiState: {
+    markerLatitude: number;
+    markerLongitude: number;
+  };
+  inspectionBookingUiStateList: {
+    date: string;
+    startingTime: string;
+    endingTime: string;
+  }[];
+  listingImageUrls: string[];
+  listingStatusText: string;
+  listingStatusPillVariant: ListingStatusPillVariant;
+  shouldDisplayListingStatus: boolean;
+  shouldDisplaySubmitDraftButton: boolean;
+  shouldDisplayReviewTenantButton: boolean;
+  shouldDisplayEditListingButton: boolean;
+  shouldShowLoadingState: boolean;
+  landlords: Landlord[];
+  isSubmittingDraft: boolean;
+  currentPropertyId: string | undefined;
+  agent: Agent | null;
+  agentProfile: ProfileData | null;
+  isLoadingAgent: boolean;
+  agentError: string | null;
+}
+
+const initialState: TenantPropertyState = {
   propertyId: "",
-  // propertyAgentId: "",
+  propertyAgentId: "",
   propertyLandlordId: "",
   streetNumber: "",
   street: "",
@@ -52,6 +102,10 @@ const initialState: TenantPropertyUiState = {
   landlords: [],
   isSubmittingDraft: false,
   currentPropertyId: undefined,
+  agent: null,
+  agentProfile: null,
+  isLoadingAgent: false,
+  agentError: null,
 };
 
 export const submitDraftListingAsync = createAsyncThunk(
@@ -59,6 +113,33 @@ export const submitDraftListingAsync = createAsyncThunk(
   async (propertyId: string) => {
     const submitDraftListing = await submitDraftListingUseCase(propertyId);
     return submitDraftListing;
+  }
+);
+
+export const fetchAgentWithProfile = createAsyncThunk(
+  "tenantProperty/fetchAgentWithProfile",
+  async (propertyId: string) => {
+    try {
+      // First get the property to get the agentId
+      const property = await getPropertyById(propertyId);
+      if (!property.agentId) {
+        throw new Error('No agent assigned to this property');
+      }
+
+      // Then fetch agent and profile data
+      const agent = await getAgentById(property.agentId);
+      const profileData = await getProfileDataById(agent.profileDataId);
+      
+      return {
+        agent,
+        profile: profileData
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch agent details: ${error.message}`);
+      }
+      throw error;
+    }
   }
 );
 
@@ -72,7 +153,6 @@ export const tenantPropertySlice = createSlice({
     });
     builder.addCase(load.fulfilled, (state, action) => {
       state.propertyId = action.payload.propertyId;
-      // state.propertyAgentId = action.payload.agentId;
       state.propertyLandlordId = action.payload.landlordId;
       state.propertyId = action.payload.propertyId;
       state.streetNumber = action.payload.streetnumber;
@@ -151,6 +231,22 @@ export const tenantPropertySlice = createSlice({
       alert(`Failed to update listing: ${action.error.message}`);
       state.currentPropertyId = action.meta.arg;
     });
+
+    builder
+      .addCase(fetchAgentWithProfile.pending, (state) => {
+        state.isLoadingAgent = true;
+        state.agentError = null;
+      })
+      .addCase(fetchAgentWithProfile.fulfilled, (state, action) => {
+        state.isLoadingAgent = false;
+        state.agent = action.payload.agent;
+        state.agentProfile = action.payload.profile;
+        state.agentError = null;
+      })
+      .addCase(fetchAgentWithProfile.rejected, (state, action) => {
+        state.isLoadingAgent = false;
+        state.agentError = action.error.message || 'Failed to fetch agent details';
+      });
   },
 });
 
@@ -205,17 +301,17 @@ function getListingStatusPillVariant(status: string): ListingStatusPillVariant {
   }
 }
 
-// export const fetchPropertyAgent = createAsyncThunk(
-//   "propertyListing/fetchPropertyAgent",
-//   async (propertyAgentId: string, { rejectWithValue }) => {
-//     try {
-//       // propertyAgentId = (await getPropertyById(propertyId)).agentId;
-//       return await getAgentById(propertyAgentId);
-//     } catch (err) {
-//       return rejectWithValue("Failed to fetch property agent");
-//     }
-//   }
-// )
+export const fetchPropertyAgent = createAsyncThunk(
+  "propertyListing/fetchPropertyAgent",
+  async (propertyAgentId: string, { rejectWithValue }) => {
+    try {
+      // propertyAgentId = (await getPropertyById(propertyId)).agentId;
+      return await getAgentById(propertyAgentId);
+    } catch (err) {
+      return rejectWithValue("Failed to fetch property agent");
+    }
+  }
+)
 
 export const load = createAsyncThunk(
   "propertyListing/load",

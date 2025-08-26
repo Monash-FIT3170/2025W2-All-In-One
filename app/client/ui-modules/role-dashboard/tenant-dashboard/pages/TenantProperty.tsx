@@ -32,6 +32,8 @@ import {
   selectAcceptedCount,
   selectHasAcceptedApplications,
 } from "../../../review-tenant-modal/state/reducers/tenant-selection-slice";
+import { fetchAgentWithProfile } from '../state/reducers/tenant-property-slice';
+import { AgentDetails } from '../components/AgentDetails';
 
 export function TenantProperty({
   className = "",
@@ -225,31 +227,9 @@ function ListingPageContent({
         inspectionBookingUiStateList={inspectionBookingUiStateList}
         onBook={onBook}
         propertyFeatures={propertyFeatures}
+        propertyId={propertyId} // Pass the propertyId to ListingDetails
         className="mb-6"
       />
-      {/* <BottomBar
-        shouldDisplaySubmitDraftButton={shouldDisplaySubmitDraftButton}
-        shouldDisplayReviewTenantButton={shouldDisplayReviewTenantButton}
-        shouldDisplayEditListingButton={shouldDisplayEditListingButton}
-        onSubmitDraftListing={onSubmitDraftListing}
-        onReviewTenant={() => setIsReviewTenantModalOpen(true)}
-      /> */}
-
-      {/* <ReviewTenantModal
-        isOpen={isReviewTenantModalOpen}
-        onClose={() => setIsReviewTenantModalOpen(false)}
-        onReject={(applicationId: string) => {
-          console.log(`Rejected application ${applicationId}`);
-        }}
-        onAccept={(applicationId: string) => {
-          console.log(`Accepted application ${applicationId}`);
-        }}
-        onSendToLandlord={() => {
-          console.log(`Sent applications to landlord`);
-        }}
-        shouldShowSendToLandlordButton={shouldShowSendToLandlordButton}
-        acceptedCount={acceptedCount}
-      /> */}
     </div>
   );
 }
@@ -369,6 +349,7 @@ function ListingDetails({
   inspectionBookingUiStateList,
   onBook,
   propertyFeatures,
+  propertyId,
   className = "",
 }: {
   propertyDescription: string;
@@ -376,26 +357,54 @@ function ListingDetails({
   inspectionBookingUiStateList: InspectionBookingListUiState[];
   onBook: (index: number) => void;
   propertyFeatures: string[];
+  propertyId: string;
   className?: string;
 }): React.JSX.Element {
-  return (
-    <div className={twMerge("flex gap-7", className)}>
-      <div className="flex-1 flex flex-col">
-        <ListingDescription
-          description={propertyDescription}
-          className="mb-4"
-        />
-        <PropertyInspections
-          bookingUiStateList={inspectionBookingUiStateList}
-          onBook={onBook}
-          className="w-full"
-        />
-      </div>
+  const dispatch = useAppDispatch();
+  const { agent, agentProfile, isLoadingAgent, agentError } = useAppSelector(
+    (state) => state.tenantProperty
+  );
 
-      <div className="flex-1 flex flex-col">
-        <PropertyFeatures featuresList={propertyFeatures} className="mb-4" />
-        <SubHeading text="Location" className="mb-2" />
-        <PropertyMap mapUiState={mapUiState} />
+  useEffect(() => {
+    if (propertyId) {
+      dispatch(fetchAgentWithProfile(propertyId))
+        .unwrap()
+        .catch((error) => {
+          console.error('Failed to fetch agent details:', error);
+        });
+    }
+  }, [dispatch, propertyId]);
+
+  return (
+    <div className={twMerge("flex flex-col gap-7", className)}>
+      <div className="flex gap-7">
+        <div className="flex-1 flex flex-col">
+          <ListingDescription
+            description={propertyDescription}
+            className="mb-4"
+          />
+          <PropertyInspections
+            bookingUiStateList={inspectionBookingUiStateList}
+            onBook={onBook}
+            className="w-full"
+          />
+        </div>
+
+        <div className="flex-1 flex flex-col">
+          <PropertyFeatures featuresList={propertyFeatures} className="mb-4" />
+          <SubHeading text="Location" className="mb-2" />
+          <PropertyMap mapUiState={mapUiState} />
+        </div>
+      </div>
+      
+      <div className="flex gap-7">
+        <AgentDetails
+          agent={agent}
+          profile={agentProfile}
+          isLoading={isLoadingAgent}
+          error={agentError}
+          className="flex-1"
+        />
       </div>
     </div>
   );
