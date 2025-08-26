@@ -12,77 +12,79 @@ import {
 } from "/app/client/library-modules/domain-models/tenant-application/repositories/tenant-application-repository";
 import { LoadTenantApplicationsUseCase } from "/app/client/library-modules/use-cases/tenant-application/LoadTenantApplicationsUseCase";
 import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
-
+import { createTenantApplication } from "/app/client/library-modules/use-cases/tenant-application/CreateTenantApplicationUseCase";
+import {
+  acceptTenantApplication,
+  rejectTenantApplication } from "/app/client/library-modules/use-cases/tenant-application/ProcessTenantApplicationWorkflowUseCase";
+  import { processTenantApplication } from "/app/client/library-modules/use-cases/tenant-application/ProcessTenantApplicationWorkflowUseCase";
 const initialState: TenantSelectionUiState = {
   applicationsByProperty: {},
   activeFilter: FilterType.ALL,
   isLoading: false,
   error: null,
   currentStep: 1,
+  bookedInspections: new Set<number>(),
 };
 // Creating tenant applications
+// export const createTenantApplicationAsync = createAsyncThunk(
+//   "tenantSelection/createTenantApplication",
+//   async (_, { getState }) => {
+//     const state = getState() as RootState;
+//     const { propertyId, propertyLandlordId} = state.propertyListing;
+//     const { currentUser, profileData } = state.currentUser;
+
+//     return await createTenantApplication({
+//       propertyId,
+//       propertyLandlordId,
+//       currentUser,
+//       profileData
+//     });
+//   }
+// );
 export const createTenantApplicationAsync = createAsyncThunk(
   "tenantSelection/createTenantApplication",
   async (_, { getState }) => {
     const state = getState() as RootState;
     const { propertyId, propertyLandlordId} = state.propertyListing;
-    const { currentUser, profileData } = state.currentUser;
+    const { currentUser, profileData, authUser } = state.currentUser;
+    const { bookedInspections } = state.tenantSelection;
 
-    if (!currentUser) {
-      throw new Error('User must be logged in to apply');
-    }
-
-    if (!propertyId) {
-      throw new Error('Property ID is required to create application');
-    }
-
-    // Get user's name from profile data or use a default
-    let applicantName: string;
-    if (profileData) {
-      applicantName = `${profileData.firstName} ${profileData.lastName}`;
-    } else if ('tenantId' in currentUser) {
-      applicantName = `Tenant ${currentUser.tenantId.slice(-4)}`;
-    } else {
-      throw new Error('Only tenants can apply for properties. Invalid user type detected.');
-    }
-
-    // Get the property to retrieve the agentId
-    const property = await getPropertyById(propertyId);
-    const agentId = property.agentId;
-
-    // Insert the tenant application into the database
-    const applicationId = await insertTenantApplication({
-      propertyId,
-      applicantName,
-      agentId: agentId,
-      landlordId: propertyLandlordId,
-    });
-
-    return {
-      applicationId,
-      applicantName,
+    const result = await processTenantApplication({
       propertyId,
       propertyLandlordId,
-      status: TenantApplicationStatus.UNDETERMINED,
+      currentUser,
+      profileData,
+      authUser,
+      bookedInspections
+    });
+
+    if (!result.success) {
+      throw new Error(result.message);
+    }
+
+    return {
+      applicationId: result.applicationId!,
+      success: true,
+      message: result.message
     };
   }
 );
 
+
 export const rejectTenantApplicationAsync = createAsyncThunk(
   "tenantSelection/rejectTenantApplication",
   async (applicationId: string) => {
-    await updateTenantApplicationStatus([applicationId], TenantApplicationStatus.REJECTED, 1);
-    return { applicationId, status: TenantApplicationStatus.REJECTED };
+    return await rejectTenantApplication(applicationId);
   }
 );
 
 export const acceptTenantApplicationAsync = createAsyncThunk(
   "tenantSelection/acceptTenantApplication",
   async (applicationId: string) => {
-    await updateTenantApplicationStatus([applicationId], TenantApplicationStatus.ACCEPTED, 1);
-    return { applicationId, status: TenantApplicationStatus.ACCEPTED };
+    return await acceptTenantApplication(applicationId);
   }
 );
+
 
 export const sendAcceptedApplicationsToLandlordAsync = createAsyncThunk(
   "tenantSelection/sendAcceptedApplicationsToLandlord",
@@ -181,6 +183,16 @@ export const tenantSelectionSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    setCurrentStep: (state, action) => {
+      state.currentStep = action.payload;
+    },
+    // temp fix until inspection slice file is created
+    setBookedInspections: (state, action) => {
+      state.bookedInspections = action.payload;
+    },
+    addBookedInspection: (state, action) => {
+      state.bookedInspections.add(action.payload);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -261,6 +273,9 @@ export const tenantSelectionSlice = createSlice({
 export const {
   setFilter,
   clearError,
+  setCurrentStep,
+  setBookedInspections,
+  addBookedInspection,
 } = tenantSelectionSlice.actions;
 
 export const selectTenantSelectionState = (state: RootState) => state.tenantSelection;
