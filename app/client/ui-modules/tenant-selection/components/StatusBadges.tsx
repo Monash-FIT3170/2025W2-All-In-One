@@ -1,13 +1,8 @@
 import React from 'react';
-import { TenantApplicationStatus } from '../enums/TenantApplicationStatus';
-import { BackgroundCheckStatus } from '../enums/BackgroundCheckStatus';
+import { TenantApplicationStatus } from '../../../../shared/api-models/tenant-application/TenantApplicationStatus';
 
 type StatusBadgeProps = {
   status: TenantApplicationStatus;
-}
-
-type BackgroundBadgeProps = {
-  backgroundCheck?: BackgroundCheckStatus;
 }
 
 export function StatusBadge({ status }: StatusBadgeProps): React.JSX.Element | null {
@@ -30,26 +25,27 @@ export function StatusBadge({ status }: StatusBadgeProps): React.JSX.Element | n
           ACCEPTED
         </span>
       );
+    case TenantApplicationStatus.LANDLORD_REVIEW:
+      return (
+        <span className="px-2 py-1 bg-blue-200 text-blue-800 text-xs font-medium rounded">
+          LANDLORD REVIEW
+        </span>
+      );
+    case TenantApplicationStatus.LANDLORD_APPROVED:
+      return (
+        <span className="px-2 py-1 bg-green-300 text-green-800 text-xs font-medium rounded">
+          LANDLORD APPROVED
+        </span>
+      );
+    case TenantApplicationStatus.LANDLORD_REJECTED:
+      return (
+        <span className="px-2 py-1 bg-red-300 text-red-800 text-xs font-medium rounded">
+          LANDLORD REJECTED
+        </span>
+      );
     default:
       return null;
   }
 }
 
-export function BackgroundBadge({ backgroundCheck }: BackgroundBadgeProps): React.JSX.Element | null {
-  switch (backgroundCheck) {
-    case BackgroundCheckStatus.PASS:
-      return (
-        <span className="px-2 py-1 bg-green-500 text-white text-xs font-medium rounded">
-          BACKGROUND PASS
-        </span>
-      );
-    case BackgroundCheckStatus.FAIL:
-      return (
-        <span className="px-2 py-1 bg-red-500 text-white text-xs font-medium rounded">
-          BACKGROUND FAIL
-        </span>
-      );
-    default:
-      return null;
-  }
-}
+

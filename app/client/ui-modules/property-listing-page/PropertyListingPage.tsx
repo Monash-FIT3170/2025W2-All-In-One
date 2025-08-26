@@ -24,7 +24,7 @@ import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonI
 import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
 import { ReviewTenantButton } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantButton";
-import { ReviewTenantModal } from "../review-tenant-modal/ReviewTenantModal";
+import { TenantSelectionModal } from "/app/client/ui-modules/tenant-selection/TenantSelectionModal";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useSelector } from "react-redux";
 import {
@@ -32,6 +32,7 @@ import {
   selectPropertyListingUiState,
   submitDraftListingAsync,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
+
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import { useNavigate, useSearchParams } from "react-router";
 import EditDraftListingModal from "./components/EditDraftListingModal";
@@ -44,9 +45,16 @@ import { PropertyMap, PropertyMapUiState } from "./components/PropertyMap";
 import { NavigationPath } from "../../navigation";
 import { BACK_ROUTES, EntryPoint  } from "../../navigation";
 import {
-  selectAcceptedCount,
-  selectHasAcceptedApplications,
-} from "../review-tenant-modal/state/reducers/tenant-selection-slice";
+  selectAcceptedApplicantCountForProperty,
+  selectHasAcceptedApplicationsForProperty,
+  selectFilteredApplications,
+  selectHasCurrentUserApplied,
+  createTenantApplicationAsync,
+  addBookedInspection
+} from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
+import { Role } from "/app/shared/user-role-identifier";
+import { CurrentUserState } from "../user-authentication/state/CurrentUserState";
+
 
 export function PropertyListingPage({
   className = "",
@@ -60,6 +68,10 @@ export function PropertyListingPage({
   const state: PropertyListingPageUiState = useSelector(
     selectPropertyListingUiState
   );
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const profileData = useAppSelector((state) => state.currentUser.profileData);
+  const authUser = useAppSelector((state) => state.currentUser.authUser);
+
 
   useEffect(() => {
     if (!propertyId) {
@@ -71,13 +83,12 @@ export function PropertyListingPage({
     dispatch(load(propertyId));
   }, []);
 
+
   if (state.shouldShowLoadingState) {
     return (
-      <>
-        <ListingPageContentLoadingSkeleton
-          className={twMerge("p-5", className)}
-        />
-      </>
+      <ListingPageContentLoadingSkeleton
+        className={twMerge("p-5", className)}
+      />
     );
   } else {
     return (
@@ -112,6 +123,9 @@ export function PropertyListingPage({
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
           propertyLandlordId={state.propertyLandlordId}
           propertyId={state.propertyId}
+          currentUser={currentUser}
+          authUser={authUser}
+          profileData={profileData}
           onBack={() => {
             const from = searchParams.get("from") as EntryPoint | null;
             if (from && from in BACK_ROUTES) {
@@ -122,9 +136,21 @@ export function PropertyListingPage({
           }}
           onBook={(index: number) => {
             console.log(`booking button ${index} pressed`);
+            dispatch(addBookedInspection(index));
           }}
-          onApply={() => {
-            console.log("applied!");
+          onApply={async () => {
+            console.log("Apply button clicked!");
+            console.log("Current user:", currentUser);
+            console.log("Profile data:", profileData);
+
+            try {
+              const result = await dispatch(createTenantApplicationAsync()).unwrap();
+              console.log("Tenant application created successfully:", result);
+              alert(result.message);
+            } catch (error) {
+              console.error("Failed to create tenant application:", error);
+              alert(error instanceof Error ? error.message : "Failed to submit application. Please try again.");
+            }
           }}
           onContactAgent={() => console.log("contacting agent!")}
           onSubmitDraftListing={() => {
@@ -132,7 +158,6 @@ export function PropertyListingPage({
             // Change value of "1" later to property ID
             dispatch(submitDraftListingAsync(state.propertyId));
           }}
-          className={twMerge("p-5", className)}
         />
       </>
     );
@@ -167,11 +192,15 @@ function ListingPageContent({
   shouldDisplayEditListingButton,
   propertyLandlordId,
   propertyId,
+  currentUser,
+  authUser,
+  profileData,
   onBack,
   onBook,
   onApply,
   onContactAgent,
   onSubmitDraftListing,
+  bookedInspections,
   className = "",
 }: {
   streetNumber: string;
@@ -201,18 +230,30 @@ function ListingPageContent({
   shouldDisplayEditListingButton: boolean;
   propertyLandlordId: string;
   propertyId: string;
+  currentUser: CurrentUserState["currentUser"];
+  authUser: CurrentUserState["authUser"];
+  profileData: CurrentUserState["profileData"];
   onBack: () => void;
   onBook: (index: number) => void;
   onApply: () => void;
   onContactAgent: () => void;
   onSubmitDraftListing: () => void;
+  bookedInspections?: Set<number>;
   className?: string;
 }): React.JSX.Element {
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
 
-  const acceptedCount = useAppSelector(selectAcceptedCount);
-  const hasAcceptedApplications = useAppSelector(selectHasAcceptedApplications);
+  const acceptedApplicantCount = useAppSelector((state) => selectAcceptedApplicantCountForProperty(state, propertyId));
+  const hasAcceptedApplications = useAppSelector((state) => selectHasAcceptedApplicationsForProperty(state, propertyId));
+  const tenantApplications = useAppSelector((state) => selectFilteredApplications(state, propertyId));
+  const isCreatingApplication = useAppSelector((state) => state.tenantSelection.isLoading);
+
+  // Get current user's name for checking if they've already applied
+  const currentUserName = profileData ? `${profileData.firstName} ${profileData.lastName}` : undefined;
+  const hasCurrentUserApplied = useAppSelector((state) => selectHasCurrentUserApplied(state, propertyId, currentUserName));
+
   const shouldShowSendToLandlordButton = hasAcceptedApplications;
+
 
   return (
     <div className={className}>
@@ -241,6 +282,9 @@ function ListingPageContent({
         listingImageUrls={listingImageUrls}
         onApply={onApply}
         onContactAgent={onContactAgent}
+        isApplying={isCreatingApplication}
+        userRole={authUser?.role}
+        hasApplied={hasCurrentUserApplied}
         className="mb-6"
       />
       <ListingDetails
@@ -249,6 +293,8 @@ function ListingPageContent({
         inspectionBookingUiStateList={inspectionBookingUiStateList}
         onBook={onBook}
         propertyFeatures={propertyFeatures}
+        userRole={authUser?.role}
+        bookedInspections={bookedInspections}
         className="mb-6"
       />
       <BottomBar
@@ -259,7 +305,7 @@ function ListingPageContent({
         onReviewTenant={() => setIsReviewTenantModalOpen(true)}
       />
 
-      <ReviewTenantModal
+      <TenantSelectionModal
         isOpen={isReviewTenantModalOpen}
         onClose={() => setIsReviewTenantModalOpen(false)}
         onReject={(applicationId: string) => {
@@ -272,7 +318,9 @@ function ListingPageContent({
           console.log(`Sent applications to landlord`);
         }}
         shouldShowSendToLandlordButton={shouldShowSendToLandlordButton}
-        acceptedCount={acceptedCount}
+        acceptedApplicantCount={acceptedApplicantCount}
+        tenantApplications={tenantApplications}
+        userRole={authUser?.role}
       />
     </div>
   );
@@ -336,6 +384,9 @@ function ListingHero({
   listingImageUrls,
   onApply,
   onContactAgent,
+  isApplying,
+  userRole,
+  hasApplied,
 }: {
   className?: string;
   streetNumber: string;
@@ -355,6 +406,9 @@ function ListingHero({
   listingImageUrls: string[];
   onApply: () => void;
   onContactAgent: () => void;
+  isApplying: boolean;
+  userRole: Role | undefined;
+  hasApplied: boolean;
 }): React.JSX.Element {
   return (
     <div className={twMerge("flex", className)}>
@@ -386,7 +440,7 @@ function ListingHero({
           className="w-full mb-8"
         />
         <div className="flex">
-          <ApplyButton onClick={onApply} className="mr-4" />
+          <ApplyButton onClick={onApply} isLoading={isApplying} userRole={userRole} hasApplied={hasApplied} className="mr-4" />
           <ContactAgentButton onClick={onContactAgent} />
         </div>
       </div>
@@ -400,6 +454,8 @@ function ListingDetails({
   inspectionBookingUiStateList,
   onBook,
   propertyFeatures,
+  userRole,
+  bookedInspections,
   className = "",
 }: {
   propertyDescription: string;
@@ -407,6 +463,8 @@ function ListingDetails({
   inspectionBookingUiStateList: InspectionBookingListUiState[];
   onBook: (index: number) => void;
   propertyFeatures: string[];
+  userRole: Role | undefined;
+  bookedInspections?: Set<number>;
   className?: string;
 }): React.JSX.Element {
   return (
@@ -419,6 +477,8 @@ function ListingDetails({
         <PropertyInspections
           bookingUiStateList={inspectionBookingUiStateList}
           onBook={onBook}
+          userRole={userRole}
+          bookedInspections={bookedInspections}
           className="w-full"
         />
       </div>

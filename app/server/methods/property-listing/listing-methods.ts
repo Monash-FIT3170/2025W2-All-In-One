@@ -167,10 +167,21 @@ async function mapListingDocumentToListingDTO(
     property_id: listing.property_id,
     image_urls: listing.image_urls,
     listing_status: listingStatusDocument.name,
-    inspections: inspections.map((inspection) => ({
-      start_time: inspection.starttime,
-      end_time: inspection.endtime,
-    })),
+    inspections: inspections.map((inspection) => {
+
+      // Convert Date objects to ISO strings for Redux serialization
+      const startTimeString = inspection.starttime instanceof Date
+        ? inspection.starttime.toISOString()
+        : inspection.starttime;
+      const endTimeString = inspection.endtime instanceof Date
+        ? inspection.endtime.toISOString()
+        : inspection.endtime;
+
+      return {
+        start_time: startTimeString,
+        end_time: endTimeString,
+      };
+    }),
   };
 }
 

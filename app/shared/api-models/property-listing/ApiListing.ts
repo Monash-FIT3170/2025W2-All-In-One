@@ -4,7 +4,7 @@ export type ApiListing = {
   image_urls: string[];
   listing_status: string;
   inspections: {
-    start_time: Date;
-    end_time: Date;
+    start_time: string;
+    end_time: string;
   }[];
 };

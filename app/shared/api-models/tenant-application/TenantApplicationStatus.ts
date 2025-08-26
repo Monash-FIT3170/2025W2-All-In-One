@@ -10,4 +10,3 @@ export enum TenantApplicationStatus {
   FINAL_APPROVED = 'final_approved',        // Step 4: Landlord final approval
   FINAL_REJECTED = 'final_rejected'         // Step 4: Landlord final rejection
 }
-
