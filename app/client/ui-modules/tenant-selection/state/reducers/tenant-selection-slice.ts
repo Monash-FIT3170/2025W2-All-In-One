@@ -12,6 +12,14 @@ import {
   updateTenantApplicationStatus
 } from "/app/client/library-modules/domain-models/tenant-application/repositories/tenant-application-repository";
 import { LoadTenantApplicationsUseCase } from "/app/client/library-modules/use-cases/tenant-application/LoadTenantApplicationsUseCase";
+import {
+  agentAcceptApplication,
+  agentRejectApplication,
+} from "../../../../library-modules/use-cases/tenant-application/AgentAcceptOrBackgroundUseCase";
+import {
+  landlordApproveApplication,
+  landlordRejectApplication
+} from "/app/client/library-modules/use-cases/tenant-application/LandlordApproveOrRejectUseCase";
 import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
 const initialState: TenantSelectionUiState = {
@@ -266,6 +274,40 @@ export const loadTenantApplicationsForPropertyAsync = createAsyncThunk(
     return await useCase.execute(propertyId);
   }
 );
+
+
+
+export const intentAcceptApplicationAsync = createAsyncThunk(
+  "tenantSelection/intentAcceptApplication",
+  async (args: { propertyId: string; applicationId: string }, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const role = state.currentUser.authUser?.role;
+    if (role === Role.AGENT) {
+      await agentAcceptApplication(dispatch as any, () => getState() as RootState, args.propertyId, args.applicationId);
+      return;
+    }
+    if (role === Role.LANDLORD) {
+      await landlordApproveApplication(dispatch as any, () => getState() as RootState, args.propertyId, args.applicationId);
+      return;
+    }
+  }
+);
+
+export const intentRejectApplicationAsync = createAsyncThunk(
+  "tenantSelection/intentRejectApplication",
+  async (args: { propertyId: string; applicationId: string }, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const role = state.currentUser.authUser?.role;
+    if (role === Role.AGENT) {
+      await agentRejectApplication(dispatch as any, () => getState() as RootState, args.propertyId, args.applicationId);
+      return;
+    }
+    if (role === Role.LANDLORD) {
+      await landlordRejectApplication(dispatch as any, () => getState() as RootState, args.propertyId, args.applicationId);
+      return;
+    }
+  }
+)
 
 const updateApplicationStatus = (
   state: TenantSelectionUiState,

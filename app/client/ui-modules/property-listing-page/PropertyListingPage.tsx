@@ -63,6 +63,7 @@ import {
   agentBackgroundCheckPassedAsync,
   selectApplicationsForProperty
 } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
+import { intentAcceptApplicationAsync, intentRejectApplicationAsync } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { Role } from "/app/shared/user-role-identifier";
 
 export function PropertyListingPage({
@@ -303,50 +304,23 @@ function ListingPageContent({
   const landlordApprovedApplicantCount = useAppSelector((state) => selectLandlordApprovedApplicantCountForProperty(state, propertyId));
 
   const shouldShowSendToLandlordButton = hasAcceptedApplications && authUser?.role === Role.AGENT;
-  const shouldShowSendToAgentButton = hasLandlordApprovedApplications && authUser?.role === Role.LANDLORD;;
-
-  const allApplications = useAppSelector((state) =>
-    selectApplicationsForProperty(state as any, propertyId)
-  );
-
-  const getStep = (id: string) =>
-    allApplications.find((a) => a.id === id)?.step;
+  const shouldShowSendToAgentButton = hasLandlordApprovedApplications && authUser?.role === Role.LANDLORD;
 
   const handleAccept = async (applicationId: string) => {
-    try {
-      const currentStep = getStep(applicationId)
-      if (authUser?.role === Role.LANDLORD && currentStep === 2) {
-        await dispatch(landlordApproveTenantApplicationAsync(applicationId)).unwrap();
-        console.log(`Landlord approved application ${applicationId}`);
-      } else if (authUser?.role === Role.AGENT && currentStep === 3) {
-        await dispatch(agentBackgroundCheckPassedAsync(applicationId)).unwrap();
-        console.log(`Background check passed ${applicationId}`)
-      } else {
-        await dispatch(acceptTenantApplicationAsync(applicationId)).unwrap();
-        console.log(`Accepted application ${applicationId}`);
-      }
-    } catch (error) {
-      console.error("Failed to accept application:", error);
-    }
-  };
+  try {
+    await dispatch(intentAcceptApplicationAsync({ propertyId, applicationId })).unwrap();
+  } catch (error) {
+    console.error("Failed to accept application:", error);
+  }
+};
 
-  const handleReject = async (applicationId: string) => {
-    try {
-      const currentStep = getStep(applicationId)
-      if (authUser?.role === Role.LANDLORD && currentStep === 2) {
-        await dispatch(landlordRejectTenantApplicationAsync(applicationId)).unwrap();
-        console.log(`Landlord rejected application ${applicationId}`);
-      } else if (authUser?.role === Role.AGENT && currentStep === 3) {
-        await dispatch(agentBackgroundCheckFailedAsync(applicationId)).unwrap();
-        console.log(`Background check failed ${applicationId}`)
-      } else {
-        await dispatch(rejectTenantApplicationAsync(applicationId)).unwrap();
-        console.log(`Rejected application ${applicationId}`);
-      }
-    } catch (error) {
-      console.error("Failed to reject application:", error);
-    }
-  };
+const handleReject = async (applicationId: string) => {
+  try {
+    await dispatch(intentRejectApplicationAsync({ propertyId, applicationId })).unwrap();
+  } catch (error) {
+    console.error("Failed to reject application:", error);
+  }
+};
   const handleSendToLandlord = async () => {
     try {
       await dispatch(sendAcceptedApplicationsToLandlordAsync()).unwrap();
