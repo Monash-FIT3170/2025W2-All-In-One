@@ -6,9 +6,9 @@ import { useAppDispatch, useAppSelector } from '/app/client/store';
 import { 
   setConversationsFromSubscription, 
   setMessagesFromSubscription,
-  addMessage,
-  updateConversationLastMessage 
+  addMessage
 } from '../state/reducers/messages-slice';
+import { formatConversationTimestamp } from '../utils/timestamp-utils';
 import { Role } from '/app/shared/user-role-identifier';
 import { Agent } from '/app/client/library-modules/domain-models/user/Agent';
 import { Tenant } from '/app/client/library-modules/domain-models/user/Tenant';
@@ -91,10 +91,13 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
 
   // Update Redux store when conversations change
   useEffect(() => {
-    if (conversationsReady && conversations.length > 0) {
-      dispatch(setConversationsFromSubscription(conversations));
+    if (conversationsReady && conversations.length > 0 && currentUserId) {
+      dispatch(setConversationsFromSubscription({ 
+        conversations, 
+        currentUserId 
+      }));
     }
-  }, [conversations, conversationsReady, dispatch]);
+  }, [conversations, conversationsReady, dispatch, currentUserId]);
 
   // Update Redux store when messages change
   useEffect(() => {
@@ -106,15 +109,8 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
         currentUserId 
       }));
       
-      // Update conversation tile with latest message
-      if (messages.length > 0) {
-        const latestMessage = messages[messages.length - 1];
-        dispatch(updateConversationLastMessage({
-          conversationId: activeConversationId,
-          message: latestMessage.text,
-          timestamp: new Date(latestMessage.timestamp).toLocaleString()
-        }));
-      }
+      // Note: No need to manually update conversation tile here since the conversations 
+      // subscription will automatically receive the updated lastMessage from the server
     }
   }, [messages, messagesReady, activeConversationId, dispatch, currentUserId]);
 

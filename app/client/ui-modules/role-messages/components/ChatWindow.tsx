@@ -4,6 +4,7 @@ import { Textarea } from "/app/client/ui-modules/theming-shadcn/Textarea";
 import { Button } from "/app/client/ui-modules/theming-shadcn/Button";
 import { Send } from "lucide-react";
 import { Message } from "../types";
+import { formatChatMessageTimestamp } from "../utils/timestamp-utils";
 
 interface ChatWindowProps {
   header: { name: string; role: string; avatar: string } | null;
@@ -53,10 +54,15 @@ export function ChatWindow({ header, messages, messageText, onChangeMessage, onS
                         m.isOutgoing ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
                       }`}
                     >
-                      <p className="text-sm break-words whitespace-pre-wrap">{m.text}</p>
-                      <div className={`flex items-center justify-between mt-1 text-xs ${m.isOutgoing ? "text-gray-300" : "text-gray-500"}`}>
-                        <span>{m.timestamp}</span>
-                        {m.isOutgoing && <span>{m.isRead ? "Read" : "Delivered"}</span>}
+                      <p className="text-sm break-words whitespace-pre-wrap mb-1">{m.text}</p>
+                      <div className={`flex items-center gap-2 text-xs ${m.isOutgoing ? "text-gray-300" : "text-gray-500"}`}>
+                        <span>{formatChatMessageTimestamp(m.timestamp)}</span>
+                        {m.isOutgoing && (
+                          <>
+                            <span>•</span>
+                            <span>{m.isRead ? "Read" : "Delivered"}</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>

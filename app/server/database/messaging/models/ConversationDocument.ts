@@ -10,6 +10,7 @@ export type ConversationDocument = {
     senderId: string;
   };
   unreadCounts: Record<string, number>; // userId -> count
+  activeUsers: string[]; // Array of user IDs who currently have this conversation open
   createdAt: Date;
   updatedAt: Date;
 }

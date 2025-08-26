@@ -10,6 +10,7 @@ import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
 import { Tenant } from "/app/client/library-modules/domain-models/user/Tenant";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { Role } from "/app/shared/user-role-identifier";
+import { formatConversationTimestamp, formatChatMessageTimestamp } from "../../utils/timestamp-utils";
 
 const initialState: MessagesState = {
   isLoading: false,
@@ -47,8 +48,8 @@ const convertConversationDocumentToUIConversationForAgentWithTenant = (
     avatar: getAvatar(name),
     lastMessage: doc.lastMessage?.text || "No messages yet",
     timestamp: doc.lastMessage?.timestamp 
-      ? new Date(doc.lastMessage.timestamp).toLocaleString()
-      : new Date(doc.createdAt).toLocaleString(),
+      ? formatConversationTimestamp(doc.lastMessage.timestamp)
+      : formatConversationTimestamp(doc.createdAt),
     unreadCount: doc.unreadCounts[doc.agentId] || 0,
   };
 };
@@ -78,8 +79,8 @@ const convertConversationDocumentToUIConversationForAgentWithLandlord = (
     avatar: getAvatar(name),
     lastMessage: doc.lastMessage?.text || "No messages yet",
     timestamp: doc.lastMessage?.timestamp 
-      ? new Date(doc.lastMessage.timestamp).toLocaleString()
-      : new Date(doc.createdAt).toLocaleString(),
+      ? formatConversationTimestamp(doc.lastMessage.timestamp)
+      : formatConversationTimestamp(doc.createdAt),
     unreadCount: doc.unreadCounts[doc.agentId] || 0,
   };
 };
@@ -109,8 +110,8 @@ const convertConversationDocumentToUIConversationForTenant = (
     avatar: getAvatar(name),
     lastMessage: doc.lastMessage?.text || "No messages yet",
     timestamp: doc.lastMessage?.timestamp 
-      ? new Date(doc.lastMessage.timestamp).toLocaleString()
-      : new Date(doc.createdAt).toLocaleString(),
+      ? formatConversationTimestamp(doc.lastMessage.timestamp)
+      : formatConversationTimestamp(doc.createdAt),
     unreadCount: doc.unreadCounts[doc.tenantId!] || 0,
   };
 };
@@ -140,8 +141,8 @@ const convertConversationDocumentToUIConversationForLandlord = (
     avatar: getAvatar(name),
     lastMessage: doc.lastMessage?.text || "No messages yet",
     timestamp: doc.lastMessage?.timestamp 
-      ? new Date(doc.lastMessage.timestamp).toLocaleString()
-      : new Date(doc.createdAt).toLocaleString(),
+      ? formatConversationTimestamp(doc.lastMessage.timestamp)
+      : formatConversationTimestamp(doc.createdAt),
     unreadCount: doc.unreadCounts[doc.landlordId!] || 0,
   };
 };
@@ -244,6 +245,7 @@ export const fetchConversations = createAsyncThunk(
                 propertyId: property?.propertyId,
                 landlordId: undefined, // CRITICAL: No landlord access
                 unreadCounts: newConversationData.unreadCounts,
+                activeUsers: [], // Initialize with empty array
                 createdAt: new Date(),
                 updatedAt: new Date()
               };
@@ -286,6 +288,7 @@ export const fetchConversations = createAsyncThunk(
                 propertyId: property?.propertyId,
                 tenantId: undefined, // CRITICAL: No tenant access
                 unreadCounts: newConversationData.unreadCounts,
+                activeUsers: [], // Initialize with empty array
                 createdAt: new Date(),
                 updatedAt: new Date()
               };
@@ -431,6 +434,7 @@ export const fetchConversations = createAsyncThunk(
           propertyId: tenantProperty.propertyId,
           landlordId: undefined, // CRITICAL: No landlord access
           unreadCounts: newConversationData.unreadCounts,
+          activeUsers: [], // Initialize with empty array
           createdAt: new Date(),
           updatedAt: new Date()
         };
@@ -532,6 +536,7 @@ export const fetchConversations = createAsyncThunk(
           propertyId: landlordProperty.propertyId,
           tenantId: undefined, // CRITICAL: No tenant access
           unreadCounts: newConversationData.unreadCounts,
+          activeUsers: [], // Initialize with empty array
           createdAt: new Date(),
           updatedAt: new Date()
         };
@@ -675,6 +680,49 @@ export const sendMessage = createAsyncThunk(
   }
 );
 
+// Reset unread count when opening a conversation
+export const resetUnreadCount = createAsyncThunk(
+  "messages/resetUnreadCount",
+  async (conversationId: string, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const currentUser = state.currentUser.currentUser;
+      const authUser = state.currentUser.authUser;
+
+      if (!authUser || !currentUser) {
+        return rejectWithValue("User is not authenticated");
+      }
+
+      // Determine current user's ID
+      let currentUserId: string;
+      if (authUser.role === Role.AGENT) {
+        const agent = currentUser as Agent;
+        currentUserId = agent.agentId;
+      } else if (authUser.role === Role.TENANT) {
+        const tenant = currentUser as Tenant;
+        currentUserId = tenant.tenantId;
+      } else if (authUser.role === Role.LANDLORD) {
+        const landlord = currentUser as Landlord;
+        currentUserId = landlord.landlordId;
+      } else {
+        return rejectWithValue("Unsupported user role");
+      }
+
+      // Reset unread count on server
+      await Meteor.callAsync(
+        MeteorMethodIdentifier.CONVERSATION_RESET_UNREAD_COUNT,
+        conversationId,
+        currentUserId
+      );
+
+      return { conversationId, userId: currentUserId };
+    } catch (error) {
+      console.error("Error resetting unread count:", error);
+      return rejectWithValue("Failed to reset unread count");
+    }
+  }
+);
+
 export const messagesSlice = createSlice({
   name: "messages",
   initialState,
@@ -701,17 +749,19 @@ export const messagesSlice = createSlice({
         conversation.timestamp = action.payload.timestamp;
       }
     },
-    // New actions for pub/sub integration
-    setConversationsFromSubscription(state, action: PayloadAction<ConversationDocument[]>) {
-      // Don't override conversations if they're already loaded with proper profile data
-      // The subscription is mainly for real-time updates, not initial loading
-      if (state.conversations.length > 0) {
-        console.log('🔄 Redux: Conversations already loaded with profile data, skipping subscription override');
-        return;
+    resetConversationUnreadCount(state, action: PayloadAction<string>) {
+      const conversation = state.conversations.find(c => c.id === action.payload);
+      if (conversation) {
+        conversation.unreadCount = 0;
       }
+    },
+    // New actions for pub/sub integration
+    setConversationsFromSubscription(state, action: PayloadAction<{ conversations: ConversationDocument[]; currentUserId: string }>) {
+      // Always update conversations from subscription for real-time updates
+      console.log('🔄 Redux: Updating conversations from subscription with', action.payload.conversations.length, 'conversations');
       
       // Convert ConversationDocument[] to Conversation[] for UI
-      const uiConversations: Conversation[] = action.payload.map(doc => {
+      const uiConversations: Conversation[] = action.payload.conversations.map(doc => {
         const getAvatar = (name: string) => {
           const parts = name.split(' ');
           return parts.length > 1 
@@ -719,19 +769,39 @@ export const messagesSlice = createSlice({
             : `${parts[0][0]}${parts[0][1] || ''}`.toUpperCase();
         };
 
-        // Use basic conversion as fallback - proper names should come from fetchConversations
-        const name = `User ${doc.tenantId?.slice(-4) || doc.agentId?.slice(-4) || 'Unknown'}`;
+        // Try to preserve existing conversation data (name, role) if available
+        const existingConversation = state.conversations.find(c => c.id === doc._id);
+        
+        // Calculate unread count for current user
+        let unreadCount = 0;
+        if (doc.unreadCounts && action.payload.currentUserId) {
+          unreadCount = doc.unreadCounts[action.payload.currentUserId] || 0;
+        }
+        
+        // Determine timestamp with better fallback logic
+        let timestamp = '';
+        if (doc.lastMessage?.timestamp) {
+          timestamp = formatConversationTimestamp(doc.lastMessage.timestamp);
+          console.log('🕐 Using lastMessage timestamp:', doc.lastMessage.timestamp, '-> formatted:', timestamp);
+        } else if (doc.createdAt) {
+          timestamp = formatConversationTimestamp(doc.createdAt);
+          console.log('🕐 Using createdAt timestamp:', doc.createdAt, '-> formatted:', timestamp);
+        } else if (existingConversation?.timestamp) {
+          // Preserve existing timestamp if no server timestamp available
+          timestamp = existingConversation.timestamp;
+          console.log('🕐 Using existing timestamp:', timestamp);
+        } else {
+          console.warn('⚠️ No timestamp available for conversation:', doc._id);
+        }
         
         return {
           id: doc._id,
-          name,
-          role: doc.tenantId ? "Tenant" : doc.agentId ? "Agent" : "User",
-          avatar: getAvatar(name),
+          name: existingConversation?.name || `User ${doc.tenantId?.slice(-4) || doc.agentId?.slice(-4) || 'Unknown'}`,
+          role: existingConversation?.role || (doc.tenantId ? "Tenant" : doc.agentId ? "Agent" : "User"),
+          avatar: existingConversation?.avatar || getAvatar(existingConversation?.name || 'User'),
           lastMessage: doc.lastMessage?.text || "No messages yet",
-          timestamp: doc.lastMessage?.timestamp 
-            ? new Date(doc.lastMessage.timestamp).toLocaleString()
-            : new Date(doc.createdAt).toLocaleString(),
-          unreadCount: 0, // Will be calculated based on current user
+          timestamp,
+          unreadCount,
         };
       });
       
@@ -796,11 +866,11 @@ export const messagesSlice = createSlice({
         state.messages.push(action.payload.message);
         state.messageText = "";
         
-        // Update the conversation tile's last message in real-time
+        // Update the conversation tile's last message in real-time with proper formatting
         const conversation = state.conversations.find(c => c.id === action.payload.conversationId);
         if (conversation) {
           conversation.lastMessage = action.payload.message.text;
-          conversation.timestamp = action.payload.message.timestamp;
+          conversation.timestamp = formatConversationTimestamp(new Date());
         }
         
         console.log('📤 Message sent successfully, added to UI immediately and updated conversation tile');
@@ -808,6 +878,20 @@ export const messagesSlice = createSlice({
       .addCase(sendMessage.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+      });
+
+    // Reset unread count
+    builder
+      .addCase(resetUnreadCount.fulfilled, (state, action) => {
+        // Reset unread count in UI immediately
+        const conversation = state.conversations.find(c => c.id === action.payload.conversationId);
+        if (conversation) {
+          conversation.unreadCount = 0;
+        }
+        console.log('🔄 Unread count reset for conversation:', action.payload.conversationId);
+      })
+      .addCase(resetUnreadCount.rejected, (state, action) => {
+        console.error('Failed to reset unread count:', action.payload);
       });
   },
 });
@@ -820,6 +904,7 @@ export const {
   clearError,
   addMessage,
   updateConversationLastMessage,
+  resetConversationUnreadCount,
   setConversationsFromSubscription,
   setMessagesFromSubscription,
 } = messagesSlice.actions;

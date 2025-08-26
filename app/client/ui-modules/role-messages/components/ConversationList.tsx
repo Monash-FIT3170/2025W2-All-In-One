@@ -4,6 +4,7 @@ import { Badge } from "/app/client/ui-modules/theming-shadcn/Badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Search } from "lucide-react";
 import { Conversation } from "../types";
+import { formatConversationTimestamp } from "../utils/timestamp-utils";
 
 interface ConversationListProps {
   title?: string;
@@ -47,16 +48,21 @@ export function ConversationList({ title = "Messages", conversations, activeConv
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-gray-900 truncate">{conversation.name}</h3>
-                      <span className="text-xs text-gray-500">{conversation.timestamp}</span>
+                      <span className="text-xs text-gray-500">
+                        {formatConversationTimestamp(conversation.timestamp)}
+                      </span>
                     </div>
                     <p className="text-sm text-gray-600 truncate">{conversation.role}</p>
                     <p className="text-sm text-gray-500 truncate mt-1">{conversation.lastMessage}</p>
                   </div>
 
-                  {conversation.unreadCount > 0 && (
-                    <Badge variant="secondary" className="ml-2">
-                      {conversation.unreadCount}
-                    </Badge>
+                  {conversation.unreadCount > 0 && activeId !== conversation.id && (
+                    <div className="flex items-center space-x-1">
+                      <div className="w-2 h-2 bg-black rounded-full"></div>
+                      <Badge variant="secondary" className="bg-black text-white text-xs px-2 py-1 min-w-[20px] h-5 flex items-center justify-center">
+                        {conversation.unreadCount}
+                      </Badge>
+                    </div>
                   )}
                 </div>
               </div>

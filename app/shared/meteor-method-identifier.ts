@@ -50,6 +50,9 @@ export enum MeteorMethodIdentifier {
 	MESSAGES_GET_FOR_CONVERSATION = "messages.getForConversation", // Get all messages for a specific conversation
 	MESSAGE_INSERT = "messages.insert", // Send a new message in a conversation
 	MESSAGE_MARK_READ = "messages.markRead", // Mark a message as read by a user
+	CONVERSATION_RESET_UNREAD_COUNT = "conversations.resetUnreadCount", // Reset unread count for a user in a conversation
+	CONVERSATION_ADD_ACTIVE_USER = "conversations.addActiveUser", // Add user to active users list when they open a conversation
+	CONVERSATION_REMOVE_ACTIVE_USER = "conversations.removeActiveUser", // Remove user from active users list when they close a conversation
 	// Profile Methods by Role ID (for direct profile lookup from role documents)
 	PROFILE_GET_BY_AGENT_ID = "profile.getByAgentId", // Get profile data by agent ID (queries agent collection first, then profile collection)
 	PROFILE_GET_BY_LANDLORD_ID = "profile.getByLandlordId", // Get profile data by landlord ID (queries landlord collection first, then profile collection)

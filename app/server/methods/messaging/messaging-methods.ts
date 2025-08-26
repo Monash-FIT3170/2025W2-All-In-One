@@ -89,6 +89,13 @@ const sendMessageMethod = {
     try {
       const now = new Date();
       
+      // Get the conversation to determine who should receive the unread count increment
+      const conversation = await ConversationCollection.findOneAsync({ _id: messageData.conversationId });
+      
+      if (!conversation) {
+        throw new Error(`Conversation with ID ${messageData.conversationId} not found`);
+      }
+      
       // Create the new message
       const newMessage: Omit<MessageDocument, '_id'> = {
         conversationId: messageData.conversationId,
@@ -102,7 +109,27 @@ const sendMessageMethod = {
       // Insert the message
       const messageId = await MessageCollection.insertAsync(newMessage);
 
-      // Update the conversation's last message and timestamp
+      // Determine who should get the unread count increment (everyone except the sender AND those who have the conversation open)
+      const unreadCountUpdates: Record<string, number> = {};
+      
+      // Increment unread count for participants except the sender and those who have the conversation actively open
+      if (conversation.agentId && 
+          conversation.agentId !== messageData.senderId && 
+          !conversation.activeUsers.includes(conversation.agentId)) {
+        unreadCountUpdates[`unreadCounts.${conversation.agentId}`] = (conversation.unreadCounts[conversation.agentId] || 0) + 1;
+      }
+      if (conversation.tenantId && 
+          conversation.tenantId !== messageData.senderId && 
+          !conversation.activeUsers.includes(conversation.tenantId)) {
+        unreadCountUpdates[`unreadCounts.${conversation.tenantId}`] = (conversation.unreadCounts[conversation.tenantId] || 0) + 1;
+      }
+      if (conversation.landlordId && 
+          conversation.landlordId !== messageData.senderId && 
+          !conversation.activeUsers.includes(conversation.landlordId)) {
+        unreadCountUpdates[`unreadCounts.${conversation.landlordId}`] = (conversation.unreadCounts[conversation.landlordId] || 0) + 1;
+      }
+
+      // Update the conversation's last message, timestamp, and unread counts
       await ConversationCollection.updateAsync(
         { _id: messageData.conversationId },
         {
@@ -113,11 +140,12 @@ const sendMessageMethod = {
               senderId: messageData.senderId,
             },
             updatedAt: now,
+            ...unreadCountUpdates,
           },
         }
       );
 
-      console.log(`✅ Inserted new message with ID: ${messageId}`);
+      console.log(`✅ Inserted new message with ID: ${messageId} and updated unread counts`);
       return messageId;
     } catch (error) {
       console.error("Error in sendMessageMethod:", error);
@@ -177,6 +205,7 @@ const insertConversationMethod = {
         propertyId: conversationData.propertyId,
         lastMessage: conversationData.lastMessage,
         unreadCounts: conversationData.unreadCounts,
+        activeUsers: [], // Initialize with empty array - no users have the conversation open yet
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -191,6 +220,94 @@ const insertConversationMethod = {
   },
 };
 
+// Reset unread count for a user in a conversation
+const resetUnreadCountMethod = {
+  [MeteorMethodIdentifier.CONVERSATION_RESET_UNREAD_COUNT]: async (
+    conversationId: string,
+    userId: string
+  ): Promise<void> => {
+    try {
+      // Find the conversation
+      const conversation = await ConversationCollection.findOneAsync({ _id: conversationId });
+      
+      if (!conversation) {
+        throw new Error(`Conversation with ID ${conversationId} not found`);
+      }
+
+      // Reset the unread count for the specific user
+      const updateQuery = {
+        [`unreadCounts.${userId}`]: 0,
+        updatedAt: new Date(),
+      };
+
+      await ConversationCollection.updateAsync(
+        { _id: conversationId },
+        { $set: updateQuery }
+      );
+
+      console.log(`✅ Reset unread count for user ${userId} in conversation ${conversationId}`);
+    } catch (error) {
+      console.error("Error in resetUnreadCountMethod:", error);
+      throw error;
+    }
+  },
+};
+
+// Add user to active users list when they open a conversation
+const addActiveUserMethod = {
+  [MeteorMethodIdentifier.CONVERSATION_ADD_ACTIVE_USER]: async (
+    conversationId: string,
+    userId: string
+  ): Promise<void> => {
+    try {
+      // Find the conversation
+      const conversation = await ConversationCollection.findOneAsync({ _id: conversationId });
+      
+      if (!conversation) {
+        throw new Error(`Conversation with ID ${conversationId} not found`);
+      }
+
+      // Add user to activeUsers array if not already present
+      if (!conversation.activeUsers.includes(userId)) {
+        await ConversationCollection.updateAsync(
+          { _id: conversationId },
+          { 
+            $addToSet: { activeUsers: userId },
+            $set: { updatedAt: new Date() }
+          }
+        );
+        console.log(`✅ Added user ${userId} to active users in conversation ${conversationId}`);
+      }
+    } catch (error) {
+      console.error("Error in addActiveUserMethod:", error);
+      throw error;
+    }
+  },
+};
+
+// Remove user from active users list when they close a conversation
+const removeActiveUserMethod = {
+  [MeteorMethodIdentifier.CONVERSATION_REMOVE_ACTIVE_USER]: async (
+    conversationId: string,
+    userId: string
+  ): Promise<void> => {
+    try {
+      // Remove user from activeUsers array
+      await ConversationCollection.updateAsync(
+        { _id: conversationId },
+        { 
+          $pull: { activeUsers: userId },
+          $set: { updatedAt: new Date() }
+        }
+      );
+      console.log(`✅ Removed user ${userId} from active users in conversation ${conversationId}`);
+    } catch (error) {
+      console.error("Error in removeActiveUserMethod:", error);
+      throw error;
+    }
+  },
+};
+
 Meteor.methods({
   ...getConversationsForAgentMethod,
   ...getConversationsForTenantMethod,
@@ -198,4 +315,7 @@ Meteor.methods({
   ...getMessagesForConversationMethod,
   ...sendMessageMethod,
   ...insertConversationMethod,
+  ...resetUnreadCountMethod,
+  ...addActiveUserMethod,
+  ...removeActiveUserMethod,
 });
