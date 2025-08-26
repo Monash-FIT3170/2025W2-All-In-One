@@ -57,12 +57,9 @@ export function ConversationList({ title = "Messages", conversations, activeConv
                   </div>
 
                   {conversation.unreadCount > 0 && activeId !== conversation.id && (
-                    <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-black rounded-full"></div>
-                      <Badge variant="secondary" className="bg-black text-white text-xs px-2 py-1 min-w-[20px] h-5 flex items-center justify-center">
-                        {conversation.unreadCount}
-                      </Badge>
-                    </div>
+                    <Badge variant="secondary" className="bg-black text-white text-xs px-2 py-1 min-w-[20px] h-5 flex items-center justify-center">
+                      {conversation.unreadCount}
+                    </Badge>
                   )}
                 </div>
               </div>
