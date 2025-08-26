@@ -12,11 +12,11 @@ import {
 } from "/app/client/library-modules/domain-models/tenant-application/repositories/tenant-application-repository";
 import { LoadTenantApplicationsUseCase } from "/app/client/library-modules/use-cases/tenant-application/LoadTenantApplicationsUseCase";
 import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
-import { createTenantApplication } from "/app/client/library-modules/use-cases/tenant-application/CreateTenantApplicationUseCase";
 import {
   acceptTenantApplication,
   rejectTenantApplication } from "/app/client/library-modules/use-cases/tenant-application/ProcessTenantApplicationWorkflowUseCase";
-  import { processTenantApplication } from "/app/client/library-modules/use-cases/tenant-application/ProcessTenantApplicationWorkflowUseCase";
+import { createTenantApplicationUseCase } from "/app/client/library-modules/use-cases/tenant-application/CreateTenantApplicationUseCase";
+import { Role } from "/app/shared/user-role-identifier";
 const initialState: TenantSelectionUiState = {
   applicationsByProperty: {},
   activeFilter: FilterType.ALL,
@@ -49,7 +49,7 @@ export const createTenantApplicationAsync = createAsyncThunk(
     const { currentUser, profileData, authUser } = state.currentUser;
     const { bookedInspections } = state.tenantSelection;
 
-    const result = await processTenantApplication({
+    const result = await createTenantApplicationUseCase({
       propertyId,
       propertyLandlordId,
       currentUser,
@@ -64,12 +64,14 @@ export const createTenantApplicationAsync = createAsyncThunk(
 
     return {
       applicationId: result.applicationId!,
+      applicantName: result.applicantName!,
+      propertyId: result.propertyId!,
+      status: result.status!,
       success: true,
-      message: result.message
+      message: result.message,
     };
   }
 );
-
 
 export const rejectTenantApplicationAsync = createAsyncThunk(
   "tenantSelection/rejectTenantApplication",
@@ -125,7 +127,10 @@ export const sendAcceptedApplicationsToLandlordAsync = createAsyncThunk(
       description: taskDescription,
       dueDate: dueDate,
       priority: TaskPriority.MEDIUM,
-      landlordId: propertyLandlordId,
+      userId: propertyLandlordId,
+      propertyAddress: `${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`,
+      propertyId: propertyId,
+      userType: Role.LANDLORD,
     });
 
     // Update all accepted applications to LANDLORD_REVIEW status
@@ -202,7 +207,7 @@ export const tenantSelectionSlice = createSlice({
         state.error = null;
       })
       .addCase(createTenantApplicationAsync.fulfilled, (state, action) => {
-        const { propertyId } = action.payload;
+        const propertyId = action.payload.propertyId;
         state.isLoading = false;
 
         const newApplication: TenantApplication = {

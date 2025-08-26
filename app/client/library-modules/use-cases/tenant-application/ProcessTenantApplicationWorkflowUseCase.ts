@@ -5,67 +5,8 @@ import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { Role } from "/app/shared/user-role-identifier";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
 import { TenantApplication } from "/app/client/ui-modules/tenant-selection/types/TenantApplication";
-import { createTenantApplication } from "./CreateTenantApplicationUseCase";
-import { CurrentUserState } from "/app/client/ui-modules/user-authentication/state/CurrentUserState";
-
-export interface ProcessTenantApplicationRequest {
-  propertyId: string;
-  propertyLandlordId: string;
-  currentUser: CurrentUserState["currentUser"]
-  profileData?: CurrentUserState["profileData"]
-  authUser: CurrentUserState["authUser"]
-  bookedInspections: Set<number>;
-}
-
-export interface ProcessTenantApplicationResponse {
-  success: boolean;
-  message: string;
-  applicationId?: string;
-}
 
 
-export function validateUserCanApply(authUser: any, currentUser: any, bookedInspections: Set<number>): void {
-  // Check if user is logged in
-  if (!currentUser) {
-    throw new Error('Please log in to apply for this property.');
-  }
-
-  // Check if user is a tenant
-  if (authUser && authUser.role !== Role.TENANT) {
-    throw new Error('Only tenants can apply for properties.');
-  }
-
-  // Check if user has booked an inspection
-  if (bookedInspections.size === 0) {
-    throw new Error('Please book an inspection before applying for this property.');
-  }
-}
-
-export async function processTenantApplication(request: ProcessTenantApplicationRequest): Promise<ProcessTenantApplicationResponse> {
-  try {
-    // Validate user can apply
-    validateUserCanApply(request.authUser, request.currentUser, request.bookedInspections);
-
-    // Create tenant application
-    const result = await createTenantApplication({
-      propertyId: request.propertyId,
-      propertyLandlordId: request.propertyLandlordId,
-      currentUser: request.currentUser,
-      profileData: request.profileData
-    });
-
-    return {
-      success: true,
-      message: 'Application submitted successfully! Your application will be reviewed by the agent.',
-      applicationId: result.applicationId
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: error instanceof Error ? error.message : 'Failed to submit application. Please try again.'
-    };
-  }
-}
 export async function acceptTenantApplication(applicationId: string): Promise<{ applicationId: string; status: TenantApplicationStatus }> {
   await updateTenantApplicationStatus([applicationId], TenantApplicationStatus.ACCEPTED, 1);
   return { applicationId, status: TenantApplicationStatus.ACCEPTED };
