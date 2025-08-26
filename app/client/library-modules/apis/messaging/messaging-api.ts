@@ -80,3 +80,17 @@ export async function apiInsertConversation(conversationData: {
 export async function apiResetUnreadCount(conversationId: string, userId: string): Promise<void> {
   return await Meteor.callAsync(MeteorMethodIdentifier.CONVERSATION_RESET_UNREAD_COUNT, conversationId, userId);
 }
+
+/**
+ * Adds a user to the active users list of a conversation
+ */
+export async function apiAddActiveUser(conversationId: string, userId: string): Promise<void> {
+  return await Meteor.callAsync(MeteorMethodIdentifier.CONVERSATION_ADD_ACTIVE_USER, conversationId, userId);
+}
+
+/**
+ * Removes a user from the active users list of a conversation
+ */
+export async function apiRemoveActiveUser(conversationId: string, userId: string): Promise<void> {
+  return await Meteor.callAsync(MeteorMethodIdentifier.CONVERSATION_REMOVE_ACTIVE_USER, conversationId, userId);
+}

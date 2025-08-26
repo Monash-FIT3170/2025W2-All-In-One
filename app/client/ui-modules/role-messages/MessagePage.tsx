@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { Meteor } from 'meteor/meteor';
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { ConversationList } from "./components/ConversationList";
 import { ChatWindow } from "./components/ChatWindow";
@@ -18,7 +17,7 @@ import {
   resetUnreadCount,
 } from "./state/reducers/messages-slice";
 import { useMessagingSubscriptions } from "./hooks/useMessagingSubscriptions";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { apiAddActiveUser, apiRemoveActiveUser } from "/app/client/library-modules/apis/messaging/messaging-api";
 import { Role } from "/app/shared/user-role-identifier";
 import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
 import { Tenant } from "/app/client/library-modules/domain-models/user/Tenant";
@@ -82,11 +81,7 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
         }
 
         // Remove user from active users
-        Meteor.callAsync(
-          MeteorMethodIdentifier.CONVERSATION_REMOVE_ACTIVE_USER,
-          activeConversationId,
-          currentUserId
-        ).catch(error => {
+        apiRemoveActiveUser(activeConversationId, currentUserId).catch(error => {
           console.error('Failed to remove active user on cleanup:', error);
         });
       }
@@ -117,11 +112,7 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
       }
 
       try {
-        await Meteor.callAsync(
-          MeteorMethodIdentifier.CONVERSATION_REMOVE_ACTIVE_USER,
-          activeConversationId,
-          currentUserId
-        );
+        await apiRemoveActiveUser(activeConversationId, currentUserId);
       } catch (error) {
         console.error('Failed to remove user from active users:', error);
       }
@@ -148,11 +139,7 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
       }
 
       try {
-        await Meteor.callAsync(
-          MeteorMethodIdentifier.CONVERSATION_ADD_ACTIVE_USER,
-          conversationId,
-          currentUserId
-        );
+        await apiAddActiveUser(conversationId, currentUserId);
       } catch (error) {
         console.error('Failed to add user to active users:', error);
       }

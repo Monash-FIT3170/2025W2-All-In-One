@@ -422,12 +422,6 @@ export const {
  */
 
 /**
- * Selects the entire messages state object
- * Useful for components that need access to multiple messaging properties
- */
-export const selectMessages = (state: RootState) => state.messages;
-
-/**
  * Selects all conversations for the current user
  * Returns an array of Conversation objects formatted for UI display
  */
@@ -499,15 +493,6 @@ export const selectConversationsForRole = (role: string) => (state: RootState) =
   }
   
   return [];
-};
-
-/**
- * Selects messages for the current user
- * Returns all messages in the currently active conversation
- * Messages include proper isOutgoing flags based on the current user
- */
-export const selectMessagesForCurrentUser = (state: RootState) => {
-  return state.messages.messages;
 };
 
 export default messagesSlice.reducer;

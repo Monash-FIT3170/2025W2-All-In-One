@@ -4,12 +4,15 @@
  * fetching user profiles, and converting between API and UI formats.
  */
 
-import { Meteor } from "meteor/meteor";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { ApiConversation } from "/app/shared/api-models/messaging/ApiConversation";
 import { 
-  createConversation,
-} from "/app/client/library-modules/domain-models/messaging/messaging-repository";
+  apiInsertConversation,
+} from "/app/client/library-modules/apis/messaging/messaging-api";
+import { 
+  apiGetProfileByAgentId,
+  apiGetProfileByTenantId,
+  apiGetProfileByLandlordId
+} from "/app/client/library-modules/apis/user/user-account-api";
+import { ApiConversation } from "/app/shared/api-models/messaging/ApiConversation";
 
 /**
  * Interface for property data from server
@@ -110,7 +113,7 @@ export async function createAgentTenantConversation(
       }
     };
 
-    const conversationId = await createConversation(newConversationData);
+    const conversationId = await apiInsertConversation(newConversationData);
 
     // Check if this is truly a new conversation
     const isNewConversation = !existingConversations.some(conv => conv.conversationId === conversationId);
@@ -157,7 +160,7 @@ export async function createAgentLandlordConversation(
       }
     };
 
-    const conversationId = await createConversation(newConversationData);
+    const conversationId = await apiInsertConversation(newConversationData);
 
     // Check if this is truly a new conversation
     const isNewConversation = !existingConversations.some(conv => conv.conversationId === conversationId);
@@ -193,10 +196,7 @@ export async function fetchUserProfiles(tenantIds: string[], landlordIds: string
   await Promise.all(
     tenantIds.map(async (tenantId) => {
       try {
-        const profile = await Meteor.callAsync(
-          MeteorMethodIdentifier.PROFILE_GET_BY_TENANT_ID,
-          tenantId
-        );
+        const profile = await apiGetProfileByTenantId(tenantId);
         tenantProfiles.set(tenantId, profile);
       } catch (error) {
         console.error(`Failed to fetch profile for tenant ${tenantId}:`, error);
@@ -208,10 +208,7 @@ export async function fetchUserProfiles(tenantIds: string[], landlordIds: string
   await Promise.all(
     landlordIds.map(async (landlordId) => {
       try {
-        const profile = await Meteor.callAsync(
-          MeteorMethodIdentifier.PROFILE_GET_BY_LANDLORD_ID,
-          landlordId
-        );
+        const profile = await apiGetProfileByLandlordId(landlordId);
         landlordProfiles.set(landlordId, profile);
       } catch (error) {
         console.error(`Failed to fetch profile for landlord ${landlordId}:`, error);
@@ -227,10 +224,7 @@ export async function fetchUserProfiles(tenantIds: string[], landlordIds: string
  */
 export async function fetchAgentProfile(agentId: string) {
   try {
-    return await Meteor.callAsync(
-      MeteorMethodIdentifier.PROFILE_GET_BY_AGENT_ID,
-      agentId
-    );
+    return await apiGetProfileByAgentId(agentId);
   } catch (error) {
     console.error(`Failed to fetch profile for agent ${agentId}:`, error);
     return null;
@@ -251,7 +245,7 @@ export async function createTenantAgentConversation(tenantId: string, tenantProp
     }
   };
 
-  const conversationId = await createConversation(newConversationData);
+  const conversationId = await apiInsertConversation(newConversationData);
 
   return {
     conversationId: conversationId,
@@ -279,7 +273,7 @@ export async function createLandlordAgentConversation(landlordId: string, landlo
     }
   };
 
-  const conversationId = await createConversation(newConversationData);
+  const conversationId = await apiInsertConversation(newConversationData);
 
   return {
     conversationId: conversationId,

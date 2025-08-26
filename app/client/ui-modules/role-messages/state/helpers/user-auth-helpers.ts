@@ -102,11 +102,3 @@ export function isTenant(role: Role): boolean {
 export function isLandlord(role: Role): boolean {
   return role === Role.LANDLORD;
 }
-
-/**
- * Gets user ID from current user object based on role
- */
-export function getUserId(currentUser: Agent | Tenant | Landlord, role: Role): string {
-  const { userId } = extractUserIdAndRole(currentUser, role);
-  return userId;
-}

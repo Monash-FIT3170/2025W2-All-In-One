@@ -4,17 +4,21 @@
  * for different user roles (Agent, Tenant, Landlord)
  */
 
-import { Meteor } from "meteor/meteor";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { ApiConversation } from "/app/shared/api-models/messaging/ApiConversation";
 import { Conversation } from "/app/client/library-modules/domain-models/messaging/Conversation";
 import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
 import { Tenant } from "/app/client/library-modules/domain-models/user/Tenant";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { 
-  getConversationsForAgent,
-  getConversationsForTenant,
-  getConversationsForLandlord,
+  apiGetConversationsForAgent,
+  apiGetConversationsForTenant,
+  apiGetConversationsForLandlord,
+} from "/app/client/library-modules/apis/messaging/messaging-api";
+import {
+  apiGetPropertyByAgentId,
+  apiGetPropertyByTenantId,
+  apiGetAllPropertiesByLandlordId,
+} from "/app/client/library-modules/apis/property/property-api";
+import { 
   convertApiConversationsToAgentView,
   convertApiConversationsToTenantView,
   convertApiConversationsToLandlordView
@@ -30,6 +34,7 @@ import {
   createTenantAgentConversation,
   createLandlordAgentConversation
 } from "./conversation-helpers";
+import { ApiConversation } from "/app/shared/api-models/messaging/ApiConversation";
 
 /**
  * Handles conversation fetching for Agent users
@@ -39,13 +44,10 @@ export async function handleAgentConversations(agent: Agent): Promise<Conversati
   const agentId = agent.agentId;
 
   // Step 1: Get existing agent conversations
-  const existingConversations: ApiConversation[] = await getConversationsForAgent(agentId);
+  const existingConversations: ApiConversation[] = await apiGetConversationsForAgent(agentId);
 
   // Step 2: Get properties managed by this agent
-  const agentProperties = await Meteor.callAsync(
-    MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID,
-    agentId
-  );
+  const agentProperties = await apiGetPropertyByAgentId(agentId);
 
   // Step 3: Extract unique tenant and landlord IDs from properties
   const userConnections = extractUserConnectionsFromProperties(agentProperties);
@@ -112,7 +114,7 @@ export async function handleTenantConversations(tenant: Tenant): Promise<Convers
   const tenantId = tenant.tenantId;
 
   // Step 1: Get existing conversations for this tenant
-  const existingConversations: ApiConversation[] = await getConversationsForTenant(tenantId);
+  const existingConversations: ApiConversation[] = await apiGetConversationsForTenant(tenantId);
 
   // Step 2: If conversation exists, use it
   if (existingConversations.length > 0) {
@@ -129,10 +131,7 @@ export async function handleTenantConversations(tenant: Tenant): Promise<Convers
   }
 
   // Step 3: No conversation exists, find the agent from tenant's property
-  const tenantProperty = await Meteor.callAsync(
-    MeteorMethodIdentifier.PROPERTY_GET_BY_TENANT_ID,
-    tenantId
-  );
+  const tenantProperty = await apiGetPropertyByTenantId(tenantId);
 
   if (!tenantProperty || !tenantProperty.agentId) {
     throw new Error("No property or agent found for this tenant");
@@ -159,7 +158,7 @@ export async function handleLandlordConversations(landlord: Landlord): Promise<C
   const landlordId = landlord.landlordId;
 
   // Step 1: Get existing conversations for this landlord
-  const existingConversations: ApiConversation[] = await getConversationsForLandlord(landlordId);
+  const existingConversations: ApiConversation[] = await apiGetConversationsForLandlord(landlordId);
 
   // Step 2: If conversation exists, use it
   if (existingConversations.length > 0) {
@@ -176,10 +175,7 @@ export async function handleLandlordConversations(landlord: Landlord): Promise<C
   }
 
   // Step 3: No conversation exists, find the agent from landlord's properties
-  const landlordProperties = await Meteor.callAsync(
-    MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_LANDLORD_ID,
-    landlordId
-  );
+  const landlordProperties = await apiGetAllPropertiesByLandlordId(landlordId);
 
   if (!landlordProperties || landlordProperties.length === 0) {
     throw new Error("No properties found for this landlord");
