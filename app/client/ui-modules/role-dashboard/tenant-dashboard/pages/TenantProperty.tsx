@@ -1,38 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { PropertyFeatures } from "../../../property-listing-page/components/PropertyFeatures";
-import { ListingPropertyDetails } from "../../../property-listing-page/components/ListingPropertyDetails";
+import { PropertyFeatures } from "../../../role-dashboard/tenant-dashboard/components/PropertyFeatures";
+import { ListingPropertyDetails } from "../components/PropertySpecifics";
 import {
   PropertyStatusPillVariant,
   ListingSummary,
-} from "../../../property-listing-page/components/ListingSummary";
-import { ListingDescription } from "../../../property-listing-page/components/ListingDescription";
+} from "../components/PropertySummary";
+import { ListingDescription } from "../components/PropertyDescription";
 import { LeftCircularArrowIcon } from "/app/client/ui-modules/theming/icons/LeftCircularArrowIcon";
 import { RightCircularArrowIcon } from "/app/client/ui-modules/theming/icons/RightCircularArrowIcon";
 import { ImageCarousel } from "../../../theming/components/ImageCarousel";
 import {
   InspectionBookingListUiState,
   PropertyInspections,
-} from "/app/client/ui-modules/property-listing-page/components/PropertyInspections";
-import { ApplyButton } from "/app/client/ui-modules/property-listing-page/components/ApplyButton";
-import { ContactAgentButton } from "/app/client/ui-modules/property-listing-page/components/ContactAgentButton";
-import {
-  ListingStatusPill,
-  ListingStatusPillVariant,
-} from "/app/client/ui-modules/property-listing-page/components/ListingStatusPill";
+} from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/PropertyInspections";
+import { ContactAgentButton } from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/ContactAgentButton";
 import { BackLink } from "../../../theming/components/BackLink";
 import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonIcon";
 import { twMerge } from "tailwind-merge";
-import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
-import { ReviewTenantButton } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantButton";
-import { ReviewTenantModal } from "../../../review-tenant-modal/ReviewTenantModal";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useSelector } from "react-redux";
-// import {
-//   load,
-//   selectPropertyListingUiState,
-//   submitDraftListingAsync,
-// } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
-// import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import {
   load, 
   selectTenantPropertyUiState,
@@ -40,15 +26,8 @@ import {
 } from "/app/client/ui-modules/role-dashboard/tenant-dashboard/state/reducers/tenant-property-slice";
 import { TenantPropertyUiState } from "../state/TenantPropertyUiState";
 import { useSearchParams } from "react-router";
-import EditDraftListingModal from "../../../property-listing-page/components/EditDraftListingModal";
-import { EditDraftListingButton } from "../../../property-listing-page/components/EditDraftListingButton";
-import {
-  FormSchemaType,
-} from "/app/client/ui-modules/property-form-agent/components/FormSchema";
-import { DynamicMap } from "../../../common/map/DynamicMap";
 import { SubHeading } from "../../../theming/components/SubHeading";
-import { BasicMarker } from "../../../common/map/markers/BasicMarker";
-import { PropertyMap, PropertyMapUiState } from "../../../property-listing-page/components/PropertyMap";
+import { PropertyMap, PropertyMapUiState } from "../components/PropertyMap";
 import {
   selectAcceptedCount,
   selectHasAcceptedApplications,
@@ -108,7 +87,6 @@ export function TenantProperty({
           inspectionBookingUiStateList={state.inspectionBookingUiStateList}
           listingImageUrls={state.listingImageUrls}
           listingStatusText={state.listingStatusText}
-          listingStatusPillVariant={state.listingStatusPillVariant}
           shouldDisplayListingStatus={state.shouldDisplayListingStatus}
           shouldDisplaySubmitDraftButton={state.shouldDisplaySubmitDraftButton}
           shouldDisplayReviewTenantButton={
@@ -160,7 +138,6 @@ function ListingPageContent({
   inspectionBookingUiStateList,
   listingImageUrls,
   listingStatusText,
-  listingStatusPillVariant,
   shouldDisplayListingStatus,
   shouldDisplaySubmitDraftButton,
   shouldDisplayReviewTenantButton,
@@ -194,7 +171,6 @@ function ListingPageContent({
   inspectionBookingUiStateList: InspectionBookingListUiState[];
   listingImageUrls: string[];
   listingStatusText: string;
-  listingStatusPillVariant: ListingStatusPillVariant;
   shouldDisplayListingStatus: boolean;
   shouldDisplaySubmitDraftButton: boolean;
   shouldDisplayReviewTenantButton: boolean;
@@ -218,7 +194,6 @@ function ListingPageContent({
     <div className={className}>
       <TopBar
         listingStatusText={listingStatusText}
-        // listingStatusPillVariant={listingStatusPillVariant}
         shouldDisplayListingStatus={shouldDisplayListingStatus}
         onBack={onBack}
         className="mb-3"
@@ -240,6 +215,7 @@ function ListingPageContent({
         propertyPrice={propertyPrice}
         listingImageUrls={listingImageUrls}
         onApply={onApply}
+        propertyId={propertyId}
         onContactAgent={onContactAgent}
         className="mb-6"
       />
@@ -288,13 +264,11 @@ function ListingPageContentLoadingSkeleton({
 
 function TopBar({
   listingStatusText,
-  // listingStatusPillVariant,
   shouldDisplayListingStatus,
   onBack,
   className = "",
 }: {
   listingStatusText: string;
-  // listingStatusPillVariant: ListingStatusPillVariant;
   shouldDisplayListingStatus: boolean;
   onBack: () => void;
   className?: string;
@@ -307,12 +281,6 @@ function TopBar({
         onClick={onBack}
         className="mr-auto"
       />
-      {/* {shouldDisplayListingStatus && (
-        // <ListingStatusPill
-        //   text={listingStatusText}
-        //   variant={listingStatusPillVariant}
-        // />
-      )} */}
     </div>
   );
 }
@@ -334,6 +302,7 @@ function ListingHero({
   propertyBedrooms,
   propertyPrice,
   listingImageUrls,
+  propertyId,
   onApply,
   onContactAgent,
 }: {
@@ -353,6 +322,7 @@ function ListingHero({
   propertyBedrooms: string;
   propertyPrice: string;
   listingImageUrls: string[];
+  propertyId: string;
   onApply: () => void;
   onContactAgent: () => void;
 }): React.JSX.Element {
@@ -386,8 +356,7 @@ function ListingHero({
           className="w-full mb-8"
         />
         <div className="flex">
-          <ApplyButton onClick={onApply} className="mr-4" />
-          <ContactAgentButton onClick={onContactAgent} />
+          <ContactAgentButton propertyId={propertyId} />
         </div>
       </div>
     </div>
@@ -431,89 +400,3 @@ function ListingDetails({
     </div>
   );
 }
-
-// function BottomBar({
-//   shouldDisplaySubmitDraftButton,
-//   shouldDisplayReviewTenantButton,
-//   shouldDisplayEditListingButton,
-//   onSubmitDraftListing,
-//   onReviewTenant,
-//   className = "",
-// }: {
-//   shouldDisplaySubmitDraftButton: boolean;
-//   shouldDisplayReviewTenantButton: boolean;
-//   shouldDisplayEditListingButton: boolean;
-//   onSubmitDraftListing: () => void;
-//   onReviewTenant: () => void;
-//   className?: string;
-// }): React.JSX.Element {
-//   return (
-//     <div
-//       className={twMerge(
-//         "flex justify-between items-center gap-2",
-//         className
-//       )}
-//     >
-//       {/* Left side - Review Tenant Button */}
-//       <div className="flex">
-//         {shouldDisplayReviewTenantButton && (
-//           <ReviewTenantButton onClick={onReviewTenant} />
-//         )}
-//       </div>
-
-//       <div className="flex">
-//         {shouldDisplayEditListingButton && <ListingModalEditor />}
-//         {shouldDisplaySubmitDraftButton && (
-//           <SubmitDraftListingButton onClick={onSubmitDraftListing} />
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
-
-// function ListingModalEditor({
-//   className = "",
-// }: {
-//   className?: string;
-// }): React.JSX.Element {
-//   const [isModalOpen, setIsModalOpen] = React.useState(false);
-//   const toggleModal = () => setIsModalOpen(!isModalOpen);
-//   const state: TenantPropertyUiState = useSelector(
-//     selectTenantPropertyUiState
-//   );
-
-//   const listingInfo: FormSchemaType = {
-//     landlord: state.propertyLandlordId,
-//     property_type: state.propertyType.toLowerCase(), // Ensure property type matches dropdown options (house or apartment)
-//     address: `${state.streetNumber} ${state.street}`,
-//     city: state.suburb,
-//     state: state.province,
-//     postal_code: state.postcode,
-//     apartment_number: "",
-//     bedroom_number: Number(state.propertyBedrooms),
-//     bathroom_number: Number(state.propertyBathrooms),
-//     space: Number(state.areaValue),
-//     description: state.propertyDescription,
-//     images: [],
-//     available_dates: new Date(),
-//     lease_term: "12_months",
-//     show_contact_boolean: true,
-//     suburb: state.suburb,
-//     address_number: state.streetNumber,
-//     monthly_rent: Number(state.propertyPrice),
-//     property_feature_ids: []
-//   };
-
-//   return (
-//     <>
-//       <EditDraftListingButton onClick={toggleModal} />
-//       <EditDraftListingModal
-//         isOpen={isModalOpen}
-//         toggle={toggleModal}
-//         propertyForm={listingInfo}
-//         landlords={state.landlords}
-//         propertyId={state.propertyId}
-//       />
-//     </>
-//   );
-// }
