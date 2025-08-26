@@ -260,8 +260,6 @@ export const messagesSlice = createSlice({
      * Converts API format to UI format and preserves existing conversation metadata
      */
     setConversationsFromSubscription(state, action: PayloadAction<{ conversations: ApiConversation[]; currentUserId: string }>) {
-      // Always update conversations from subscription for real-time updates
-      console.log('🔄 Redux: Updating conversations from subscription with', action.payload.conversations.length, 'conversations');
       
       // Helper function to generate user avatars from names
       const getAvatar = (name: string) => {
@@ -286,10 +284,8 @@ export const messagesSlice = createSlice({
         let timestamp = '';
         if (doc.lastMessage?.timestamp && doc.lastMessage?.text && doc.lastMessage.text.trim() !== '') {
           timestamp = formatConversationTimestamp(new Date(doc.lastMessage.timestamp));
-          console.log('🕐 Using lastMessage timestamp:', doc.lastMessage.timestamp, '-> formatted:', timestamp);
         } else {
           timestamp = '';
-          console.log('🕐 No timestamp - conversation has no messages:', doc.conversationId);
         }
         
         return {
@@ -311,7 +307,6 @@ export const messagesSlice = createSlice({
      * Converts server message documents to UI format with proper isOutgoing logic
      */
     setMessagesFromSubscription(state, action: PayloadAction<{ conversationId: string; messages: any[]; currentUserId?: string }>) {
-      console.log('🔄 Redux: setMessagesFromSubscription called with', action.payload.messages.length, 'messages');
       
       // Convert message documents to Message[] for UI
       const uiMessages: Message[] = action.payload.messages.map(doc => ({
@@ -322,7 +317,6 @@ export const messagesSlice = createSlice({
         isRead: doc.isRead,
       }));
       
-      console.log('🔄 Redux: Setting', uiMessages.length, 'UI messages');
       state.messages = uiMessages;
     },
   },
@@ -376,7 +370,6 @@ export const messagesSlice = createSlice({
           conversation.timestamp = formatConversationTimestamp(new Date());
         }
         
-        console.log('📤 Message sent successfully, added to UI immediately and updated conversation tile');
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.isLoading = false;
@@ -391,7 +384,6 @@ export const messagesSlice = createSlice({
         if (conversation) {
           conversation.unreadCount = 0;
         }
-        console.log('🔄 Unread count reset for conversation:', action.payload.conversationId);
       })
       .addCase(resetUnreadCount.rejected, (state, action) => {
         console.error('Failed to reset unread count:', action.payload);

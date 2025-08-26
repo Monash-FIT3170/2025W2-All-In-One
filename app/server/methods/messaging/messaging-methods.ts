@@ -145,7 +145,6 @@ const sendMessageMethod = {
         }
       );
 
-      console.log(`✅ Inserted new message with ID: ${messageId} and updated unread counts`);
       return messageId;
     } catch (error) {
       console.error("Error in sendMessageMethod:", error);
@@ -182,7 +181,6 @@ const insertConversationMethod = {
         });
         
         if (existingConversation) {
-          console.log(`⚠️ Conversation already exists between agent ${conversationData.agentId} and tenant ${conversationData.tenantId}`);
           return existingConversation._id;
         }
       } else if (conversationData.landlordId) {
@@ -193,7 +191,6 @@ const insertConversationMethod = {
         });
         
         if (existingConversation) {
-          console.log(`⚠️ Conversation already exists between agent ${conversationData.agentId} and landlord ${conversationData.landlordId}`);
           return existingConversation._id;
         }
       }
@@ -211,7 +208,6 @@ const insertConversationMethod = {
       };
 
       const conversationId = await ConversationCollection.insertAsync(newConversation);
-      console.log(`✅ Inserted new conversation with ID: ${conversationId}`);
       return conversationId;
     } catch (error) {
       console.error("Error in insertConversationMethod:", error);
@@ -245,7 +241,6 @@ const resetUnreadCountMethod = {
         { $set: updateQuery }
       );
 
-      console.log(`✅ Reset unread count for user ${userId} in conversation ${conversationId}`);
     } catch (error) {
       console.error("Error in resetUnreadCountMethod:", error);
       throw error;
@@ -276,7 +271,6 @@ const addActiveUserMethod = {
             $set: { updatedAt: new Date() }
           }
         );
-        console.log(`✅ Added user ${userId} to active users in conversation ${conversationId}`);
       }
     } catch (error) {
       console.error("Error in addActiveUserMethod:", error);
@@ -300,7 +294,6 @@ const removeActiveUserMethod = {
           $set: { updatedAt: new Date() }
         }
       );
-      console.log(`✅ Removed user ${userId} from active users in conversation ${conversationId}`);
     } catch (error) {
       console.error("Error in removeActiveUserMethod:", error);
       throw error;

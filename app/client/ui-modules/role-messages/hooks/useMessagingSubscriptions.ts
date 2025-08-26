@@ -55,26 +55,21 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
   // Subscribe to conversations with role and roleId
   const conversationsReady = useTracker(() => {
     if (!userRole || !roleId) {
-      console.log('🔔 No user role or roleId, skipping conversations subscription. userRole:', userRole, 'roleId:', roleId);
       return true; // Return true instead of false to avoid blocking
     }
     const handle = Meteor.subscribe('conversations', userRole, roleId);
-    console.log('🔔 Conversations subscription for role:', userRole, 'roleId:', roleId, 'ready:', handle.ready());
     return handle.ready();
   }, [userRole, roleId]);
 
   // Subscribe to messages for active conversation with role and roleId
   const messagesReady = useTracker(() => {
     if (!activeConversationId) {
-      console.log('🔔 No active conversation, skipping messages subscription');
       return true;
     }
     if (!userRole || !roleId) {
-      console.log('🔔 No user role or roleId for messages, skipping subscription. userRole:', userRole, 'roleId:', roleId);
       return true; // Return true instead of false to avoid blocking
     }
     const handle = Meteor.subscribe('messages', activeConversationId, userRole, roleId);
-    console.log('🔔 Messages subscription for conversation:', activeConversationId, 'role:', userRole, 'roleId:', roleId, 'ready:', handle.ready());
     return handle.ready();
   }, [activeConversationId, userRole, roleId]);
 
@@ -82,7 +77,6 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
   const conversations = useTracker(() => {
     if (!conversationsReady) return [];
     const convs = ConversationCollection.find({}).fetch();
-    console.log('📋 Found conversations in client collection:', convs.length, convs);
     return convs;
   }, [conversationsReady]);
 
@@ -93,7 +87,6 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
       { conversationId: activeConversationId },
       { sort: { timestamp: 1 } }
     ).fetch();
-    console.log('💬 Found messages in client collection for conversation', activeConversationId, ':', msgs.length, msgs);
     return msgs;
   }, [activeConversationId, messagesReady]);
 
@@ -130,7 +123,6 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
   // Update Redux store when messages change
   useEffect(() => {
     if (messagesReady && activeConversationId) {
-      console.log('🔄 Messages updated via subscription:', messages.length, 'messages');
       
       // Convert server documents to API format
       const apiMessages: ApiMessage[] = messages.map(msg => ({
@@ -158,7 +150,6 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
   // Also update when messages change even if conversation isn't active (for real-time updates)
   useEffect(() => {
     if (messagesReady && activeConversationId && messages.length > 0) {
-      console.log('🔄 Real-time message update detected');
     }
   }, [messages.length, messagesReady, activeConversationId]);
 
