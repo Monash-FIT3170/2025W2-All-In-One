@@ -3,7 +3,7 @@ import { Input } from "/app/client/ui-modules/theming-shadcn/Input";
 import { Badge } from "/app/client/ui-modules/theming-shadcn/Badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Search } from "lucide-react";
-import { Conversation } from "../types";
+import { Conversation } from "/app/client/library-modules/domain-models/messaging/Conversation";
 import { formatConversationTimestamp } from "../utils/timestamp-utils";
 
 interface ConversationListProps {

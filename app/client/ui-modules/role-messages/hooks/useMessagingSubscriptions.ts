@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { useTracker } from 'meteor/react-meteor-data';
-import { ConversationCollection, MessageCollection } from '../collections/messaging-collections';
+import { Mongo } from "meteor/mongo";
 import { useAppDispatch, useAppSelector } from '/app/client/store';
 import { 
   setConversationsFromSubscription, 
@@ -14,6 +14,13 @@ import { Role } from '/app/shared/user-role-identifier';
 import { Agent } from '/app/client/library-modules/domain-models/user/Agent';
 import { Tenant } from '/app/client/library-modules/domain-models/user/Tenant';
 import { Landlord } from '/app/client/library-modules/domain-models/user/Landlord';
+import { ApiConversation } from '/app/shared/api-models/messaging/ApiConversation';
+import { ApiMessage } from '/app/shared/api-models/messaging/ApiMessage';
+
+// Client-side collections that mirror the server collections
+// These will be automatically synchronized via Meteor's pub/sub system
+const ConversationCollection: Mongo.Collection<any> = new Mongo.Collection("conversations");
+const MessageCollection: Mongo.Collection<any> = new Mongo.Collection("messages");
 
 // Hook for managing messaging subscriptions and real-time updates
 export function useMessagingSubscriptions(activeConversationId: string | null) {
@@ -93,21 +100,28 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
   // Update Redux store when conversations change
   useEffect(() => {
     if (conversationsReady && conversations.length > 0 && currentUserId) {
-      // Convert Date objects to strings to avoid Redux serialization warnings
-      const serializedConversations = conversations.map(conv => ({
-        ...conv,
-        createdAt: conv.createdAt ? conv.createdAt.toISOString() : undefined,
-        updatedAt: conv.updatedAt ? conv.updatedAt.toISOString() : undefined,
+      // Convert server documents to API format
+      const apiConversations: ApiConversation[] = conversations.map(conv => ({
+        conversationId: conv._id,
+        agentId: conv.agentId,
+        landlordId: conv.landlordId,
+        tenantId: conv.tenantId,
+        propertyId: conv.propertyId,
         lastMessage: conv.lastMessage ? {
-          ...conv.lastMessage,
+          text: conv.lastMessage.text,
           timestamp: conv.lastMessage.timestamp instanceof Date 
             ? conv.lastMessage.timestamp.toISOString() 
-            : conv.lastMessage.timestamp
-        } : undefined
+            : conv.lastMessage.timestamp,
+          senderId: conv.lastMessage.senderId
+        } : undefined,
+        unreadCounts: conv.unreadCounts || {},
+        activeUsers: conv.activeUsers || [],
+        createdAt: conv.createdAt ? (conv.createdAt instanceof Date ? conv.createdAt.toISOString() : conv.createdAt) : new Date().toISOString(),
+        updatedAt: conv.updatedAt ? (conv.updatedAt instanceof Date ? conv.updatedAt.toISOString() : conv.updatedAt) : new Date().toISOString()
       }));
       
       dispatch(setConversationsFromSubscription({ 
-        conversations: serializedConversations as any, 
+        conversations: apiConversations, 
         currentUserId 
       }));
     }
@@ -118,15 +132,20 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
     if (messagesReady && activeConversationId) {
       console.log('🔄 Messages updated via subscription:', messages.length, 'messages');
       
-      // Convert Date objects to strings to avoid Redux serialization warnings
-      const serializedMessages = messages.map(msg => ({
-        ...msg,
-        timestamp: msg.timestamp instanceof Date ? msg.timestamp.toISOString() : msg.timestamp
+      // Convert server documents to API format
+      const apiMessages: ApiMessage[] = messages.map(msg => ({
+        messageId: msg._id,
+        conversationId: msg.conversationId,
+        senderId: msg.senderId,
+        senderRole: msg.senderRole,
+        text: msg.text,
+        timestamp: msg.timestamp instanceof Date ? msg.timestamp.toISOString() : msg.timestamp,
+        isRead: msg.isRead
       }));
       
       dispatch(setMessagesFromSubscription({ 
         conversationId: activeConversationId, 
-        messages: serializedMessages as any, 
+        messages: apiMessages as any, 
         currentUserId 
       }));
       
@@ -139,7 +158,7 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
   // Also update when messages change even if conversation isn't active (for real-time updates)
   useEffect(() => {
     if (messagesReady && activeConversationId && messages.length > 0) {
-      console.log('� Real-time message update detected');
+      console.log('🔄 Real-time message update detected');
     }
   }, [messages.length, messagesReady, activeConversationId]);
 

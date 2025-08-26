@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Textarea } from "/app/client/ui-modules/theming-shadcn/Textarea";
 import { Button } from "/app/client/ui-modules/theming-shadcn/Button";
 import { Send } from "lucide-react";
-import { Message } from "../types";
+import { Message } from "/app/client/library-modules/domain-models/messaging/Message";
 import { formatChatMessageTimestamp } from "../utils/timestamp-utils";
 
 interface ChatWindowProps {

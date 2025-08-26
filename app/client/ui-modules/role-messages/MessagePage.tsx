@@ -94,17 +94,23 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
   }, [activeConversationId, authUser, currentUser]);
 
   const handleSelectConversation = async (conversationId: string) => {
+    // Validate conversationId is not null/undefined
+    if (!conversationId) {
+      console.error('Cannot select conversation: conversationId is null or undefined');
+      return;
+    }
+
     // Remove current user from previous conversation's active users (if any)
-    if (activeConversationId && currentUser) {
+    if (activeConversationId && activeConversationId !== conversationId && currentUser && authUser) {
       let currentUserId: string;
-      if (authUser?.role === 'agent') {
-        const agent = currentUser as any;
+      if (authUser.role === Role.AGENT) {
+        const agent = currentUser as Agent;
         currentUserId = agent.agentId;
-      } else if (authUser?.role === 'tenant') {
-        const tenant = currentUser as any;
+      } else if (authUser.role === Role.TENANT) {
+        const tenant = currentUser as Tenant;
         currentUserId = tenant.tenantId;
-      } else if (authUser?.role === 'landlord') {
-        const landlord = currentUser as any;
+      } else if (authUser.role === Role.LANDLORD) {
+        const landlord = currentUser as Landlord;
         currentUserId = landlord.landlordId;
       } else {
         return;
@@ -126,16 +132,16 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
     dispatch(resetUnreadCount(conversationId));
 
     // Add current user to new conversation's active users
-    if (currentUser) {
+    if (currentUser && authUser) {
       let currentUserId: string;
-      if (authUser?.role === 'agent') {
-        const agent = currentUser as any;
+      if (authUser.role === Role.AGENT) {
+        const agent = currentUser as Agent;
         currentUserId = agent.agentId;
-      } else if (authUser?.role === 'tenant') {
-        const tenant = currentUser as any;
+      } else if (authUser.role === Role.TENANT) {
+        const tenant = currentUser as Tenant;
         currentUserId = tenant.tenantId;
-      } else if (authUser?.role === 'landlord') {
-        const landlord = currentUser as any;
+      } else if (authUser.role === Role.LANDLORD) {
+        const landlord = currentUser as Landlord;
         currentUserId = landlord.landlordId;
       } else {
         return;
