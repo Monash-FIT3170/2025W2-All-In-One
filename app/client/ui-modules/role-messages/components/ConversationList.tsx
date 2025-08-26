@@ -49,7 +49,7 @@ export function ConversationList({ title = "Messages", conversations, activeConv
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-gray-900 truncate">{conversation.name}</h3>
                       <span className="text-xs text-gray-500">
-                        {formatConversationTimestamp(conversation.timestamp)}
+                        {conversation.timestamp}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 truncate">{conversation.role}</p>

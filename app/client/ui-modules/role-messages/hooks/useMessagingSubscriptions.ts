@@ -6,7 +6,8 @@ import { useAppDispatch, useAppSelector } from '/app/client/store';
 import { 
   setConversationsFromSubscription, 
   setMessagesFromSubscription,
-  addMessage
+  addMessage,
+  updateConversationLastMessage
 } from '../state/reducers/messages-slice';
 import { formatConversationTimestamp } from '../utils/timestamp-utils';
 import { Role } from '/app/shared/user-role-identifier';
@@ -92,8 +93,21 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
   // Update Redux store when conversations change
   useEffect(() => {
     if (conversationsReady && conversations.length > 0 && currentUserId) {
+      // Convert Date objects to strings to avoid Redux serialization warnings
+      const serializedConversations = conversations.map(conv => ({
+        ...conv,
+        createdAt: conv.createdAt ? conv.createdAt.toISOString() : undefined,
+        updatedAt: conv.updatedAt ? conv.updatedAt.toISOString() : undefined,
+        lastMessage: conv.lastMessage ? {
+          ...conv.lastMessage,
+          timestamp: conv.lastMessage.timestamp instanceof Date 
+            ? conv.lastMessage.timestamp.toISOString() 
+            : conv.lastMessage.timestamp
+        } : undefined
+      }));
+      
       dispatch(setConversationsFromSubscription({ 
-        conversations, 
+        conversations: serializedConversations as any, 
         currentUserId 
       }));
     }
@@ -103,21 +117,29 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
   useEffect(() => {
     if (messagesReady && activeConversationId) {
       console.log('🔄 Messages updated via subscription:', messages.length, 'messages');
+      
+      // Convert Date objects to strings to avoid Redux serialization warnings
+      const serializedMessages = messages.map(msg => ({
+        ...msg,
+        timestamp: msg.timestamp instanceof Date ? msg.timestamp.toISOString() : msg.timestamp
+      }));
+      
       dispatch(setMessagesFromSubscription({ 
         conversationId: activeConversationId, 
-        messages, 
+        messages: serializedMessages as any, 
         currentUserId 
       }));
       
-      // Note: No need to manually update conversation tile here since the conversations 
+      // Note: Don't manually update conversation tile here since the conversations 
       // subscription will automatically receive the updated lastMessage from the server
+      // This prevents incorrect timestamp updates for conversations without new messages
     }
   }, [messages, messagesReady, activeConversationId, dispatch, currentUserId]);
 
   // Also update when messages change even if conversation isn't active (for real-time updates)
   useEffect(() => {
     if (messagesReady && activeConversationId && messages.length > 0) {
-      console.log('📨 Real-time message update detected');
+      console.log('� Real-time message update detected');
     }
   }, [messages.length, messagesReady, activeConversationId]);
 

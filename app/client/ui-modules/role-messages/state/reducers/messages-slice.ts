@@ -47,9 +47,9 @@ const convertConversationDocumentToUIConversationForAgentWithTenant = (
     role: "Tenant",
     avatar: getAvatar(name),
     lastMessage: doc.lastMessage?.text || "No messages yet",
-    timestamp: doc.lastMessage?.timestamp 
+    timestamp: (doc.lastMessage?.timestamp && doc.lastMessage?.text && doc.lastMessage.text.trim() !== '') 
       ? formatConversationTimestamp(doc.lastMessage.timestamp)
-      : formatConversationTimestamp(doc.createdAt),
+      : '',
     unreadCount: doc.unreadCounts[doc.agentId] || 0,
   };
 };
@@ -78,9 +78,9 @@ const convertConversationDocumentToUIConversationForAgentWithLandlord = (
     role: "Landlord",
     avatar: getAvatar(name),
     lastMessage: doc.lastMessage?.text || "No messages yet",
-    timestamp: doc.lastMessage?.timestamp 
+    timestamp: (doc.lastMessage?.timestamp && doc.lastMessage?.text && doc.lastMessage.text.trim() !== '') 
       ? formatConversationTimestamp(doc.lastMessage.timestamp)
-      : formatConversationTimestamp(doc.createdAt),
+      : '',
     unreadCount: doc.unreadCounts[doc.agentId] || 0,
   };
 };
@@ -109,9 +109,9 @@ const convertConversationDocumentToUIConversationForTenant = (
     role: "Agent", // For tenant conversations, the other party is the agent
     avatar: getAvatar(name),
     lastMessage: doc.lastMessage?.text || "No messages yet",
-    timestamp: doc.lastMessage?.timestamp 
+    timestamp: (doc.lastMessage?.timestamp && doc.lastMessage?.text && doc.lastMessage.text.trim() !== '') 
       ? formatConversationTimestamp(doc.lastMessage.timestamp)
-      : formatConversationTimestamp(doc.createdAt),
+      : '',
     unreadCount: doc.unreadCounts[doc.tenantId!] || 0,
   };
 };
@@ -140,9 +140,9 @@ const convertConversationDocumentToUIConversationForLandlord = (
     role: "Agent", // For landlord conversations, the other party is the agent
     avatar: getAvatar(name),
     lastMessage: doc.lastMessage?.text || "No messages yet",
-    timestamp: doc.lastMessage?.timestamp 
+    timestamp: (doc.lastMessage?.timestamp && doc.lastMessage?.text && doc.lastMessage.text.trim() !== '') 
       ? formatConversationTimestamp(doc.lastMessage.timestamp)
-      : formatConversationTimestamp(doc.createdAt),
+      : '',
     unreadCount: doc.unreadCounts[doc.landlordId!] || 0,
   };
 };
@@ -778,20 +778,19 @@ export const messagesSlice = createSlice({
           unreadCount = doc.unreadCounts[action.payload.currentUserId] || 0;
         }
         
-        // Determine timestamp with better fallback logic
+        // Determine timestamp - only show timestamp if there's an actual message
         let timestamp = '';
-        if (doc.lastMessage?.timestamp) {
-          timestamp = formatConversationTimestamp(doc.lastMessage.timestamp);
+        if (doc.lastMessage?.timestamp && doc.lastMessage?.text && doc.lastMessage.text.trim() !== '') {
+          // Only show timestamp if there's an actual message with content
+          const timestampDate = typeof doc.lastMessage.timestamp === 'string' 
+            ? new Date(doc.lastMessage.timestamp) 
+            : doc.lastMessage.timestamp;
+          timestamp = formatConversationTimestamp(timestampDate);
           console.log('🕐 Using lastMessage timestamp:', doc.lastMessage.timestamp, '-> formatted:', timestamp);
-        } else if (doc.createdAt) {
-          timestamp = formatConversationTimestamp(doc.createdAt);
-          console.log('🕐 Using createdAt timestamp:', doc.createdAt, '-> formatted:', timestamp);
-        } else if (existingConversation?.timestamp) {
-          // Preserve existing timestamp if no server timestamp available
-          timestamp = existingConversation.timestamp;
-          console.log('🕐 Using existing timestamp:', timestamp);
         } else {
-          console.warn('⚠️ No timestamp available for conversation:', doc._id);
+          // No timestamp for conversations without messages
+          timestamp = '';
+          console.log('🕐 No timestamp - conversation has no messages:', doc._id);
         }
         
         return {
