@@ -46,24 +46,8 @@ export async function apiCreateTaskForAgent(taskData: {
     userId: taskData.userId,
   });
 }
-// export async function apiCreateTaskForLandlord(taskData: {
-//   name: string;
-//   description: string;
-//   dueDate: Date;
-//   priority: TaskPriority;
-//   landlordId: string;
-//   propertyAddress: string;
-//   propertyId: string;
-// }): Promise<string> {
-//   try {
-//     const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT_FOR_LANDLORD, taskData);
-//     return result;
-//   } catch (error) {
-//     console.error("Failed to create landlord task:", error);
-//     throw error;
-//   }
-// }
 
+// will update to a universal role apiCreateTask
 export async function apiCreateTaskForLandlord(taskData: {
   name: string;
   description: string;
@@ -72,6 +56,8 @@ export async function apiCreateTaskForLandlord(taskData: {
   landlordId: string;
   propertyAddress: string;
   propertyId: string;
+  userId: string;
+  userType: Role;
 }): Promise<string> {
   return apiCreateTask({
     name: taskData.name,

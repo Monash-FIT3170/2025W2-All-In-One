@@ -10,7 +10,6 @@ export interface LoadTenantApplicationsResult {
 export class LoadTenantApplicationsUseCase {
 
   async execute(propertyId: string): Promise<LoadTenantApplicationsResult> {
-    // Validate input
     if (!propertyId) {
       throw new Error('Property ID is required to load tenant applications');
     }

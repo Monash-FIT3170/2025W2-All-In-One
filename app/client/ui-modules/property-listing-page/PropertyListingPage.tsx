@@ -51,20 +51,16 @@ import {
   selectHasCurrentUserApplied,
   createTenantApplicationAsync,
   loadTenantApplicationsForPropertyAsync,
-  landlordApproveTenantApplicationAsync,
-  landlordRejectTenantApplicationAsync,
-  acceptTenantApplicationAsync,
-  rejectTenantApplicationAsync,
   sendApprovedApplicationsToAgentAsync,
   sendAcceptedApplicationsToLandlordAsync,
   selectLandlordApprovedApplicantCountForProperty,
   selectHasLandlordApprovedApplicationsForProperty,
-  agentBackgroundCheckFailedAsync,
-  agentBackgroundCheckPassedAsync,
-  selectApplicationsForProperty
+  addBookedInspection
 } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { intentAcceptApplicationAsync, intentRejectApplicationAsync } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { Role } from "/app/shared/user-role-identifier";
+import { CurrentUserState } from "../user-authentication/state/CurrentUserState";
+
 
 export function PropertyListingPage({
   className = "",
@@ -82,8 +78,6 @@ export function PropertyListingPage({
   const profileData = useAppSelector((state) => state.currentUser.profileData);
   const authUser = useAppSelector((state) => state.currentUser.authUser);
 
-  // Track inspection bookings for the current user (temporary solution before setting up DB)
-  const [bookedInspections, setBookedInspections] = useState<Set<number>>(new Set());
 
 
 
@@ -157,41 +151,20 @@ export function PropertyListingPage({
           }}
           onBook={(index: number) => {
             console.log(`booking button ${index} pressed`);
-            // Track that this user has booked this inspection (local state only)
-            setBookedInspections(prev => new Set(prev).add(index));
+            dispatch(addBookedInspection(index));
           }}
           onApply={async () => {
             console.log("Apply button clicked!");
-            console.log("Booked inspections:", bookedInspections);
             console.log("Current user:", currentUser);
             console.log("Profile data:", profileData);
 
-        // Only tenants can apply for properties
-        if (authUser && authUser.role !== Role.TENANT) {
-          alert("Only tenants can apply for properties.");
-          return;
-        }
-
-            // Check if user has booked an inspection before applying
-            if (bookedInspections.size > 0 && currentUser) {
-              try {
-                console.log("Creating tenant application...");
-                // Create tenant application
-                const result = await dispatch(createTenantApplicationAsync()).unwrap();
-                console.log("Tenant application created successfully:", result);
-
-
-                alert("Application submitted successfully! Your application will be reviewed by the agent.");
-              } catch (error) {
-                console.error("Failed to create tenant application:", error);
-                alert("Failed to submit application. Please try again.");
-              }
-            } else if (!currentUser) {
-              console.log("User must be logged in to apply");
-              alert("Please log in to apply for this property.");
-            } else {
-              console.log("User must book an inspection before applying");
-              alert("Please book an inspection before applying for this property.");
+            try {
+              const result = await dispatch(createTenantApplicationAsync()).unwrap();
+              console.log("Tenant application created successfully:", result);
+              alert(result.message);
+            } catch (error) {
+              console.error("Failed to create tenant application:", error);
+              alert(error instanceof Error ? error.message : "Failed to submit application. Please try again.");
             }
           }}
           onContactAgent={() => console.log("contacting agent!")}
@@ -200,8 +173,6 @@ export function PropertyListingPage({
             // Change value of "1" later to property ID
             dispatch(submitDraftListingAsync(state.propertyId));
           }}
-          bookedInspections={bookedInspections}
-          className={twMerge("p-5", className)}
         />
       </>
     );
@@ -274,9 +245,9 @@ function ListingPageContent({
   shouldDisplayEditListingButton: boolean;
   propertyLandlordId: string;
   propertyId: string;
-  currentUser: any;
-  authUser: any;
-  profileData: any;
+  currentUser: CurrentUserState["currentUser"];
+  authUser: CurrentUserState["authUser"];
+  profileData: CurrentUserState["profileData"];
   onBack: () => void;
   onBook: (index: number) => void;
   onApply: () => void;
