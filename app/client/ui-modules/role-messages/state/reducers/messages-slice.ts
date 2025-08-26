@@ -1,3 +1,13 @@
+/**
+ * Messages Redux Slice
+ * 
+ * This slice manages the messaging state for the application, handling:
+ * - Conversation fetching and management for different user roles
+ * - Message sending and receiving
+ * - Real-time updates via subscriptions
+ * - Unread count management
+ */
+
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../../store";
 import { MessagesState } from "../MessagesPageUIState";
@@ -9,21 +19,25 @@ import { Landlord } from "/app/client/library-modules/domain-models/user/Landlor
 import { Role } from "/app/shared/user-role-identifier";
 import { formatConversationTimestamp } from "../../utils/timestamp-utils";
 import { 
-  getConversationsForAgent,
-  getConversationsForTenant,
-  getConversationsForLandlord,
   getMessagesForConversation,
   sendMessage as sendMessageRepo,
-  createConversation,
   resetUnreadCount as resetUnreadCountRepo,
-  convertApiConversationsToAgentView,
-  convertApiConversationsToTenantView,
-  convertApiConversationsToLandlordView
 } from "/app/client/library-modules/domain-models/messaging/messaging-repository";
 import { ApiConversation } from "/app/shared/api-models/messaging/ApiConversation";
-import { apiGetUserAccount } from "/app/client/library-modules/apis/user/user-account-api";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { Meteor } from "meteor/meteor";
+
+// Import helper functions
+import { 
+  validateAndGetUserContext, 
+  validateConversationId,
+  isAgent,
+  isTenant,
+  isLandlord
+} from "../helpers/user-auth-helpers";
+import {
+  handleAgentConversations,
+  handleTenantConversations,
+  handleLandlordConversations
+} from "../helpers/role-conversation-handlers";
 
 const initialState: MessagesState = {
   isLoading: false,
@@ -36,7 +50,13 @@ const initialState: MessagesState = {
   messagesLoading: false,
 };
 
-// Async thunks
+/**
+ * Async Thunks - These handle the complex business logic for messaging operations
+ */
+
+/**
+ * Fetches conversations for the current user based on their role
+ */
 export const fetchConversations = createAsyncThunk(
   "messages/fetchConversations",
   async (_, { getState, rejectWithValue }) => {
@@ -45,431 +65,60 @@ export const fetchConversations = createAsyncThunk(
       const currentUser = state.currentUser.currentUser;
       const authUser = state.currentUser.authUser;
 
-      if (!authUser || !currentUser) {
-        return rejectWithValue("User is not authenticated");
+      // Validate user authentication using helper function
+      const userContext = validateAndGetUserContext(currentUser, authUser);
+
+      // Route to appropriate role-specific handler
+      if (isAgent(userContext.authUser.role)) {
+        return await handleAgentConversations(userContext.currentUser as Agent);
+      } else if (isTenant(userContext.authUser.role)) {
+        return await handleTenantConversations(userContext.currentUser as Tenant);
+      } else if (isLandlord(userContext.authUser.role)) {
+        return await handleLandlordConversations(userContext.currentUser as Landlord);
+      } else {
+        return rejectWithValue("Unsupported user role");
       }
-
-      // Handle Agent Flow - Agent needs BOTH tenant AND landlord conversations
-      if (authUser.role === Role.AGENT) {
-        const agent = currentUser as Agent;
-        const agentId = agent.agentId;
-
-        // Step 1: Get existing agent conversations
-        const existingConversations: ApiConversation[] = await getConversationsForAgent(agentId);
-
-        // Step 2: Get properties managed by this agent
-        const agentProperties = await Meteor.callAsync(
-          MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID,
-          agentId
-        );
-
-        // Step 3: Extract unique tenant and landlord IDs from properties
-        const tenantConnections = new Set<string>();
-        const landlordConnections = new Set<string>();
-        
-        agentProperties.forEach((property: any) => {
-          if (property.tenantId && property.tenantId.trim() !== '') {
-            tenantConnections.add(property.tenantId);
-          }
-          if (property.landlordId && property.landlordId.trim() !== '') {
-            landlordConnections.add(property.landlordId);
-          }
-        });
-
-        // Step 4: Check existing conversations
-        const existingTenantIds = new Set<string>();
-        const existingLandlordIds = new Set<string>();
-        
-        existingConversations.forEach(conversation => {
-          if (conversation.tenantId) {
-            existingTenantIds.add(conversation.tenantId);
-          }
-          if (conversation.landlordId) {
-            existingLandlordIds.add(conversation.landlordId);
-          }
-        });
-
-        // Step 5: Find missing conversations
-        const tenantsWithoutConversations = Array.from(tenantConnections).filter(
-          tenantId => !existingTenantIds.has(tenantId)
-        );
-        const landlordsWithoutConversations = Array.from(landlordConnections).filter(
-          landlordId => !existingLandlordIds.has(landlordId)
-        );
-
-        // Step 6: Create new conversations
-        const newConversations: ApiConversation[] = [];
-        
-        // Create tenant conversations (AGENT ↔ TENANT ONLY)
-        for (const tenantId of tenantsWithoutConversations) {
-          try {
-            const property = agentProperties.find((p: any) => p.tenantId === tenantId);
-            
-            const newConversationData = {
-              agentId: agentId,
-              tenantId: tenantId,
-              propertyId: property?.propertyId || undefined,
-              unreadCounts: {
-                [agentId]: 0,
-                [tenantId]: 0
-              }
-            };
-
-            const conversationId = await createConversation(newConversationData);
-
-            const isNewConversation = !existingConversations.some(conv => conv.conversationId === conversationId);
-            
-            if (isNewConversation) {
-              const newConversation: ApiConversation = {
-                conversationId: conversationId,
-                agentId: agentId,
-                tenantId: tenantId,
-                propertyId: property?.propertyId,
-                unreadCounts: newConversationData.unreadCounts,
-                activeUsers: [],
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-              };
-
-              newConversations.push(newConversation);
-            }
-          } catch (error) {
-            console.error(`Failed to create conversation for tenant ${tenantId}:`, error);
-          }
-        }
-
-        // Create landlord conversations (AGENT ↔ LANDLORD ONLY)
-        for (const landlordId of landlordsWithoutConversations) {
-          try {
-            const property = agentProperties.find((p: any) => p.landlordId === landlordId);
-            
-            const newConversationData = {
-              agentId: agentId,
-              landlordId: landlordId,
-              propertyId: property?.propertyId || undefined,
-              unreadCounts: {
-                [agentId]: 0,
-                [landlordId]: 0
-              }
-            };
-
-            const conversationId = await createConversation(newConversationData);
-
-            const isNewConversation = !existingConversations.some(conv => conv.conversationId === conversationId);
-            
-            if (isNewConversation) {
-              const newConversation: ApiConversation = {
-                conversationId: conversationId,
-                agentId: agentId,
-                landlordId: landlordId,
-                propertyId: property?.propertyId,
-                unreadCounts: newConversationData.unreadCounts,
-                activeUsers: [],
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-              };
-
-              newConversations.push(newConversation);
-            }
-          } catch (error) {
-            console.error(`Failed to create conversation for landlord ${landlordId}:`, error);
-          }
-        }
-
-        // Step 7: Combine all conversations
-        const allConversations = [...existingConversations, ...newConversations];
-
-        // Step 8: Fetch profiles for both tenants and landlords
-        const tenantProfiles = new Map<string, any>();
-        const landlordProfiles = new Map<string, any>();
-        
-        const uniqueTenantIds = [...new Set(allConversations.map(c => c.tenantId).filter(Boolean))];
-        const uniqueLandlordIds = [...new Set(allConversations.map(c => c.landlordId).filter(Boolean))];
-        
-        // Fetch tenant profiles
-        await Promise.all(
-          uniqueTenantIds.map(async (tenantId) => {
-            try {
-              const profile = await Meteor.callAsync(
-                MeteorMethodIdentifier.PROFILE_GET_BY_TENANT_ID,
-                tenantId
-              );
-              tenantProfiles.set(tenantId!, profile);
-            } catch (error) {
-              console.error(`Failed to fetch profile for tenant ${tenantId}:`, error);
-            }
-          })
-        );
-
-        // Fetch landlord profiles
-        await Promise.all(
-          uniqueLandlordIds.map(async (landlordId) => {
-            try {
-              const profile = await Meteor.callAsync(
-                MeteorMethodIdentifier.PROFILE_GET_BY_LANDLORD_ID,
-                landlordId
-              );
-              landlordProfiles.set(landlordId!, profile);
-            } catch (error) {
-              console.error(`Failed to fetch profile for landlord ${landlordId}:`, error);
-            }
-          })
-        );
-
-        // Step 9: Convert to UI format with proper role identification
-        const uiConversations: Conversation[] = convertApiConversationsToAgentView(
-          allConversations,
-          agentId,
-          tenantProfiles,
-          landlordProfiles
-        );
-
-        return uiConversations;
-      }
-
-      // Handle Tenant Flow
-      else if (authUser.role === Role.TENANT) {
-        const tenant = currentUser as Tenant;
-        const tenantId = tenant.tenantId;
-
-        // Step 1: Get existing conversations for this tenant
-        const existingConversations: ApiConversation[] = await getConversationsForTenant(tenantId);
-
-        // Step 2: If conversation exists, use it
-        if (existingConversations.length > 0) {
-          // Fetch agent profile for the conversation
-          const conversation = existingConversations[0]; // Tenant only has one agent
-          let agentProfile = null;
-          
-          if (conversation.agentId) {
-            try {
-              agentProfile = await Meteor.callAsync(
-                MeteorMethodIdentifier.PROFILE_GET_BY_AGENT_ID,
-                conversation.agentId
-              );
-            } catch (error) {
-              console.error(`Failed to fetch profile for agent ${conversation.agentId}:`, error);
-            }
-          }
-
-          // Convert to UI format
-          const uiConversations: Conversation[] = convertApiConversationsToTenantView(
-            existingConversations,
-            tenantId,
-            agentProfile
-          );
-
-          return uiConversations;
-        }
-
-        // Step 3: No conversation exists, find the agent from tenant's property
-        const tenantProperty = await Meteor.callAsync(
-          MeteorMethodIdentifier.PROPERTY_GET_BY_TENANT_ID,
-          tenantId
-        );
-
-        if (!tenantProperty || !tenantProperty.agentId) {
-          return rejectWithValue("No property or agent found for this tenant");
-        }
-
-        // Step 4: Create new conversation with the agent (AGENT ↔ TENANT ONLY)
-        const newConversationData = {
-          agentId: tenantProperty.agentId,
-          tenantId: tenantId,
-          propertyId: tenantProperty.propertyId,
-          unreadCounts: {
-            [tenantProperty.agentId]: 0,
-            [tenantId]: 0
-          }
-        };
-
-        const conversationId = await createConversation(newConversationData);
-
-        // Create the conversation document
-        const newConversation: ApiConversation = {
-          conversationId: conversationId,
-          agentId: tenantProperty.agentId,
-          tenantId: tenantId,
-          propertyId: tenantProperty.propertyId,
-          unreadCounts: newConversationData.unreadCounts,
-          activeUsers: [],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-
-        // Fetch agent profile
-        let agentProfile = null;
-        try {
-          agentProfile = await Meteor.callAsync(
-            MeteorMethodIdentifier.PROFILE_GET_BY_AGENT_ID,
-            tenantProperty.agentId
-          );
-        } catch (error) {
-          console.error(`Failed to fetch profile for agent ${tenantProperty.agentId}:`, error);
-        }
-
-        // Convert to UI format
-        const uiConversations: Conversation[] = convertApiConversationsToTenantView(
-          [newConversation],
-          tenantId,
-          agentProfile
-        );
-
-        return uiConversations;
-      }
-
-      // Handle Landlord Flow
-      else if (authUser.role === Role.LANDLORD) {
-        const landlord = currentUser as Landlord;
-        const landlordId = landlord.landlordId;
-
-        // Step 1: Get existing conversations for this landlord
-        const existingConversations: ApiConversation[] = await getConversationsForLandlord(landlordId);
-
-        // Step 2: If conversation exists, use it
-        if (existingConversations.length > 0) {
-          // Fetch agent profile for the conversation
-          const conversation = existingConversations[0]; // Landlord only has one agent
-          let agentProfile = null;
-          
-          if (conversation.agentId) {
-            try {
-              agentProfile = await Meteor.callAsync(
-                MeteorMethodIdentifier.PROFILE_GET_BY_AGENT_ID,
-                conversation.agentId
-              );
-            } catch (error) {
-              console.error(`Failed to fetch profile for agent ${conversation.agentId}:`, error);
-            }
-          }
-
-          // Convert to UI format
-          const uiConversations: Conversation[] = convertApiConversationsToLandlordView(
-            existingConversations,
-            landlordId,
-            agentProfile
-          );
-
-          return uiConversations;
-        }
-
-        // Step 3: No conversation exists, find the agent from landlord's property
-        const landlordProperties = await Meteor.callAsync(
-          MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_LANDLORD_ID,
-          landlordId
-        );
-
-        if (!landlordProperties || landlordProperties.length === 0) {
-          return rejectWithValue("No properties found for this landlord");
-        }
-
-        // Get the first property with an agent
-        const landlordProperty = landlordProperties.find((p: any) => p.agentId);
-
-        if (!landlordProperty || !landlordProperty.agentId) {
-          return rejectWithValue("No property or agent found for this landlord");
-        }
-
-        // Step 4: Create new conversation with the agent (AGENT ↔ LANDLORD ONLY)
-        const newConversationData = {
-          agentId: landlordProperty.agentId,
-          landlordId: landlordId,
-          propertyId: landlordProperty.propertyId,
-          unreadCounts: {
-            [landlordProperty.agentId]: 0,
-            [landlordId]: 0
-          }
-        };
-
-        const conversationId = await createConversation(newConversationData);
-
-        // Create the conversation document
-        const newConversation: ApiConversation = {
-          conversationId: conversationId,
-          agentId: landlordProperty.agentId,
-          landlordId: landlordId,
-          propertyId: landlordProperty.propertyId,
-          unreadCounts: newConversationData.unreadCounts,
-          activeUsers: [],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-
-        // Fetch agent profile
-        let agentProfile = null;
-        try {
-          agentProfile = await Meteor.callAsync(
-            MeteorMethodIdentifier.PROFILE_GET_BY_AGENT_ID,
-            landlordProperty.agentId
-          );
-        } catch (error) {
-          console.error(`Failed to fetch profile for agent ${landlordProperty.agentId}:`, error);
-        }
-
-        // Convert to UI format
-        const uiConversations: Conversation[] = convertApiConversationsToLandlordView(
-          [newConversation],
-          landlordId,
-          agentProfile
-        );
-
-        return uiConversations;
-      }
-
-      // Unsupported role
-      return rejectWithValue("Unsupported user role");
 
     } catch (error) {
       console.error("Error fetching conversations:", error);
-      return rejectWithValue("Failed to fetch conversations");
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to fetch conversations");
     }
   }
 );
 
+/**
+ * Fetches messages for a specific conversation
+ * Validates conversation ID and user authentication before fetching
+ */
 export const fetchConversationMessages = createAsyncThunk(
   "messages/fetchMessages",
   async (conversationId: string, { getState, rejectWithValue }) => {
     try {
-      // Validate conversationId
-      if (!conversationId || conversationId === 'null' || conversationId === 'undefined') {
-        console.error("Cannot fetch messages: conversationId is null or undefined");
-        return rejectWithValue("Invalid conversation ID");
-      }
+      // Validate conversation ID using helper function
+      validateConversationId(conversationId);
 
       const state = getState() as RootState;
       const currentUser = state.currentUser.currentUser;
       const authUser = state.currentUser.authUser;
 
-      if (!authUser || !currentUser) {
-        return rejectWithValue("User is not authenticated");
-      }
+      // Validate user authentication and get user context
+      const userContext = validateAndGetUserContext(currentUser, authUser);
 
-      // Determine current user's ID for isOutgoing logic
-      let currentUserId: string;
-      if (authUser.role === Role.AGENT) {
-        const agent = currentUser as Agent;
-        currentUserId = agent.agentId;
-      } else if (authUser.role === Role.TENANT) {
-        const tenant = currentUser as Tenant;
-        currentUserId = tenant.tenantId;
-      } else if (authUser.role === Role.LANDLORD) {
-        const landlord = currentUser as Landlord;
-        currentUserId = landlord.landlordId;
-      } else {
-        return rejectWithValue("Unsupported user role");
-      }
-
-      // Fetch messages using repository
-      const messages: Message[] = await getMessagesForConversation(conversationId, currentUserId);
+      // Fetch messages using repository with current user ID for isOutgoing logic
+      const messages: Message[] = await getMessagesForConversation(conversationId, userContext.userId);
 
       return { conversationId, messages };
     } catch (error) {
       console.error("Error fetching messages:", error);
-      return rejectWithValue("Failed to fetch messages");
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to fetch messages");
     }
   }
 );
 
+/**
+ * Sends a message in a conversation
+ * Validates user authentication and creates immediate UI feedback
+ */
 export const sendMessage = createAsyncThunk(
   "messages/sendMessage",
   async (messageData: { conversationId: string; text: string }, { getState, rejectWithValue }) => {
@@ -478,36 +127,15 @@ export const sendMessage = createAsyncThunk(
       const currentUser = state.currentUser.currentUser;
       const authUser = state.currentUser.authUser;
 
-      if (!authUser || !currentUser) {
-        return rejectWithValue("User is not authenticated");
-      }
-
-      // Determine sender ID and role based on current user
-      let senderId: string;
-      let senderRole: string;
-
-      if (authUser.role === Role.AGENT) {
-        const agent = currentUser as Agent;
-        senderId = agent.agentId;
-        senderRole = 'agent';
-      } else if (authUser.role === Role.TENANT) {
-        const tenant = currentUser as Tenant;
-        senderId = tenant.tenantId;
-        senderRole = 'tenant';
-      } else if (authUser.role === Role.LANDLORD) {
-        const landlord = currentUser as Landlord;
-        senderId = landlord.landlordId;
-        senderRole = 'landlord';
-      } else {
-        return rejectWithValue("Unsupported user role");
-      }
+      // Validate user authentication and get user context
+      const userContext = validateAndGetUserContext(currentUser, authUser);
 
       // Send message via repository
       const messageId = await sendMessageRepo({
         conversationId: messageData.conversationId,
         text: messageData.text,
-        senderId,
-        senderRole,
+        senderId: userContext.userId,
+        senderRole: userContext.userRole,
       });
 
       // Create UI message object for immediate feedback
@@ -522,75 +150,92 @@ export const sendMessage = createAsyncThunk(
       return { conversationId: messageData.conversationId, message: newMessage };
     } catch (error) {
       console.error("Error sending message:", error);
-      return rejectWithValue("Failed to send message");
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to send message");
     }
   }
 );
 
-// Reset unread count when opening a conversation
+/**
+ * Resets unread count when opening a conversation
+ * Validates conversation ID and user authentication before resetting
+ */
 export const resetUnreadCount = createAsyncThunk(
   "messages/resetUnreadCount",
   async (conversationId: string, { getState, rejectWithValue }) => {
     try {
-      // Validate conversationId
-      if (!conversationId || conversationId === 'null' || conversationId === 'undefined') {
-        console.error("Cannot reset unread count: conversationId is null or undefined");
-        return rejectWithValue("Invalid conversation ID");
-      }
+      // Validate conversation ID using helper function
+      validateConversationId(conversationId);
 
       const state = getState() as RootState;
       const currentUser = state.currentUser.currentUser;
       const authUser = state.currentUser.authUser;
 
-      if (!authUser || !currentUser) {
-        return rejectWithValue("User is not authenticated");
-      }
-
-      // Determine current user's ID
-      let currentUserId: string;
-      if (authUser.role === Role.AGENT) {
-        const agent = currentUser as Agent;
-        currentUserId = agent.agentId;
-      } else if (authUser.role === Role.TENANT) {
-        const tenant = currentUser as Tenant;
-        currentUserId = tenant.tenantId;
-      } else if (authUser.role === Role.LANDLORD) {
-        const landlord = currentUser as Landlord;
-        currentUserId = landlord.landlordId;
-      } else {
-        return rejectWithValue("Unsupported user role");
-      }
+      // Validate user authentication and get user context
+      const userContext = validateAndGetUserContext(currentUser, authUser);
 
       // Reset unread count via repository
-      await resetUnreadCountRepo(conversationId, currentUserId);
+      await resetUnreadCountRepo(conversationId, userContext.userId);
 
-      return { conversationId, userId: currentUserId };
+      return { conversationId, userId: userContext.userId };
     } catch (error) {
       console.error("Error resetting unread count:", error);
-      return rejectWithValue("Failed to reset unread count");
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to reset unread count");
     }
   }
 );
 
+/**
+ * Redux Slice Definition
+ * Contains reducers for synchronous state updates and real-time subscription handling
+ */
 export const messagesSlice = createSlice({
   name: "messages",
   initialState,
   reducers: {
+    /**
+     * Sets the currently active conversation ID
+     * Used when user selects a conversation to view
+     */
     setActiveConversation(state, action: PayloadAction<string>) {
       state.activeConversationId = action.payload;
     },
+
+    /**
+     * Updates the message text being typed by the user
+     * Used for controlled input in the message text field
+     */
     setMessageText(state, action: PayloadAction<string>) {
       state.messageText = action.payload;
     },
+
+    /**
+     * Clears the message text field
+     * Used after sending a message or canceling input
+     */
     clearMessageText(state) {
       state.messageText = "";
     },
+
+    /**
+     * Clears any error messages from the state
+     * Used to dismiss error notifications
+     */
     clearError(state) {
       state.error = null;
     },
+
+    /**
+     * Adds a new message to the current conversation
+     * Used for optimistic updates when sending messages
+     */
     addMessage(state, action: PayloadAction<Message>) {
       state.messages.push(action.payload);
     },
+
+    /**
+     * Updates the last message and timestamp for a conversation
+     * Used to update conversation tiles when new messages arrive
+     */
     updateConversationLastMessage(state, action: PayloadAction<{ conversationId: string; message: string; timestamp: string }>) {
       const conversation = state.conversations.find(c => c.id === action.payload.conversationId);
       if (conversation) {
@@ -598,26 +243,36 @@ export const messagesSlice = createSlice({
         conversation.timestamp = action.payload.timestamp;
       }
     },
+
+    /**
+     * Resets the unread count for a specific conversation
+     * Used when user opens a conversation to mark it as read
+     */
     resetConversationUnreadCount(state, action: PayloadAction<string>) {
       const conversation = state.conversations.find(c => c.id === action.payload);
       if (conversation) {
         conversation.unreadCount = 0;
       }
     },
-    // New actions for pub/sub integration
+
+    /**
+     * Updates conversations from real-time subscription data
+     * Converts API format to UI format and preserves existing conversation metadata
+     */
     setConversationsFromSubscription(state, action: PayloadAction<{ conversations: ApiConversation[]; currentUserId: string }>) {
       // Always update conversations from subscription for real-time updates
       console.log('🔄 Redux: Updating conversations from subscription with', action.payload.conversations.length, 'conversations');
       
+      // Helper function to generate user avatars from names
+      const getAvatar = (name: string) => {
+        const parts = name.split(' ');
+        return parts.length > 1 
+          ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+          : `${parts[0][0]}${parts[0][1] || ''}`.toUpperCase();
+      };
+
       // Convert ApiConversation[] to Conversation[] for UI
       const uiConversations: Conversation[] = action.payload.conversations.map(doc => {
-        const getAvatar = (name: string) => {
-          const parts = name.split(' ');
-          return parts.length > 1 
-            ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-            : `${parts[0][0]}${parts[0][1] || ''}`.toUpperCase();
-        };
-
         // Try to preserve existing conversation data (name, role) if available
         const existingConversation = state.conversations.find(c => c.id === doc.conversationId);
         
@@ -650,6 +305,11 @@ export const messagesSlice = createSlice({
       
       state.conversations = uiConversations;
     },
+
+    /**
+     * Updates messages from real-time subscription data
+     * Converts server message documents to UI format with proper isOutgoing logic
+     */
     setMessagesFromSubscription(state, action: PayloadAction<{ conversationId: string; messages: any[]; currentUserId?: string }>) {
       console.log('🔄 Redux: setMessagesFromSubscription called with', action.payload.messages.length, 'messages');
       
@@ -739,7 +399,10 @@ export const messagesSlice = createSlice({
   },
 });
 
-// Export actions
+/**
+ * Action Exports
+ * These actions can be dispatched from components to update the messaging state
+ */
 export const {
   setActiveConversation,
   setMessageText,
@@ -752,24 +415,81 @@ export const {
   setMessagesFromSubscription,
 } = messagesSlice.actions;
 
-// Export selectors
+/**
+ * Selector Functions
+ * These functions extract specific pieces of state for use in components
+ * They provide a clean interface for accessing messaging data
+ */
+
+/**
+ * Selects the entire messages state object
+ * Useful for components that need access to multiple messaging properties
+ */
 export const selectMessages = (state: RootState) => state.messages;
+
+/**
+ * Selects all conversations for the current user
+ * Returns an array of Conversation objects formatted for UI display
+ */
 export const selectAllConversations = (state: RootState) => state.messages.conversations;
+
+/**
+ * Selects the ID of the currently active conversation
+ * Returns null if no conversation is selected
+ */
 export const selectActiveConversationId = (state: RootState) => state.messages.activeConversationId;
+
+/**
+ * Selects all messages for the currently active conversation
+ * Returns an array of Message objects formatted for UI display
+ */
 export const selectAllMessages = (state: RootState) => state.messages.messages;
+
+/**
+ * Selects the current message text being typed by the user
+ * Used for controlled input components
+ */
 export const selectMessageText = (state: RootState) => state.messages.messageText;
+
+/**
+ * Selects the loading state for message sending operations
+ * True when a message is being sent
+ */
 export const selectIsLoading = (state: RootState) => state.messages.isLoading;
+
+/**
+ * Selects the loading state for conversation fetching operations
+ * True when conversations are being loaded
+ */
 export const selectConversationsLoading = (state: RootState) => state.messages.conversationsLoading;
+
+/**
+ * Selects the loading state for message fetching operations
+ * True when messages for a conversation are being loaded
+ */
 export const selectMessagesLoading = (state: RootState) => state.messages.messagesLoading;
+
+/**
+ * Selects any error messages from messaging operations
+ * Returns null if no errors are present
+ */
 export const selectError = (state: RootState) => state.messages.error;
 
-// Role-based selectors using currentUser role
+/**
+ * Role-based selector that filters conversations based on user role
+ * @param role - The role to filter conversations for ('agent', 'tenant', 'landlord')
+ * @returns A selector function that returns conversations for the specified role
+ * 
+ * Note: Currently returns all conversations as they are already filtered by role
+ * in the fetchConversations thunk. This selector provides future extensibility
+ * for additional role-based filtering if needed.
+ */
 export const selectConversationsForRole = (role: string) => (state: RootState) => {
   const currentRole = state.currentUser.authUser?.role;
   if (!currentRole) return [];
   
-  // For agents, return all conversations (they are already filtered by agent in fetchConversations)
-  // For other roles, we can add specific filtering logic later
+  // Conversations are already filtered by role in fetchConversations
+  // This selector ensures type safety and provides a consistent interface
   if (role === 'agent' && currentRole === Role.AGENT) {
     return state.messages.conversations;
   } else if (role === 'landlord' && currentRole === Role.LANDLORD) {
@@ -781,6 +501,11 @@ export const selectConversationsForRole = (role: string) => (state: RootState) =
   return [];
 };
 
+/**
+ * Selects messages for the current user
+ * Returns all messages in the currently active conversation
+ * Messages include proper isOutgoing flags based on the current user
+ */
 export const selectMessagesForCurrentUser = (state: RootState) => {
   return state.messages.messages;
 };
