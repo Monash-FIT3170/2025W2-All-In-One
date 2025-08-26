@@ -42,6 +42,25 @@ const getConversationsForTenantMethod = {
   },
 };
 
+// Simple database method to get conversations for a landlord
+const getConversationsForLandlordMethod = {
+  [MeteorMethodIdentifier.CONVERSATIONS_GET_FOR_LANDLORD]: async (
+    landlordId: string
+  ): Promise<ConversationDocument[]> => {
+    try {
+      // Get conversations where landlord is the landlordId
+      const conversations = await ConversationCollection.find({
+        landlordId: landlordId
+      }).fetchAsync();
+      
+      return conversations;
+    } catch (error) {
+      console.error("Error in getConversationsForLandlordMethod:", error);
+      throw error;
+    }
+  },
+};
+
 // Get messages for a specific conversation
 const getMessagesForConversationMethod = {
   [MeteorMethodIdentifier.MESSAGES_GET_FOR_CONVERSATION]: async (
@@ -125,14 +144,30 @@ const insertConversationMethod = {
   ): Promise<string> => {
     try {
       // Check if conversation already exists to prevent duplicates
-      const existingConversation = await ConversationCollection.findOneAsync({
-        agentId: conversationData.agentId,
-        tenantId: conversationData.tenantId
-      });
-
-      if (existingConversation) {
-        console.log(`⚠️ Conversation already exists between agent ${conversationData.agentId} and tenant ${conversationData.tenantId}`);
-        return existingConversation._id;
+      let existingConversation;
+      
+      if (conversationData.tenantId) {
+        // Agent-Tenant conversation
+        existingConversation = await ConversationCollection.findOneAsync({
+          agentId: conversationData.agentId,
+          tenantId: conversationData.tenantId
+        });
+        
+        if (existingConversation) {
+          console.log(`⚠️ Conversation already exists between agent ${conversationData.agentId} and tenant ${conversationData.tenantId}`);
+          return existingConversation._id;
+        }
+      } else if (conversationData.landlordId) {
+        // Agent-Landlord conversation
+        existingConversation = await ConversationCollection.findOneAsync({
+          agentId: conversationData.agentId,
+          landlordId: conversationData.landlordId
+        });
+        
+        if (existingConversation) {
+          console.log(`⚠️ Conversation already exists between agent ${conversationData.agentId} and landlord ${conversationData.landlordId}`);
+          return existingConversation._id;
+        }
       }
 
       const newConversation: Omit<ConversationDocument, '_id'> = {
@@ -159,6 +194,7 @@ const insertConversationMethod = {
 Meteor.methods({
   ...getConversationsForAgentMethod,
   ...getConversationsForTenantMethod,
+  ...getConversationsForLandlordMethod,
   ...getMessagesForConversationMethod,
   ...sendMessageMethod,
   ...insertConversationMethod,

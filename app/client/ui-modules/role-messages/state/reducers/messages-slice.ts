@@ -8,6 +8,7 @@ import { MessageDocument } from "/app/server/database/messaging/models/MessageDo
 import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
 import { Tenant } from "/app/client/library-modules/domain-models/user/Tenant";
+import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { Role } from "/app/shared/user-role-identifier";
 
 const initialState: MessagesState = {
@@ -21,8 +22,8 @@ const initialState: MessagesState = {
   messagesLoading: false,
 };
 
-// Helper function to convert ConversationDocument to UI Conversation for Agent view
-const convertConversationDocumentToUIConversationForAgent = (
+// Helper function to convert ConversationDocument to UI Conversation for Agent view with Tenant
+const convertConversationDocumentToUIConversationForAgentWithTenant = (
   doc: ConversationDocument,
   tenantProfile?: any
 ): Conversation => {
@@ -42,7 +43,38 @@ const convertConversationDocumentToUIConversationForAgent = (
   return {
     id: doc._id,
     name,
-    role: "Tenant", // For agent conversations, the other party is typically a tenant
+    role: "Tenant",
+    avatar: getAvatar(name),
+    lastMessage: doc.lastMessage?.text || "No messages yet",
+    timestamp: doc.lastMessage?.timestamp 
+      ? new Date(doc.lastMessage.timestamp).toLocaleString()
+      : new Date(doc.createdAt).toLocaleString(),
+    unreadCount: doc.unreadCounts[doc.agentId] || 0,
+  };
+};
+
+// Helper function to convert ConversationDocument to UI Conversation for Agent view with Landlord
+const convertConversationDocumentToUIConversationForAgentWithLandlord = (
+  doc: ConversationDocument,
+  landlordProfile?: any
+): Conversation => {
+  // Generate avatar from name
+  const getAvatar = (name: string) => {
+    const parts = name.split(' ');
+    return parts.length > 1 
+      ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+      : `${parts[0][0]}${parts[0][1] || ''}`.toUpperCase();
+  };
+
+  // Use real landlord name from profile if available
+  const name = landlordProfile 
+    ? `${landlordProfile.firstName} ${landlordProfile.lastName}`.trim()
+    : `Landlord ${doc.landlordId?.slice(-4) || 'Unknown'}`;
+  
+  return {
+    id: doc._id,
+    name,
+    role: "Landlord",
     avatar: getAvatar(name),
     lastMessage: doc.lastMessage?.text || "No messages yet",
     timestamp: doc.lastMessage?.timestamp 
@@ -83,6 +115,37 @@ const convertConversationDocumentToUIConversationForTenant = (
   };
 };
 
+// Helper function to convert ConversationDocument to UI Conversation for Landlord view
+const convertConversationDocumentToUIConversationForLandlord = (
+  doc: ConversationDocument,
+  agentProfile?: any
+): Conversation => {
+  // Generate avatar from name
+  const getAvatar = (name: string) => {
+    const parts = name.split(' ');
+    return parts.length > 1 
+      ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+      : `${parts[0][0]}${parts[0][1] || ''}`.toUpperCase();
+  };
+
+  // Use real agent name from profile if available
+  const name = agentProfile 
+    ? `${agentProfile.firstName} ${agentProfile.lastName}`.trim()
+    : `Agent ${doc.agentId?.slice(-4) || 'Unknown'}`;
+  
+  return {
+    id: doc._id,
+    name,
+    role: "Agent", // For landlord conversations, the other party is the agent
+    avatar: getAvatar(name),
+    lastMessage: doc.lastMessage?.text || "No messages yet",
+    timestamp: doc.lastMessage?.timestamp 
+      ? new Date(doc.lastMessage.timestamp).toLocaleString()
+      : new Date(doc.createdAt).toLocaleString(),
+    unreadCount: doc.unreadCounts[doc.landlordId!] || 0,
+  };
+};
+
 // Async thunks
 export const fetchConversations = createAsyncThunk(
   "messages/fetchConversations",
@@ -96,74 +159,81 @@ export const fetchConversations = createAsyncThunk(
         return rejectWithValue("User is not authenticated");
       }
 
-      // Handle Agent Flow
+      // Handle Agent Flow - Agent needs BOTH tenant AND landlord conversations
       if (authUser.role === Role.AGENT) {
         const agent = currentUser as Agent;
         const agentId = agent.agentId;
 
-        // Step 1: Get agent code from current user (already have it)
-        const agentCode = agent.agentCode;
-
-        // Step 2.1: Get agent conversations by agent id
+        // Step 1: Get existing agent conversations
         const existingConversations: ConversationDocument[] = await Meteor.callAsync(
           MeteorMethodIdentifier.CONVERSATIONS_GET_FOR_AGENT,
           agentId
         );
 
-        // Step 2.2: Get tenant connections (properties managed by this agent)
+        // Step 2: Get properties managed by this agent
         const agentProperties: ApiProperty[] = await Meteor.callAsync(
           MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID,
           agentId
         );
 
-        // Extract unique tenant IDs from properties
+        // Step 3: Extract unique tenant and landlord IDs from properties
         const tenantConnections = new Set<string>();
+        const landlordConnections = new Set<string>();
+        
         agentProperties.forEach(property => {
           if (property.tenantId && property.tenantId.trim() !== '') {
             tenantConnections.add(property.tenantId);
           }
-        });
-
-        // Step 3: Compare tenant connections against existing conversations
-        const existingConversationTenantIds = new Set<string>();
-        existingConversations.forEach(conversation => {
-          if (conversation.tenantId) {
-            existingConversationTenantIds.add(conversation.tenantId);
+          if (property.landlordId && property.landlordId.trim() !== '') {
+            landlordConnections.add(property.landlordId);
           }
         });
 
-        // Find tenants that don't have conversations yet
+        // Step 4: Check existing conversations
+        const existingTenantIds = new Set<string>();
+        const existingLandlordIds = new Set<string>();
+        
+        existingConversations.forEach(conversation => {
+          if (conversation.tenantId) {
+            existingTenantIds.add(conversation.tenantId);
+          }
+          if (conversation.landlordId) {
+            existingLandlordIds.add(conversation.landlordId);
+          }
+        });
+
+        // Step 5: Find missing conversations
         const tenantsWithoutConversations = Array.from(tenantConnections).filter(
-          tenantId => !existingConversationTenantIds.has(tenantId)
+          tenantId => !existingTenantIds.has(tenantId)
+        );
+        const landlordsWithoutConversations = Array.from(landlordConnections).filter(
+          landlordId => !existingLandlordIds.has(landlordId)
         );
 
-        // Step 4.2: Create new conversations for tenants without conversations
+        // Step 6: Create new conversations
         const newConversations: ConversationDocument[] = [];
         
+        // Create tenant conversations (AGENT ↔ TENANT ONLY)
         for (const tenantId of tenantsWithoutConversations) {
           try {
-            // Find the property for this tenant to get additional context
             const property = agentProperties.find(p => p.tenantId === tenantId);
             
             const newConversationData = {
               agentId: agentId,
               tenantId: tenantId,
               propertyId: property?.propertyId || undefined,
-              landlordId: property?.landlordId || undefined,
+              landlordId: undefined, // CRITICAL: No landlord in agent-tenant conversation
               unreadCounts: {
                 [agentId]: 0,
                 [tenantId]: 0
               }
             };
 
-            // The server method now handles duplicate checking, so we can call it directly
             const conversationId = await Meteor.callAsync(
               MeteorMethodIdentifier.CONVERSATION_INSERT,
               newConversationData
             );
 
-            // Only add to newConversations if it's actually a new conversation
-            // (server returns existing ID if conversation already exists)
             const isNewConversation = !existingConversations.some(conv => conv._id === conversationId);
             
             if (isNewConversation) {
@@ -172,7 +242,7 @@ export const fetchConversations = createAsyncThunk(
                 agentId: agentId,
                 tenantId: tenantId,
                 propertyId: property?.propertyId,
-                landlordId: property?.landlordId,
+                landlordId: undefined, // CRITICAL: No landlord access
                 unreadCounts: newConversationData.unreadCounts,
                 createdAt: new Date(),
                 updatedAt: new Date()
@@ -182,17 +252,62 @@ export const fetchConversations = createAsyncThunk(
             }
           } catch (error) {
             console.error(`Failed to create conversation for tenant ${tenantId}:`, error);
-            // Continue with other tenants even if one fails
           }
         }
 
-        // Step 4: Combine existing and new conversations
+        // Create landlord conversations (AGENT ↔ LANDLORD ONLY)
+        for (const landlordId of landlordsWithoutConversations) {
+          try {
+            const property = agentProperties.find(p => p.landlordId === landlordId);
+            
+            const newConversationData = {
+              agentId: agentId,
+              landlordId: landlordId,
+              propertyId: property?.propertyId || undefined,
+              tenantId: undefined, // CRITICAL: No tenant in agent-landlord conversation
+              unreadCounts: {
+                [agentId]: 0,
+                [landlordId]: 0
+              }
+            };
+
+            const conversationId = await Meteor.callAsync(
+              MeteorMethodIdentifier.CONVERSATION_INSERT,
+              newConversationData
+            );
+
+            const isNewConversation = !existingConversations.some(conv => conv._id === conversationId);
+            
+            if (isNewConversation) {
+              const newConversation: ConversationDocument = {
+                _id: conversationId,
+                agentId: agentId,
+                landlordId: landlordId,
+                propertyId: property?.propertyId,
+                tenantId: undefined, // CRITICAL: No tenant access
+                unreadCounts: newConversationData.unreadCounts,
+                createdAt: new Date(),
+                updatedAt: new Date()
+              };
+
+              newConversations.push(newConversation);
+            }
+          } catch (error) {
+            console.error(`Failed to create conversation for landlord ${landlordId}:`, error);
+          }
+        }
+
+        // Step 7: Combine all conversations
         const allConversations = [...existingConversations, ...newConversations];
 
-        // Fetch tenant profiles for all conversations to get real names
+        // Step 8: Fetch profiles for both tenants and landlords
         const tenantProfiles = new Map<string, any>();
-        const uniqueTenantIds = [...new Set(allConversations.map(c => c.tenantId).filter(Boolean))];
+        const landlordProfiles = new Map<string, any>();
         
+        const uniqueTenantIds = [...new Set(allConversations.map(c => c.tenantId).filter(Boolean))];
+        const uniqueLandlordIds = [...new Set(allConversations.map(c => c.landlordId).filter(Boolean))];
+        
+        // Fetch tenant profiles
         await Promise.all(
           uniqueTenantIds.map(async (tenantId) => {
             try {
@@ -203,18 +318,44 @@ export const fetchConversations = createAsyncThunk(
               tenantProfiles.set(tenantId!, profile);
             } catch (error) {
               console.error(`Failed to fetch profile for tenant ${tenantId}:`, error);
-              // Continue without profile data for this tenant
             }
           })
         );
 
-        // Convert to UI format with real tenant names
-        const uiConversations: Conversation[] = allConversations.map(doc => 
-          convertConversationDocumentToUIConversationForAgent(
-            doc, 
-            doc.tenantId ? tenantProfiles.get(doc.tenantId) : undefined
-          )
+        // Fetch landlord profiles
+        await Promise.all(
+          uniqueLandlordIds.map(async (landlordId) => {
+            try {
+              const profile = await Meteor.callAsync(
+                MeteorMethodIdentifier.PROFILE_GET_BY_LANDLORD_ID,
+                landlordId
+              );
+              landlordProfiles.set(landlordId!, profile);
+            } catch (error) {
+              console.error(`Failed to fetch profile for landlord ${landlordId}:`, error);
+            }
+          })
         );
+
+        // Step 9: Convert to UI format with proper role identification
+        const uiConversations: Conversation[] = allConversations.map(doc => {
+          if (doc.tenantId) {
+            // Agent-Tenant conversation
+            return convertConversationDocumentToUIConversationForAgentWithTenant(
+              doc, 
+              tenantProfiles.get(doc.tenantId)
+            );
+          } else if (doc.landlordId) {
+            // Agent-Landlord conversation
+            return convertConversationDocumentToUIConversationForAgentWithLandlord(
+              doc, 
+              landlordProfiles.get(doc.landlordId)
+            );
+          } else {
+            // Fallback (shouldn't happen)
+            return convertConversationDocumentToUIConversationForAgentWithTenant(doc);
+          }
+        });
 
         return uiConversations;
       }
@@ -265,12 +406,12 @@ export const fetchConversations = createAsyncThunk(
           return rejectWithValue("No property or agent found for this tenant");
         }
 
-        // Step 4: Create new conversation with the agent
+        // Step 4: Create new conversation with the agent (AGENT ↔ TENANT ONLY)
         const newConversationData = {
           agentId: tenantProperty.agentId,
           tenantId: tenantId,
           propertyId: tenantProperty.propertyId,
-          landlordId: tenantProperty.landlordId,
+          landlordId: undefined, // CRITICAL: No landlord in agent-tenant conversation
           unreadCounts: {
             [tenantProperty.agentId]: 0,
             [tenantId]: 0
@@ -288,7 +429,7 @@ export const fetchConversations = createAsyncThunk(
           agentId: tenantProperty.agentId,
           tenantId: tenantId,
           propertyId: tenantProperty.propertyId,
-          landlordId: tenantProperty.landlordId,
+          landlordId: undefined, // CRITICAL: No landlord access
           unreadCounts: newConversationData.unreadCounts,
           createdAt: new Date(),
           updatedAt: new Date()
@@ -308,6 +449,107 @@ export const fetchConversations = createAsyncThunk(
         // Convert to UI format
         const uiConversations: Conversation[] = [
           convertConversationDocumentToUIConversationForTenant(newConversation, agentProfile)
+        ];
+
+        return uiConversations;
+      }
+
+      // Handle Landlord Flow
+      else if (authUser.role === Role.LANDLORD) {
+        const landlord = currentUser as Landlord;
+        const landlordId = landlord.landlordId;
+
+        // Step 1: Get existing conversations for this landlord
+        const existingConversations: ConversationDocument[] = await Meteor.callAsync(
+          MeteorMethodIdentifier.CONVERSATIONS_GET_FOR_LANDLORD,
+          landlordId
+        );
+
+        // Step 2: If conversation exists, use it
+        if (existingConversations.length > 0) {
+          // Fetch agent profile for the conversation
+          const conversation = existingConversations[0]; // Landlord only has one agent
+          let agentProfile = null;
+          
+          if (conversation.agentId) {
+            try {
+              agentProfile = await Meteor.callAsync(
+                MeteorMethodIdentifier.PROFILE_GET_BY_AGENT_ID,
+                conversation.agentId
+              );
+            } catch (error) {
+              console.error(`Failed to fetch profile for agent ${conversation.agentId}:`, error);
+            }
+          }
+
+          // Convert to UI format
+          const uiConversations: Conversation[] = [
+            convertConversationDocumentToUIConversationForLandlord(conversation, agentProfile)
+          ];
+
+          return uiConversations;
+        }
+
+        // Step 3: No conversation exists, find the agent from landlord's property
+        const landlordProperties: ApiProperty[] = await Meteor.callAsync(
+          MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_LANDLORD_ID,
+          landlordId
+        );
+
+        if (!landlordProperties || landlordProperties.length === 0) {
+          return rejectWithValue("No properties found for this landlord");
+        }
+
+        // Get the first property with an agent
+        const landlordProperty = landlordProperties.find(p => p.agentId);
+
+        if (!landlordProperty || !landlordProperty.agentId) {
+          return rejectWithValue("No property or agent found for this landlord");
+        }
+
+        // Step 4: Create new conversation with the agent (AGENT ↔ LANDLORD ONLY)
+        const newConversationData = {
+          agentId: landlordProperty.agentId,
+          landlordId: landlordId,
+          propertyId: landlordProperty.propertyId,
+          tenantId: undefined, // CRITICAL: No tenant in agent-landlord conversation
+          unreadCounts: {
+            [landlordProperty.agentId]: 0,
+            [landlordId]: 0
+          }
+        };
+
+        const conversationId = await Meteor.callAsync(
+          MeteorMethodIdentifier.CONVERSATION_INSERT,
+          newConversationData
+        );
+
+        // Create the conversation document
+        const newConversation: ConversationDocument = {
+          _id: conversationId,
+          agentId: landlordProperty.agentId,
+          landlordId: landlordId,
+          propertyId: landlordProperty.propertyId,
+          tenantId: undefined, // CRITICAL: No tenant access
+          unreadCounts: newConversationData.unreadCounts,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+
+        // Fetch agent profile
+        let agentProfile = null;
+        try {
+          agentProfile = await Meteor.callAsync(
+            MeteorMethodIdentifier.PROFILE_GET_BY_AGENT_ID,
+            landlordProperty.agentId
+          );
+        } catch (error) {
+          console.error(`Failed to fetch profile for agent ${landlordProperty.agentId}:`, error);
+        }
+
+        // Convert to UI format
+        const uiConversations: Conversation[] = [
+          convertConversationDocumentToUIConversationForLandlord(newConversation, agentProfile)
         ];
 
         return uiConversations;
@@ -349,6 +591,9 @@ export const fetchConversationMessages = createAsyncThunk(
       } else if (authUser.role === Role.TENANT) {
         const tenant = currentUser as Tenant;
         currentUserId = tenant.tenantId;
+      } else if (authUser.role === Role.LANDLORD) {
+        const landlord = currentUser as Landlord;
+        currentUserId = landlord.landlordId;
       } else {
         return rejectWithValue("Unsupported user role");
       }
@@ -394,6 +639,10 @@ export const sendMessage = createAsyncThunk(
         const tenant = currentUser as Tenant;
         senderId = tenant.tenantId;
         senderRole = 'tenant';
+      } else if (authUser.role === Role.LANDLORD) {
+        const landlord = currentUser as Landlord;
+        senderId = landlord.landlordId;
+        senderRole = 'landlord';
       } else {
         return rejectWithValue("Unsupported user role");
       }

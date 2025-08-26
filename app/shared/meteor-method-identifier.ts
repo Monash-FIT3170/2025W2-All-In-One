@@ -45,6 +45,7 @@ export enum MeteorMethodIdentifier {
   PROPERTY_SEARCH = "PROPERTY_SEARCH",
 	CONVERSATIONS_GET_FOR_AGENT = "conversations.getForAgent", // Get conversations for an agent based on their managed properties
 	CONVERSATIONS_GET_FOR_TENANT = "conversations.getForTenant", // Get conversations for a tenant
+	CONVERSATIONS_GET_FOR_LANDLORD = "conversations.getForLandlord", // Get conversations for a landlord
 	CONVERSATION_INSERT = "conversations.insert", // Create a new conversation between users
 	MESSAGES_GET_FOR_CONVERSATION = "messages.getForConversation", // Get all messages for a specific conversation
 	MESSAGE_INSERT = "messages.insert", // Send a new message in a conversation
