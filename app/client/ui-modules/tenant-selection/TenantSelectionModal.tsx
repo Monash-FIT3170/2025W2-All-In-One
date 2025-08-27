@@ -8,8 +8,6 @@ import { ModalContent } from './components/ModalContent';
 import { ModalDone } from './components/ModalDone';
 import { useAppDispatch, useAppSelector } from '/app/client/store';
 import {
-  sendAcceptedApplicationsToLandlordAsync,
-  sendApprovedApplicationsToAgentAsync,
   setFilter,
   selectActiveFilter,
 } from './state/reducers/tenant-selection-slice';

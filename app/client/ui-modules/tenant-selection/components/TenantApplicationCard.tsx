@@ -36,6 +36,9 @@ export const TenantApplicationCard = ({
   const canAgentBackgroundCheck = userRole === Role.AGENT &&
     application.status === TenantApplicationStatus.BACKGROUND_CHECK_PENDING;
 
+  const canLandlordFinalReview = userRole === Role.LANDLORD &&
+    application.status === TenantApplicationStatus.FINAL_REVIEW;
+
   return (
     <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
       <div className="flex flex-col flex-1">
@@ -71,6 +74,15 @@ export const TenantApplicationCard = ({
               <BackgroundPassButton onClick={handleAccept} />
             </>
           )}
+
+          {/* Landlord final review actions */}
+          {canLandlordFinalReview && (
+            <>
+            <RejectButton onClick={handleReject} />
+            <AcceptButton onClick={handleAccept} />
+          </>
+          )}
+
 
           {/* Status messages for different states
           {userRole === Role.LANDLORD && application.status === TenantApplicationStatus.ACCEPTED && (

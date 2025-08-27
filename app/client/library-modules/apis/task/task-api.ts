@@ -17,8 +17,8 @@ export type CreateTaskPayload = {
   priority: TaskPriority;
   propertyAddress: string;
   propertyId: string;
-  userType: Role.AGENT | Role.LANDLORD;
   userId: string;
+  userType: Role.AGENT | Role.LANDLORD;
 };
 
 export async function apiCreateTask(taskData: CreateTaskPayload): Promise<string> {
@@ -44,29 +44,5 @@ export async function apiCreateTaskForAgent(taskData: {
     propertyId: taskData.propertyId,
     userType: Role.AGENT,
     userId: taskData.userId,
-  });
-}
-
-// will update to a universal role apiCreateTask
-export async function apiCreateTaskForLandlord(taskData: {
-  name: string;
-  description: string;
-  dueDate: Date;
-  priority: TaskPriority;
-  landlordId: string;
-  propertyAddress: string;
-  propertyId: string;
-  userId: string;
-  userType: Role;
-}): Promise<string> {
-  return apiCreateTask({
-    name: taskData.name,
-    description: taskData.description,
-    dueDate: taskData.dueDate,
-    priority: taskData.priority,
-    propertyAddress: taskData.propertyAddress,
-    propertyId: taskData.propertyId,
-    userType: Role.LANDLORD,
-    userId: taskData.landlordId,
   });
 }

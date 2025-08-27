@@ -49,12 +49,24 @@ export function StatusBadge({ status }: StatusBadgeProps): React.JSX.Element | n
           BACKGROUND CHECK PENDING
         </span>
       );
+    case TenantApplicationStatus.BACKGROUND_CHECK_PASSED:
+      return (
+        <span className="px-2 py-1 bg-green-200 text-green-800 text-xs font-medium rounded">
+          BACKGROUND CHECK PASSED
+        </span>
+      );
     case TenantApplicationStatus.BACKGROUND_CHECK_FAILED:
       return (
         <span className="px-2 py-1 bg-red-300 text-red-800 text-xs font-medium rounded">
           BACKGROUND CHECK FAILED
         </span>
       );
+    case TenantApplicationStatus.FINAL_REVIEW:
+      return (
+        <span className ="px-2 py-1 bg-purple-200 text-purple-800 text-xs font-medium rounded">
+          FINAL REVIEW
+        </span>
+      )
 
     default:
       return null;

@@ -10,5 +10,5 @@ export type TenantSelectionUiState = {
   isLoading: boolean;
   error: string | null;
   currentStep: number;
-  bookedInspections: Set<number>;
+  bookedInspections: number[];
 };

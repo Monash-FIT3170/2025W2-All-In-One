@@ -55,9 +55,14 @@ import {
   sendAcceptedApplicationsToLandlordAsync,
   selectLandlordApprovedApplicantCountForProperty,
   selectHasLandlordApprovedApplicationsForProperty,
-  addBookedInspection
+  addBookedInspection,
+  intentSendApplicationToAgentAsync,
+  intentSendApplicationToLandlordAsync,
+  selectHasBackgroundPassedApplicationsForProperty,
+  selectBackgroundPassedApplicantCountForProperty,
+  intentAcceptApplicationAsync,
+  intentRejectApplicationAsync
 } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
-import { intentAcceptApplicationAsync, intentRejectApplicationAsync } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { Role } from "/app/shared/user-role-identifier";
 import { CurrentUserState } from "../user-authentication/state/CurrentUserState";
 
@@ -274,7 +279,10 @@ function ListingPageContent({
   const hasLandlordApprovedApplications = useAppSelector((state) => selectHasLandlordApprovedApplicationsForProperty(state, propertyId));
   const landlordApprovedApplicantCount = useAppSelector((state) => selectLandlordApprovedApplicantCountForProperty(state, propertyId));
 
-  const shouldShowSendToLandlordButton = hasAcceptedApplications && authUser?.role === Role.AGENT;
+  const hasBackgroundPassedApplications = useAppSelector((state) => selectHasBackgroundPassedApplicationsForProperty(state, propertyId));
+  const backgroundPassedApplicantCount = useAppSelector((state) => selectBackgroundPassedApplicantCountForProperty(state, propertyId))
+
+  const shouldShowSendToLandlordButton = (hasAcceptedApplications || hasBackgroundPassedApplications) && authUser?.role === Role.AGENT;
   const shouldShowSendToAgentButton = hasLandlordApprovedApplications && authUser?.role === Role.LANDLORD;
 
   const handleAccept = async (applicationId: string) => {
@@ -285,16 +293,17 @@ function ListingPageContent({
   }
 };
 
-const handleReject = async (applicationId: string) => {
-  try {
-    await dispatch(intentRejectApplicationAsync({ propertyId, applicationId })).unwrap();
-  } catch (error) {
-    console.error("Failed to reject application:", error);
-  }
-};
+  const handleReject = async (applicationId: string) => {
+    try {
+      await dispatch(intentRejectApplicationAsync({ propertyId, applicationId })).unwrap();
+    } catch (error) {
+      console.error("Failed to reject application:", error);
+    }
+  };
+
   const handleSendToLandlord = async () => {
     try {
-      await dispatch(sendAcceptedApplicationsToLandlordAsync()).unwrap();
+      await dispatch(intentSendApplicationToLandlordAsync()).unwrap();
       console.log("Successfully sent applications to landlord");
     } catch (error) {
       console.error("Failed to send applications to landlord:", error);
@@ -303,7 +312,7 @@ const handleReject = async (applicationId: string) => {
 
   const handleSendToAgent = async () => {
     try {
-      await dispatch(sendApprovedApplicationsToAgentAsync()).unwrap();
+      await dispatch(intentSendApplicationToAgentAsync()).unwrap();
       console.log("Successfully sent applications to agent");
     } catch (error) {
       console.error("Failed to send applications to agent:", error);
