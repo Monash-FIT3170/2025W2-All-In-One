@@ -14,9 +14,10 @@ import { Landlord } from "/app/client/library-modules/domain-models/user/Landlor
 import { getAllLandlords } from "/app/client/library-modules/domain-models/user/role-repositories/landlord-repository";
 import { Agent } from '/app/client/library-modules/domain-models/user/Agent';
 import { ProfileData } from '/app/client/library-modules/domain-models/user/ProfileData';
-import { getAgentById } from '/app/client/library-modules/domain-models/user/role-repositories/agent-repository';
+import { getAgentByAgentId, getAgentById } from '/app/client/library-modules/domain-models/user/role-repositories/agent-repository';
 import { getProfileDataById } from '/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository';
 import { getPropertyById } from '/app/client/library-modules/domain-models/property/repositories/property-repository';
+import { getUserAccountById } from "/app/client/library-modules/domain-models/user/user-account-repositories/user-account-repository";
 
 interface TenantPropertyState {
   propertyId: string;
@@ -120,21 +121,34 @@ export const fetchAgentWithProfile = createAsyncThunk(
   "tenantProperty/fetchAgentWithProfile",
   async (propertyId: string) => {
     try {
-      // First get the property to get the agentId
+      // Debug log for property ID
+      console.log('Fetching property with ID:', propertyId);
+      
       const property = await getPropertyById(propertyId);
+      console.log('Found property:', property);
+
       if (!property.agentId) {
         throw new Error('No agent assigned to this property');
       }
+      // console.log('Property agent ID:', property.agentId);
+      // const user = await getUserAccountById(property.agentId);
+      // console.log('Found user account for agent:', user);
 
-      // Then fetch agent and profile data
-      const agent = await getAgentById(property.agentId);
-      const profileData = await getProfileDataById(agent.profileDataId);
+      // Debug log for agent ID
+      console.log('Fetching agent with ID:', property.agentId);
       
+      const agent = await getAgentByAgentId(property.agentId);
+      console.log('Found agent:', agent);
+
+      const profileData = await getProfileDataById(agent.profileDataId);
+      console.log('Found profile data:', profileData);
+
       return {
         agent,
         profile: profileData
       };
     } catch (error) {
+      console.error('Error in fetchAgentWithProfile:', error);
       if (error instanceof Error) {
         throw new Error(`Failed to fetch agent details: ${error.message}`);
       }
