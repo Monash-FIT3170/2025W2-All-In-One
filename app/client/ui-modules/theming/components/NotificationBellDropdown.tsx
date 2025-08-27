@@ -2,15 +2,33 @@ import React from 'react';
 import { TaskStatus } from '/app/shared/task-status-identifier';
 import { parse, format, compareAsc } from "date-fns";
 import { Task } from '/app/client/library-modules/domain-models/task/Task';
+import { useRef, useEffect } from 'react';
 
-
-interface NotificationBoardProps {
+interface NotificationDropdownProps {
   open: boolean;
   onClose: () => void;
   tasks: Task[];
 }
 
-export function NotificationBoard({ open, onClose, tasks }: NotificationBoardProps) {
+export function NotificationBellDropdown({ open, onClose, tasks }: NotificationDropdownProps) {
+  const popupRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        popupRef.current &&
+        !popupRef.current.contains(event.target as Node)
+      ) {
+        onClose();
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [open, onClose]);
+
   if (!open) return null;
 
   const formatTaskDate = (date: Date): string => {
@@ -40,7 +58,7 @@ export function NotificationBoard({ open, onClose, tasks }: NotificationBoardPro
     });
 
   return (
-    <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
+    <div ref={popupRef} className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
         <span className="font-semibold text-lg">Notifications</span>
         <button
