@@ -59,7 +59,6 @@ export const AgentDetails: React.FC<AgentDetailsProps> = ({
             <p className="font-medium text-lg">
               {profile.firstName} {profile.lastName}
             </p>
-            <p className="text-gray-600">Agent Code: {agent.agentCode}</p>
           </div>
         </div>
         

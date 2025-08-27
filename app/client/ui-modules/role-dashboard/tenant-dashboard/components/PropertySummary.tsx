@@ -13,7 +13,6 @@ export function ListingSummary({
   postcode,
   summaryDescription,
   propertyStatusText,
-  propertyStatusPillVariant,
   className = "",
 }: {
   streetNumber: string;
@@ -23,7 +22,6 @@ export function ListingSummary({
   postcode: string;
   summaryDescription: string;
   propertyStatusText: string;
-  propertyStatusPillVariant: PropertyStatusPillVariant;
   className?: string;
 }): React.JSX.Element {
   return (
@@ -37,7 +35,6 @@ export function ListingSummary({
           postcode={postcode}
           className="mr-6"
         />
-        <StatusPill text={propertyStatusText} variant={propertyStatusPillVariant} />
       </div>
 
       <Description description={summaryDescription} />

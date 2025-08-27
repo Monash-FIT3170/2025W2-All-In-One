@@ -76,7 +76,6 @@ export function TenantProperty({
           postcode={state.postcode}
           summaryDescription={state.summaryDescription}
           propertyStatusText={state.propertyStatusText}
-          propertyStatusPillVariant={state.propertyStatusPillVariant}
           propertyDescription={state.propertyDescription}
           propertyFeatures={state.propertyFeatures}
           propertyType={state.propertyType}
@@ -127,7 +126,6 @@ function ListingPageContent({
   postcode,
   summaryDescription,
   propertyStatusText,
-  propertyStatusPillVariant,
   propertyDescription,
   propertyFeatures,
   propertyType,
@@ -160,7 +158,6 @@ function ListingPageContent({
   postcode: string;
   summaryDescription: string;
   propertyStatusText: string;
-  propertyStatusPillVariant: PropertyStatusPillVariant;
   propertyDescription: string;
   propertyFeatures: string[];
   propertyType: string;
@@ -208,7 +205,6 @@ function ListingPageContent({
         postcode={postcode}
         summaryDescription={summaryDescription}
         propertyStatusText={propertyStatusText}
-        propertyStatusPillVariant={propertyStatusPillVariant}
         propertyType={propertyType}
         propertyLandArea={propertyLandArea}
         propertyBathrooms={propertyBathrooms}
@@ -274,7 +270,6 @@ function ListingHero({
   postcode,
   summaryDescription,
   propertyStatusText,
-  propertyStatusPillVariant,
   propertyType,
   propertyLandArea,
   propertyBathrooms,
@@ -294,7 +289,6 @@ function ListingHero({
   postcode: string;
   summaryDescription: string;
   propertyStatusText: string;
-  propertyStatusPillVariant: PropertyStatusPillVariant;
   propertyType: string;
   propertyLandArea: string;
   propertyBathrooms: string;
@@ -315,6 +309,7 @@ function ListingHero({
         className="flex-3 min-w-[500px] mr-6"
       />
       <div className="flex-4 flex flex-col">
+        <h1 className="text-3xl font-semibold mb-4">My Property</h1>
         <ListingSummary
           streetNumber={streetNumber}
           street={street}
@@ -323,7 +318,6 @@ function ListingHero({
           postcode={postcode}
           summaryDescription={summaryDescription}
           propertyStatusText={propertyStatusText}
-          propertyStatusPillVariant={propertyStatusPillVariant}
           className="mb-2"
         />
         <ListingPropertyDetails
@@ -335,9 +329,6 @@ function ListingHero({
           price={propertyPrice}
           className="w-full mb-8"
         />
-        <div className="flex">
-          <ContactAgentButton propertyId={propertyId} />
-        </div>
       </div>
     </div>
   );
@@ -388,6 +379,13 @@ function ListingDetails({
             onBook={onBook}
             className="w-full"
           />
+          <AgentDetails
+          agent={agent}
+          profile={agentProfile}
+          isLoading={isLoadingAgent}
+          error={agentError}
+          className="flex-1"
+          />
         </div>
 
         <div className="flex-1 flex flex-col">
@@ -395,16 +393,6 @@ function ListingDetails({
           <SubHeading text="Location" className="mb-2" />
           <PropertyMap mapUiState={mapUiState} />
         </div>
-      </div>
-      
-      <div className="flex gap-7">
-        <AgentDetails
-          agent={agent}
-          profile={agentProfile}
-          isLoading={isLoadingAgent}
-          error={agentError}
-          className="flex-1"
-        />
       </div>
     </div>
   );
