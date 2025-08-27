@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate } from 'react-router';
+import React from "react";
+import { useNavigate } from "react-router";
 import { PropertyWithListingDataAndNames } from "../landlord-dashboard/state/landlord-properties-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { NavigationPath } from "/app/client/navigation";
@@ -8,7 +8,6 @@ import { StatusBadge } from "../landlord-dashboard/components/StatusBadge";
 interface PropertyCardProps {
   property: PropertyWithListingDataAndNames;
 }
-
 
 function PropertyCard({ property }: PropertyCardProps) {
   const navigate = useNavigate();
@@ -22,15 +21,16 @@ function PropertyCard({ property }: PropertyCardProps) {
 
   // Handle click to navigate to property detail with property data
   const handleClick = () => {
-    navigate(`${NavigationPath.LandlordPropertyDetail}?propertyId=${property.propertyId}`, {
-      state: { property } // Pass the entire property object via router state
-    });
+    navigate(
+      `${NavigationPath.LandlordPropertyDetail}?propertyId=${property.propertyId}`,
+      {
+        state: { property }, // Pass the entire property object via router state
+      }
+    );
   };
 
-  console.log(property.propertyStatus);
-
   return (
-    <div 
+    <div
       className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
       onClick={handleClick}
     >
@@ -45,12 +45,22 @@ function PropertyCard({ property }: PropertyCardProps) {
         ) : (
           // Fallback placeholder when no image is available
           <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-            <svg className="h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m4 0v-4a1 1 0 011-1h4a1 1 0 011 1v4m-5 0h10" />
+            <svg
+              className="h-16 w-16 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m4 0v-4a1 1 0 011-1h4a1 1 0 011 1v4m-5 0h10"
+              />
             </svg>
           </div>
         )}
-        
+
         {/* Status Badge */}
         <div className="absolute top-3 right-3">
           <StatusBadge status={property.propertyStatus as PropertyStatus} />
@@ -70,7 +80,9 @@ function PropertyCard({ property }: PropertyCardProps) {
       <div className="p-4">
         {/* Address */}
         <div className="mb-3">
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">{fullAddress}</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+            {fullAddress}
+          </h3>
           <p className="text-sm text-gray-600">{locationText}</p>
           <p className="text-xs text-gray-500">{property.type}</p>
         </div>
