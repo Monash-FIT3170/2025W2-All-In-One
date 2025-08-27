@@ -24,6 +24,7 @@ import {
   resetUnreadCount as resetUnreadCountRepo,
 } from "/app/client/library-modules/domain-models/messaging/messaging-repository";
 import { ApiConversation } from "/app/shared/api-models/messaging/ApiConversation";
+import { ApiMessage } from "/app/shared/api-models/messaging/ApiMessage";
 
 // Import helper functions
 import { 
@@ -61,7 +62,7 @@ export const fetchConversations = createAsyncThunk(
   "messages/fetchConversations",
   async (_, { getState, rejectWithValue }) => {
     try {
-      const state = getState() as RootState;
+      const state = getState() as { currentUser: { currentUser: Agent | Tenant | Landlord | null; authUser: { role: Role } | null } };
       const currentUser = state.currentUser.currentUser;
       const authUser = state.currentUser.authUser;
 
@@ -70,11 +71,20 @@ export const fetchConversations = createAsyncThunk(
 
       // Route to appropriate role-specific handler
       if (isAgent(userContext.authUser.role)) {
-        return await handleAgentConversations(userContext.currentUser as Agent);
+        if ('agentId' in userContext.currentUser) {
+          return await handleAgentConversations(userContext.currentUser);
+        }
+        return rejectWithValue("Invalid agent user data");
       } else if (isTenant(userContext.authUser.role)) {
-        return await handleTenantConversations(userContext.currentUser as Tenant);
+        if ('tenantId' in userContext.currentUser) {
+          return await handleTenantConversations(userContext.currentUser);
+        }
+        return rejectWithValue("Invalid tenant user data");
       } else if (isLandlord(userContext.authUser.role)) {
-        return await handleLandlordConversations(userContext.currentUser as Landlord);
+        if ('landlordId' in userContext.currentUser) {
+          return await handleLandlordConversations(userContext.currentUser);
+        }
+        return rejectWithValue("Invalid landlord user data");
       } else {
         return rejectWithValue("Unsupported user role");
       }
@@ -97,7 +107,7 @@ export const fetchConversationMessages = createAsyncThunk(
       // Validate conversation ID using helper function
       validateConversationId(conversationId);
 
-      const state = getState() as RootState;
+      const state = getState() as { currentUser: { currentUser: Agent | Tenant | Landlord | null; authUser: { role: Role } | null } };
       const currentUser = state.currentUser.currentUser;
       const authUser = state.currentUser.authUser;
 
@@ -123,7 +133,7 @@ export const sendMessage = createAsyncThunk(
   "messages/sendMessage",
   async (messageData: { conversationId: string; text: string }, { getState, rejectWithValue }) => {
     try {
-      const state = getState() as RootState;
+      const state = getState() as { currentUser: { currentUser: Agent | Tenant | Landlord | null; authUser: { role: Role } | null } };
       const currentUser = state.currentUser.currentUser;
       const authUser = state.currentUser.authUser;
 
@@ -166,7 +176,7 @@ export const resetUnreadCount = createAsyncThunk(
       // Validate conversation ID using helper function
       validateConversationId(conversationId);
 
-      const state = getState() as RootState;
+      const state = getState() as { currentUser: { currentUser: Agent | Tenant | Landlord | null; authUser: { role: Role } | null } };
       const currentUser = state.currentUser.currentUser;
       const authUser = state.currentUser.authUser;
 
@@ -306,11 +316,11 @@ export const messagesSlice = createSlice({
      * Updates messages from real-time subscription data
      * Converts server message documents to UI format with proper isOutgoing logic
      */
-    setMessagesFromSubscription(state, action: PayloadAction<{ conversationId: string; messages: any[]; currentUserId?: string }>) {
+    setMessagesFromSubscription(state, action: PayloadAction<{ conversationId: string; messages: ApiMessage[]; currentUserId?: string }>) {
       
-      // Convert message documents to Message[] for UI
+      // Convert API messages to Message[] for UI
       const uiMessages: Message[] = action.payload.messages.map(doc => ({
-        id: doc._id,
+        id: doc.messageId,
         text: doc.text,
         timestamp: new Date(doc.timestamp).toLocaleString(),
         isOutgoing: action.payload.currentUserId ? doc.senderId === action.payload.currentUserId : false,

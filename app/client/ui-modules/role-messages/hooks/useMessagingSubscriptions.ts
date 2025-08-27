@@ -6,21 +6,33 @@ import { useAppDispatch, useAppSelector } from '/app/client/store';
 import { 
   setConversationsFromSubscription, 
   setMessagesFromSubscription,
-  addMessage,
-  updateConversationLastMessage
 } from '../state/reducers/messages-slice';
-import { formatConversationTimestamp } from '../utils/timestamp-utils';
 import { Role } from '/app/shared/user-role-identifier';
 import { Agent } from '/app/client/library-modules/domain-models/user/Agent';
 import { Tenant } from '/app/client/library-modules/domain-models/user/Tenant';
 import { Landlord } from '/app/client/library-modules/domain-models/user/Landlord';
 import { ApiConversation } from '/app/shared/api-models/messaging/ApiConversation';
 import { ApiMessage } from '/app/shared/api-models/messaging/ApiMessage';
+import { ConversationDocument } from '/app/server/database/messaging/models/ConversationDocument';
+import { MessageDocument } from '/app/server/database/messaging/models/MessageDocument';
 
 // Client-side collections that mirror the server collections
 // These will be automatically synchronized via Meteor's pub/sub system
-const ConversationCollection: Mongo.Collection<any> = new Mongo.Collection("conversations");
-const MessageCollection: Mongo.Collection<any> = new Mongo.Collection("messages");
+const ConversationCollection: Mongo.Collection<ConversationDocument> = new Mongo.Collection("conversations");
+const MessageCollection: Mongo.Collection<MessageDocument> = new Mongo.Collection("messages");
+
+// Type guards to safely check user types
+function isAgent(user: unknown): user is Agent {
+  return user !== null && typeof user === 'object' && 'agentId' in user;
+}
+
+function isTenant(user: unknown): user is Tenant {
+  return user !== null && typeof user === 'object' && 'tenantId' in user;
+}
+
+function isLandlord(user: unknown): user is Landlord {
+  return user !== null && typeof user === 'object' && 'landlordId' in user;
+}
 
 // Hook for managing messaging subscriptions and real-time updates
 export function useMessagingSubscriptions(activeConversationId: string | null) {
@@ -37,25 +49,22 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
   
   if (authUser && currentUser) {
     userRole = authUser.role;
-    if (userRole === Role.AGENT) {
-      const agent = currentUser as Agent;
-      currentUserId = agent.agentId;
-      roleId = agent.agentId; // Use agentId as the roleId
-    } else if (userRole === Role.TENANT) {
-      const tenant = currentUser as Tenant;
-      currentUserId = tenant.tenantId;
-      roleId = tenant.tenantId; // Use tenantId as the roleId
-    } else if (userRole === Role.LANDLORD) {
-      const landlord = currentUser as Landlord;
-      currentUserId = landlord.landlordId;
-      roleId = landlord.landlordId; // Use landlordId as the roleId
+    if (userRole === Role.AGENT && isAgent(currentUser)) {
+      currentUserId = currentUser.agentId;
+      roleId = currentUser.agentId;
+    } else if (userRole === Role.TENANT && isTenant(currentUser)) {
+      currentUserId = currentUser.tenantId;
+      roleId = currentUser.tenantId;
+    } else if (userRole === Role.LANDLORD && isLandlord(currentUser)) {
+      currentUserId = currentUser.landlordId;
+      roleId = currentUser.landlordId;
     }
   }
 
   // Subscribe to conversations with role and roleId
   const conversationsReady = useTracker(() => {
     if (!userRole || !roleId) {
-      return true; // Return true instead of false to avoid blocking
+      return true;
     }
     const handle = Meteor.subscribe('conversations', userRole, roleId);
     return handle.ready();
@@ -67,7 +76,7 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
       return true;
     }
     if (!userRole || !roleId) {
-      return true; // Return true instead of false to avoid blocking
+      return true;
     }
     const handle = Meteor.subscribe('messages', activeConversationId, userRole, roleId);
     return handle.ready();
@@ -123,7 +132,6 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
   // Update Redux store when messages change
   useEffect(() => {
     if (messagesReady && activeConversationId) {
-      
       // Convert server documents to API format
       const apiMessages: ApiMessage[] = messages.map(msg => ({
         messageId: msg._id,
@@ -137,21 +145,11 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
       
       dispatch(setMessagesFromSubscription({ 
         conversationId: activeConversationId, 
-        messages: apiMessages as any, 
+        messages: apiMessages, 
         currentUserId 
       }));
-      
-      // Note: Don't manually update conversation tile here since the conversations 
-      // subscription will automatically receive the updated lastMessage from the server
-      // This prevents incorrect timestamp updates for conversations without new messages
     }
   }, [messages, messagesReady, activeConversationId, dispatch, currentUserId]);
-
-  // Also update when messages change even if conversation isn't active (for real-time updates)
-  useEffect(() => {
-    if (messagesReady && activeConversationId && messages.length > 0) {
-    }
-  }, [messages.length, messagesReady, activeConversationId]);
 
   return {
     conversationsReady,

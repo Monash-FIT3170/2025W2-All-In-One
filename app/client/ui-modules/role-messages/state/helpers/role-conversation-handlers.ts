@@ -35,6 +35,7 @@ import {
   createLandlordAgentConversation
 } from "./conversation-helpers";
 import { ApiConversation } from "/app/shared/api-models/messaging/ApiConversation";
+import { ApiProperty } from "/app/shared/api-models/property/ApiProperty";
 
 /**
  * Handles conversation fetching for Agent users
@@ -182,7 +183,7 @@ export async function handleLandlordConversations(landlord: Landlord): Promise<C
   }
 
   // Get the first property with an agent
-  const landlordProperty = landlordProperties.find((p: any) => p.agentId);
+  const landlordProperty = landlordProperties.find((p: ApiProperty) => p.agentId);
 
   if (!landlordProperty || !landlordProperty.agentId) {
     throw new Error("No property or agent found for this landlord");

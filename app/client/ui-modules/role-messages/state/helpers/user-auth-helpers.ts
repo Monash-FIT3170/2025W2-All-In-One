@@ -48,25 +48,31 @@ export function extractUserIdAndRole(
 ): { userId: string; userRole: string } {
   switch (role) {
     case Role.AGENT:
-      const agent = currentUser as Agent;
-      return {
-        userId: agent.agentId,
-        userRole: 'agent'
-      };
+      if ('agentId' in currentUser) {
+        return {
+          userId: currentUser.agentId,
+          userRole: 'agent'
+        };
+      }
+      throw new Error("Invalid agent user data");
     
     case Role.TENANT:
-      const tenant = currentUser as Tenant;
-      return {
-        userId: tenant.tenantId,
-        userRole: 'tenant'
-      };
+      if ('tenantId' in currentUser) {
+        return {
+          userId: currentUser.tenantId,
+          userRole: 'tenant'
+        };
+      }
+      throw new Error("Invalid tenant user data");
     
     case Role.LANDLORD:
-      const landlord = currentUser as Landlord;
-      return {
-        userId: landlord.landlordId,
-        userRole: 'landlord'
-      };
+      if ('landlordId' in currentUser) {
+        return {
+          userId: currentUser.landlordId,
+          userRole: 'landlord'
+        };
+      }
+      throw new Error("Invalid landlord user data");
     
     default:
       throw new Error("Unsupported user role");

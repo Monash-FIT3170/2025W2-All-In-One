@@ -29,6 +29,19 @@ interface MessagesPageProps {
   role: UserRole;
 } 
 
+// Type guards to safely check user types
+function isAgent(user: unknown): user is Agent {
+  return user !== null && typeof user === 'object' && 'agentId' in user;
+}
+
+function isTenant(user: unknown): user is Tenant {
+  return user !== null && typeof user === 'object' && 'tenantId' in user;
+}
+
+function isLandlord(user: unknown): user is Landlord {
+  return user !== null && typeof user === 'object' && 'landlordId' in user;
+}
+
 export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
   const dispatch = useAppDispatch();
   
@@ -47,6 +60,36 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
   // Use real-time subscriptions for live messaging
   const { conversationsReady, messagesReady } = useMessagingSubscriptions(activeConversationId);
 
+  // Helper function to get current user ID
+  const getCurrentUserId = (): string | null => {
+    if (!authUser || !currentUser) return null;
+    
+    if (authUser.role === Role.AGENT && isAgent(currentUser)) {
+      return currentUser.agentId;
+    } else if (authUser.role === Role.TENANT && isTenant(currentUser)) {
+      return currentUser.tenantId;
+    } else if (authUser.role === Role.LANDLORD && isLandlord(currentUser)) {
+      return currentUser.landlordId;
+    }
+    return null;
+  };
+
+  // Helper function to handle active user management
+  const handleActiveUserManagement = async (conversationId: string, action: 'add' | 'remove') => {
+    const currentUserId = getCurrentUserId();
+    if (!currentUserId) return;
+
+    try {
+      if (action === 'add') {
+        await apiAddActiveUser(conversationId, currentUserId);
+      } else {
+        await apiRemoveActiveUser(conversationId, currentUserId);
+      }
+    } catch (error) {
+      console.error(`Failed to ${action} user from active users:`, error);
+    }
+  };
+
   // Initial fetch for conversations (fallback for when subscriptions aren't ready)
   useEffect(() => {
     if (authUser && !conversationsReady) {
@@ -64,29 +107,11 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
   // Cleanup function to remove user from active users when leaving
   useEffect(() => {
     return () => {
-      if (activeConversationId && authUser && currentUser) {
-        // Remove user from active users when component unmounts
-        let currentUserId: string;
-        if (authUser.role === Role.AGENT) {
-          const agent = currentUser as Agent;
-          currentUserId = agent.agentId;
-        } else if (authUser.role === Role.TENANT) {
-          const tenant = currentUser as Tenant;
-          currentUserId = tenant.tenantId;
-        } else if (authUser.role === Role.LANDLORD) {
-          const landlord = currentUser as Landlord;
-          currentUserId = landlord.landlordId;
-        } else {
-          return;
-        }
-
-        // Remove user from active users
-        apiRemoveActiveUser(activeConversationId, currentUserId).catch(error => {
-          console.error('Failed to remove active user on cleanup:', error);
-        });
+      if (activeConversationId) {
+        handleActiveUserManagement(activeConversationId, 'remove');
       }
     };
-  }, [activeConversationId, authUser, currentUser]);
+  }, [activeConversationId]);
 
   const handleSelectConversation = async (conversationId: string) => {
     // Validate conversationId is not null/undefined
@@ -96,26 +121,8 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
     }
 
     // Remove current user from previous conversation's active users (if any)
-    if (activeConversationId && activeConversationId !== conversationId && currentUser && authUser) {
-      let currentUserId: string;
-      if (authUser.role === Role.AGENT) {
-        const agent = currentUser as Agent;
-        currentUserId = agent.agentId;
-      } else if (authUser.role === Role.TENANT) {
-        const tenant = currentUser as Tenant;
-        currentUserId = tenant.tenantId;
-      } else if (authUser.role === Role.LANDLORD) {
-        const landlord = currentUser as Landlord;
-        currentUserId = landlord.landlordId;
-      } else {
-        return;
-      }
-
-      try {
-        await apiRemoveActiveUser(activeConversationId, currentUserId);
-      } catch (error) {
-        console.error('Failed to remove user from active users:', error);
-      }
+    if (activeConversationId && activeConversationId !== conversationId) {
+      await handleActiveUserManagement(activeConversationId, 'remove');
     }
 
     dispatch(setActiveConversation(conversationId));
@@ -123,27 +130,7 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
     dispatch(resetUnreadCount(conversationId));
 
     // Add current user to new conversation's active users
-    if (currentUser && authUser) {
-      let currentUserId: string;
-      if (authUser.role === Role.AGENT) {
-        const agent = currentUser as Agent;
-        currentUserId = agent.agentId;
-      } else if (authUser.role === Role.TENANT) {
-        const tenant = currentUser as Tenant;
-        currentUserId = tenant.tenantId;
-      } else if (authUser.role === Role.LANDLORD) {
-        const landlord = currentUser as Landlord;
-        currentUserId = landlord.landlordId;
-      } else {
-        return;
-      }
-
-      try {
-        await apiAddActiveUser(conversationId, currentUserId);
-      } catch (error) {
-        console.error('Failed to add user to active users:', error);
-      }
-    }
+    await handleActiveUserManagement(conversationId, 'add');
   };
 
   const handleChangeMessage = (value: string) => {

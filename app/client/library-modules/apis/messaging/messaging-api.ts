@@ -2,9 +2,11 @@ import { Meteor } from "meteor/meteor";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { ApiConversation } from "/app/shared/api-models/messaging/ApiConversation";
 import { ApiMessage } from "/app/shared/api-models/messaging/ApiMessage";
+import { ConversationDocument } from "/app/server/database/messaging/models/ConversationDocument";
+import { MessageDocument } from "/app/server/database/messaging/models/MessageDocument";
 
 // Helper function to convert server ConversationDocument to ApiConversation
-function convertConversationDocumentToApi(doc: any): ApiConversation {
+function convertConversationDocumentToApi(doc: ConversationDocument): ApiConversation {
   return {
     conversationId: doc._id,
     agentId: doc.agentId,
@@ -26,7 +28,7 @@ function convertConversationDocumentToApi(doc: any): ApiConversation {
 }
 
 // Helper function to convert server MessageDocument to ApiMessage
-function convertMessageDocumentToApi(doc: any): ApiMessage {
+function convertMessageDocumentToApi(doc: MessageDocument): ApiMessage {
   return {
     messageId: doc._id,
     conversationId: doc.conversationId,
@@ -38,23 +40,49 @@ function convertMessageDocumentToApi(doc: any): ApiMessage {
   };
 }
 
+// Type guard to check if the result is an array of ConversationDocument
+function isConversationDocumentArray(result: unknown): result is ConversationDocument[] {
+  return Array.isArray(result) && result.every(item => 
+    item && typeof item === 'object' && '_id' in item && 'agentId' in item
+  );
+}
+
+// Type guard to check if the result is an array of MessageDocument
+function isMessageDocumentArray(result: unknown): result is MessageDocument[] {
+  return Array.isArray(result) && result.every(item => 
+    item && typeof item === 'object' && '_id' in item && 'conversationId' in item
+  );
+}
+
 export async function apiGetConversationsForAgent(agentId: string): Promise<ApiConversation[]> {
   const serverDocs = await Meteor.callAsync(MeteorMethodIdentifier.CONVERSATIONS_GET_FOR_AGENT, agentId);
+  if (!isConversationDocumentArray(serverDocs)) {
+    throw new Error("Invalid response format from server");
+  }
   return serverDocs.map(convertConversationDocumentToApi);
 }
 
 export async function apiGetConversationsForTenant(tenantId: string): Promise<ApiConversation[]> {
   const serverDocs = await Meteor.callAsync(MeteorMethodIdentifier.CONVERSATIONS_GET_FOR_TENANT, tenantId);
+  if (!isConversationDocumentArray(serverDocs)) {
+    throw new Error("Invalid response format from server");
+  }
   return serverDocs.map(convertConversationDocumentToApi);
 }
 
 export async function apiGetConversationsForLandlord(landlordId: string): Promise<ApiConversation[]> {
   const serverDocs = await Meteor.callAsync(MeteorMethodIdentifier.CONVERSATIONS_GET_FOR_LANDLORD, landlordId);
+  if (!isConversationDocumentArray(serverDocs)) {
+    throw new Error("Invalid response format from server");
+  }
   return serverDocs.map(convertConversationDocumentToApi);
 }
 
 export async function apiGetMessagesForConversation(conversationId: string): Promise<ApiMessage[]> {
   const serverDocs = await Meteor.callAsync(MeteorMethodIdentifier.MESSAGES_GET_FOR_CONVERSATION, conversationId);
+  if (!isMessageDocumentArray(serverDocs)) {
+    throw new Error("Invalid response format from server");
+  }
   return serverDocs.map(convertMessageDocumentToApi);
 }
 

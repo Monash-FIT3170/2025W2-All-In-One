@@ -12,6 +12,7 @@ import {
   apiResetUnreadCount
 } from "../../apis/messaging/messaging-api";
 import { formatConversationTimestamp } from "/app/client/ui-modules/role-messages/utils/timestamp-utils";
+import { ApiProfileData } from "/app/shared/api-models/user/api-roles/ApiProfileData";
 
 // Helper function to generate avatar from name
 function getAvatar(name: string): string {
@@ -106,8 +107,8 @@ export async function resetUnreadCount(conversationId: string, userId: string): 
 export function convertApiConversationsToAgentView(
   apiConversations: ApiConversation[],
   agentId: string,
-  tenantProfiles: Map<string, any>,
-  landlordProfiles: Map<string, any>
+  tenantProfiles: Map<string, ApiProfileData>,
+  landlordProfiles: Map<string, ApiProfileData>
 ): Conversation[] {
   return apiConversations.map(apiConversation => {
     if (apiConversation.tenantId) {
@@ -134,7 +135,7 @@ export function convertApiConversationsToAgentView(
 export function convertApiConversationsToTenantView(
   apiConversations: ApiConversation[],
   tenantId: string,
-  agentProfile?: any
+  agentProfile?: ApiProfileData
 ): Conversation[] {
   return apiConversations.map(apiConversation => {
     const name = agentProfile 
@@ -147,7 +148,7 @@ export function convertApiConversationsToTenantView(
 export function convertApiConversationsToLandlordView(
   apiConversations: ApiConversation[],
   landlordId: string,
-  agentProfile?: any
+  agentProfile?: ApiProfileData
 ): Conversation[] {
   return apiConversations.map(apiConversation => {
     const name = agentProfile 
