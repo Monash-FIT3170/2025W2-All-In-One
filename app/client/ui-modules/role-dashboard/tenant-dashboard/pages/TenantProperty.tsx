@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { PropertyFeatures } from "../../../role-dashboard/tenant-dashboard/components/PropertyFeatures";
-import { ListingPropertyDetails } from "../components/PropertySpecifics";
+import { PropertySpecifics } from "../components/PropertySpecifics";
 import {
   PropertyStatusPillVariant,
-  ListingSummary,
+  PropertySummary,
 } from "../components/PropertySummary";
-import { ListingDescription } from "../components/PropertyDescription";
+import { PropertyDescription } from "../components/PropertyDescription";
 import { LeftCircularArrowIcon } from "/app/client/ui-modules/theming/icons/LeftCircularArrowIcon";
 import { RightCircularArrowIcon } from "/app/client/ui-modules/theming/icons/RightCircularArrowIcon";
 import { ImageCarousel } from "../../../theming/components/ImageCarousel";
@@ -60,7 +60,7 @@ export function TenantProperty({
   if (state.shouldShowLoadingState) {
     return (
       <>
-        <ListingPageContentLoadingSkeleton
+        <PropertyPageContentLoadingSkeleton
           className={twMerge("p-5", className)}
         />
       </>
@@ -68,7 +68,7 @@ export function TenantProperty({
   } else {
     return (
       <>
-        <ListingPageContent
+        <PropertyPageContent
           streetNumber={state.streetNumber}
           street={state.street}
           suburb={state.suburb}
@@ -118,7 +118,7 @@ export function TenantProperty({
   }
 }
 
-function ListingPageContent({
+function PropertyPageContent({
   streetNumber,
   street,
   suburb,
@@ -197,7 +197,7 @@ function ListingPageContent({
         onBack={onBack}
         className="mb-3"
       />
-      <ListingHero
+      <PropertyHero
         streetNumber={streetNumber}
         street={street}
         suburb={suburb}
@@ -217,7 +217,7 @@ function ListingPageContent({
         onContactAgent={onContactAgent}
         className="mb-6"
       />
-      <ListingDetails
+      <PropertyDetails
         propertyDescription={propertyDescription}
         mapUiState={mapUiState}
         inspectionBookingUiStateList={inspectionBookingUiStateList}
@@ -230,7 +230,7 @@ function ListingPageContent({
   );
 }
 
-function ListingPageContentLoadingSkeleton({
+function PropertyPageContentLoadingSkeleton({
   className = "",
 }: {
   className?: string;
@@ -261,7 +261,7 @@ function TopBar({
   );
 }
 
-function ListingHero({
+function PropertyHero({
   className = "",
   streetNumber,
   street,
@@ -310,7 +310,7 @@ function ListingHero({
       />
       <div className="flex-4 flex flex-col">
         <h1 className="text-3xl font-semibold mb-4">My Property</h1>
-        <ListingSummary
+        <PropertySummary
           streetNumber={streetNumber}
           street={street}
           suburb={suburb}
@@ -320,7 +320,7 @@ function ListingHero({
           propertyStatusText={propertyStatusText}
           className="mb-2"
         />
-        <ListingPropertyDetails
+        <PropertySpecifics
           propertyType={propertyType}
           area={propertyLandArea}
           bathrooms={propertyBathrooms}
@@ -334,7 +334,7 @@ function ListingHero({
   );
 }
 
-function ListingDetails({
+function PropertyDetails({
   propertyDescription,
   mapUiState,
   inspectionBookingUiStateList,
@@ -370,7 +370,7 @@ function ListingDetails({
     <div className={twMerge("flex flex-col gap-7", className)}>
       <div className="flex gap-7">
         <div className="flex-1 flex flex-col">
-          <ListingDescription
+          <PropertyDescription
             description={propertyDescription}
             className="mb-4"
           />

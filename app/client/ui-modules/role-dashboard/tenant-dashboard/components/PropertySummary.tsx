@@ -5,7 +5,7 @@ export enum PropertyStatusPillVariant {
   VACANT,
 }
 
-export function ListingSummary({
+export function PropertySummary({
   streetNumber,
   street,
   suburb,
