@@ -1,27 +1,27 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { Property } from "/app/client/library-modules/domain-models/property/Property";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
-import { selectProperties, fetchLandlordDetails } from "../state/landlord-dashboard-slice";
+import { 
+  selectLandlordProperties, 
+  selectLandlordPropertiesLoading,
+  fetchLandlordProperties 
+} from "../state/landlord-properties-slice";
 import PropertyCard from "../../components/PropertyCard";
 
 export function LandlordProperties(): React.JSX.Element {
   const dispatch = useAppDispatch();
-  const properties = useAppSelector(selectProperties);
+  const properties = useAppSelector(selectLandlordProperties);
+  const isLoading = useAppSelector(selectLandlordPropertiesLoading);
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
-
-  console.log(properties);
-  
   
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("All");
 
   useEffect(() => {
     if (currentUser?.userId) {
-      dispatch(fetchLandlordDetails(currentUser.userId));
+      dispatch(fetchLandlordProperties(currentUser.userId));
     }
   }, [dispatch, currentUser?.userId]);
-  console.log(properties);
   // Filter options
   const filterOptions = [
     { label: "All", value: "All" },
@@ -51,6 +51,18 @@ export function LandlordProperties(): React.JSX.Element {
 
     return filtered;
   }, [properties, selectedFilter, searchTerm]);
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your properties...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

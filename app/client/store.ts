@@ -1,6 +1,7 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import { agentDashboardSlice } from "./ui-modules/role-dashboard/agent-dashboard/state/agent-dashboard-slice";
 import { landlordDashboardSlice } from "./ui-modules/role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
+import { landlordPropertiesSlice } from "./ui-modules/role-dashboard/landlord-dashboard/state/landlord-properties-slice";
 import { guestLandingPageSlice } from "./ui-modules/guest-landing-page/state/reducers/guest-landing-page-slice";
 import { settingsPageSlice } from "./ui-modules/settings-page/state/reducers/settings-page-slice";
 import { profileSlice } from "./ui-modules/profiles/state/profile-slice";
@@ -19,6 +20,7 @@ export const store = configureStore({
     guestLandingPage: guestLandingPageSlice.reducer,
     settingsPage: settingsPageSlice.reducer,
     landlordDashboard: landlordDashboardSlice.reducer,
+    landlordProperties: landlordPropertiesSlice.reducer,
     profile: profileSlice.reducer,
     signinForm: signinFormSlice.reducer,
     propertyListing: propertyListingSlice.reducer,

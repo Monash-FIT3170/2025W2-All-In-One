@@ -1,12 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { PropertyWithImages } from "../landlord-dashboard/state/landlord-dashboard-slice";
+import { PropertyWithListingDataAndNames } from "../landlord-dashboard/state/landlord-properties-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { NavigationPath } from "/app/client/navigation";
 import { StatusBadge } from "../landlord-dashboard/components/StatusBadge";
 
 interface PropertyCardProps {
-  property: PropertyWithImages;
+  property: PropertyWithListingDataAndNames;
 }
 
 
@@ -18,11 +18,13 @@ function PropertyCard({ property }: PropertyCardProps) {
   const locationText = `${property.suburb}, ${property.province}`;
 
   // Get the first image URL or use placeholder
-  const displayImageUrl = property.imageUrls?.[0];
+  const displayImageUrl = property.image_urls?.[0];
 
-  // Handle click to navigate to property detail
+  // Handle click to navigate to property detail with property data
   const handleClick = () => {
-    navigate(`${NavigationPath.LandlordPropertyDetail}?propertyId=${property.propertyId}`);
+    navigate(`${NavigationPath.LandlordPropertyDetail}?propertyId=${property.propertyId}`, {
+      state: { property } // Pass the entire property object via router state
+    });
   };
 
   console.log(property.propertyStatus);
@@ -55,10 +57,10 @@ function PropertyCard({ property }: PropertyCardProps) {
         </div>
 
         {/* Image counter - show if there are multiple images */}
-        {property.imageUrls && property.imageUrls.length > 1 && (
+        {property.image_urls && property.image_urls.length > 1 && (
           <div className="absolute bottom-3 right-3">
             <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-black bg-opacity-70 text-white">
-              1/{property.imageUrls.length}
+              1/{property.image_urls.length}
             </span>
           </div>
         )}
