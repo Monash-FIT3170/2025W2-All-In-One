@@ -235,10 +235,36 @@ const getListingStatusIdByName = {
   },
 };
 
+const insertInspection = {
+  [MeteorMethodIdentifier.INSPECTION_INSERT]: async (
+    inspections: { start_time: Date; end_time: Date }[]
+  ): Promise<string[]> => {
+    if (!Array.isArray(inspections)) {
+      throw new Meteor.Error("invalid-args", "inspections must be an array");
+    }
+    const ids: string[] = [];
+    for (const insp of inspections) {
+      if (!insp?.start_time || !insp?.end_time) {
+        throw new Meteor.Error(
+          "invalid-args",
+          "start_time and end_time are required"
+        );
+      }
+      const id = await InspectionCollection.insertAsync({
+        starttime: new Date(insp.start_time),
+        endtime: new Date(insp.end_time),
+      } as InspectionDocument);
+      ids.push(id);
+    }
+    return ids;
+  },
+};
+
 Meteor.methods({
   ...getListingForProperty,
   ...insertDraftListingDocumentForProperty,
   ...getListingStatusIdByName,
   ...submitDraftListing,
   ...getAllListedListings,
+  ...insertInspection,
 });
