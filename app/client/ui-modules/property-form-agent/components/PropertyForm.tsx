@@ -12,7 +12,7 @@ import { formSchema, FormSchemaType } from "./FormSchema";
 import { Button } from "../../theming-shadcn/Button";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { PropertyFormMode } from "../enum/PropertyFormMode";
-import { ImageOrderItem } from "../utils/image-utils";
+import { ImageOrderItem } from "../enum/ImageType";
 
 export interface PropertyFormRef {
   loadExistingImages: (urls: string[]) => void;

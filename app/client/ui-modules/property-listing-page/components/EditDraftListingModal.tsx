@@ -20,7 +20,7 @@ import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpda
 import { uploadFilesHandler, getImageUrlsFromUploadResults } from "/app/client/library-modules/apis/azure/blob-api";
 import { BlobNamePrefix } from "/app/shared/azure/blob-models";
 import { updatePropertyListingImages } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
-import { ImageType } from "../../property-form-agent/utils/image-utils";
+import { ImageType } from "../../property-form-agent/enum/ImageType";
 
 interface EditDraftListingModalProps {
   toggle: () => void;

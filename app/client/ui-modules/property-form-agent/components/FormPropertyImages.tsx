@@ -15,7 +15,7 @@ import { FormSchemaType } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
 import ImagePreviewGrid from "./ImagePreviewGrid";
-import { ImageType, ImageOrderItem } from "../utils/image-utils";
+import { ImageType, ImageOrderItem } from "../enum/ImageType";
 
 export interface FormPropertyImagesRef {
   addExistingImages: (urls: string[]) => void;
@@ -25,6 +25,9 @@ export interface FormPropertyImagesRef {
 const FormPropertyImages = forwardRef<FormPropertyImagesRef, { form: UseFormReturn<FormSchemaType> }>(({ form }, ref) => {
   const [existingImages, setExistingImages] = useState<string[]>([]); // Blob urls
   const [newImages, setNewImages] = useState<File[]>(form.getValues("images") || []); // New image uploads
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]); // Array to hold preview URLs for display
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [draggedOver, setDraggedOver] = useState<number | null>(null);
   
   // Order tracking: array of objects indicating the type and index in respective arrays
   const [imageOrder, setImageOrder] = useState<ImageOrderItem[]>(() => {
@@ -32,13 +35,8 @@ const FormPropertyImages = forwardRef<FormPropertyImagesRef, { form: UseFormRetu
     // Since we're starting with only new files from form, create order for them
     return formImages.map((_, index) => ({type: ImageType.NEW, index}));
   });
-  
-  // Array to hold preview URLs for display
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [draggedOver, setDraggedOver] = useState<number | null>(null);
 
-  // Generate preview URLs whenever images or order changes
+  // Update preview URLs whenever images or order changes
   useEffect(() => {
     const newPreviewUrls: string[] = [];
     
@@ -98,7 +96,7 @@ const FormPropertyImages = forwardRef<FormPropertyImagesRef, { form: UseFormRetu
     multiple: true,
   };
 
-  // Helper function to add existing images (useful for editing drafts)
+  // Helper function to add existing images and updates the order
   const addExistingImages = (urls: string[]) => {
     const currentExistingLength = existingImages.length;
     setExistingImages(prev => [...prev, ...urls]);
