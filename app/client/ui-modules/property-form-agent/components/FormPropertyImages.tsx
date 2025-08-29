@@ -15,28 +15,26 @@ import { FormSchemaType } from "./FormSchema";
 import { UseFormReturn } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
 import ImagePreviewGrid from "./ImagePreviewGrid";
+import { ImageType, ImageOrderItem } from "../utils/image-utils";
 
 export interface FormPropertyImagesRef {
   addExistingImages: (urls: string[]) => void;
-  getCombinedImages: () => { existingImages: string[]; newImages: File[]; imageOrder: { type: 'existing' | 'new'; index: number }[] };
+  getCombinedImages: () => { existingImages: string[]; newImages: File[]; imageOrder: ImageOrderItem[] };
 }
 
 const FormPropertyImages = forwardRef<FormPropertyImagesRef, { form: UseFormReturn<FormSchemaType> }>(({ form }, ref) => {
-  const [existingImages, setExistingImages] = useState<string[]>([]); // blob urls
-  const [newImages, setNewImages] = useState<File[]>(() => {
-    return form.getValues("images") || [];
-  }); // new images uploaded
+  const [existingImages, setExistingImages] = useState<string[]>([]); // Blob urls
+  const [newImages, setNewImages] = useState<File[]>(form.getValues("images") || []); // New image uploads
   
   // Order tracking: array of objects indicating the type and index in respective arrays
-  const [imageOrder, setImageOrder] = useState<Array<{type: 'existing' | 'new', index: number}>>(() => {
+  const [imageOrder, setImageOrder] = useState<ImageOrderItem[]>(() => {
     const formImages = form.getValues("images") || [];
     // Since we're starting with only new files from form, create order for them
-    return formImages.map((_, index) => ({type: 'new' as const, index}));
+    return formImages.map((_, index) => ({type: ImageType.NEW, index}));
   });
   
   // Array to hold preview URLs for display
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [draggedOver, setDraggedOver] = useState<number | null>(null);
 
@@ -45,7 +43,7 @@ const FormPropertyImages = forwardRef<FormPropertyImagesRef, { form: UseFormRetu
     const newPreviewUrls: string[] = [];
     
     imageOrder.forEach(orderItem => {
-      if (orderItem.type === 'existing') {
+      if (orderItem.type === ImageType.EXISTING) {
         const url = existingImages[orderItem.index];
         if (url) newPreviewUrls.push(url);
       } else {
@@ -107,7 +105,7 @@ const FormPropertyImages = forwardRef<FormPropertyImagesRef, { form: UseFormRetu
     
     // Add to order
     const newOrderItems = urls.map((_, index) => ({
-      type: 'existing' as const,
+      type: ImageType.EXISTING,
       index: currentExistingLength + index
     }));
     setImageOrder(prev => [...prev, ...newOrderItems]);
@@ -125,7 +123,7 @@ const FormPropertyImages = forwardRef<FormPropertyImagesRef, { form: UseFormRetu
 
   // Create combined array for ImagePreviewGrid based on current order
   const combinedImages = imageOrder.map(orderItem => {
-    if (orderItem.type === 'existing') {
+    if (orderItem.type === ImageType.EXISTING) {
       return existingImages[orderItem.index];
     } else {
       return newImages[orderItem.index];
@@ -137,7 +135,7 @@ const FormPropertyImages = forwardRef<FormPropertyImagesRef, { form: UseFormRetu
     const orderItem = imageOrder[indexToRemove];
     if (!orderItem) return;
     
-    if (orderItem.type === 'existing') {
+    if (orderItem.type === ImageType.EXISTING) {
       // Remove from existing images
       const newExistingImages = existingImages.filter((_, idx) => idx !== orderItem.index);
       setExistingImages(newExistingImages);
@@ -146,7 +144,7 @@ const FormPropertyImages = forwardRef<FormPropertyImagesRef, { form: UseFormRetu
       const newOrder = imageOrder
         .filter((_, idx) => idx !== indexToRemove)
         .map(item => {
-          if (item.type === 'existing' && item.index > orderItem.index) {
+          if (item.type === ImageType.EXISTING && item.index > orderItem.index) {
             return { ...item, index: item.index - 1 };
           }
           return item;
@@ -161,7 +159,7 @@ const FormPropertyImages = forwardRef<FormPropertyImagesRef, { form: UseFormRetu
       const newOrder = imageOrder
         .filter((_, idx) => idx !== indexToRemove)
         .map(item => {
-          if (item.type === 'new' && item.index > orderItem.index) {
+          if (item.type === ImageType.NEW && item.index > orderItem.index) {
             return { ...item, index: item.index - 1 };
           }
           return item;
@@ -233,7 +231,7 @@ const FormPropertyImages = forwardRef<FormPropertyImagesRef, { form: UseFormRetu
     
     // Add to order at the end
     const newOrderItems = trulyNewFiles.map((_, index) => ({
-      type: 'new' as const,
+      type: ImageType.NEW,
       index: currentNewImagesLength + index
     }));
     setImageOrder(prev => [...prev, ...newOrderItems]);

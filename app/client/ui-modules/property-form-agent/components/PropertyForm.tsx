@@ -12,10 +12,11 @@ import { formSchema, FormSchemaType } from "./FormSchema";
 import { Button } from "../../theming-shadcn/Button";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { PropertyFormMode } from "../enum/PropertyFormMode";
+import { ImageOrderItem } from "../utils/image-utils";
 
 export interface PropertyFormRef {
   loadExistingImages: (urls: string[]) => void;
-  getCombinedImages: () => { existingImages: string[]; newImages: File[]; imageOrder: { type: 'existing' | 'new'; index: number }[] };
+  getCombinedImages: () => { existingImages: string[]; newImages: File[]; imageOrder: ImageOrderItem[] };
 }
 
 export const PropertyForm = forwardRef<PropertyFormRef, {

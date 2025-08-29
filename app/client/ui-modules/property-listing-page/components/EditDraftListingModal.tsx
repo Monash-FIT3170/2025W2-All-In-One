@@ -20,6 +20,7 @@ import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpda
 import { uploadFilesHandler, getImageUrlsFromUploadResults } from "/app/client/library-modules/apis/azure/blob-api";
 import { BlobNamePrefix } from "/app/shared/azure/blob-models";
 import { updatePropertyListingImages } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
+import { ImageType } from "../../property-form-agent/utils/image-utils";
 
 interface EditDraftListingModalProps {
   toggle: () => void;
@@ -105,7 +106,7 @@ export default function EditDraftListingModal(
       // Preserve the user's ordering by converting the ordered array
       const finalImageUrls: string[] = [];
       combinedImageData.imageOrder.forEach(orderItem => {
-        if (orderItem.type === 'existing') {
+        if (orderItem.type === ImageType.EXISTING) {
           // Existing URL - keep as is
           const existingUrl = combinedImageData.existingImages[orderItem.index];
           if (existingUrl) {
