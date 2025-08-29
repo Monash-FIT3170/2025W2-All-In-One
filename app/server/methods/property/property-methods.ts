@@ -56,29 +56,6 @@ const propertyGetMethod = {
 	},
 };
 
-const propertyGetCountMethod = {
-	[MeteorMethodIdentifier.PROPERTY_GET_COUNT]: async (
-		agentId: string
-	): Promise<number> => {
-		return await PropertyCollection.find({
-			agent_id: agentId,
-		}).countAsync();
-	},
-};
-// This method is used to get all properties for a specific agent\
-// It returns a promise that resolves to an array of ApiProperty objects
-//
-const propertyGetListMethod = {
-	[MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID]: async (
-		agentId: string
-	): Promise<ApiProperty[]> => {
-		const properties = await PropertyCollection.find({
-			agent_id: agentId,
-		}).fetchAsync();
-		return Promise.all(properties.map(mapPropertyDocumentToPropertyDTO));
-	},
-};
-
 // This method is used to map a property document to an ApiProperty DTO.
 // This function transforms a PropertyDocument (raw database document) into an ApiProperty (structured DTO) for client use. It performs the following steps:
 // 1. Fetches the property status document by its ID
@@ -311,6 +288,27 @@ const propertyGetAllByLandlordId = {
 	},
 };
 
+const propertyGetAllByAgentId = {
+	[MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_AGENT_ID]: async (
+		agentId: string
+	): Promise<ApiProperty[]> => {
+		const properties = await PropertyCollection.find({
+			agent_id: agentId,
+		}).fetchAsync();
+		return Promise.all(properties.map(mapPropertyDocumentToPropertyDTO));
+	},
+};
+
+const propertyGetAgentPropertyCountMethod = {
+	[MeteorMethodIdentifier.PROPERTY_GET_AGENT_PROP_COUNT]: async (
+		agentId: string
+	): Promise<number> => {
+		return await PropertyCollection.find({
+			agent_id: agentId,
+		}).countAsync();
+	},
+};
+
 const updatePropertyData = {
 	[MeteorMethodIdentifier.PROPERTY_DATA_UPDATE]: async (
 		property: PropertyUpdateData
@@ -463,8 +461,8 @@ const getLandlordDashboardMethod = {
 Meteor.methods({
 	...propertyGetMethod,
 	...propertyInsertMethod,
-	...propertyGetCountMethod,
-	...propertyGetListMethod,
+	...propertyGetAgentPropertyCountMethod,
+	...propertyGetAllByAgentId,
 	...propertyInsertMethod,
 	...propertyGetByTenantIdMethod,
 	...propertyGetAllByLandlordId,
