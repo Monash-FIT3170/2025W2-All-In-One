@@ -125,10 +125,6 @@ async function mapProfileDataDocumentToDTO(
         workAddress: profile.workAddress,
         workPhone: profile.workPhone,
         profilePicture: profile.profilePicture,
-        carMake: profile.carMake,
-        carModel: profile.carModel,
-        carYear: profile.carYear,
-        carPlate: profile.carPlate,
     };
 }
 
