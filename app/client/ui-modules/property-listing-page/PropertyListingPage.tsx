@@ -491,7 +491,7 @@ function ListingModalEditor({
     bathroom_number: Number(state.propertyBathrooms),
     space: Number(state.areaValue),
     description: state.propertyDescription,
-    images: state.listingImageUrls || [], // Include existing images from the listing
+    images: [], // Placeholder, as we don't have image files in the current state
     available_dates: new Date(),
     lease_term: "12_months",
     show_contact_boolean: true,
@@ -510,6 +510,7 @@ function ListingModalEditor({
         propertyForm={listingInfo}
         landlords={state.landlords}
         propertyId={state.propertyId}
+        existingImageUrls={state.listingImageUrls}
       />
     </>
   );

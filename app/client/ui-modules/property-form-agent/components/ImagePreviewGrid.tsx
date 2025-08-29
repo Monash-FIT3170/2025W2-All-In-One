@@ -1,9 +1,10 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { X } from "lucide-react";
 
 interface ImagePreviewGridProps {
-  files: (File | string)[];
+  imageUrls: string[];
+  imageItems: (File | string)[];
   draggedIndex: number | null;
   draggedOver: number | null;
   onRemoveFile: (index: number) => void;
@@ -15,7 +16,8 @@ interface ImagePreviewGridProps {
 }
 
 export default function ImagePreviewGrid({
-  files,
+  imageUrls,
+  imageItems,
   draggedIndex,
   draggedOver,
   onRemoveFile,
@@ -25,57 +27,18 @@ export default function ImagePreviewGrid({
   onDragEnd,
   onDragLeave,
 }: ImagePreviewGridProps) {
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-
-  // Generate preview URLs whenever files change
-  useEffect(() => {
-    if (files && files.length > 0) {
-      const newPreviewUrls = files.map(item => 
-        typeof item === 'string' ? item : URL.createObjectURL(item)
-      );
-      
-      // Clean up old blob URLs that are no longer needed
-      previewUrls.forEach(url => {
-        if (!newPreviewUrls.includes(url) && url.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
-        }
-      });
-      
-      setPreviewUrls(newPreviewUrls);
-    } else {
-      // Clean up all blob URLs when no files
-      previewUrls.forEach(url => {
-        if (url.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
-        }
-      });
-      setPreviewUrls([]);
-    }
-  }, [files]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      previewUrls.forEach(url => {
-        if (url.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
-        }
-      });
-    };
-  }, []);
-
   return (
     <div className="mt-4">
       <div className="flex justify-between items-center mb-3">
         <p className="text-sm font-medium">
-          {files.length} image{files.length > 1 ? 's' : ''} uploaded
+          {imageItems.length} image{imageItems.length > 1 ? 's' : ''} uploaded
         </p>
         <p className="text-xs text-gray-500">
           Drag images to reorder
         </p>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {files.map((item, index) => {
+        {imageItems.map((item, index) => {
           const isFile = item instanceof File;
           const displayName = isFile ? item.name : `Image ${index + 1}`;
           const displaySize = isFile ? `${Math.round(item.size / 1024)} KB` : 'Existing image';
@@ -111,7 +74,7 @@ export default function ImagePreviewGrid({
               {/* Image Preview */}
               <div className="aspect-square">
                 <img
-                  src={previewUrls[index]}
+                  src={imageUrls[index]}
                   alt={`Preview ${index + 1}`}
                   className="w-full h-full object-cover"
                 />

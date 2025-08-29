@@ -8,14 +8,14 @@ import {
   ThemedButton,
   ThemedButtonVariant,
 } from "../../theming/components/ThemedButton";
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { apiUpdatePropertyData } from "/app/client/library-modules/apis/property/property-api";
 import { useAppDispatch } from "/app/client/store";
 import { load } from "../state/reducers/property-listing-slice";
 import { PropertyFormMode } from "../../property-form-agent/enum/PropertyFormMode";
-import { PropertyForm } from "../../property-form-agent/components/PropertyForm";
+import { PropertyForm, PropertyFormRef } from "../../property-form-agent/components/PropertyForm";
 import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
 import { uploadFilesHandler, getImageUrlsFromUploadResults } from "/app/client/library-modules/apis/azure/blob-api";
 import { BlobNamePrefix } from "/app/shared/azure/blob-models";
@@ -27,6 +27,7 @@ interface EditDraftListingModalProps {
   propertyForm: FormSchemaType;
   landlords: Landlord[];
   propertyId: string;
+  existingImageUrls?: string[];
 }
 
 export default function EditDraftListingModal(
@@ -37,6 +38,15 @@ export default function EditDraftListingModal(
     defaultValues: props.propertyForm,
   });
   const dispatch = useAppDispatch();
+  const propertyFormRef = useRef<PropertyFormRef>(null);
+
+  // Load existing images when modal opens
+  useEffect(() => {
+    if (props.isOpen && props.existingImageUrls && props.existingImageUrls.length > 0) {
+      console.log("Loading existing images in EditDraftListingModal:", props.existingImageUrls);
+      propertyFormRef.current?.loadExistingImages(props.existingImageUrls);
+    }
+  }, [props.isOpen, props.existingImageUrls]);
 
   const handleSaveChanges = async (values: FormSchemaType) => {
     // Update property details
@@ -66,15 +76,17 @@ export default function EditDraftListingModal(
     // Update property details
     const prop = await apiUpdatePropertyData(updatedProperty);
 
-    // Handle image updates
-    if (values.images && values.images.length > 0) {
+    // Handle image updates - get both existing and new images in the correct order
+    const combinedImageData = propertyFormRef.current?.getCombinedImages();
+    if (combinedImageData && (combinedImageData.existingImages.length > 0 || combinedImageData.newImages.length > 0)) {
+      console.log("Processing combined images:", combinedImageData);
+      
       // Upload new files and get their URLs (uploadFilesHandler handles dev vs prod)
-      const newFiles: File[] = values.images.filter(item => item instanceof File);
       let newFileUrls: string[] = [];
       
-      if (newFiles.length > 0) {
+      if (combinedImageData.newImages.length > 0) {
         try {
-          const uploadResults = await uploadFilesHandler(newFiles, BlobNamePrefix.PROPERTY);
+          const uploadResults = await uploadFilesHandler(combinedImageData.newImages, BlobNamePrefix.PROPERTY);
           newFileUrls = getImageUrlsFromUploadResults(uploadResults);
         } catch (error) {
           console.error("Failed to upload new images:", error);
@@ -84,7 +96,7 @@ export default function EditDraftListingModal(
 
       // Create a mapping from File objects to their uploaded URLs
       const fileToUrlMap = new Map<File, string>();
-      newFiles.forEach((file, index) => {
+      combinedImageData.newImages.forEach((file, index) => {
         if (newFileUrls[index]) {
           fileToUrlMap.set(file, newFileUrls[index]);
         }
@@ -92,13 +104,17 @@ export default function EditDraftListingModal(
 
       // Preserve the user's ordering by converting the ordered array
       const finalImageUrls: string[] = [];
-      values.images.forEach(item => {
-        if (typeof item === 'string') {
+      combinedImageData.imageOrder.forEach(orderItem => {
+        if (orderItem.type === 'existing') {
           // Existing URL - keep as is
-          finalImageUrls.push(item);
+          const existingUrl = combinedImageData.existingImages[orderItem.index];
+          if (existingUrl) {
+            finalImageUrls.push(existingUrl);
+          }
         } else {
           // File object - use its uploaded URL if available
-          const uploadedUrl = fileToUrlMap.get(item);
+          const file = combinedImageData.newImages[orderItem.index];
+          const uploadedUrl = file ? fileToUrlMap.get(file) : undefined;
           if (uploadedUrl) {
             finalImageUrls.push(uploadedUrl);
           }
@@ -108,7 +124,7 @@ export default function EditDraftListingModal(
       // Update the listing with the ordered image URLs
       try {
         await updatePropertyListingImages(props.propertyId, finalImageUrls);
-        console.log("Updated listing images successfully");
+        console.log("Updated listing images successfully:", finalImageUrls);
       } catch (error) {
         console.error("Failed to update listing images:", error);
       }
@@ -133,6 +149,7 @@ export default function EditDraftListingModal(
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <div className="w-full max-w-3xl mx-auto">
                 <PropertyForm
+                  ref={propertyFormRef}
                   onSubmit={handleSaveChanges}
                   form={listingInfo}
                   landlords={props.landlords.map(l => ({
