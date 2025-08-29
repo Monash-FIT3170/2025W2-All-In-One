@@ -32,9 +32,6 @@ export function PropertyFormPage() {
     dispatch(load());
   }, []);
 
-  const onClick = () => {
-    console.log("Attempting to return to previous route.");
-  };
   const navigate = (propertyId: string) =>{ 
     navigator(`${NavigationPath.PropertyListing}?propertyId=${propertyId}`);
   }

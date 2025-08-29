@@ -499,6 +499,7 @@ function ListingModalEditor({
     address_number: state.streetNumber,
     monthly_rent: Number(state.propertyPrice),
     property_feature_ids: [],
+    inspection_times: [],
   };
 
   return (
