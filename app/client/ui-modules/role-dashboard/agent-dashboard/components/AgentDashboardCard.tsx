@@ -3,23 +3,27 @@ import { Progress } from "../../components/ProgressBar";
 import { CardWidget } from "../../components/CardWidget";
 import { useAppSelector, useAppDispatch } from "/app/client/store";
 import {
-  fetchPropertyCount,
-  fetchPropertiesAndMetrics,
+  fetchAgentDetails,
   selectAgentDashboard,
 } from "../state/agent-dashboard-slice";
 
-export function DashboardCards() {
-    const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-    const {propertyCount, monthlyRevenue, occupancyRate, isLoading, error} = useAppSelector(selectAgentDashboard);
-    const dispatch = useAppDispatch();
-  
-  
-    useEffect(() => {
-      if (currentUser && 'agentId' in currentUser && currentUser.agentId) {
-        dispatch(fetchPropertyCount(currentUser.agentId));
-        dispatch(fetchPropertiesAndMetrics(currentUser.agentId));
-      }
-    }, [currentUser, dispatch]);  
+export function AgentDashboardCards() {
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const {
+    propertyCount,
+    monthlyRevenue,
+    occupancyRate,
+    tasks,
+    isLoading,
+    error,
+  } = useAppSelector(selectAgentDashboard);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (currentUser && "agentId" in currentUser && currentUser.agentId) {
+      dispatch(fetchAgentDetails(currentUser.agentId));
+    }
+  }, [currentUser, dispatch]);
 
   if (isLoading) {
     return <div>Loading...</div>;

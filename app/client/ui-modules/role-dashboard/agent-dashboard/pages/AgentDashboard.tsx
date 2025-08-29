@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 import { UpcomingTasks } from "../../components/UpcomingTask";
 import { PropertyOverview } from "../components/PropertyOverview";
-import { DashboardCards } from "../components/AgentDashboardCard";
+import { AgentDashboardCards } from "../components/AgentDashboardCard";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
   fetchAgentDetails,
-  selectError,
-  selectIsLoading,
+  fetchAgentTasks,
   selectProperties,
   selectTasks,
+  selectLoading,
 } from "../state/agent-dashboard-slice";
 
 export function AgentDashboard(): React.JSX.Element {
@@ -16,11 +16,12 @@ export function AgentDashboard(): React.JSX.Element {
   const properties = useAppSelector(selectProperties); // is used to retrieve data from the Redux store.
   const tasks = useAppSelector(selectTasks);
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
-  const isLoading = useAppSelector(selectIsLoading)
-  const error = useAppSelector(selectError)
+  const isLoading = useAppSelector(selectLoading);
+
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchAgentDetails(currentUser.userId));
+      dispatch(fetchAgentTasks(currentUser.userId));
     } else {
       console.warn("No user ID found. Please log in to view the dashboard.");
     }
@@ -31,9 +32,10 @@ export function AgentDashboard(): React.JSX.Element {
       <div className="flex">
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-bold mb-6">Agent Dashboard</h1>
-          <DashboardCards />
+          <AgentDashboardCards />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <UpcomingTasks tasks={tasks} currentUser={currentUser} /> <PropertyOverview properties={properties} error={error} isLoading={isLoading}/>
+            <UpcomingTasks tasks={tasks} currentUser={currentUser} />{" "}
+            <PropertyOverview properties={properties} isLoading={isLoading} />
           </div>
         </div>
       </div>
