@@ -1,4 +1,4 @@
-import { apiGetListingForProperty, apiSubmitDraftListing, apiGetAllListedListings, apiInsertPropertyListing } from "../../../apis/property-listing/listing-api";
+import { apiGetListingForProperty, apiSubmitDraftListing, apiGetAllListedListings, apiInsertPropertyListing, apiInsertInspections } from "../../../apis/property-listing/listing-api";
 import { Listing } from "/app/client/library-modules/domain-models/property-listing/Listing";
 import { mapApiListingToListing } from "./mappers/listing-mapper";
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
@@ -26,6 +26,13 @@ export async function insertPropertyListing(
   propertyId: string,
   imageUrls: string[],
   status: ListingStatus,
+  inspectionIds: string[]
 ): Promise<string> {
-  return await apiInsertPropertyListing(propertyId, imageUrls, status);
+  return await apiInsertPropertyListing(propertyId, imageUrls, status, inspectionIds);
+}
+
+export async function insertInspections(
+  inspections: { start_time: Date; end_time: Date }[]
+): Promise<string[]> {
+  return apiInsertInspections(inspections);
 }
