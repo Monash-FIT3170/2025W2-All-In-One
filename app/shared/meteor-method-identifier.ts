@@ -17,6 +17,7 @@ export enum MeteorMethodIdentifier {
   LISTING_GET_FOR_PROPERTY = "listings.getForProperty", //Get listing document from property id
   LISTING_STATUS_GET_BY_NAME = "listings.getStatusByName", // Get listing status document by name
   LISTING_GET_ALL_LISTED = "listings.getAllListed",
+  LISTING_UPDATE_IMAGES = "listings.updateImages", // Update images of a draft listing
   INSERT_PROPERTY_LISTING = "listings.insertProperty",
   USER_REGISTER = "user.register",
   USER_ACCOUNT_INSERT = "users.insert",
