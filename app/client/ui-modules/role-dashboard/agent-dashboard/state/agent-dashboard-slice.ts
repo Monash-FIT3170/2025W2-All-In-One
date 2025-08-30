@@ -22,6 +22,8 @@ interface AgentDashboardState {
   markers: { latitude: number; longitude: number }[];
   error: string | null;
   propertiesError: string | null;
+  tasksCount: number;
+  tasksDueThisWeek: number;
 }
 const initialState: AgentDashboardState = {
   isLoading: false,
@@ -34,6 +36,8 @@ const initialState: AgentDashboardState = {
   markers: [],
   error: null,
   propertiesError: null,
+  tasksCount: 0,
+  tasksDueThisWeek: 0,
 };
 
 export const fetchAgentDetails = createAsyncThunk(
@@ -58,12 +62,21 @@ export const fetchAgentDetails = createAsyncThunk(
           ? (occupiedProperties.length / properties.length) * 100
           : 0;
 
-      // fetch tasks
+      // fetch tasks + calculate metrics
       const taskDetails = await Promise.all(
-        agentResponse.tasks.map((taskId) => {
-          return getTaskById(taskId);
-        })
+        agentResponse.tasks.map((taskId) => getTaskById(taskId))
       );
+
+      const tasksCount = taskDetails.length;
+      const startofWeek = new Date();
+      startofWeek.setDate(startofWeek.getDate() - startofWeek.getDay() + 1); //Monday
+      const endofWeek = new Date(startofWeek);
+      endofWeek.setDate(startofWeek.getDate() + 6); //Sunday
+
+      const tasksDueThisWeek = taskDetails.filter((task) => {
+        const due = new Date(task.dueDate);
+        return due >= startofWeek && due <= endofWeek;
+      }).length;
 
       return {
         properties,
@@ -71,6 +84,8 @@ export const fetchAgentDetails = createAsyncThunk(
         monthlyRevenue,
         occupancyRate,
         taskDetails,
+        tasksCount,
+        tasksDueThisWeek,
       };
     } catch (error) {
       console.error("Error fetching agent details:", error);
@@ -169,6 +184,8 @@ export const agentDashboardSlice = createSlice({
         state.propertyCount = action.payload.propertyCount;
         state.occupancyRate = action.payload.occupancyRate;
         state.monthlyRevenue = action.payload.monthlyRevenue;
+        state.tasksCount = action.payload.tasksCount;
+        state.tasksDueThisWeek = action.payload.tasksDueThisWeek;
       })
 
       .addCase(fetchAgentDetails.rejected, (state) => {
