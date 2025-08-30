@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "../theming-shadcn/Button";
 import { PropertyCard } from "../guest-landing-page/components/PropertyCard";
 import { Input } from "../theming-shadcn/Input";
@@ -26,23 +26,31 @@ export function GuestSearchResultsPage() {
 
 	const decodedUrlQuery = decodeSearchQuery(getQParam(location.search));
 
+	const [input, setInput] = useState(decodedQuery || decodedUrlQuery || "");
+	const hydratedRef = useRef(false);
+
 	const onSearch = () => {
-		const cleaned = decodedQuery.trim();
+		const cleaned = input.trim();
+
 		if (!cleaned) return;
 
-		// Update URL
-		const url = buildSearchUrl(decodedQuery);
-		if (url) navigate(url);
-
-		// Perform search
+		dispatch(setDecodedQuery(cleaned));
 		dispatch(fetchPropertiesByQuery(cleaned));
-	};
 
+		const url = buildSearchUrl(cleaned);
+		if (url) navigate(url);
+	};
 	// Initial search if there's a URL query but no current search
-	if (decodedUrlQuery && !decodedQuery) {
-		dispatch(setDecodedQuery(decodedUrlQuery));
-		dispatch(fetchPropertiesByQuery(decodedUrlQuery));
-	}
+	useEffect(() => {
+		if (!hydratedRef.current) {
+			if (decodedUrlQuery) {
+				setInput(decodedUrlQuery);
+				dispatch(setDecodedQuery(decodedUrlQuery));
+				dispatch(fetchPropertiesByQuery(decodedUrlQuery));
+			}
+			hydratedRef.current = true;
+		}
+	}, [decodedUrlQuery, dispatch]);
 
 	// Dispatches to slice to increment the visible count
 	const handleLoadMore = () => {
@@ -63,8 +71,8 @@ export function GuestSearchResultsPage() {
 								<Input
 									type="search"
 									placeholder="Melbourne"
-									value={decodedQuery}
-									onChange={(e) => dispatch(setDecodedQuery(e.target.value))}
+									value={input}
+									onChange={(e) => setInput(e.target.value)}
 									className="h-12 border-0 rounded-none shadow-none pl-11 focus:ring-0"
 								/>
 							</div>
