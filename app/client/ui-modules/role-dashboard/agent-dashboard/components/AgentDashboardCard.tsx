@@ -6,12 +6,14 @@ interface AgentDashBoardProps {
   propertyCount: number;
   monthlyRevenue: number;
   occupancyRate: number;
+  tasksCount: number;
 }
 
 export function AgentDashboardCards({
   propertyCount,
   monthlyRevenue,
   occupancyRate,
+  tasksCount,
 }: AgentDashBoardProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -23,7 +25,11 @@ export function AgentDashboardCards({
       <CardWidget title="Occupancy Rate" value={`${occupancyRate.toFixed(2)}%`}>
         <Progress value={occupancyRate} className="mt-2" />
       </CardWidget>
-      <CardWidget title="Pending Tasks" value="7" subtitle="1 due this week" />
+      <CardWidget
+        title="Pending Tasks"
+        value={tasksCount.toString()}
+        subtitle="1 due this week"
+      />
       <CardWidget
         title="Monthly Revenue"
         value={`$${monthlyRevenue.toLocaleString()}`}

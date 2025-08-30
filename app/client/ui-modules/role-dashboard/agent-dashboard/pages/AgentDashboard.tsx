@@ -38,6 +38,7 @@ export function AgentDashboard(): React.JSX.Element {
             propertyCount={dashboardData.propertyCount}
             monthlyRevenue={dashboardData.monthlyRevenue}
             occupancyRate={dashboardData.occupancyRate}
+            tasksCount={tasks.length}
           />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <UpcomingTasks tasks={tasks} currentUser={currentUser} />{" "}
