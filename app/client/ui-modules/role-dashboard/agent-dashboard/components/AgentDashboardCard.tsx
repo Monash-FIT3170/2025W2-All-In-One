@@ -1,38 +1,18 @@
 import React, { useEffect } from "react";
 import { Progress } from "../../components/ProgressBar";
 import { CardWidget } from "../../components/CardWidget";
-import { useAppSelector, useAppDispatch } from "/app/client/store";
-import {
-  fetchAgentDetails,
-  selectAgentDashboard,
-} from "../state/agent-dashboard-slice";
 
-export function AgentDashboardCards() {
-  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
-  const {
-    propertyCount,
-    monthlyRevenue,
-    occupancyRate,
-    tasks,
-    isLoading,
-    error,
-  } = useAppSelector(selectAgentDashboard);
-  const dispatch = useAppDispatch();
+interface AgentDashBoardProps {
+  propertyCount: number;
+  monthlyRevenue: number;
+  occupancyRate: number;
+}
 
-  useEffect(() => {
-    if (currentUser && "agentId" in currentUser && currentUser.agentId) {
-      dispatch(fetchAgentDetails(currentUser.agentId));
-    }
-  }, [currentUser, dispatch]);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
+export function AgentDashboardCards({
+  propertyCount,
+  monthlyRevenue,
+  occupancyRate,
+}: AgentDashBoardProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
       <CardWidget
