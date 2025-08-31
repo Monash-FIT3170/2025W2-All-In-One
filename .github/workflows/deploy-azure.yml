@@ -34,6 +34,23 @@ jobs:
       - name: Compute SHORT_SHA
         run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
+      # Install Meteor CLI for building the server bundle
+      - name: Install Meteor
+        run: |
+          curl https://install.meteor.com/ | sh
+          meteor --version
+
+      # Install Node dependencies via Meteor's bundled Node/npm
+      - name: Install dependencies
+        run: meteor npm ci
+
+      # Build Meteor server bundle expected by Dockerfile (bundle/bundle)
+      - name: Build Meteor server bundle
+        run: |
+          rm -rf bundle
+          meteor build --directory bundle --server-only
+          test -d bundle/bundle && ls -la bundle/bundle || (echo "Bundle not created" && exit 1)
+
       # Login to Azure using OIDC (no client secret needed)
       - name: Azure login (OIDC)
         uses: azure/login@v2
