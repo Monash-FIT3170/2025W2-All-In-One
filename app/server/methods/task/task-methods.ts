@@ -146,6 +146,8 @@ const taskInsertForLandlordMethod = {
     dueDate: Date;
     priority: TaskPriority;
     landlordId: string;
+    propertyAddress: string;
+    propertyId: string;
   }): Promise<string> => {
     console.log("taskInsertForLandlordMethod called with:", taskData);
 
@@ -181,6 +183,8 @@ const taskInsertForLandlordMethod = {
       priority: taskData.priority,
       taskPropertyAddress: "",
       taskPropertyId: "",
+      taskPropertyAddress: taskData.propertyAddress,
+      taskPropertyId: taskData.propertyId,
       taskStatus: TaskStatus.NOTSTARTED,
       createdDate: new Date(),
     };
