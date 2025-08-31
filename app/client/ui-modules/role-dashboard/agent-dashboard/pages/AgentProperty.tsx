@@ -104,6 +104,7 @@ export function AgentProperty(): React.JSX.Element {
                           matchesStatus = listingStatus === statusFilter;
                           break;
                         case PropertyStatus.OCCUPIED:
+                        case PropertyStatus.VACANT:
                           matchesStatus = propertyStatus === statusFilter; // filter already uppercase for property statuses
                           break;
                         default:
