@@ -1,6 +1,6 @@
 import { Mongo } from "meteor/mongo";
-import { InspectionDocument } from "./models/InspectionDocument";
 import { ListingDocument } from "./models/ListingDocument";
+import { InspectionDocument } from "./models/InspectionDocument";
 import { ListingStatusDocument } from "/app/server/database/property-listing/models/ListingStatusDocument";
 
 export const InspectionCollection: Mongo.Collection<InspectionDocument> =

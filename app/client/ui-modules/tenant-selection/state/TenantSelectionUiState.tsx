@@ -1,4 +1,4 @@
-import { TenantApplication } from "../types/TenantApplication";
+import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
 import { FilterType } from "../enums/FilterType";
 
 export type TenantSelectionUiState = {

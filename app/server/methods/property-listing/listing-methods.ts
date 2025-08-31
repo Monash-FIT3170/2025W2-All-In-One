@@ -146,13 +146,6 @@ async function mapListingDocumentToListingDTO(
   listing: ListingDocument
 ): Promise<ApiListing> {
   let inspections: InspectionDocument[] = [];
-
-  if (listing.inspection_ids.length > 0) {
-    inspections = await getInspectionDocumentsMatchingIds(
-      listing.inspection_ids
-    );
-  }
-
   const listingStatusDocument = await getListingStatusDocumentById(
     listing.listing_status_id
   );

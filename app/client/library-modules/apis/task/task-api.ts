@@ -25,7 +25,6 @@ export async function apiCreateTask(taskData: CreateTaskPayload): Promise<string
   return await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT, taskData);
 }
 
-// Optional thin wrappers for callers migrating gradually
 export async function apiCreateTaskForAgent(taskData: {
   name: string;
   description: string;

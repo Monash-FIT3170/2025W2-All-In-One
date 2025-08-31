@@ -31,7 +31,7 @@ const taskGetMethod = {
       );
     }
 
-    const taskDTO = await mapTaskDocumentTotaskDTO(taskDocument).catch(
+    const taskDTO = await mapTaskDocumentToTaskDTO(taskDocument).catch(
       (error) => {
         throw meteorWrappedInvalidDataError(error);
       }
@@ -309,7 +309,7 @@ const taskInsertUniversalMethod = {
  * @param task - The TaskDocument to be mapped.
  * @returns A promise that resolves to an ApiTask object.
  */
-async function mapTaskDocumentTotaskDTO(task: TaskDocument): Promise<ApiTask> {
+async function mapTaskDocumentToTaskDTO(task: TaskDocument): Promise<ApiTask> {
   return {
     taskId: task._id,
     name: task.name,

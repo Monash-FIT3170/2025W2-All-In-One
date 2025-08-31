@@ -25,7 +25,7 @@ const initialState: TenantSelectionUiState = {
   isLoading: false,
   error: null,
   currentStep: 1,
-  bookedInspections: new Set<number>(),
+  bookedInspections: [],
 };
 
 export const createTenantApplicationAsync = createAsyncThunk(
@@ -51,7 +51,8 @@ export const createTenantApplicationAsync = createAsyncThunk(
       currentUser,
       profileData,
       authUser,
-      bookedInspections: new Set(bookedInspections)
+      bookedInspections: bookedInspectionsSet
+
     });
 
     if (!result.success) {
@@ -386,16 +387,7 @@ export const intentRejectApplicationAsync = createAsyncThunk(
 );
 
 
-// export const intentSendApplicationToLandlordAsync = createAsyncThunk(
-//   "tenantSelection/intentSendApplicationToLandlord",
-//   async (args: { propertyId: string; applicationId: string }, { getState, dispatch }) => {
-//     const state = getState() as RootState;
-//     const propertyId = state.propertyListing.propertyId;
-//     const applicationId = args.applicationId;
-//     // const apps = state.tenantSelection.applicationsByProperty[propertyId] || [];
-//     await agentSendApplicationToLandlord(dispatch as any, () => getState() as RootState, propertyId!, applicationId!);
-//   }
-// );
+
 
 export const intentSendApplicationToLandlordAsync = createAsyncThunk(
   "tenantSelection/intentSendApplicationToLandlord",
