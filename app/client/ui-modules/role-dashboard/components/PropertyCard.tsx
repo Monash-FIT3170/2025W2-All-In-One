@@ -1,11 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router";
+import { PropertyWithListingDataAndNames } from "../landlord-dashboard/state/landlord-properties-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { NavigationPath } from "/app/client/navigation";
 import { StatusBadge } from "../landlord-dashboard/components/StatusBadge";
 
 interface PropertyCardProps {
-  property: any; // Property with listing data and tenant/agent names
+  property: PropertyWithListingDataAndNames;
 }
 
 function PropertyCard({ property }: PropertyCardProps) {

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router";
+import { PropertyWithListingDataAndNames } from "../state/landlord-properties-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { NavigationPath } from "/app/client/navigation";
 import { StatusBadge } from "../components/StatusBadge";
@@ -10,7 +11,7 @@ export function LandlordPropertyDetail(): React.JSX.Element {
   const [activeTab, setActiveTab] = useState("Financial");
 
   // Get property from router state (passed from PropertyCard)
-  const passedProperty = location.state?.property;
+  const passedProperty = location.state?.property as PropertyWithListingDataAndNames;
 
   const handleBackToProperties = () => {
     navigate(NavigationPath.LandlordProperties);
@@ -157,7 +158,7 @@ export function LandlordPropertyDetail(): React.JSX.Element {
                 <div className="h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-3">
                   <svg className="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 616 0z" />
                   </svg>
                 </div>
                 <div className="flex items-start">
@@ -209,10 +210,11 @@ export function LandlordPropertyDetail(): React.JSX.Element {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === tab
+                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === tab
                         ? "border-blue-600 text-blue-600"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                      }`}
+                    }`}
                   >
                     {tab}
                   </button>

@@ -8,9 +8,15 @@ import { getTenantById } from "/app/client/library-modules/domain-models/user/ro
 import { getAgentById } from "/app/client/library-modules/domain-models/user/role-repositories/agent-repository";
 import { getProfileDataById } from "/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository";
 
+// Enhanced type that includes tenant and agent names
+export type PropertyWithListingDataAndNames = PropertyWithListingData & {
+  tenantName?: string;
+  agentName?: string;
+};
+
 interface LandlordPropertiesState {
   isLoading: boolean;
-  properties: any[]; // Properties with listing data and enhanced with tenant/agent names
+  properties: PropertyWithListingDataAndNames[];
   error: string | null;
 }
 
@@ -81,7 +87,7 @@ export const fetchLandlordProperties = createAsyncThunk(
             ...property,
             tenantName,
             agentName,
-          };
+          } as PropertyWithListingDataAndNames;
         })
       );
       
