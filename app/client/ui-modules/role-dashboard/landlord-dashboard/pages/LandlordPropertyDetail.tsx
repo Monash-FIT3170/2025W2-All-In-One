@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { PropertyWithListingDataAndNames } from "../state/landlord-properties-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { NavigationPath } from "/app/client/navigation";
 import { StatusBadge } from "../components/StatusBadge";
@@ -11,7 +10,7 @@ export function LandlordPropertyDetail(): React.JSX.Element {
   const [activeTab, setActiveTab] = useState("Financial");
 
   // Get property from router state (passed from PropertyCard)
-  const passedProperty = location.state?.property as PropertyWithListingDataAndNames;
+  const passedProperty = location.state?.property;
 
   const handleBackToProperties = () => {
     navigate(NavigationPath.LandlordProperties);

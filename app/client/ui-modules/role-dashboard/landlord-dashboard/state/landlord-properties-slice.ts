@@ -8,15 +8,9 @@ import { getTenantById } from "/app/client/library-modules/domain-models/user/ro
 import { getAgentById } from "/app/client/library-modules/domain-models/user/role-repositories/agent-repository";
 import { getProfileDataById } from "/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository";
 
-// Enhanced type that includes tenant and agent names
-export type PropertyWithListingDataAndNames = PropertyWithListingData & {
-  tenantName?: string;
-  agentName?: string;
-};
-
 interface LandlordPropertiesState {
   isLoading: boolean;
-  properties: PropertyWithListingDataAndNames[];
+  properties: any[]; // Properties with listing data and enhanced with tenant/agent names
   error: string | null;
 }
 
@@ -87,7 +81,7 @@ export const fetchLandlordProperties = createAsyncThunk(
             ...property,
             tenantName,
             agentName,
-          } as PropertyWithListingDataAndNames;
+          };
         })
       );
       
@@ -102,21 +96,7 @@ export const fetchLandlordProperties = createAsyncThunk(
 export const landlordPropertiesSlice = createSlice({
   name: "landlordProperties",
   initialState,
-  reducers: {
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
-    },
-    setProperties: (state, action: PayloadAction<PropertyWithListingDataAndNames[]>) => {
-      state.properties = action.payload;
-    },
-    setError: (state, action: PayloadAction<string | null>) => {
-      state.error = action.payload;
-    },
-    clearProperties: (state) => {
-      state.properties = [];
-      state.error = null;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchLandlordProperties.pending, (state) => {
@@ -134,8 +114,7 @@ export const landlordPropertiesSlice = createSlice({
   },
 });
 
-export const { setLoading, setProperties, setError, clearProperties } =
-  landlordPropertiesSlice.actions;
+// No manual reducers needed - state is managed through async thunks
 
 // Selectors
 export const selectLandlordProperties = (state: RootState) =>

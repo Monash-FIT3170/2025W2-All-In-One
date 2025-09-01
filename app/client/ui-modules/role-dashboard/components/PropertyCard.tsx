@@ -1,12 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router";
-import { PropertyWithListingDataAndNames } from "../landlord-dashboard/state/landlord-properties-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { NavigationPath } from "/app/client/navigation";
 import { StatusBadge } from "../landlord-dashboard/components/StatusBadge";
 
 interface PropertyCardProps {
-  property: PropertyWithListingDataAndNames;
+  property: any; // Property with listing data and tenant/agent names
 }
 
 function PropertyCard({ property }: PropertyCardProps) {
@@ -127,7 +126,7 @@ function PropertyCard({ property }: PropertyCardProps) {
         {property.features && property.features.length > 0 && (
           <div className="mt-3">
             <div className="flex flex-wrap gap-1">
-              {property.features.slice(0, 3).map((feature, index) => (
+              {property.features.slice(0, 3).map((feature: string, index: number) => (
                 <span
                   key={index}
                   className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800"
