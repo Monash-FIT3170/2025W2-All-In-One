@@ -12,7 +12,7 @@ import { ImageCarousel } from "../theming/components/ImageCarousel";
 import {
   InspectionBookingListUiState,
   PropertyInspections,
-} from "/app/client/ui-modules/common/property-components/PropertyInspections";
+} from "./components/PropertyInspections";
 import { ApplyButton } from "/app/client/ui-modules/property-listing-page/components/ApplyButton";
 import { ContactAgentButton } from "/app/client/ui-modules/common/property-components/ContactAgentButton";
 import {

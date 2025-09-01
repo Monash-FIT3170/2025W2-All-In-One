@@ -25,7 +25,7 @@ export function PropertyInspections({
 }): React.JSX.Element {
   return (
     <div className={twMerge("flex flex-col w-[520px]", className)}>
-      <SubHeading text="Upcoming Inspections" className="mb-2" />
+      <SubHeading text="Upcoming Annual Inspections" className="mb-2" />
       <InspectionBookingList
         bookingUiStateList={bookingUiStateList}
         onBook={onBook}

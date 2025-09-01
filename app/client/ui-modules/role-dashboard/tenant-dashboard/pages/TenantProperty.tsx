@@ -12,7 +12,7 @@ import { ImageCarousel } from "../../../theming/components/ImageCarousel";
 import {
   InspectionBookingListUiState,
   PropertyInspections,
-} from "../../../common/property-components/PropertyInspections";
+} from "../components/PropertyInspections";
 import { BackLink } from "../../../theming/components/BackLink";
 import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonIcon";
 import { twMerge } from "tailwind-merge";
