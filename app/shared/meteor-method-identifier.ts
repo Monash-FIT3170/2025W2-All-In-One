@@ -24,6 +24,7 @@ export enum MeteorMethodIdentifier {
   USER_ACCOUNT_GET = "users.getOne",
   AGENT_INSERT = "agents.insert",
   AGENT_GET = "agents.getOne",
+  AGENT_GET_BY_AGENT_ID = "agents.getByAgentId", // Get agent by agent ID (not user ID)
   AGENT_UPDATE_TASKS = "agents.updateTasks", // Adds the id of the newly created task to the agent's task_ids
   TENANT_INSERT = "tenants.insert",
   TENANT_GET = "tenants.getOne",
