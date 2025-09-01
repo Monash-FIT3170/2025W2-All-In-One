@@ -89,7 +89,7 @@ export const searchResultsSlice = createSlice({
 			})
 			.addCase(fetchPropertiesByQuery.fulfilled, (state, action) => {
 				state.properties = action.payload;
-				state.isLoading = true;
+				state.isLoading = false;
 			})
 			.addCase(fetchPropertiesByQuery.rejected, (state, action) => {
 				state.isLoading = false;
