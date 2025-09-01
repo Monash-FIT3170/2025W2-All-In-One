@@ -2,7 +2,7 @@ import React from 'react';
 import { Agent } from '/app/client/library-modules/domain-models/user/Agent';
 import { ProfileData } from '/app/client/library-modules/domain-models/user/ProfileData';
 import { twMerge } from 'tailwind-merge';
-import { ContactAgentButton } from './ContactAgentButton';
+import { ContactAgentButton } from '../../../common/property-components/ContactAgentButton';
 
 interface AgentDetailsProps {
   agent: Agent | null;

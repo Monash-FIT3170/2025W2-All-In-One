@@ -78,28 +78,3 @@ function Description({
     </span>
   );
 }
-
-function StatusPill({
-  text,
-  variant,
-  className = "",
-}: {
-  text: string;
-  variant: PropertyStatusPillVariant;
-  className?: string;
-}): React.JSX.Element {
-  const bgColorClass = (() => {
-    switch (variant) {
-      case PropertyStatusPillVariant.VACANT:
-        return "bg-(--status-green-color)";
-    }
-  })();
-
-  return (
-    <span
-      className={twMerge(`px-5 py-0.5 text-[12px] rounded-full ${bgColorClass}`, className)}
-    >
-      {text}
-    </span>
-  );
-}

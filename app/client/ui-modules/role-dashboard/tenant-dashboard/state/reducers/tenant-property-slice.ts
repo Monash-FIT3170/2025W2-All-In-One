@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ListingStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingStatusPill";
 import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingSummary";
-import { TenantPropertyUiState } from "/app/client/ui-modules/role-dashboard/tenant-dashboard/state/TenantPropertyUiState";
 import { getPropertyWithListingDataUseCase } from "/app/client/library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
 import { submitDraftListingUseCase } from "/app/client/library-modules/use-cases/property-listing/SubmitDraftListingUseCase";
 import {
@@ -17,7 +16,6 @@ import { ProfileData } from '/app/client/library-modules/domain-models/user/Prof
 import { getAgentByAgentId, getAgentById } from '/app/client/library-modules/domain-models/user/role-repositories/agent-repository';
 import { getProfileDataById } from '/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository';
 import { getPropertyById } from '/app/client/library-modules/domain-models/property/repositories/property-repository';
-import { getUserAccountById } from "/app/client/library-modules/domain-models/user/user-account-repositories/user-account-repository";
 
 interface TenantPropertyState {
   propertyId: string;

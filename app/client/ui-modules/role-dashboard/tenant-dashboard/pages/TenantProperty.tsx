@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { PropertyFeatures } from "../../../role-dashboard/tenant-dashboard/components/PropertyFeatures";
-import { PropertySpecifics } from "../components/PropertySpecifics";
+import { PropertyFeatures } from "../../../common/property-components/PropertyFeatures";
+import { PropertySpecifics } from "../../../common/property-components/PropertySpecifics";
 import {
   PropertyStatusPillVariant,
   PropertySummary,
 } from "../components/PropertySummary";
-import { PropertyDescription } from "../components/PropertyDescription";
+import { PropertyDescription } from "../../../common/property-components/PropertyDescription";
 import { LeftCircularArrowIcon } from "/app/client/ui-modules/theming/icons/LeftCircularArrowIcon";
 import { RightCircularArrowIcon } from "/app/client/ui-modules/theming/icons/RightCircularArrowIcon";
 import { ImageCarousel } from "../../../theming/components/ImageCarousel";
 import {
   InspectionBookingListUiState,
   PropertyInspections,
-} from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/PropertyInspections";
-import { ContactAgentButton } from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/ContactAgentButton";
+} from "../../../common/property-components/PropertyInspections";
 import { BackLink } from "../../../theming/components/BackLink";
 import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonIcon";
 import { twMerge } from "tailwind-merge";
@@ -27,7 +26,7 @@ import {
 import { TenantPropertyUiState } from "../state/TenantPropertyUiState";
 import { useSearchParams } from "react-router";
 import { SubHeading } from "../../../theming/components/SubHeading";
-import { PropertyMap, PropertyMapUiState } from "../components/PropertyMap";
+import { PropertyMap, PropertyMapUiState } from "../../../common/property-components/PropertyMap";
 import {
   selectAcceptedCount,
   selectHasAcceptedApplications,
