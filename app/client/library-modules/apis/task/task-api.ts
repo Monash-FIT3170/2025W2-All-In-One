@@ -26,18 +26,21 @@ export async function apiCreateTaskForAgent(taskData: {
     throw error;
   }
 }
+
 export async function apiCreateTaskForLandlord(taskData: {
   name: string;
   description: string;
   dueDate: Date;
   priority: TaskPriority;
-  landlordId: string;
+  userId: string;
+  propertyAddress: string;
+  propertyId: string; 
 }): Promise<string> {
   try {
     const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT_FOR_LANDLORD, taskData);
     return result;
   } catch (error) {
-    console.error("Failed to create landlord task:", error);
+    console.error("Failed to create task:", error);
     throw error;
   }
 }
