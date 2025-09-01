@@ -9,6 +9,9 @@ import {
   getAllPropertiesByLandlordId,
 } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { PropertyOption } from "../../agent-dashboard/components/TaskFormSchema";
+
 interface LandlordDashboardState {
   isLoading: boolean;
   properties: Property[];
@@ -58,18 +61,29 @@ const initialState: LandlordDashboardState = {
 export const fetchLandlordTasks = createAsyncThunk(
   "landlordDashboard/fetchLandlordTasks",
   async (userId: string) => {
-    try {
-      const landlord = await getLandlordById(userId);
-      const tasks = await Promise.all(
-        landlord.tasks.map((taskId) => getTaskById(taskId))
-      );
-      return tasks;
-    } catch (error) {
-      console.error("Error fetching landlord tasks:", error);
-      throw new Error("Failed to fetch landlord tasks");
+    const landlordResponse = await getLandlordById(userId);
+    console.log("fetching landlord tasks");
+    const taskDetails = [];
+    for (const taskId of landlordResponse.tasks) {
+      try {
+        const taskData = await getTaskById(taskId);
+
+        if (taskData) {
+          // Format the task data for display
+          taskDetails.push(taskData);
+        }
+      } catch (error) {
+        console.error(`Error fetching task ${taskId}:`, error);
+      }
     }
+
+    return {
+      ...landlordResponse,
+      taskDetails: taskDetails,
+    };
   }
 );
+
 
 export const fetchLandlordDetails = createAsyncThunk(
   "landlordDashboard/fetchLandlordDetails",
@@ -150,12 +164,13 @@ export const landlordDashboardSlice = createSlice({
       })
       .addCase(fetchLandlordTasks.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.tasks = action.payload || [];
+        state.tasks = action.payload.taskDetails || [];
       })
       .addCase(fetchLandlordTasks.rejected, (state) => {
         state.isLoading = false;
-        state.error = "Failed to fetch landlord tasks";
+        state.error = "Failed to fetch agent tasks";
       });
+
   },
 });
 
@@ -170,3 +185,31 @@ export const selectProperties = (state: RootState) =>
 export const selectLoading = (state: RootState) =>
   state.landlordDashboard.isLoading;
 export default landlordDashboardSlice.reducer;
+
+
+export const fetchPropertiesForLandlord = (
+  agentId: string
+): Promise<PropertyOption[]> => {
+  return new Promise((resolve, reject) => {
+    Meteor.call(
+      MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_LANDLORD_ID,
+      agentId,
+      (err: Meteor.Error | null, result: any[]) => {
+        if (err) {
+          reject(err);
+        } else {
+          // Map full property objects to lightweight PropertyOption[]
+          const properties: PropertyOption[] = (result || []).map((p) => ({
+            _id: p._id,
+            propertyId: p.propertyId,
+            streetnumber: p.streetnumber,
+            streetname: p.streetname,
+            suburb: p.suburb,
+          }));
+          resolve(properties);
+        }
+      }
+    );
+  });
+};
+
