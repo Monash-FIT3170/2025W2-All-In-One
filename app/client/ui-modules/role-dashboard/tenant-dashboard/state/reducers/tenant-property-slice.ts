@@ -8,7 +8,6 @@ import {
   getFormattedTimeStringFromDate,
 } from "/app/client/library-modules/utils/date-utils";
 import { RootState } from "/app/client/store";
-import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { getAllLandlords } from "/app/client/library-modules/domain-models/user/role-repositories/landlord-repository";
 import { Agent } from '/app/client/library-modules/domain-models/user/Agent';
@@ -175,9 +174,6 @@ export const tenantPropertySlice = createSlice({
       state.summaryDescription = action.payload.summaryDescription;
       state.areaValue = action.payload.area ?? 0;
       state.propertyStatusText = action.payload.propertyStatus;
-      state.propertyStatusPillVariant = getPropertyStatusPillVariant(
-        action.payload.propertyStatus
-      );
       state.propertyDescription = action.payload.description;
       state.propertyFeatures = action.payload.features;
       state.propertyType = action.payload.type;
@@ -202,47 +198,10 @@ export const tenantPropertySlice = createSlice({
         })
       );
       state.listingImageUrls = action.payload.image_urls;
-      state.listingStatusText = getListingStatusDisplayString(
-        action.payload.listing_status
-      );
-      state.listingStatusPillVariant = getListingStatusPillVariant(
-        action.payload.listing_status
-      );
-
-      // Set button visibility based on listing status
-      const isDraft = action.payload.listing_status.toLowerCase() === "draft";
-      state.shouldDisplaySubmitDraftButton = isDraft;
-      state.shouldDisplayReviewTenantButton = !isDraft;
-      state.shouldDisplayEditListingButton = isDraft;
 
       state.shouldShowLoadingState = false;
       state.landlords = action.payload.landlords;
       })
-
-
-
-    builder.addCase(submitDraftListingAsync.pending, (state, action) => {
-      state.isSubmittingDraft = true;
-      state.currentPropertyId = action.meta.arg;
-    });
-
-    builder.addCase(submitDraftListingAsync.fulfilled, (state, action) => {
-      console.log('Draft listing submitted successfully:', action.payload);
-      state.listingStatusText = getListingStatusDisplayString("listed");
-      state.listingStatusPillVariant = getListingStatusPillVariant("listed");
-      state.shouldDisplaySubmitDraftButton = false;
-      state.shouldDisplayReviewTenantButton = true;
-      state.shouldDisplayEditListingButton = false;
-      state.isSubmittingDraft = false;
-      state.currentPropertyId = action.meta.arg;
-    });
-
-    builder.addCase(submitDraftListingAsync.rejected, (state, action) => {
-      console.error('Failed to submit draft listing:', action.error.message);
-      state.isSubmittingDraft = false;
-      alert(`Failed to update listing: ${action.error.message}`);
-      state.currentPropertyId = action.meta.arg;
-    });
 
     builder
       .addCase(fetchAgentWithProfile.pending, (state) => {
@@ -268,49 +227,6 @@ function getPropertyAreaDisplayString(area: number): string {
 
 function getPropertyPriceDisplayString(price: number): string {
   return `$${price.toString()}/month`;
-}
-
-function getListingStatusDisplayString(status: string): string {
-  const lowerStatus = status.toLowerCase();
-  switch (lowerStatus) {
-    case ListingStatus.DRAFT.toLowerCase():
-      return "DRAFT LISTING";
-    case "listed":
-      return "CURRENT LISTING";
-    case ListingStatus.LISTED.toLowerCase():
-      return "LISTED";
-    case ListingStatus.TENANT_SELECTION.toLowerCase():
-      return "TENANT SELECTION";
-    case ListingStatus.TENANT_APPROVAL.toLowerCase():
-      return "TENANT APPROVAL";
-    default:
-      return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : "Unknown Status";
-  }
-}
-
-function getPropertyStatusPillVariant(
-  status: string
-): PropertyStatusPillVariant {
-  const lowerStatus = status.toLowerCase();
-  if (lowerStatus === "vacant") {
-    return PropertyStatusPillVariant.VACANT;
-  }
-  return PropertyStatusPillVariant.VACANT;
-}
-
-function getListingStatusPillVariant(status: string): ListingStatusPillVariant {
-  const lowerStatus = status.toLowerCase();
-  switch (lowerStatus) {
-    case ListingStatus.DRAFT.toLowerCase():
-      return ListingStatusPillVariant.DRAFT;
-    case "listed":
-    case ListingStatus.LISTED.toLowerCase():
-    case ListingStatus.TENANT_SELECTION.toLowerCase():
-    case ListingStatus.TENANT_APPROVAL.toLowerCase():
-      return ListingStatusPillVariant.CURRENT;
-    default:
-      return ListingStatusPillVariant.DRAFT;
-  }
 }
 
 export const fetchPropertyAgent = createAsyncThunk(
