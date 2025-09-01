@@ -122,7 +122,7 @@ const taskInsertForAgentMethod = {
         console.log("Agent task_ids updated successfully");
       } catch (agentError) {
         console.warn("Failed to update agent task_ids:", agentError);
-        // Don't fail the task creation if agent update fails - task was already created
+
       }
       console.log("After agent update call");
 
@@ -181,8 +181,6 @@ const taskInsertForLandlordMethod = {
       description: taskData.description || "",
       dueDate: taskData.dueDate,
       priority: taskData.priority,
-      taskPropertyAddress: "",
-      taskPropertyId: "",
       taskPropertyAddress: taskData.propertyAddress,
       taskPropertyId: taskData.propertyId,
       taskStatus: TaskStatus.NOTSTARTED,
@@ -217,7 +215,7 @@ const taskInsertForLandlordMethod = {
 /**
  * Creates a new task for either AGENT or LANDLORD via a single entry point and returns the task ID.
  */
-const taskInsertUniversalMethod = {
+const taskInsertMethod = {
   [MeteorMethodIdentifier.TASK_INSERT]: async (taskData: {
     name: string;
     description: string;
@@ -300,6 +298,7 @@ const taskInsertUniversalMethod = {
     }
   },
 };
+
 /**
  * Maps a TaskDocument to an ApiTask DTO.
  *
@@ -319,7 +318,7 @@ async function mapTaskDocumentToTaskDTO(task: TaskDocument): Promise<ApiTask> {
     description: task.description,
     priority: task.priority,
     propertyAddress: task.taskPropertyAddress,
-    propertyId: task.taskPropertyId, // Optional property ID
+    propertyId: task.taskPropertyId,
   };
 }
 
@@ -331,7 +330,7 @@ async function getTaskDocumentById(
 
 Meteor.methods({
   ...taskGetMethod,
-  ...taskInsertUniversalMethod,
+  ...taskInsertMethod,
   ...taskInsertForAgentMethod,
   ...taskInsertForLandlordMethod
 });

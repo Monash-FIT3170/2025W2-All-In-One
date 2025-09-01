@@ -10,5 +10,6 @@ export type ApiTenantApplication = {
   updatedAt: Date;
   agentId: string;
   landlordId: string;
+  tenantUserId: string;
   taskId?: string;
 };

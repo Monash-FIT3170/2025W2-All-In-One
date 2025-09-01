@@ -38,6 +38,7 @@ export enum MeteorMethodIdentifier {
   PROPERTY_GET_BY_AGENT_ID = "property.getByAgentId", // fetches all properties managed by an agent by their ID
   PROPERTY_GET_ALL_BY_LANDLORD_ID = "property.getAllByLandlordId", // fetches all properties managed by a landlord by their ID
   PROPERTY_DATA_UPDATE = "property.updateData",
+  PROPERTY_TENANT_UPDATE = "property.updateTenant",
   PROFILE_GET = "profileData.getOne",
   PROFILE_EDIT = "profileData.edit",
   PROFILE_INSERT = "profileData.insert",

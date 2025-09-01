@@ -28,6 +28,7 @@ async function mapTenantApplicationDocumentToDTO(
     updatedAt: doc.updatedAt,
     agentId: doc.agentId,
     landlordId: doc.landlordId,
+    tenantUserId: doc.tenantUserId,
     taskId: doc.taskId,
   };
 }
@@ -84,6 +85,7 @@ const tenantApplicationInsertMethod = {
       applicantName: string;
       agentId: string;
       landlordId: string;
+      tenantUserId: string;
     }
   ): Promise<string> => {
     try {
@@ -98,6 +100,7 @@ const tenantApplicationInsertMethod = {
         updatedAt: now,
         agentId: applicationData.agentId,
         landlordId: applicationData.landlordId,
+        tenantUserId: applicationData.tenantUserId,
       };
 
       const insertedId = await TenantApplicationCollection.insertAsync(applicationDoc);
