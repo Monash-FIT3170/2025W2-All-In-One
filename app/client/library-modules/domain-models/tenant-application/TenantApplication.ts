@@ -6,10 +6,11 @@ export type TenantApplication = {
   applicantName: string;
   status: TenantApplicationStatus;
   step: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   agentId: string;
   landlordId: string;
+  tenantUserId: string;
   taskId?: string;
 };
 
@@ -19,4 +20,5 @@ export type TenantApplicationInsertData = {
   applicantName: string;
   agentId: string;
   landlordId: string;
+  tenantUserId: string;
 };

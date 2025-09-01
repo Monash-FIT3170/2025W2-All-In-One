@@ -11,10 +11,6 @@ import {
   landLordFinalApprovedAsync,
   landlordRejectTenantApplicationAsync,
   landLordFinalRejectedAsync,
-  sendAcceptedApplicationsToLandlordAsync,
-  sendBackgroundPassedToLandlordAsync,
-  sendApprovedApplicationsToAgentAsync,
-  sendFinalApprovedApplicationsToAgentAsync,
 } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
 
@@ -105,41 +101,3 @@ export async function landLordRejectApplication(
   }
 
 }
-
-// export async function agentSendApplicationToLandlord(
-//   dispatch: AppDispatch,
-//   getState: () => RootState,
-//   propertyId: string,
-//   applicationId: string
-// ): Promise<void> {
-//   const status = getApplicationStatus(getState, propertyId, applicationId);
-
-//   if (status === TenantApplicationStatus.ACCEPTED) {
-//     await dispatch(sendAcceptedApplicationsToLandlordAsync()).unwrap();
-//     return;
-//   }
-
-//   if (status === TenantApplicationStatus.BACKGROUND_CHECK_PENDING) {
-//     await dispatch(sendBackgroundPassedToLandlordAsync()).unwrap();
-//     return;
-//   }
-// }
-
-// export async function landLordSendApplicationToAgent(
-//   dispatch: AppDispatch,
-//   getState: () => RootState,
-//   propertyId: string,
-//   applicationId: string
-// ): Promise<void> {
-//   const status = getApplicationStatus(getState, propertyId, applicationId);
-
-//   if (status === TenantApplicationStatus.LANDLORD_APPROVED) {
-//     await dispatch(sendApprovedApplicationsToAgentAsync()).unwrap();
-//     return;
-//   }
-
-//   if (status === TenantApplicationStatus.FINAL_APPROVED) {
-//     await dispatch(sendFinalApprovedApplicationsToAgentAsync()).unwrap();
-//     return;
-//   }
-// }

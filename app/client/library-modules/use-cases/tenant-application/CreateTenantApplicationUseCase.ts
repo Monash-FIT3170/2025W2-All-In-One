@@ -1,9 +1,13 @@
-// app/client/library-modules/use-cases/tenant-application/TenantApplicationUseCase.ts
 import { insertTenantApplication } from "/app/client/library-modules/domain-models/tenant-application/repositories/tenant-application-repository";
 import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { Role } from "/app/shared/user-role-identifier";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
 import { CreateTenantApplicationRequest, CreateTenantApplicationResponse } from "./models/TenantApplicationsData";
+import { Agent } from "../../domain-models/user/Agent";
+import { Tenant } from "../../domain-models/user/Tenant";
+import { Landlord } from "../../domain-models/user/Landlord";
+import { UserAccount } from "../../domain-models/user/UserAccount";
+import { ProfileData } from "../../domain-models/user/ProfileData";
 
 export async function createTenantApplicationUseCase(request: CreateTenantApplicationRequest): Promise<CreateTenantApplicationResponse> {
     try {
@@ -26,6 +30,7 @@ export async function createTenantApplicationUseCase(request: CreateTenantApplic
         applicantName,
         agentId,
         landlordId: request.propertyLandlordId,
+        tenantUserId: request.tenantUserId,
       });
 
       return {
@@ -35,6 +40,7 @@ export async function createTenantApplicationUseCase(request: CreateTenantApplic
         applicantName,
         propertyId: request.propertyId,
         propertyLandlordId: request.propertyLandlordId,
+        tenantUserId: request.tenantUserId,
         status: TenantApplicationStatus.UNDETERMINED,
       };
     } catch (error) {
@@ -59,7 +65,7 @@ export function validateCreateTenantApplicationRequest(request: CreateTenantAppl
   }
 }
 
-export function validateUserCanApply(authUser: any, currentUser: any, bookedInspections: Set<number>): void {
+export function validateUserCanApply(authUser: UserAccount | null, currentUser: Agent | Tenant | Landlord | null, bookedInspections: Set<number>): void {
   if (!currentUser) {
     throw new Error('Please log in to apply for this property.');
   }
@@ -73,12 +79,12 @@ export function validateUserCanApply(authUser: any, currentUser: any, bookedInsp
   }
 }
 
-export function determineApplicantName(currentUser: any, profileData?: any): string {
+export function determineApplicantName(currentUser: Agent | Tenant| Landlord | null, profileData?: ProfileData | null): string {
   if (profileData?.firstName && profileData?.lastName) {
     return `${profileData.firstName} ${profileData.lastName}`;
   }
 
-  if (currentUser?.tenantId) {
+  if (currentUser && 'tenantId' in currentUser) {
     return `Tenant ${currentUser.tenantId.slice(-4)}`;
   }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TenantApplication } from '../types/TenantApplication';
+import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
 import { TenantApplicationCard } from './TenantApplicationCard';
 import { UserAccount } from '/app/client/library-modules/domain-models/user/UserAccount';
 import { Role } from '/app/shared/user-role-identifier';

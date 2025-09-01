@@ -51,17 +51,18 @@ import {
   selectHasCurrentUserApplied,
   createTenantApplicationAsync,
   loadTenantApplicationsForPropertyAsync,
-  sendApprovedApplicationsToAgentAsync,
-  sendAcceptedApplicationsToLandlordAsync,
   selectLandlordApprovedApplicantCountForProperty,
   selectHasLandlordApprovedApplicationsForProperty,
-  addBookedInspection,
   intentSendApplicationToAgentAsync,
   intentSendApplicationToLandlordAsync,
   selectHasBackgroundPassedApplicationsForProperty,
   selectBackgroundPassedApplicantCountForProperty,
   intentAcceptApplicationAsync,
-  intentRejectApplicationAsync
+  intentRejectApplicationAsync,
+  addBookedInspection,
+  selectHasFinalApprovedApplicationForProperty,
+  selectFinalApprovedApplicantCountForProperty,
+  sendFinalApprovedApplicationToAgentAsync,
 } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { Role } from "/app/shared/user-role-identifier";
 import { CurrentUserState } from "../user-authentication/state/CurrentUserState";
@@ -258,7 +259,7 @@ function ListingPageContent({
   onApply: () => void;
   onContactAgent: () => void;
   onSubmitDraftListing: () => void;
-  bookedInspections?: Set<number>;
+  bookedInspections?: number[];
   className?: string;
 }): React.JSX.Element {
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
@@ -284,6 +285,10 @@ function ListingPageContent({
 
   const shouldShowSendToLandlordButton = (hasAcceptedApplications || hasBackgroundPassedApplications) && authUser?.role === Role.AGENT;
   const shouldShowSendToAgentButton = hasLandlordApprovedApplications && authUser?.role === Role.LANDLORD;
+
+  const hasFinalApprovedApplications = useAppSelector((state) => selectHasFinalApprovedApplicationForProperty(state, propertyId));
+  const finalApprovedApplicantCount = useAppSelector((state) => selectFinalApprovedApplicantCountForProperty(state, propertyId));
+  const shouldShowSendFinalApprovedToAgentButton = hasFinalApprovedApplications && authUser?.role === Role.LANDLORD;
 
   const handleAccept = async (applicationId: string) => {
   try {
@@ -316,6 +321,15 @@ function ListingPageContent({
       console.log("Successfully sent applications to agent");
     } catch (error) {
       console.error("Failed to send applications to agent:", error);
+    }
+  };
+
+  const handleSendFinalApprovedToAgent = async () => {
+    try {
+      await dispatch(sendFinalApprovedApplicationToAgentAsync()).unwrap();
+      console.log("Successfully sent final approved application to agent");
+    } catch (error) {
+      console.error("Failed to send final approved application to agent:", error);
     }
   };
 
@@ -379,6 +393,8 @@ function ListingPageContent({
           onSendToLandlord={handleSendToLandlord}
           shouldShowSendToLandlordButton={shouldShowSendToLandlordButton}
           acceptedApplicantCount={acceptedApplicantCount}
+          backgroundPassedApplicantCount={backgroundPassedApplicantCount}
+          hasAcceptedApplications={hasAcceptedApplications}
           tenantApplications={tenantApplications}
         />
       )}
@@ -390,8 +406,11 @@ function ListingPageContent({
           onReject={handleReject}
           onAccept={handleAccept}
           onSendToAgent={handleSendToAgent}
+          onSendFinalApprovedToAgent={handleSendFinalApprovedToAgent}
           shouldShowSendToAgentButton={shouldShowSendToAgentButton}
+          shouldShowSendFinalApprovedToAgentButton={shouldShowSendFinalApprovedToAgentButton}
           landlordApprovedApplicantCount={landlordApprovedApplicantCount}
+          finalApprovedApplicantCount={finalApprovedApplicantCount}
           tenantApplications={tenantApplications}
         />
       )}
@@ -537,7 +556,7 @@ function ListingDetails({
   onBook: (index: number) => void;
   propertyFeatures: string[];
   userRole: Role | undefined;
-  bookedInspections?: Set<number>;
+  bookedInspections?: number[];
   className?: string;
 }): React.JSX.Element {
   return (

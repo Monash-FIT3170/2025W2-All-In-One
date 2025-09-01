@@ -14,6 +14,8 @@ export type CreateTenantApplicationRequest = {
   profileData?: ProfileData | null;
   authUser: UserAccount | null;
   bookedInspections: Set<number>;
+  agentId?: string;
+  tenantUserId: string;
 };
 
 export type CreateTenantApplicationResponse = {
@@ -23,5 +25,7 @@ export type CreateTenantApplicationResponse = {
   applicantName?: string;
   propertyId?: string;
   propertyLandlordId?: string;
+  agentId?: string;
   status?: TenantApplicationStatus;
+  tenantUserId?: string;
 };

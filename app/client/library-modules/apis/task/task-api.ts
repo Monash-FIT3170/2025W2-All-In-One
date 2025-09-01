@@ -2,7 +2,6 @@ import { Meteor } from "meteor/meteor";
 import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
-import { Role } from "/app/shared/user-role-identifier";
 
 export async function apiGetTaskById(id: string): Promise<ApiTask> {
   const fetchedTask = await Meteor.callAsync(MeteorMethodIdentifier.TASK_GET, id);
@@ -18,7 +17,6 @@ export type CreateTaskPayload = {
   propertyAddress: string;
   propertyId: string;
   userId: string;
-  userType: Role.AGENT | Role.LANDLORD;
 };
 
 export async function apiCreateTask(taskData: CreateTaskPayload): Promise<string> {
@@ -34,14 +32,28 @@ export async function apiCreateTaskForAgent(taskData: {
   propertyAddress: string;
   propertyId: string;
 }): Promise<string> {
-  return apiCreateTask({
-    name: taskData.name,
-    description: taskData.description,
-    dueDate: taskData.dueDate,
-    priority: taskData.priority,
-    propertyAddress: taskData.propertyAddress,
-    propertyId: taskData.propertyId,
-    userType: Role.AGENT,
-    userId: taskData.userId,
-  });
+  try {
+    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT_FOR_AGENT, taskData);
+    return result;
+  } catch (error) {
+    console.error("Failed to create task:", error);
+    throw error;
+  }
+}
+
+
+export async function apiCreateTaskForLandlord(taskData: {
+  name: string;
+  description: string;
+  dueDate: Date;
+  priority: TaskPriority;
+  landlordId: string;
+}): Promise<string> {
+  try {
+    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT_FOR_LANDLORD, taskData);
+    return result;
+  } catch (error) {
+    console.error("Failed to create landlord task:", error);
+    throw error;
+  }
 }

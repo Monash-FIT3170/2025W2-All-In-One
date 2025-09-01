@@ -1,5 +1,5 @@
 import React from 'react';
-import { TenantApplication } from '../types/TenantApplication';
+import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
 import { TenantApplicationStatus } from '../../../../shared/api-models/tenant-application/TenantApplicationStatus';
 import { StatusBadge } from './StatusBadges';
 import { RejectButton, AcceptButton, BackgroundFailButton, BackgroundPassButton } from '../../property-listing-page/components/TenantReviewButtons';
@@ -43,7 +43,7 @@ export const TenantApplicationCard = ({
     <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
       <div className="flex flex-col flex-1">
         <div className="flex items-center gap-2 mb-2">
-          <span className="font-medium text-gray-900">{application.name}</span>
+          <span className="font-medium text-gray-900">{application.applicantName}</span>
           <StatusBadge status={application.status} />
         </div>
 

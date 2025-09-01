@@ -2,15 +2,10 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ListingStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingStatusPill";
 import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingSummary";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
-import { getPropertyWithListingDataUseCase } from "/app/client/library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
 import { submitDraftListingUseCase } from "/app/client/library-modules/use-cases/property-listing/SubmitDraftListingUseCase";
 import { LoadPropertyWithTenantApplicationsUseCase } from "/app/client/library-modules/use-cases/property-listing/LoadPropertyWithTenantApplicationsUseCase";
 import { RootState } from "/app/client/store";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
-import {
-  getFormattedDateStringFromDate,
-  getFormattedTimeStringFromDate,
-} from "/app/client/library-modules/utils/date-utils";
 import { loadTenantApplicationsForPropertyAsync } from "../../../tenant-selection/state/reducers/tenant-selection-slice";
 
 const initialState: PropertyListingPageUiState = {
@@ -38,6 +33,7 @@ const initialState: PropertyListingPageUiState = {
     markerLongitude: 0,
   },
   inspectionBookingUiStateList: [],
+  bookedInspections: [],
   listingImageUrls: [],
   listingStatusText: "",
   listingStatusPillVariant: ListingStatusPillVariant.DRAFT,
@@ -62,7 +58,14 @@ export const submitDraftListingAsync = createAsyncThunk(
 export const propertyListingSlice = createSlice({
   name: "propertyListing",
   initialState: initialState,
-  reducers: {},
+  reducers: {
+    addBookedInspection: (state, action) => {
+      const index = action.payload;
+      if (!state.bookedInspections.includes(index)) {
+        state.bookedInspections.push(index);
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(load.pending, (state) => {
       state.shouldShowLoadingState = true;
@@ -167,7 +170,11 @@ export const propertyListingSlice = createSlice({
       state.currentPropertyId = action.meta.arg;
     });
   },
-});
+})
+
+export const {
+  addBookedInspection, // ADD THIS
+} = propertyListingSlice.actions;
 
 function getPropertyAreaDisplayString(area: number): string {
   return `${area}m²`;

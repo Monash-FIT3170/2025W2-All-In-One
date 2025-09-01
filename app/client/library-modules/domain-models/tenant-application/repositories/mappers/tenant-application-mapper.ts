@@ -1,17 +1,18 @@
 import { TenantApplication } from "../../TenantApplication";
 import { ApiTenantApplication } from "../../../../../../shared/api-models/tenant-application/ApiTenantApplication";
 
-export function mapApiTenantApplicationToTenantApplication(tenantApplication: ApiTenantApplication): TenantApplication {
+export function mapApiTenantApplicationToTenantApplication(app: ApiTenantApplication): TenantApplication {
   return {
-    id: tenantApplication.id,
-    propertyId: tenantApplication.propertyId,
-    applicantName: tenantApplication.applicantName,
-    status: tenantApplication.status,
-    step: tenantApplication.step,
-    createdAt: tenantApplication.createdAt,
-    updatedAt: tenantApplication.updatedAt,
-    agentId: tenantApplication.agentId,
-    landlordId: tenantApplication.landlordId,
-    taskId: tenantApplication.taskId,
+    id: app.id,
+    propertyId: app.propertyId,
+    applicantName: app.applicantName,
+    status: app.status,
+    step: app.step,
+    createdAt: app.createdAt.toISOString(),
+    updatedAt: app.updatedAt.toISOString(),
+    agentId: app.agentId,
+    landlordId: app.landlordId,
+    tenantUserId: app.tenantUserId,
+    taskId: app.taskId,
   }
 }

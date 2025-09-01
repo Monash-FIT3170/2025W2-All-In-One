@@ -67,6 +67,24 @@ export function StatusBadge({ status }: StatusBadgeProps): React.JSX.Element | n
           FINAL REVIEW
         </span>
       )
+    case TenantApplicationStatus.FINAL_APPROVED:
+      return (
+        <span className="px-2 py-1 bg-green-300 text-green-800 text-xs font-medium rounded">
+          FINAL APPROVED
+        </span>
+      );
+    case TenantApplicationStatus.FINAL_REJECTED:
+      return (
+        <span className="px-2 py-1 bg-red-300 text-red-800 text-xs font-medium rounded">
+          FINAL REJECTED
+        </span>
+      );
+    case TenantApplicationStatus.TENANT_CHOSEN:
+      return (
+        <span className="px-2 py-1 bg-purple-300 text-purple-800 text-xs font-medium rounded">
+          TENANT CHOSEN
+        </span>
+      );
 
     default:
       return null;

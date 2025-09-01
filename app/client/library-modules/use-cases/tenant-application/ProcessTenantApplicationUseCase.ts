@@ -1,14 +1,12 @@
-// app/client/library-modules/use-cases/tenant-application/ProcessTenantApplicationWorkflowUseCase.ts
 import { updateTenantApplicationStatus } from "/app/client/library-modules/domain-models/tenant-application/repositories/tenant-application-repository";
-import { apiCreateTask } from "/app/client/library-modules/apis/task/task-api"
 import { TaskPriority } from "/app/shared/task-priority-identifier";
-import { Role } from "/app/shared/user-role-identifier";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
-import { TenantApplication } from "/app/client/ui-modules/tenant-selection/types/TenantApplication";
+import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
+import { createTaskForLandlord } from "../../domain-models/task/repositories/task-repository";
 
 export async function sendAcceptedApplicationsToLandlordUseCase(
   propertyId: string,
-  propertyLandlordId: string,
+  landlordId: string,
   streetNumber: string,
   street: string,
   suburb: string,
@@ -16,25 +14,24 @@ export async function sendAcceptedApplicationsToLandlordUseCase(
   postcode: string,
   acceptedApplications: TenantApplication[]
 ): Promise<{ success: boolean; propertyId: string; acceptedApplications: string[]; applicationCount: number; taskId: string }> {
-  validateTaskInputs(propertyId, propertyLandlordId);
+  validateTaskInputs(propertyId, landlordId);
   ensureNonEmptyApplications(acceptedApplications, 'No accepted applications to send to landlord')
 
   // Create task for landlord
   const taskName = `Review ${acceptedApplications.length} Tenant Application(s)`;
-  const taskDescription = `Review ${acceptedApplications.length} accepted tenant application(s) for property at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}. Applicants: ${acceptedApplications.map((app: TenantApplication) => app.name).join(', ')}`;
+  const taskDescription = `Review ${acceptedApplications.length} accepted tenant application(s) for property at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}. Applicants: ${acceptedApplications.map((app: TenantApplication) => app.applicantName).join(', ')}`;
   const dueDate = new Date();
   dueDate.setDate(dueDate.getDate() + 7);
 
   // Create task for landlord
-  const taskResult = await apiCreateTask({
+  const taskResult = await createTaskForLandlord({
     name: taskName,
     description: taskDescription,
     dueDate: dueDate,
     priority: TaskPriority.MEDIUM,
     propertyAddress: `${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`,
     propertyId: propertyId,
-    userId: propertyLandlordId,
-    userType: Role.LANDLORD,
+    userId: landlordId,
   });
 
   // Update all accepted applications to LANDLORD_REVIEW status
@@ -46,7 +43,7 @@ export async function sendAcceptedApplicationsToLandlordUseCase(
     taskResult // Passes the task ID to link applications to the task
   );
 
-  console.log(`Successfully sent ${acceptedApplications.length} application(s) to landlord ${propertyLandlordId} for property ${propertyId}`);
+  console.log(`Successfully sent ${acceptedApplications.length} application(s) to landlord ${landlordId} for property ${propertyId}`);
 
   return {
     success: true,
@@ -59,7 +56,7 @@ export async function sendAcceptedApplicationsToLandlordUseCase(
 
 export async function sendBackgroundPassedToLandlordUseCase(
   propertyId: string,
-  propertyLandlordId: string,
+  landlordId: string,
   streetNumber: string,
   street: string,
   suburb: string,
@@ -67,22 +64,21 @@ export async function sendBackgroundPassedToLandlordUseCase(
   postcode: string,
   passedApplications: TenantApplication[]
 ): Promise<{ success: boolean; propertyId: string; passedApplications: string[]; applicationCount: number; taskId: string }> {
-  validateTaskInputs(propertyId, propertyLandlordId);
+  validateTaskInputs(propertyId, landlordId);
   ensureNonEmptyApplications(passedApplications, 'No accepted applications to send to landlord')
 
   const taskName = `Final Review for ${passedApplications.length} Tenant Application(s)`;
-  const taskDescription = `Final landlord review for ${passedApplications.length} tenant application(s) at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}. Applicants: ${passedApplications.map(a => a.name).join(', ')}`;
+  const taskDescription = `Final landlord review for ${passedApplications.length} tenant application(s) at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}. Applicants: ${passedApplications.map(a => a.applicantName).join(', ')}`;
   const dueDate = new Date(); dueDate.setDate(dueDate.getDate() + 7);
 
-  const taskResult = await apiCreateTask({
+  const taskResult = await createTaskForLandlord({
     name: taskName,
     description: taskDescription,
     dueDate,
     priority: TaskPriority.MEDIUM,
     propertyAddress: `${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`,
     propertyId,
-    userId: propertyLandlordId,
-    userType: Role.LANDLORD,
+    userId: landlordId,
   });
 
   const ids = passedApplications.map(a => a.id);
@@ -101,11 +97,11 @@ export async function sendBackgroundPassedToLandlordUseCase(
   };
 }
 
-export function validateTaskInputs(propertyId: string, propertyLandlordId: string): void {
+export function validateTaskInputs(propertyId: string, landlordId: string): void {
   if (!propertyId) {
     throw new Error('Property ID is required to send applications to landlord');
   }
-  if (!propertyLandlordId) {
+  if (!landlordId) {
     throw new Error('Property landlord ID is required to send tenant to landlord');
   }
 }

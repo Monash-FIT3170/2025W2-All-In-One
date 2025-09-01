@@ -1,5 +1,5 @@
 import React from 'react';
-import { TenantSelectionModalProps } from './types/TenantSelectionModalProps';
+import { TenantSelectionModalProps } from './TenantSelectionModalProps';
 import { Role } from '/app/shared/user-role-identifier';
 import { FilterType } from './enums/FilterType';
 import { ModalHeader } from './components/ModalHeader';
@@ -47,9 +47,16 @@ export const TenantSelectionModal = (
     }
   };
 
+  const handleSendFinalApprovedToAgent = () => {
+    if (props.role === Role.LANDLORD) {
+      props.onSendFinalApprovedToAgent();
+    }
+  };
+
   const handleFilterChange = (filter: FilterType) => {
     dispatch(setFilter(filter));
   };
+
 
   if (!isOpen) return <></>;
 
@@ -85,14 +92,14 @@ export const TenantSelectionModal = (
         />
 
          {/* Agent-only button */}
-         {props.role === Role.AGENT && props.shouldShowSendToLandlordButton && (
+        {props.role === Role.AGENT && props.shouldShowSendToLandlordButton && (
           <div className="p-4 border-t">
             <button
               onClick={handleSendToLandlord}
               disabled={isLoading}
               className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              Send {props.acceptedApplicantCount} Accepted Applicant(s) to Landlord
+              Send {props.hasAcceptedApplications ? props.acceptedApplicantCount : props.backgroundPassedApplicantCount} {props.hasAcceptedApplications ? 'Accepted' : 'Background Passed'} Applicant(s) to Landlord
             </button>
           </div>
         )}
@@ -106,6 +113,19 @@ export const TenantSelectionModal = (
               className="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               Send {props.landlordApprovedApplicantCount} Approved Applicant(s) to Agent for Background Check
+            </button>
+          </div>
+        )}
+
+        {/* Landlord final approved button */}
+        {props.role === Role.LANDLORD && props.shouldShowSendFinalApprovedToAgentButton && (
+          <div className="p-4 border-t">
+            <button
+              onClick={handleSendFinalApprovedToAgent}
+              disabled={isLoading}
+              className="w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              Send {props.finalApprovedApplicantCount} Final Approved Applicant to Agent
             </button>
           </div>
         )}
