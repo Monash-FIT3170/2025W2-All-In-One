@@ -9,12 +9,13 @@ import { signinFormSlice } from "./ui-modules/user-authentication/state/reducers
 import { signupFormSlice } from "./ui-modules/user-authentication/state/reducers/signup-form-slice";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { propertyListingSlice } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
-import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
+import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/reducers/tenant-dashboard-slice";
 import { currentUserSlice } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
 import { propertyFormSlice } from "./ui-modules/property-form-agent/state/reducers/property-form-slice";
 import { tenantSelectionSlice } from "./ui-modules/review-tenant-modal/state/reducers/tenant-selection-slice";
 import { messagesSlice } from "./ui-modules/role-messages/state/reducers/messages-slice";
 import { searchResultsSlice } from "./ui-modules/search/state/search-result-slice";
+import { tenantPropertySlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/reducers/tenant-property-slice";
 
 export const store = configureStore({
   reducer: {
@@ -33,6 +34,7 @@ export const store = configureStore({
     tenantSelection: tenantSelectionSlice.reducer,
     messages: messagesSlice.reducer,
     searchResults: searchResultsSlice.reducer,
+    tenantProperty: tenantPropertySlice.reducer,
   },
 });
 

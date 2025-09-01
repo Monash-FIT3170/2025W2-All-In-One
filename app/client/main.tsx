@@ -26,7 +26,7 @@ import { SettingsPage } from "./ui-modules/settings-page/SettingsPage";
 import { PropertyFormPage } from "./ui-modules/property-form-agent/PropertyFormPage";
 import { AuthTabs } from "./ui-modules/user-authentication/AuthTabs";
 import TenantDashboard from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDashboard";
-import TenantProperty from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantProperty";
+import { TenantProperty } from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantProperty";
 import { TenantCalendar } from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantCalendar";
 import TenantMaintenance from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMaintenance";
 import { TenantMessagePage } from "./ui-modules/role-messages/TenantMessagePage";

@@ -10,7 +10,7 @@ import { ProfileFooter } from "../navigation-bars/side-nav-bars/components/Profi
 import { signoutUser } from "../user-authentication/state/reducers/current-user-slice";
 import { NotificationBellDropdown } from "../theming/components/NotificationBellDropdown";
 import { selectTasks as selectAgentTasks } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
-import { selectTasks as selectTenantTasks } from "../role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
+import { selectTasks as selectTenantTasks } from "../role-dashboard/tenant-dashboard/state/reducers/tenant-dashboard-slice";
 import { selectTasks as selectLandlordTasks } from "../role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
 import { Role } from "/app/shared/user-role-identifier";
 import { NavigationPath } from "../../navigation";
