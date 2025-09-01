@@ -4,6 +4,7 @@ import {
   selectTasks,
   selectLoading,
   fetchLandlordTasks,
+  selectMarkers,
 } from "../../landlord-dashboard/state/landlord-dashboard-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
@@ -28,7 +29,7 @@ export function LandlordCalendar(): React.JSX.Element {
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
   const tasks = useAppSelector(selectTasks);
   const loading = useAppSelector(selectLoading);
-  // const markers = useAppSelector(selectMarkers);
+  const markers = useAppSelector(selectMarkers);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
@@ -36,9 +37,9 @@ export function LandlordCalendar(): React.JSX.Element {
   const [properties, setProperties] = useState<PropertyOption[]>([]);
   const [mapUiState, setMapUiState] = useState<TaskMapUiState>({ markers: [] });
 
-  // useEffect(() => {
-  //   setMapUiState({ markers });
-  // }, [markers]);
+  useEffect(() => {
+    setMapUiState({ markers });
+  }, [markers]);
 
   // Fetch tasks for the current user
   useEffect(() => {

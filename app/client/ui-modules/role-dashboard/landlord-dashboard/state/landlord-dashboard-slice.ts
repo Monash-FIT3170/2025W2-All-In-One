@@ -16,6 +16,7 @@ interface LandlordDashboardState {
   isLoading: boolean;
   properties: Property[];
   tasks: Task[];
+  markers: { latitude: number; longitude: number }[];
   dashboardData: {
     propertyCount: number;
     statusCounts: {
@@ -38,6 +39,7 @@ interface LandlordDashboardState {
 const initialState: LandlordDashboardState = {
   isLoading: false,
   tasks: [],
+  markers: [],
   properties: [],
   dashboardData: {
     propertyCount: 0,
@@ -83,7 +85,6 @@ export const fetchLandlordTasks = createAsyncThunk(
     };
   }
 );
-
 
 export const fetchLandlordDetails = createAsyncThunk(
   "landlordDashboard/fetchLandlordDetails",
@@ -170,7 +171,6 @@ export const landlordDashboardSlice = createSlice({
         state.isLoading = false;
         state.error = "Failed to fetch agent tasks";
       });
-
   },
 });
 
@@ -185,8 +185,7 @@ export const selectProperties = (state: RootState) =>
 export const selectLoading = (state: RootState) =>
   state.landlordDashboard.isLoading;
 export default landlordDashboardSlice.reducer;
-
-
+export const selectMarkers = (state: RootState) => state.agentDashboard.markers;
 export const fetchPropertiesForLandlord = (
   agentId: string
 ): Promise<PropertyOption[]> => {
@@ -212,4 +211,3 @@ export const fetchPropertiesForLandlord = (
     );
   });
 };
-
