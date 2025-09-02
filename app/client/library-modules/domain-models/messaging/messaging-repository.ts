@@ -22,6 +22,13 @@ function getAvatar(name: string): string {
     : `${parts[0][0]}${parts[0][1] || ''}`.toUpperCase();
 }
 
+// Helper function to generate display name from profile
+function getDisplayName(profile: ApiProfileData | undefined, roleType: string, id: string): string {
+  return profile 
+    ? `${profile.firstName} ${profile.lastName}`.trim()
+    : `${roleType} ${id.slice(-4)}`;
+}
+
 // Convert API conversation to domain model
 function convertApiConversationToDomain(
   apiConversation: ApiConversation,
@@ -114,16 +121,12 @@ export function convertApiConversationsToAgentView(
     if (apiConversation.tenantId) {
       // Agent-Tenant conversation
       const tenantProfile = tenantProfiles.get(apiConversation.tenantId);
-      const name = tenantProfile 
-        ? `${tenantProfile.firstName} ${tenantProfile.lastName}`.trim()
-        : `Tenant ${apiConversation.tenantId.slice(-4)}`;
+      const name = getDisplayName(tenantProfile, "Tenant", apiConversation.tenantId);
       return convertApiConversationToDomain(apiConversation, agentId, name, "Tenant");
     } else if (apiConversation.landlordId) {
       // Agent-Landlord conversation
       const landlordProfile = landlordProfiles.get(apiConversation.landlordId);
-      const name = landlordProfile 
-        ? `${landlordProfile.firstName} ${landlordProfile.lastName}`.trim()
-        : `Landlord ${apiConversation.landlordId.slice(-4)}`;
+      const name = getDisplayName(landlordProfile, "Landlord", apiConversation.landlordId);
       return convertApiConversationToDomain(apiConversation, agentId, name, "Landlord");
     } else {
       // Fallback
@@ -138,9 +141,7 @@ export function convertApiConversationsToTenantView(
   agentProfile?: ApiProfileData
 ): Conversation[] {
   return apiConversations.map(apiConversation => {
-    const name = agentProfile 
-      ? `${agentProfile.firstName} ${agentProfile.lastName}`.trim()
-      : `Agent ${apiConversation.agentId.slice(-4)}`;
+    const name = getDisplayName(agentProfile, "Agent", apiConversation.agentId);
     return convertApiConversationToDomain(apiConversation, tenantId, name, "Agent");
   });
 }
@@ -151,9 +152,7 @@ export function convertApiConversationsToLandlordView(
   agentProfile?: ApiProfileData
 ): Conversation[] {
   return apiConversations.map(apiConversation => {
-    const name = agentProfile 
-      ? `${agentProfile.firstName} ${agentProfile.lastName}`.trim()
-      : `Agent ${apiConversation.agentId.slice(-4)}`;
+    const name = getDisplayName(agentProfile, "Agent", apiConversation.agentId);
     return convertApiConversationToDomain(apiConversation, landlordId, name, "Agent");
   });
 }

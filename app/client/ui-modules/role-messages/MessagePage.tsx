@@ -15,31 +15,15 @@ import {
   setActiveConversation,
   setMessageText,
   resetUnreadCount,
+  addActiveUser,
+  removeActiveUser,
 } from "./state/reducers/messages-slice";
 import { useMessagingSubscriptions } from "./hooks/useMessagingSubscriptions";
-import { apiAddActiveUser, apiRemoveActiveUser } from "/app/client/library-modules/apis/messaging/messaging-api";
-import { Role } from "/app/shared/user-role-identifier";
-import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
-import { Tenant } from "/app/client/library-modules/domain-models/user/Tenant";
-import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 
 type UserRole = 'agent' | 'landlord' | 'tenant';
 
 interface MessagesPageProps {
   role: UserRole;
-} 
-
-// Type guards to safely check user types
-function isAgent(user: unknown): user is Agent {
-  return user !== null && typeof user === 'object' && 'agentId' in user;
-}
-
-function isTenant(user: unknown): user is Tenant {
-  return user !== null && typeof user === 'object' && 'tenantId' in user;
-}
-
-function isLandlord(user: unknown): user is Landlord {
-  return user !== null && typeof user === 'object' && 'landlordId' in user;
 }
 
 export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
@@ -53,42 +37,11 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
   const conversationsLoading = useAppSelector(selectConversationsLoading);
   const error = useAppSelector(selectError);
 
-  // Get current user ID for fetching conversations
-  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  // Get current user for authentication checks
   const authUser = useAppSelector((state) => state.currentUser.authUser);
 
   // Use real-time subscriptions for live messaging
   const { conversationsReady, messagesReady } = useMessagingSubscriptions(activeConversationId);
-
-  // Helper function to get current user ID
-  const getCurrentUserId = (): string | null => {
-    if (!authUser || !currentUser) return null;
-    
-    if (authUser.role === Role.AGENT && isAgent(currentUser)) {
-      return currentUser.agentId;
-    } else if (authUser.role === Role.TENANT && isTenant(currentUser)) {
-      return currentUser.tenantId;
-    } else if (authUser.role === Role.LANDLORD && isLandlord(currentUser)) {
-      return currentUser.landlordId;
-    }
-    return null;
-  };
-
-  // Helper function to handle active user management
-  const handleActiveUserManagement = async (conversationId: string, action: 'add' | 'remove') => {
-    const currentUserId = getCurrentUserId();
-    if (!currentUserId) return;
-
-    try {
-      if (action === 'add') {
-        await apiAddActiveUser(conversationId, currentUserId);
-      } else {
-        await apiRemoveActiveUser(conversationId, currentUserId);
-      }
-    } catch (error) {
-      console.error(`Failed to ${action} user from active users:`, error);
-    }
-  };
 
   // Initial fetch for conversations (fallback for when subscriptions aren't ready)
   useEffect(() => {
@@ -108,12 +61,12 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
   useEffect(() => {
     return () => {
       if (activeConversationId) {
-        handleActiveUserManagement(activeConversationId, 'remove');
+        dispatch(removeActiveUser(activeConversationId));
       }
     };
-  }, [activeConversationId]);
+  }, [activeConversationId, dispatch]);
 
-  const handleSelectConversation = async (conversationId: string) => {
+  const handleSelectConversation = (conversationId: string) => {
     // Validate conversationId is not null/undefined
     if (!conversationId) {
       console.error('Cannot select conversation: conversationId is null or undefined');
@@ -122,7 +75,7 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
 
     // Remove current user from previous conversation's active users (if any)
     if (activeConversationId && activeConversationId !== conversationId) {
-      await handleActiveUserManagement(activeConversationId, 'remove');
+      dispatch(removeActiveUser(activeConversationId));
     }
 
     dispatch(setActiveConversation(conversationId));
@@ -130,7 +83,7 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
     dispatch(resetUnreadCount(conversationId));
 
     // Add current user to new conversation's active users
-    await handleActiveUserManagement(conversationId, 'add');
+    dispatch(addActiveUser(conversationId));
   };
 
   const handleChangeMessage = (value: string) => {

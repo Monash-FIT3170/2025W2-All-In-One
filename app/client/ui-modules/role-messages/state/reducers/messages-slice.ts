@@ -23,6 +23,7 @@ import {
   sendMessage as sendMessageRepo,
   resetUnreadCount as resetUnreadCountRepo,
 } from "/app/client/library-modules/domain-models/messaging/messaging-repository";
+import { apiAddActiveUser, apiRemoveActiveUser } from "/app/client/library-modules/apis/messaging/messaging-api";
 import { ApiConversation } from "/app/shared/api-models/messaging/ApiConversation";
 import { ApiMessage } from "/app/shared/api-models/messaging/ApiMessage";
 
@@ -190,6 +191,64 @@ export const resetUnreadCount = createAsyncThunk(
     } catch (error) {
       console.error("Error resetting unread count:", error);
       return rejectWithValue(error instanceof Error ? error.message : "Failed to reset unread count");
+    }
+  }
+);
+
+/**
+ * Adds current user to active users list when opening a conversation
+ * Validates conversation ID and user authentication before adding
+ */
+export const addActiveUser = createAsyncThunk(
+  "messages/addActiveUser",
+  async (conversationId: string, { getState, rejectWithValue }) => {
+    try {
+      // Validate conversation ID using helper function
+      validateConversationId(conversationId);
+
+      const state = getState() as { currentUser: { currentUser: Agent | Tenant | Landlord | null; authUser: { role: Role } | null } };
+      const currentUser = state.currentUser.currentUser;
+      const authUser = state.currentUser.authUser;
+
+      // Validate user authentication and get user context
+      const userContext = validateAndGetUserContext(currentUser, authUser);
+
+      // Add user to active users via API
+      await apiAddActiveUser(conversationId, userContext.userId);
+
+      return { conversationId, userId: userContext.userId };
+    } catch (error) {
+      console.error("Error adding active user:", error);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to add active user");
+    }
+  }
+);
+
+/**
+ * Removes current user from active users list when leaving a conversation
+ * Validates conversation ID and user authentication before removing
+ */
+export const removeActiveUser = createAsyncThunk(
+  "messages/removeActiveUser",
+  async (conversationId: string, { getState, rejectWithValue }) => {
+    try {
+      // Validate conversation ID using helper function
+      validateConversationId(conversationId);
+
+      const state = getState() as { currentUser: { currentUser: Agent | Tenant | Landlord | null; authUser: { role: Role } | null } };
+      const currentUser = state.currentUser.currentUser;
+      const authUser = state.currentUser.authUser;
+
+      // Validate user authentication and get user context
+      const userContext = validateAndGetUserContext(currentUser, authUser);
+
+      // Remove user from active users via API
+      await apiRemoveActiveUser(conversationId, userContext.userId);
+
+      return { conversationId, userId: userContext.userId };
+    } catch (error) {
+      console.error("Error removing active user:", error);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to remove active user");
     }
   }
 );
