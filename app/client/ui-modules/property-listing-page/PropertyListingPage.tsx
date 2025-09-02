@@ -82,6 +82,7 @@ export function PropertyListingPage({
     return (
       <>
         <ListingPageContent
+          propertyId={state.propertyId}
           streetNumber={state.streetNumber}
           street={state.street}
           suburb={state.suburb}
@@ -137,6 +138,7 @@ export function PropertyListingPage({
 }
 
 function ListingPageContent({
+  propertyId,
   streetNumber,
   street,
   suburb,
@@ -169,6 +171,7 @@ function ListingPageContent({
   onSubmitDraftListing,
   className = "",
 }: {
+  propertyId: string;
   streetNumber: string;
   street: string;
   suburb: string;
