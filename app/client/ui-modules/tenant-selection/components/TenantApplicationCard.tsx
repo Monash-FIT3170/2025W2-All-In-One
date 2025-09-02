@@ -82,50 +82,6 @@ export const TenantApplicationCard = ({
             <AcceptButton onClick={handleAccept} />
           </>
           )}
-
-
-          {/* Status messages for different states
-          {userRole === Role.LANDLORD && application.status === TenantApplicationStatus.ACCEPTED && (
-            <div className="text-sm text-gray-500">
-              Accepted by agent - ready for your review
-            </div>
-          )}
-
-          {userRole === Role.LANDLORD && application.status === TenantApplicationStatus.LANDLORD_APPROVED && (
-            <div className="text-sm text-green-600">
-              ✓ Approved by you
-            </div>
-          )}
-
-          {userRole === Role.LANDLORD && application.status === TenantApplicationStatus.LANDLORD_REJECTED && (
-            <div className="text-sm text-red-600">
-              ✗ Rejected by you
-            </div>
-          )}
-
-          {userRole === Role.AGENT && application.status === TenantApplicationStatus.LANDLORD_REVIEW && (
-            <div className="text-sm text-blue-600">
-              Sent to landlord for review
-            </div>
-          )}
-
-          {userRole === Role.AGENT && application.status === TenantApplicationStatus.LANDLORD_APPROVED && (
-            <div className="text-sm text-green-600">
-              ✓ Approved by landlord
-            </div>
-          )}
-
-          {userRole === Role.AGENT && application.status === TenantApplicationStatus.LANDLORD_REJECTED && (
-            <div className="text-sm text-red-600">
-              ✗ Rejected by landlord
-            </div>
-          )} */}
-
-          {application.status == TenantApplicationStatus.BACKGROUND_CHECK_PENDING && (
-            <div className ="text-sm text-amber-600">
-              Background check pending
-            </div>
-          )}
         </div>
       </div>
     </div>

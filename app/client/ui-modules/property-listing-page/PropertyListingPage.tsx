@@ -59,11 +59,11 @@ import {
   selectBackgroundPassedApplicantCountForProperty,
   intentAcceptApplicationAsync,
   intentRejectApplicationAsync,
-  addBookedInspection,
   selectHasFinalApprovedApplicationForProperty,
   selectFinalApprovedApplicantCountForProperty,
   sendFinalApprovedApplicationToAgentAsync,
 } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
+import { addBookedInspection } from "./state/reducers/property-listing-slice";
 import { Role } from "/app/shared/user-role-identifier";
 import { CurrentUserState } from "../user-authentication/state/CurrentUserState";
 

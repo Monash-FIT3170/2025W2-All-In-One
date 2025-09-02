@@ -12,4 +12,5 @@ export type ApiTenantApplication = {
   landlordId: string;
   tenantUserId: string;
   taskId?: string;
+  linkedTaskId?: string;
 };

@@ -1,4 +1,4 @@
-import { apiGetTaskById, apiCreateTaskForAgent, apiCreateTaskForLandlord, apiCreateTask } from "../../../apis/task/task-api";
+import { apiGetTaskById, apiCreateTaskForAgent, apiCreateTaskForLandlord,apiUpdateTaskForAgent, apiUpdateTaskForLandlord } from "../../../apis/task/task-api";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { mapApiTaskToTask, mapAgentTaskInsertData, mapLandlordTaskInsertData, mapTaskInsertData } from "./mappers/task-mapper";
 import { TaskPriority } from "/app/shared/task-priority-identifier"
@@ -37,16 +37,22 @@ export async function createTaskForLandlord(task: {
   return await apiCreateTaskForLandlord(payload)
 }
 
-export async function createTask(task: {
+export async function updateTaskForAgent(task: {
+  taskId: string;
   name: string;
   description: string;
   dueDate: Date;
   priority: TaskPriority;
-  userId: string;
-  propertyAddress: string;
-  propertyId: string;
-  userType: Role.AGENT | Role.LANDLORD;
 }): Promise<string> {
-  const payload = mapTaskInsertData(task)
-  return await apiCreateTask(payload)
+  return await apiUpdateTaskForAgent(task);
+}
+
+export async function updateTaskForLandlord(task: {
+  taskId: string;
+  name: string;
+  description: string;
+  dueDate: Date;
+  priority: TaskPriority;
+}): Promise<string> {
+  return await apiUpdateTaskForLandlord(task);
 }

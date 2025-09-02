@@ -14,7 +14,7 @@ import { TaskPriority } from "/app/shared/task-priority-identifier";
  * This Meteor method can be called from the client. It performs the following steps:
  * 1. Fetches the task document from the database using the provided ID.
  * 2. Throws an `InvalidDataError` if the task is not found.
- * 3. Maps the task document to an `ApiTask` DTO using `mapTaskDocumentTotaskDTO`.
+ * 3. Maps the task document to an `ApiTask` DTO using `mapTaskDocumentToTaskDTO`.
  * 4. Throws an `InvalidDataError` if there is an error during mapping.
  *
  * @param id - The unique identifier of the task to retrieve.
@@ -213,87 +213,108 @@ const taskInsertForLandlordMethod = {
 };
 
 /**
- * Creates a new task for either AGENT or LANDLORD via a single entry point and returns the task ID.
+ * Updates an existing task for AGENT in the database and returns the task ID.
  */
-const taskInsertMethod = {
-  [MeteorMethodIdentifier.TASK_INSERT]: async (taskData: {
-    name: string;
-    description: string;
-    dueDate: Date;
-    priority: TaskPriority;
-    propertyAddress: string;
-    propertyId: string;
-    userType: "agent" | "landlord";
-    userId: string;
+const taskUpdateForAgentMethod = {
+  [MeteorMethodIdentifier.TASK_UPDATE_FOR_AGENT]: async (taskData: {
+    taskId: string;
+    name?: string;
+    description?: string;
+    dueDate?: Date;
+    priority?: TaskPriority;
   }): Promise<string> => {
-    console.log("taskInsertUniversalMethod called with:", taskData);
+    console.log("taskUpdateForAgentMethod called with:", taskData);
 
     // Validate required fields
-    if (!taskData.name || taskData.name.trim() === "") {
+    if (!taskData.taskId) {
       throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Task name is required")
-      );
-    }
-    if (!taskData.dueDate) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Due date is required")
-      );
-    }
-    if (!taskData.priority) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Priority is required")
-      );
-    }
-    if (!taskData.userId) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Assignee user ID is required")
-      );
-    }
-    if (!taskData.propertyAddress || !taskData.propertyId) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Property context (address and id) is required")
+        new InvalidDataError("Task ID is required")
       );
     }
 
-    const taskDocument: Omit<TaskDocument, "_id"> = {
-      name: taskData.name.trim(),
-      description: taskData.description || "",
-      dueDate: taskData.dueDate,
-      priority: taskData.priority,
-      taskPropertyAddress: taskData.propertyAddress,
-      taskPropertyId: taskData.propertyId,
-      taskStatus: TaskStatus.NOTSTARTED,
-      createdDate: new Date(),
-    };
+    const updateData: any = {};
+
+    if (taskData.name !== undefined) {
+      updateData.name = taskData.name.trim();
+    }
+    if (taskData.description !== undefined) {
+      updateData.description = taskData.description;
+    }
+    if (taskData.dueDate !== undefined) {
+      updateData.dueDate = taskData.dueDate;
+    }
+    if (taskData.priority !== undefined) {
+      updateData.priority = taskData.priority;
+    }
 
     try {
-      const insertedId = await TaskCollection.insertAsync(taskDocument);
-      const createdTask = await getTaskDocumentById(insertedId);
+      const result = await TaskCollection.updateAsync(
+        { _id: taskData.taskId },
+        { $set: updateData }
+      );
 
-      if (!createdTask) {
-        throw new InvalidDataError("Failed to retrieve created task");
+      if (result === 0) {
+        throw new InvalidDataError("Task not found");
       }
 
-      if (taskData.userType === "agent") {
-        await Meteor.callAsync(
-          MeteorMethodIdentifier.AGENT_UPDATE_TASKS,
-          taskData.userId,
-          insertedId
-        );
-      } else if (taskData.userType === "landlord") {
-        await Meteor.callAsync(
-          MeteorMethodIdentifier.LANDLORD_UPDATE_TASKS,
-          taskData.userId,
-          insertedId
-        );
-      } else {
-        throw new InvalidDataError("Unsupported assignee type");
-      }
-
-      return insertedId;
+      return taskData.taskId;
     } catch (error) {
       throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Failed to create task: ${error}`)
+        new InvalidDataError(`Failed to update task: ${error}`)
+      );
+    }
+  },
+};
+
+/**
+ * Updates an existing task for LANDLORD in the database and returns the task ID.
+ */
+const taskUpdateForLandlordMethod = {
+  [MeteorMethodIdentifier.TASK_UPDATE_FOR_LANDLORD]: async (taskData: {
+    taskId: string;
+    name?: string;
+    description?: string;
+    dueDate?: Date;
+    priority?: TaskPriority;
+  }): Promise<string> => {
+    console.log("taskUpdateForLandlordMethod called with:", taskData);
+
+    // Validate required fields
+    if (!taskData.taskId) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("Task ID is required")
+      );
+    }
+
+    const updateData: any = {};
+
+    if (taskData.name !== undefined) {
+      updateData.name = taskData.name.trim();
+    }
+    if (taskData.description !== undefined) {
+      updateData.description = taskData.description;
+    }
+    if (taskData.dueDate !== undefined) {
+      updateData.dueDate = taskData.dueDate;
+    }
+    if (taskData.priority !== undefined) {
+      updateData.priority = taskData.priority;
+    }
+
+    try {
+      const result = await TaskCollection.updateAsync(
+        { _id: taskData.taskId },
+        { $set: updateData }
+      );
+
+      if (result === 0) {
+        throw new InvalidDataError("Task not found");
+      }
+
+      return taskData.taskId;
+    } catch (error) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Failed to update task: ${error}`)
       );
     }
   },
@@ -330,7 +351,8 @@ async function getTaskDocumentById(
 
 Meteor.methods({
   ...taskGetMethod,
-  ...taskInsertMethod,
   ...taskInsertForAgentMethod,
-  ...taskInsertForLandlordMethod
+  ...taskInsertForLandlordMethod,
+  ...taskUpdateForAgentMethod,
+  ...taskUpdateForLandlordMethod
 });

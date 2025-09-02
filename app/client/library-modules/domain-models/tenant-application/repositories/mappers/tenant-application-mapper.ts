@@ -14,5 +14,6 @@ export function mapApiTenantApplicationToTenantApplication(app: ApiTenantApplica
     landlordId: app.landlordId,
     tenantUserId: app.tenantUserId,
     taskId: app.taskId,
+    linkedTaskId: app.linkedTaskId,
   }
 }

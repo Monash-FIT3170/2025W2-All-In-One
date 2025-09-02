@@ -3,6 +3,7 @@ import {
   apiGetTenantApplicationsByLandlordId,
   apiInsertTenantApplication,
   apiUpdateTenantApplicationStatuses,
+  apiUpdateTenantApplicationLinkedTaskId,
 } from "/app/client/library-modules/apis/tenant-application/tenant-application";
 import { TenantApplication, TenantApplicationInsertData } from "../TenantApplication";
 import { mapApiTenantApplicationToTenantApplication } from "./mappers/tenant-application-mapper";
@@ -35,4 +36,12 @@ export async function updateTenantApplicationStatus(
   taskId?: string
 ): Promise<void> {
   await apiUpdateTenantApplicationStatuses(applicationIds, status, step, taskId);
+}
+
+// Update tenant application linked task (when the role has an existing task related to the applications)
+export async function updateTenantApplicationLinkedTaskId(
+  applicationId: string,
+  linkedTaskId: string
+): Promise<void> {
+  await apiUpdateTenantApplicationLinkedTaskId(applicationId, linkedTaskId);
 }

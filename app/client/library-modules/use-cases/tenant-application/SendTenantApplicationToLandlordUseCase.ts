@@ -1,8 +1,11 @@
-import { updateTenantApplicationStatus } from "/app/client/library-modules/domain-models/tenant-application/repositories/tenant-application-repository";
+import { updateTenantApplicationStatus, updateTenantApplicationLinkedTaskId } from "/app/client/library-modules/domain-models/tenant-application/repositories/tenant-application-repository";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
 import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
-import { createTaskForLandlord } from "../../domain-models/task/repositories/task-repository";
+import { createTaskForLandlord, updateTaskForLandlord } from "../../domain-models/task/repositories/task-repository";
+import { ex } from "@fullcalendar/core/internal-common";
+
+/*WILL SEPARATE THESE USE CASES INTO SEPARATE FILES LATER*/
 
 export async function sendAcceptedApplicationsToLandlordUseCase(
   propertyId: string,
@@ -43,6 +46,11 @@ export async function sendAcceptedApplicationsToLandlordUseCase(
     taskResult // Passes the task ID to link applications to the task
   );
 
+  // Update applications to store the linkedTaskId
+  for (const applicationId of acceptedApplicationIds) {
+    await updateTenantApplicationLinkedTaskId(applicationId, taskResult);
+  }
+
   console.log(`Successfully sent ${acceptedApplications.length} application(s) to landlord ${landlordId} for property ${propertyId}`);
 
   return {
@@ -54,6 +62,7 @@ export async function sendAcceptedApplicationsToLandlordUseCase(
   };
 }
 
+
 export async function sendBackgroundPassedToLandlordUseCase(
   propertyId: string,
   landlordId: string,
@@ -62,23 +71,29 @@ export async function sendBackgroundPassedToLandlordUseCase(
   suburb: string,
   province: string,
   postcode: string,
-  passedApplications: TenantApplication[]
+  passedApplications: TenantApplication[],
+
 ): Promise<{ success: boolean; propertyId: string; passedApplications: string[]; applicationCount: number; taskId: string }> {
   validateTaskInputs(propertyId, landlordId);
   ensureNonEmptyApplications(passedApplications, 'No accepted applications to send to landlord')
 
-  const taskName = `Final Review for ${passedApplications.length} Tenant Application(s)`;
-  const taskDescription = `Final landlord review for ${passedApplications.length} tenant application(s) at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}. Applicants: ${passedApplications.map(a => a.applicantName).join(', ')}`;
-  const dueDate = new Date(); dueDate.setDate(dueDate.getDate() + 7);
+  const updatedTaskName = `Background Check for ${passedApplications.length} Tenant Application(s)`;
+  const updatedTaskDescription = `Background check for ${passedApplications.length} tenant application(s) at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}. Applicants: ${passedApplications.map(a => a.applicantName).join(', ')}`;
+  const updatedDueDate = new Date();
+  updatedDueDate.setDate(updatedDueDate.getDate() + 7);
 
-  const taskResult = await createTaskForLandlord({
-    name: taskName,
-    description: taskDescription,
-    dueDate,
+  const existingTaskId = passedApplications[0].linkedTaskId;
+
+  if (!existingTaskId) {
+    throw new Error('No linked task ID found for background check applications');
+  }
+
+  const taskResult = await updateTaskForLandlord({
+    taskId: existingTaskId,
+    name: updatedTaskName,
+    description: updatedTaskDescription,
+    dueDate: updatedDueDate,
     priority: TaskPriority.MEDIUM,
-    propertyAddress: `${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`,
-    propertyId,
-    userId: landlordId,
   });
 
   const ids = passedApplications.map(a => a.id);
@@ -86,7 +101,7 @@ export async function sendBackgroundPassedToLandlordUseCase(
     ids,
     TenantApplicationStatus.FINAL_REVIEW,
     4,
-    taskResult // Passes the task ID to link applications to the task
+    taskResult
   );
   return {
     success: true,
@@ -104,6 +119,7 @@ export function validateTaskInputs(propertyId: string, landlordId: string): void
   if (!landlordId) {
     throw new Error('Property landlord ID is required to send tenant to landlord');
   }
+
 }
 
 export function ensureNonEmptyApplications(apps: TenantApplication[], message: string): void {
@@ -116,3 +132,4 @@ export function calculateDueDate(daysFromNow: number): Date {
   dueDate.setDate(dueDate.getDate() + daysFromNow);
   return dueDate;
 }
+

@@ -4,27 +4,35 @@ import { TenantApplication as DomainTenantApplication } from "/app/client/librar
 import { TenantApplicationStatus } from "../../../../../shared/api-models/tenant-application/TenantApplicationStatus";
 import { FilterType } from "../../enums/FilterType";
 import { TenantSelectionUiState } from "../TenantSelectionUiState";
-import { createTaskForAgent } from "/app/client/library-modules/domain-models/task/repositories/task-repository";
-import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { Role } from "/app/shared/user-role-identifier";
 import {
   updateTenantApplicationStatus
 } from "/app/client/library-modules/domain-models/tenant-application/repositories/tenant-application-repository";
 import { LoadTenantApplicationsUseCase } from "/app/client/library-modules/use-cases/tenant-application/LoadTenantApplicationsUseCase";
-import { getPropertyById, updatePropertyTenantId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";;
+
 import {
   sendAcceptedApplicationsToLandlordUseCase,
   sendBackgroundPassedToLandlordUseCase
-} from "../../../../library-modules/use-cases/tenant-application/ProcessTenantApplicationUseCase";
+} from "../../../../library-modules/use-cases/tenant-application/SendTenantApplicationToLandlordUseCase";
 import { createTenantApplicationUseCase } from "/app/client/library-modules/use-cases/tenant-application/CreateTenantApplicationUseCase";
-import { agentAcceptApplication, agentRejectApplication, landLordApproveApplication, landLordRejectApplication } from "../../../../library-modules/use-cases/tenant-application/TenantApplicationDecisionUseCase.ts";
+import {
+  sendApprovedApplicationsToAgentUseCase,
+  sendFinalApprovedApplicationToAgentUseCase
+} from "/app/client/library-modules/use-cases/tenant-application/SendTenantApplicationToAgentUseCase";
+import { agentAcceptApplication, agentRejectApplication, landLordApproveApplication, landLordRejectApplication } from "../../../../library-modules/use-cases/tenant-application/AcceptOrRejectTenantApplicationUseCase.ts";
+import { AppDispatch } from "/app/client/store";
+import { createTaskForAgent, updateTaskForAgent } from "../../domain-models/task/repositories/task-repository";
+import { TaskPriority } from "../../domain-models/task/TaskPriority";
+import { TenantApplicationLinkedTaskId } from "../../../../../shared/api-models/tenant-application/TenantApplicationLinkedTaskId";
+import { apiUpdateTenantApplicationLinkedTask } from "/app/client/library-modules/apis/tenant-application/tenant-application";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+
 const initialState: TenantSelectionUiState = {
   applicationsByProperty: {},
   activeFilter: FilterType.ALL,
   isLoading: false,
   error: null,
   currentStep: 1,
-  bookedInspections: [],
 };
 
 export const createTenantApplicationAsync = createAsyncThunk(
@@ -34,15 +42,10 @@ export const createTenantApplicationAsync = createAsyncThunk(
     const { propertyId, propertyLandlordId} = state.propertyListing;
     const { currentUser, profileData, authUser } = state.currentUser;
 
-    const { bookedInspections } = state.tenantSelection;
-
     // Validate landlord ID
     if (!propertyLandlordId || propertyLandlordId.trim() === "") {
       throw new Error('Property landlord ID is missing. This property may not have a valid landlord assigned.');
     }
-
-    // Convert array to Set for the use case
-    const bookedInspectionsSet = new Set(bookedInspections);
 
     const result = await createTenantApplicationUseCase({
       propertyId,
@@ -50,7 +53,6 @@ export const createTenantApplicationAsync = createAsyncThunk(
       currentUser,
       profileData,
       authUser,
-      bookedInspections: bookedInspectionsSet,
       tenantUserId: 'tenantId' in (currentUser || {}) ? (currentUser as { tenantId: string }).tenantId : "",
     });
 
@@ -148,14 +150,6 @@ export const sendApprovedApplicationsToAgentAsync = createAsyncThunk(
     const { propertyId, propertyLandlordId, streetNumber, street, suburb, province, postcode } = state.propertyListing;
     const { applicationsByProperty } = state.tenantSelection;
 
-    if (!propertyId) {
-      throw new Error('Property ID is required to send applications to agent');
-    }
-
-    if (!propertyLandlordId) {
-      throw new Error('Property landlord ID is required to send applications to agent');
-    }
-
     // Get tenant applications for the specific property
     const propertyApplications = applicationsByProperty[propertyId] || [];
 
@@ -164,115 +158,38 @@ export const sendApprovedApplicationsToAgentAsync = createAsyncThunk(
       app.status === TenantApplicationStatus.LANDLORD_APPROVED
     );
 
-    if (approvedApplications.length === 0) {
-      throw new Error('No approved applications to send to agent for background check');
-    }
-
-
-    const taskName = `Perform Background Check on ${approvedApplications.length} Tenant Application(s)`;
-    const taskDescription =
-    `Perform background checks on ${approvedApplications.length} landlord approved tenant application(s) ` +
-    `for property at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}. ` +
-    `Applicants: ${approvedApplications.map((app: DomainTenantApplication) => app.applicantName).join(', ')}`;
-    const dueDate = new Date();
-
-    dueDate.setDate(dueDate.getDate() + 7);
-
-    // Create task for agent
-    const property = await getPropertyById(propertyId);
-    const agentId = property.agentId;
-    const taskResult = await createTaskForAgent({
-      name: taskName,
-      description: taskDescription,
-      dueDate: dueDate,
-      priority: TaskPriority.MEDIUM,
-      propertyAddress: `${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`,
-      propertyId: propertyId,
-      userId: agentId,
-    });
-
-    // Update all approved applications to BACKGROUND_CHECK_PASSED status
-    const approvedApplicationIds = approvedApplications.map((app: DomainTenantApplication) => app.id);
-    await updateTenantApplicationStatus(
-      approvedApplicationIds,
-      TenantApplicationStatus.BACKGROUND_CHECK_PENDING,
-      3,
-      taskResult // Passes the task ID to link applications to the task
-    );
-
-    console.log(`Successfully sent ${approvedApplications.length} application(s) to agent for background check for property ${propertyId}`);
-
-    return {
-      success: true,
+    return await sendApprovedApplicationsToAgentUseCase(
       propertyId,
-      approvedApplications: approvedApplicationIds,
-      applicationCount: approvedApplications.length,
-      taskId: taskResult
-    };
+      propertyLandlordId,
+      streetNumber,
+      street,
+      suburb,
+      province,
+      postcode,
+      approvedApplications
+    );
   }
 );
 
-// Send final approved application to agent (Step 3 -> Step 4)
+// Send final approved application to agent (Step 4 -> Step 5)
 export const sendFinalApprovedApplicationToAgentAsync = createAsyncThunk(
-  "tenantSelection/sendFinallApprovedApplicationToAgent",
+  "tenantSelection/sendFinalApprovedApplicationToAgent",
   async (_, { getState }) => {
     const state = getState() as RootState;
     const { propertyId, propertyLandlordId, streetNumber, street, suburb, province, postcode } = state.propertyListing;
     const apps = state.tenantSelection.applicationsByProperty[propertyId] || [];
     const finalApproved = apps.filter(a => a.status === TenantApplicationStatus.FINAL_APPROVED);
 
-    // Ensure only one applicant is chosen
-    if (finalApproved.length > 1) {
-      throw new Error('Only one applicant can be chosen for final approval');
-    }
-
-    if (finalApproved.length === 0) {
-      throw new Error('No final approved applications to send to agent');
-    }
-
-    const chosenApplication = finalApproved[0];
-
-    // Update property's tenantId with the chosen tenant's user ID
-    if (chosenApplication.tenantUserId) {
-      await updatePropertyTenantId(propertyId, chosenApplication.tenantUserId);
-    } else {
-      console.log('No tenantUserId found in chosen application');
-    }
-
-    const taskName = `Process Final Tenant Selection`;
-    const taskDescription = `Process final tenant selection for ${finalApproved[0].applicantName} at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`;
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 3);
-
-    const property = await getPropertyById(propertyId);
-    const agentId = property.agentId;
-
-    const taskResult = await createTaskForAgent({
-      name: taskName,
-      description: taskDescription,
-      dueDate: dueDate,
-      priority: TaskPriority.MEDIUM,
-      propertyAddress: `${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`,
-      propertyId: propertyId,
-      userId: agentId,
-    });
-
-    const applicationId = finalApproved[0].id;
-    await updateTenantApplicationStatus(
-      [applicationId],
-      TenantApplicationStatus.TENANT_CHOSEN,
-      5,
-      taskResult
-    );
-
-    console.log(`Successfully sent final approved application to agent for property ${propertyId}`);
-
-    return {
-      success: true,
+    return await sendFinalApprovedApplicationToAgentUseCase(
       propertyId,
-      applicationId,
-      taskId: taskResult
-    };
+      propertyLandlordId,
+      streetNumber,
+      street,
+      suburb,
+      province,
+      postcode,
+      finalApproved
+    );
   }
 );
 
@@ -334,26 +251,18 @@ export const loadTenantApplicationsForPropertyAsync = createAsyncThunk(
   }
 );
 
-
-// const findApplicationById = (state: RootState, applicationId: string): TenantApplication | undefined => {
-//   const all = Object.values(state.tenantSelection.applicationsByProperty).flat();
-//   return all.find(a => a.id === applicationId);
-// };
-
 export const intentAcceptApplicationAsync = createAsyncThunk(
   "tenantSelection/intentAcceptApplication",
   async (args: { propertyId: string; applicationId: string }, { getState, dispatch }) => {
     const state = getState() as RootState;
     const role = state.currentUser.authUser?.role;
 
-
-    // }
     if (role === Role.AGENT) {
-      await agentAcceptApplication(dispatch as any, () => getState() as RootState, args.propertyId, args.applicationId);
+      await agentAcceptApplication(dispatch as AppDispatch, () => getState() as RootState, args.propertyId, args.applicationId);
       return;
     }
     if (role === Role.LANDLORD) {
-      await landLordApproveApplication(dispatch as any, () => getState() as RootState, args.propertyId, args.applicationId);
+      await landLordApproveApplication(dispatch as AppDispatch, () => getState() as RootState, args.propertyId, args.applicationId);
       return;
     }
     throw new Error("Action not allowed");
@@ -367,30 +276,32 @@ export const intentRejectApplicationAsync = createAsyncThunk(
     const role = state.currentUser.authUser?.role;
 
     if (role === Role.AGENT) {
-      await agentRejectApplication(dispatch as any, () => getState() as RootState, args.propertyId, args.applicationId);
+      await agentRejectApplication(dispatch as AppDispatch, () => getState() as RootState, args.propertyId, args.applicationId);
       return;
     }
     if (role === Role.LANDLORD) {
-      await landLordRejectApplication(dispatch as any, () => getState() as RootState, args.propertyId, args.applicationId);
+      await landLordRejectApplication(dispatch as AppDispatch, () => getState() as RootState, args.propertyId, args.applicationId);
       return;
     }
     throw new Error("Action not allowed");
   }
 );
 
-
-
-
 export const intentSendApplicationToLandlordAsync = createAsyncThunk(
   "tenantSelection/intentSendApplicationToLandlord",
   async (_, { getState, dispatch }) => {
-    const s = getState() as RootState;
-    const apps = s.tenantSelection.applicationsByProperty[s.propertyListing.propertyId] || [];
-    if (apps.some(a => a.status === TenantApplicationStatus.ACCEPTED)) {
-      return await (dispatch as any)(sendAcceptedApplicationsToLandlordAsync()).unwrap();
+    const state = getState() as RootState;
+    const propertyId = state.propertyListing.propertyId;
+    const apps = state.tenantSelection.applicationsByProperty[propertyId] || [];
+
+    const hasAccepted = apps.some(a => a.status === TenantApplicationStatus.ACCEPTED);
+    if (hasAccepted) {
+      return await dispatch(sendAcceptedApplicationsToLandlordAsync()).unwrap();
     }
-    if (apps.some(a => a.status === TenantApplicationStatus.BACKGROUND_CHECK_PASSED)) {
-      return await (dispatch as any)(sendBackgroundPassedToLandlordAsync()).unwrap();
+
+    const hasBackgroundPassed = apps.some(a => a.status === TenantApplicationStatus.BACKGROUND_CHECK_PASSED);
+    if (hasBackgroundPassed) {
+      return await dispatch(sendBackgroundPassedToLandlordAsync()).unwrap();
     }
   }
 );
@@ -403,12 +314,17 @@ export const intentSendApplicationToAgentAsync = createAsyncThunk(
     const apps = state.tenantSelection.applicationsByProperty[propertyId] || [];
 
     const hasApproved = apps.some(a => a.status === TenantApplicationStatus.LANDLORD_APPROVED);
-    if (hasApproved) return await (dispatch as any)(sendApprovedApplicationsToAgentAsync()).unwrap();
+    if (hasApproved) {
+      return await dispatch(sendApprovedApplicationsToAgentAsync()).unwrap();
+    }
 
     const hasFinalApproved = apps.some(a => a.status === TenantApplicationStatus.FINAL_APPROVED);
-    if (hasFinalApproved) return await (dispatch as any)(sendFinalApprovedApplicationToAgentAsync()).unwrap();
+    if (hasFinalApproved) {
+      return await dispatch(sendFinalApprovedApplicationToAgentAsync()).unwrap();
+    }
   }
 );
+
 const updateApplicationStatus = (
   state: TenantSelectionUiState,
   applicationId: string,
@@ -438,12 +354,6 @@ export const tenantSelectionSlice = createSlice({
     },
     setCurrentStep: (state, action) => {
       state.currentStep = action.payload;
-    },
-    addBookedInspection: (state, action) => {
-      const index = action.payload;
-      if (!state.bookedInspections.includes(index)) {
-        state.bookedInspections.push(index);
-      }
     },
   },
   extraReducers: (builder) => {
@@ -655,7 +565,6 @@ export const {
   setFilter,
   clearError,
   setCurrentStep,
-  addBookedInspection,
 } = tenantSelectionSlice.actions;
 
 export const selectTenantSelectionState = (state: RootState) => state.tenantSelection;
@@ -674,7 +583,6 @@ export const selectHasAcceptedApplicationsForProperty = (state: RootState, prope
   return applications.some((app: DomainTenantApplication) => app.status === TenantApplicationStatus.ACCEPTED);
 };
 
-// Selector to check if there are landlord approved applications
 export const selectHasLandlordApprovedApplicationsForProperty = (state: RootState, propertyId: string) => {
   const applications = selectApplicationsForProperty(state, propertyId);
   return applications.some((app: DomainTenantApplication) => app.status === TenantApplicationStatus.LANDLORD_APPROVED);
@@ -683,6 +591,11 @@ export const selectHasBackgroundPassedApplicationsForProperty = (state: RootStat
   const applications = selectApplicationsForProperty(state, propertyId);
   return applications.some((app: DomainTenantApplication) => app.status === TenantApplicationStatus.BACKGROUND_CHECK_PASSED)
 }
+
+export const selectHasFinalApprovedApplicationForProperty = (state: RootState, propertyId: string) => {
+  const applications = selectApplicationsForProperty(state, propertyId);
+  return applications.some((app: DomainTenantApplication) => app.status === TenantApplicationStatus.FINAL_APPROVED);
+};
 
 export const selectFilteredApplications = (state: RootState, propertyId: string) => {
   const applications = selectApplicationsForProperty(state, propertyId);
@@ -706,31 +619,26 @@ export const selectHasCurrentUserApplied = (state: RootState, propertyId: string
   return applications.some((app: DomainTenantApplication) => app.applicantName === currentUserName);
 };
 
-// Property-specific count selector
 
-// Step 1
+
+// Step 1 agent accepted applicant count
 export const selectAcceptedApplicantCountForProperty = (state: RootState, propertyId: string) => {
   const applications = selectApplicationsForProperty(state, propertyId);
   return applications.filter((app: DomainTenantApplication) => app.status === TenantApplicationStatus.ACCEPTED).length;
 };
 
-// Step 2
+// Step 2 landlord approved applicant count
 export const selectLandlordApprovedApplicantCountForProperty = (state: RootState, propertyId: string) => {
   const applications = selectApplicationsForProperty(state, propertyId);
   return applications.filter((app: DomainTenantApplication) => app.status === TenantApplicationStatus.LANDLORD_APPROVED).length;
 };
-
+// Step 3 background check passed applicantcount
 export const selectBackgroundPassedApplicantCountForProperty = (state: RootState, propertyId: string) => {
   const applications = selectApplicationsForProperty(state, propertyId);
   return applications.filter((app: DomainTenantApplication) => app.status === TenantApplicationStatus.BACKGROUND_CHECK_PASSED).length;
 };
 
-// step 4 final approved application (only one applicant is chosen)
-export const selectHasFinalApprovedApplicationForProperty = (state: RootState, propertyId: string) => {
-  const applications = selectApplicationsForProperty(state, propertyId);
-  return applications.some((app: DomainTenantApplication) => app.status === TenantApplicationStatus.FINAL_APPROVED);
-};
-
+// Step 4 final approved applicant count
 export const selectFinalApprovedApplicantCountForProperty = (state: RootState, propertyId: string) => {
   const applications = selectApplicationsForProperty(state, propertyId);
   return applications.filter((app: DomainTenantApplication) => app.status === TenantApplicationStatus.FINAL_APPROVED).length;

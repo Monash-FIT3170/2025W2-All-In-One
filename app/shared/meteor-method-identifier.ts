@@ -1,7 +1,8 @@
 export enum MeteorMethodIdentifier {
-  TASK_INSERT = "tasks.insert",
   TASK_INSERT_FOR_AGENT = "tasks.insertForAgent",
   TASK_INSERT_FOR_LANDLORD = "tasks.insertForLandlord",
+  TASK_UPDATE_FOR_AGENT = "tasks.updateForAgent",
+  TASK_UPDATE_FOR_LANDLORD = "tasks.updateForLandlord",
   TASK_GET_ALL = "tasks.getAll",
   TASK_GET = "tasks.getOne",
   TASK_GET_MULTIPLE = "tasks.getMultiple",
@@ -44,16 +45,10 @@ export enum MeteorMethodIdentifier {
   PROFILE_INSERT = "profileData.insert",
   LISTING_SUBMIT_DRAFT = "listing.submitDraft",
   PROPERTY_FEATURES_GET_ALL = "propertyFeatures.getAll",
-
-
-  // Tenant application methods
   TENANT_APPLICATION_GET_BY_PROPERTY_ID = "tenantApplication.getByPropertyId",
   TENANT_APPLICATION_GET_BY_LANDLORD_ID = "tenantApplications.getByLandlordId",
   TENANT_APPLICATION_INSERT = "tenantApplications.insert",
   TENANT_APPLICATION_UPDATE_STATUS = "tenantApplications.updateStatus",
-
-
-
-
+  TENANT_APPLICATION_UPDATE_LINKED_TASK = "tenantApplications.updateLinkedTask", // Updates the task ID when the role has an existing task related to the applications
   PROPERTY_SEARCH = "PROPERTY_SEARCH",
 }

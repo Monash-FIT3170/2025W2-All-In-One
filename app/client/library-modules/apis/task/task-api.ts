@@ -3,24 +3,11 @@ import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
 
+
 export async function apiGetTaskById(id: string): Promise<ApiTask> {
   const fetchedTask = await Meteor.callAsync(MeteorMethodIdentifier.TASK_GET, id);
 
   return fetchedTask;
-}
-
-export type CreateTaskPayload = {
-  name: string;
-  description: string;
-  dueDate: Date;
-  priority: TaskPriority;
-  propertyAddress: string;
-  propertyId: string;
-  userId: string;
-};
-
-export async function apiCreateTask(taskData: CreateTaskPayload): Promise<string> {
-  return await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT, taskData);
 }
 
 export async function apiCreateTaskForAgent(taskData: {
@@ -54,6 +41,38 @@ export async function apiCreateTaskForLandlord(taskData: {
     return result;
   } catch (error) {
     console.error("Failed to create landlord task:", error);
+    throw error;
+  }
+}
+
+export async function apiUpdateTaskForAgent(taskData: {
+  taskId: string;
+  name?: string;
+  description?: string;
+  dueDate?: Date;
+  priority?: TaskPriority;
+}): Promise<string> {
+  try {
+    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_UPDATE_FOR_AGENT, taskData);
+    return result;
+  } catch (error) {
+    console.error("Failed to update agent task:", error);
+    throw error;
+  }
+}
+
+export async function apiUpdateTaskForLandlord(taskData: {
+  taskId: string;
+  name?: string;
+  description?: string;
+  dueDate?: Date;
+  priority?: TaskPriority;
+}): Promise<string> {
+  try {
+    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_UPDATE_FOR_LANDLORD, taskData);
+    return result;
+  } catch (error) {
+    console.error("Failed to update landlord task:", error);
     throw error;
   }
 }

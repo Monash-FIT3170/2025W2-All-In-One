@@ -30,6 +30,7 @@ async function mapTenantApplicationDocumentToDTO(
     landlordId: doc.landlordId,
     tenantUserId: doc.tenantUserId,
     taskId: doc.taskId,
+    linkedTaskId: doc.linkedTaskId,
   };
 }
 
@@ -143,9 +144,43 @@ const tenantApplicationUpdateStatusMethod = {
   },
 };
 
+const tenantApplicationUpdateLinkedTaskMethod = {
+  [MeteorMethodIdentifier.TENANT_APPLICATION_UPDATE_LINKED_TASK]: async (
+    applicationId: string,
+    linkedTaskId: string
+  ): Promise<void> => {
+    try {
+      // Validate inputs
+      if (!applicationId || !linkedTaskId) {
+        throw new InvalidDataError('Application ID and Linked Task ID are required');
+      }
+
+      // Update the tenant application with the linked task ID
+      const result = await TenantApplicationCollection.updateAsync(
+        { _id: applicationId },
+        {
+          $set: {
+            linkedTaskId: linkedTaskId,
+            updatedAt: new Date()
+          }
+        }
+      );
+
+      if (result === 0) {
+        throw new InvalidDataError('Tenant application not found');
+      }
+
+      console.log(`Updated tenant application ${applicationId} with linked task ID ${linkedTaskId}`);
+    } catch (error) {
+      console.error("Error in tenantApplicationUpdateLinkedTaskMethod:", error);
+      throw meteorWrappedInvalidDataError(error as InvalidDataError);
+    }
+  },
+};
 Meteor.methods({
   ...tenantApplicationGetByPropertyIdMethod,
   ...tenantApplicationGetByLandlordIdMethod,
   ...tenantApplicationInsertMethod,
   ...tenantApplicationUpdateStatusMethod,
+  ...tenantApplicationUpdateLinkedTaskMethod,
 });

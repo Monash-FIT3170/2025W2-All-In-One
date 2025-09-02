@@ -173,7 +173,7 @@ export const propertyListingSlice = createSlice({
 })
 
 export const {
-  addBookedInspection, // ADD THIS
+  addBookedInspection,
 } = propertyListingSlice.actions;
 
 function getPropertyAreaDisplayString(area: number): string {

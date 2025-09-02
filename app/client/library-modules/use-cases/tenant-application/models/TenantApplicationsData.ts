@@ -13,7 +13,6 @@ export type CreateTenantApplicationRequest = {
   currentUser: RoleUser | null;
   profileData?: ProfileData | null;
   authUser: UserAccount | null;
-  bookedInspections: Set<number>;
   agentId?: string;
   tenantUserId: string;
 };

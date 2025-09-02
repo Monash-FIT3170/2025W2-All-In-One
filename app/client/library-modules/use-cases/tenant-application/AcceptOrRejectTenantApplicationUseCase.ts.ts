@@ -1,4 +1,3 @@
-import { sendBackgroundPassedToLandlordUseCase } from "./ProcessTenantApplicationUseCase";
 import { RootState } from "/app/client/store";
 import { AppDispatch } from "/app/client/store";
 import {

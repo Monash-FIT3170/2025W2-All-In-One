@@ -2,7 +2,6 @@ import { TenantApplication } from "/app/client/library-modules/domain-models/ten
 import { FilterType } from "../enums/FilterType";
 
 export type TenantSelectionUiState = {
-  // Property specific applications: { propertyId: TenantApplication[] }
   applicationsByProperty: Record<string, TenantApplication[]>;
 
   // UI state
@@ -10,5 +9,4 @@ export type TenantSelectionUiState = {
   isLoading: boolean;
   error: string | null;
   currentStep: number;
-  bookedInspections: number[];
 };

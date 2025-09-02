@@ -57,3 +57,15 @@ export async function apiGetTenantApplicationsByLandlordId(landlordId: string): 
       throw error;
     }
   }
+
+  export async function apiUpdateTenantApplicationLinkedTaskId(
+    applicationId: string,
+    linkedTaskId: string
+  ): Promise<void> {
+    try {
+      await Meteor.callAsync(MeteorMethodIdentifier.TENANT_APPLICATION_UPDATE_LINKED_TASK, applicationId, linkedTaskId);
+    } catch (error) {
+      console.error('Failed to update tenant application linked task:', error);
+      throw error;
+    }
+  }
