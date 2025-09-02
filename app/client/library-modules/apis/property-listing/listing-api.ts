@@ -56,12 +56,12 @@ export async function apiSubmitDraftListing(propertyId: string): Promise<void> {
   );
 }
 
-export async function apiInsertPropertyInspections(
-  propertyInspections: { start_time: Date; end_time: Date }[]
+export async function apiInsertPropertyListingInspections(
+  propertyListingInspections: { start_time: Date; end_time: Date }[]
 ): Promise<string[]> {
   const ids = await Meteor.callAsync(
-    MeteorMethodIdentifier.INSERT_PROPERTY_INSPECTION,
-    propertyInspections
+    MeteorMethodIdentifier.INSERT_PROPERTY_LISTING_INSPECTION,
+    propertyListingInspections
   );
   return ids;
 }

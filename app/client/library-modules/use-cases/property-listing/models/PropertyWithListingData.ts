@@ -21,7 +21,7 @@ export type PropertyWithListingData = {
   locationLatitude: number;
   locationLongitude: number;
   listing_status: string;
-  propertyInspections: {
+  propertyListingInspections: {
     start_time: Date;
     end_time: Date;
   }[];

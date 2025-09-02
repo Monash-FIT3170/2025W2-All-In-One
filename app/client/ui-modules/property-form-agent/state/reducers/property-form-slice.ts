@@ -14,7 +14,7 @@ import {
   uploadFilesHandler,
 } from "/app/client/library-modules/apis/azure/blob-api";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
-import { insertPropertyInspections, insertPropertyListing } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
+import { insertPropertyListingInspections, insertPropertyListing } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
 import { insertPropertyPrice } from "/app/client/library-modules/domain-models/property-price/property-price-repository";
 import { FormSchemaType } from "../../components/FormSchema";
 import { mapFormSchemaToPropertyInsertData } from "/app/client/library-modules/domain-models/property/repositories/mappers/property-mapper";
@@ -76,7 +76,7 @@ export const submitForm = createAsyncThunk(
       BlobNamePrefix.PROPERTY
     );
     const imageUrls = getImageUrlsFromUploadResults(uploadResults);
-    const inspectionIds = await insertPropertyInspections(
+    const inspectionIds = await insertPropertyListingInspections(
       (propertyFormData.inspection_times ?? []).map((t) => ({
         start_time: t.start_time,
         end_time: t.end_time,

@@ -5,14 +5,14 @@ import { useNavigate } from "react-router";
 import { getFormattedDateStringFromDate } from "../../../library-modules/utils/date-utils";
 import { PropertyWithListingData } from "../../../library-modules/use-cases/property-listing/models/PropertyWithListingData";
 
-function getNextInspectionDateString(propertyInspections?: { start_time: Date }[]): string { 
-    if (!propertyInspections || propertyInspections.length === 0) {
+function getNextInspectionDateString(propertyListingInspections?: { start_time: Date }[]): string { 
+    if (!propertyListingInspections || propertyListingInspections.length === 0) {
         return "No upcoming inspections";
     }
 
     const now = new Date();
-    const futureInspections = propertyInspections
-        .filter(propertyInspections => propertyInspections.start_time > now)
+    const futureInspections = propertyListingInspections
+        .filter(propertyListingInspections => propertyListingInspections.start_time > now)
         .sort((a, b) => a.start_time.getTime() - b.start_time.getTime());
 
     if (futureInspections.length === 0) {
@@ -33,7 +33,7 @@ export function PropertyCard(props: PropertyWithListingData) {
         bathrooms,
         bedrooms,
         image_urls,
-        propertyInspections,
+        propertyListingInspections,
     } = props;
 
     const address = `${streetnumber} ${streetname}`;
@@ -42,7 +42,7 @@ export function PropertyCard(props: PropertyWithListingData) {
 
     const displayImageUrl = image_urls?.[0];
 
-    const nextInspectionDate = getNextInspectionDateString(propertyInspections);
+    const nextInspectionDate = getNextInspectionDateString(propertyListingInspections);
 
     const handleClick = () => {
         if (propertyId) {            

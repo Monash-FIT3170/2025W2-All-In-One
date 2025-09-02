@@ -5,6 +5,6 @@ export function mapApiListingToListing(data: ApiListing): Listing {
   return {
     image_urls: data.image_urls,
     listing_status: data.listing_status,
-    propertyInspections: data.propertyInspections
+    propertyListingInspections: data.propertyListingInspections
   }
 }
