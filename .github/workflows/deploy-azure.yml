@@ -85,3 +85,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # Point the Web App to the new immutable tag to force a fresh pull
+      - name: Update App Service image tag
+        run: |
+          az webapp config container set \
+            --name "${APP_SERVICE_NAME}" \
+            --resource-group "${AZ_RESOURCE_GROUP}" \
+            --docker-custom-image-name "${REGISTRY}/${REPOSITORY}:prod-${SHORT_SHA}" \
+            --docker-registry-server-url "https://${REGISTRY}"
+
+
