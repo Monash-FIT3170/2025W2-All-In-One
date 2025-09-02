@@ -54,7 +54,6 @@ export function PropertyListingPage({
   className?: string;
 }): React.JSX.Element {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams] = useSearchParams();
   const propertyId = searchParams.get("propertyId");
   const dispatch = useAppDispatch();

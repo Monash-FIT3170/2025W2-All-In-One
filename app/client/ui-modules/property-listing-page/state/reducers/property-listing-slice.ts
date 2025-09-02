@@ -167,8 +167,6 @@ function getListingStatusDisplayString(status: string): string {
       return "CURRENT LISTING";
     case ListingStatus.LISTED.toLowerCase():
       return "LISTED";
-    case ListingStatus.TENANT_SELECTION.toLowerCase():
-      return "TENANT SELECTION";
     case ListingStatus.TENANT_APPROVAL.toLowerCase():
       return "TENANT APPROVAL";
     default:
@@ -193,7 +191,6 @@ function getListingStatusPillVariant(status: string): ListingStatusPillVariant {
       return ListingStatusPillVariant.DRAFT;
     case "listed":
     case ListingStatus.LISTED.toLowerCase():
-    case ListingStatus.TENANT_SELECTION.toLowerCase():
     case ListingStatus.TENANT_APPROVAL.toLowerCase():
       return ListingStatusPillVariant.CURRENT;
     default:
