@@ -19,7 +19,7 @@ export enum MeteorMethodIdentifier {
   LISTING_STATUS_GET_BY_NAME = "listings.getStatusByName", // Get listing status document by name
   LISTING_GET_ALL_LISTED = "listings.getAllListed",
   INSERT_PROPERTY_LISTING = "listings.insertProperty",
-  INSPECTION_INSERT = "inspections.insert",
+  INSERT_PROPERTY_INSPECTION = "inspections.insert",
   USER_REGISTER = "user.register",
   USER_ACCOUNT_INSERT = "users.insert",
   USER_ACCOUNT_GET = "users.getOne",

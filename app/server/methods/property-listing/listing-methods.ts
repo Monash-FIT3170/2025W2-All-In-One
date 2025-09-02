@@ -167,7 +167,7 @@ async function mapListingDocumentToListingDTO(
     property_id: listing.property_id,
     image_urls: listing.image_urls,
     listing_status: listingStatusDocument.name,
-    inspections: inspections.map((inspection) => ({
+    propertyInspections: inspections.map((inspection) => ({
       start_time: inspection.starttime,
       end_time: inspection.endtime,
     })),
@@ -235,15 +235,15 @@ const getListingStatusIdByName = {
   },
 };
 
-const insertInspection = {
-  [MeteorMethodIdentifier.INSPECTION_INSERT]: async (
-    inspections: { start_time: Date; end_time: Date }[]
+const insertPropertyInspection = {
+  [MeteorMethodIdentifier.INSERT_PROPERTY_INSPECTION]: async (
+    propertyInspections: { start_time: Date; end_time: Date }[]
   ): Promise<string[]> => {
-    if (!Array.isArray(inspections)) {
+    if (!Array.isArray(propertyInspections)) {
       throw new Meteor.Error("invalid-args", "inspections must be an array");
     }
     const ids: string[] = [];
-    for (const insp of inspections) {
+    for (const insp of propertyInspections) {
       if (!insp?.start_time || !insp?.end_time) {
         throw new Meteor.Error(
           "invalid-args",
@@ -266,5 +266,5 @@ Meteor.methods({
   ...getListingStatusIdByName,
   ...submitDraftListing,
   ...getAllListedListings,
-  ...insertInspection,
+  ...insertPropertyInspection,
 });
