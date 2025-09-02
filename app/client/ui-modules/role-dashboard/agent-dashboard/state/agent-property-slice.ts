@@ -25,8 +25,14 @@ const initialState: AgentPropertyState = {
 
 export const fetchAgentPropertiesWithListingData = createAsyncThunk(
   "agentProperties/fetchAgentProperties",
-  async (userId: string, { rejectWithValue }) => {
+  async (_: void, { getState, rejectWithValue }) => {
     try {
+      const state = getState() as RootState;
+      const userId = state.currentUser.authUser?.userId;
+      if (!userId) {
+        return rejectWithValue("No authenticated user");
+      }
+
       const agent = await getAgentById(userId);
       const properties = await getPropertyByAgentId(agent.agentId);
       const listings = await Promise.all(

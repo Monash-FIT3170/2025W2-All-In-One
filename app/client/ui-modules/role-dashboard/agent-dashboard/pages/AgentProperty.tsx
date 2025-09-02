@@ -32,11 +32,8 @@ export function AgentProperty(): React.JSX.Element {
     ListingStatus.CLOSED,   
   ];
   useEffect(() => {
-    // Fetch agent properties when the component mounts
-    if (currentUser) {
-      dispatch(fetchAgentPropertiesWithListingData(currentUser.userId));
-    }
-  }, [currentUser, dispatch]);
+    dispatch(fetchAgentPropertiesWithListingData());
+  }, [currentUser?.userId, dispatch]);
   console.log("Properties with listing data:", propertiesWithListingData);
 
   return (
