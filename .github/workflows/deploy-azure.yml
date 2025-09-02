@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
 
 # OIDC login needs this
+
 permissions:
   contents: read
   id-token: write
@@ -26,6 +27,7 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Checkout
@@ -42,7 +44,7 @@ jobs:
 
       # Install Node dependencies via Meteor's bundled Node/npm
       - name: Install dependencies
-        run: meteor npm ci
+        run: meteor npm install
 
       # Build Meteor server bundle expected by Dockerfile (bundle/bundle)
       - name: Build Meteor server bundle
@@ -82,4 +84,14 @@ jobs:
             EXACT_NODE_VERSION=true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # Point the Web App to the new immutable tag to force a fresh pull
+      - name: Update App Service image tag
+        run: |
+          az webapp config container set \
+            --name "${APP_SERVICE_NAME}" \
+            --resource-group "${AZ_RESOURCE_GROUP}" \
+            --docker-custom-image-name "${REGISTRY}/${REPOSITORY}:prod-${SHORT_SHA}" \
+            --docker-registry-server-url "https://${REGISTRY}"
+
 
