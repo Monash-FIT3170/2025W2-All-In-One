@@ -1,7 +1,7 @@
 import React from "react";
 import { twMerge } from "tailwind-merge";
 
-export function ListingPropertyDetails({
+export function PropertySpecifics({
   propertyType,
   area,
   bathrooms,

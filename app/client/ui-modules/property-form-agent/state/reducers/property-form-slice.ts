@@ -71,8 +71,10 @@ export const submitForm = createAsyncThunk(
     const propertyId = await insertProperty(propertyInsertData);
     await insertPropertyPrice(propertyId, monthly_rent);
 
+    // Handle image uploads
+    const fileObjects = images.filter(item => item instanceof File) as File[];
     const uploadResults: UploadResults = await uploadFilesHandler(
-      images,
+      fileObjects,
       BlobNamePrefix.PROPERTY
     );
     const imageUrls = getImageUrlsFromUploadResults(uploadResults);

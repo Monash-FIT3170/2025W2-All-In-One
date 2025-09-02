@@ -56,6 +56,17 @@ export async function apiSubmitDraftListing(propertyId: string): Promise<void> {
   );
 }
 
+export async function apiUpdatePropertyListingImages(
+  propertyId: string,
+  imageUrls: string[]
+): Promise<{ success: boolean; propertyId: string }> {
+  return await Meteor.callAsync(
+    MeteorMethodIdentifier.LISTING_UPDATE_IMAGES,
+    propertyId,
+    imageUrls
+  );
+}
+
 export async function apiInsertPropertyListingInspections(
   propertyListingInspections: { start_time: Date; end_time: Date }[]
 ): Promise<string[]> {

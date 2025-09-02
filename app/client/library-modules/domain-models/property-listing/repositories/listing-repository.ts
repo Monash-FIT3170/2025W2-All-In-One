@@ -1,4 +1,5 @@
 import { apiGetListingForProperty, apiSubmitDraftListing, apiGetAllListedListings, apiInsertPropertyListing, apiInsertPropertyListingInspections } from "../../../apis/property-listing/listing-api";
+import { apiGetListingForProperty, apiSubmitDraftListing, apiGetAllListedListings, apiInsertPropertyListing, apiUpdatePropertyListingImages } from "../../../apis/property-listing/listing-api";
 import { Listing } from "/app/client/library-modules/domain-models/property-listing/Listing";
 import { mapApiListingToListing } from "./mappers/listing-mapper";
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
@@ -35,4 +36,11 @@ export async function insertPropertyListingInspections(
   propertyListingInspections: { start_time: Date; end_time: Date }[]
 ): Promise<string[]> {
   return apiInsertPropertyListingInspections(propertyListingInspections);
+}
+
+export async function updatePropertyListingImages(
+  propertyId: string,
+  imageUrls: string[]
+): Promise<{ success: boolean; propertyId: string }> {
+  return await apiUpdatePropertyListingImages(propertyId, imageUrls);
 }
