@@ -16,10 +16,10 @@ import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { PropertyInsertData } from "/app/shared/api-models/property/PropertyInsertData";
 
 export async function getPropertyById(id: string): Promise<Property> {
-    const apiProperty = await apiGetPropertyById(id);
-    const mappedProperty = mapApiPropertyToProperty(apiProperty);
+  const apiProperty = await apiGetPropertyById(id);
+  const mappedProperty = mapApiPropertyToProperty(apiProperty);
 
-    return mappedProperty;
+  return mappedProperty;
 }
 
 export async function getPropertyStatusId(
@@ -28,7 +28,6 @@ export async function getPropertyStatusId(
   return await apiGetPropertyStatusId(name);
 }
 
-
 export async function insertProperty(
   property: PropertyInsertData
 ): Promise<string> {
@@ -36,10 +35,10 @@ export async function insertProperty(
 }
 
 export async function getAllProperties(): Promise<Property[]> {
-    const apiProperties = await apiGetAllProperties();
-    const mappedProperties = apiProperties.map(mapApiPropertyToProperty);
+  const apiProperties = await apiGetAllProperties();
+  const mappedProperties = apiProperties.map(mapApiPropertyToProperty);
 
-    return mappedProperties;
+  return mappedProperties;
 }
 
 export async function getPropertyByTenantId(
@@ -66,9 +65,19 @@ export async function getAllPropertiesByLandlordId(
   return mappedProperties;
 }
 
+export async function fetchLandlordDashboardData(
+  landlordId: string
+): Promise<ApiLandlordDashboard> {
+  return await apiGetLandlordDashboard(landlordId);
+}
+
+export const landlordPropertyRepository = {
+  fetchLandlordDashboardData,
+};
+
 export async function searchProperties(query: string): Promise<Property[]> {
-    const apiProperties = await apiSearchPropertyByQuery(query);
-    return apiProperties.map(mapApiPropertyToProperty);
+  const apiProperties = await apiSearchPropertyByQuery(query);
+  return apiProperties.map(mapApiPropertyToProperty);
 }
 
 export async function updatePropertyTenantId(propertyId: string, tenantId: string): Promise<void> {
