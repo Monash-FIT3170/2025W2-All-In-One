@@ -8,7 +8,6 @@ export enum MeteorMethodIdentifier {
   BLOB_UPLOAD_FILES = "blobs.uploadFiles", // Uploads multiple files to Azure Blob Storage
   PROPERTY_GET = "properties.getOne",
   PROPERTY_GET_ALL = "properties.getAll",
-  PROPERTY_GET_COUNT = "properties.getCount",
   PROPERTY_GET_ALL_BY_AGENT_ID = "properties.getAllByAgentId", // Fetches all properties managed by an agent by their userID
   PROPERTY_INSERT = "properties.insert", // Inserts property into property collection
   PROPERTY_PRICE_INSERT = "properties.insertPrice", // Inserts property price into property price collection
@@ -18,12 +17,14 @@ export enum MeteorMethodIdentifier {
   LISTING_GET_FOR_PROPERTY = "listings.getForProperty", //Get listing document from property id
   LISTING_STATUS_GET_BY_NAME = "listings.getStatusByName", // Get listing status document by name
   LISTING_GET_ALL_LISTED = "listings.getAllListed",
+  LISTING_UPDATE_IMAGES = "listings.updateImages", // Update images of a draft listing
   INSERT_PROPERTY_LISTING = "listings.insertProperty",
   USER_REGISTER = "user.register",
   USER_ACCOUNT_INSERT = "users.insert",
   USER_ACCOUNT_GET = "users.getOne",
   AGENT_INSERT = "agents.insert",
   AGENT_GET = "agents.getOne",
+  AGENT_GET_BY_AGENT_ID = "agents.getByAgentId", // Get agent by agent ID (not user ID)
   AGENT_UPDATE_TASKS = "agents.updateTasks", // Adds the id of the newly created task to the agent's task_ids
   TENANT_INSERT = "tenants.insert",
   TENANT_GET = "tenants.getOne",

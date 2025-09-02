@@ -1,5 +1,6 @@
-import {UploadResults, FileInfo,isValidBlobContentType, BlobNamePrefix, UploadResult, dummyUploadResults } from '/app/shared/azure/blob-models'
+import {UploadResults, FileInfo,isValidBlobContentType, BlobNamePrefix, UploadResult } from '/app/shared/azure/blob-models'
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { BlobUploadCommonResponse } from "@azure/storage-blob";
 
 export async function uploadFileHandler(blob: Blob, blobName: string): Promise<UploadResult>{
     const uint8Array = await blobToUint8Array(blob)
@@ -11,8 +12,20 @@ export async function uploadFileHandler(blob: Blob, blobName: string): Promise<U
 export async function uploadFilesHandler(blobs: File[], blobNamePrefix: BlobNamePrefix): Promise<UploadResults>{
   
   if (Meteor.isDevelopment) {
-    console.warn("Development mode: Skipping file upload.");
-    return dummyUploadResults;  
+    console.warn("Development mode: Creating blob URLs instead of uploading.");
+    
+    // In development mode, create blob URLs to preserve actual uploaded images
+    const developmentResults: UploadResults = {
+      success: blobs.map(file => ({
+        blobName: `${blobNamePrefix}dev-${Date.now()}-${file.name}`,
+        success: true as const,
+        url: URL.createObjectURL(file),
+        response: {} as BlobUploadCommonResponse // Mock response for development
+      })),
+      failed: []
+    };
+    
+    return developmentResults;
   }
   
   const files: FileInfo[] = await Promise.all(

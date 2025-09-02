@@ -79,9 +79,10 @@ export const fetchLandlordDetails = createAsyncThunk(
     try {
       const landlordResponse = await getLandlordById(userId);
       const landlordId = landlordResponse?.landlordId;
-      properties = await getAllPropertiesByLandlordId(
-        landlordResponse.landlordId
-      );
+      
+      // Fetch basic properties (no listing data needed for dashboard)
+      properties = await getAllPropertiesByLandlordId(landlordResponse.landlordId);
+      
       taskDetails = await Promise.all(
         landlordResponse.tasks.map((taskId) => {
           return getTaskById(taskId);

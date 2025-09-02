@@ -47,6 +47,27 @@ const agentGetMethod = {
   },
 };
 
+// -- GET AGENT BY ID --
+const agentGetByAgentIDMethod = {
+  [MeteorMethodIdentifier.AGENT_GET_BY_AGENT_ID]: async (
+    agentId: string
+  ): Promise<ApiAgent> => {
+    const agentDoc = await AgentCollection.findOneAsync({
+      _id: agentId,
+    });
+
+    if (!agentDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Agent with user ID ${agentId} not found.`)
+      );
+    }
+    const agentDTO = await mapAgentDocumentToDTO(agentDoc).catch((error) => {
+      throw meteorWrappedInvalidDataError(error);
+    });
+    return agentDTO;
+  },
+};
+
 // -- UPDATE AGENT TASKS --
 const agentUpdateTasksMethod = {
   [MeteorMethodIdentifier.AGENT_UPDATE_TASKS]: async (
@@ -135,4 +156,5 @@ Meteor.methods({
   ...agentGetMethod,
   ...agentUpdateTasksMethod,
   ...profileGetByAgentIdMethod,
+  ...agentGetByAgentIDMethod,
 });

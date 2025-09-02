@@ -1,6 +1,6 @@
 import React from "react";
-import { DynamicMap } from "../../common/map/DynamicMap";
-import { BasicMarker } from "../../common/map/markers/BasicMarker";
+import { DynamicMap } from "../map/DynamicMap";
+import { BasicMarker } from "../map/markers/BasicMarker";
 import { twMerge } from "tailwind-merge";
 
 export type PropertyMapUiState = {
