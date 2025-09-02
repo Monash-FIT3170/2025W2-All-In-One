@@ -44,11 +44,7 @@ export function PropertyCard(props: PropertyWithListingData) {
 
     const displayImageUrl = image_urls?.[0];
 
-    const nextInspectionDate = getNextInspectionDateString(
-        inspections?.map(i => ({
-            start_time: new Date(i.start_time)
-        }))
-    );
+    const nextInspectionDate = getNextInspectionDateString(inspections);
 
     const handleClick = () => {
         if (propertyId) {
