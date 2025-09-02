@@ -42,7 +42,7 @@ jobs:
 
       # Install Node dependencies via Meteor's bundled Node/npm
       - name: Install dependencies
-        run: meteor npm ci
+        run: meteor npm install
 
       # Build Meteor server bundle expected by Dockerfile (bundle/bundle)
       - name: Build Meteor server bundle
