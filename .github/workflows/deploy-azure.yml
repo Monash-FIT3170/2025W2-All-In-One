@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
 
 # OIDC login needs this
+
 permissions:
   contents: read
   id-token: write
@@ -26,6 +27,7 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Checkout
