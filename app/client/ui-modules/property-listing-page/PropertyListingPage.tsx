@@ -537,8 +537,7 @@ function ListingHero({
         <div className="flex">
           <ApplyButton onClick={onApply} isLoading={isApplying} userRole={userRole} hasApplied={hasApplied} className="mr-4" />
           <ContactAgentButton
-            propertyId={propertyId}
-            onClick={onContactAgent} />
+            propertyId={propertyId} />
         </div>
       </div>
     </div>

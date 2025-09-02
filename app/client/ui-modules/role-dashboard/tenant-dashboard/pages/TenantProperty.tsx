@@ -19,7 +19,7 @@ import { twMerge } from "tailwind-merge";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useSelector } from "react-redux";
 import {
-  load, 
+  load,
   selectTenantPropertyUiState,
   submitDraftListingAsync,
 } from "/app/client/ui-modules/role-dashboard/tenant-dashboard/state/reducers/tenant-property-slice";
@@ -27,10 +27,6 @@ import { TenantPropertyUiState } from "../state/TenantPropertyUiState";
 import { useSearchParams } from "react-router";
 import { SubHeading } from "../../../theming/components/SubHeading";
 import { PropertyMap, PropertyMapUiState } from "../../../common/property-components/PropertyMap";
-import {
-  selectAcceptedCount,
-  selectHasAcceptedApplications,
-} from "../../../review-tenant-modal/state/reducers/tenant-selection-slice";
 import { fetchAgentWithProfile } from '../state/reducers/tenant-property-slice';
 import { AgentDetails } from '../components/AgentDetails';
 
@@ -183,11 +179,6 @@ function PropertyPageContent({
   className?: string;
 }): React.JSX.Element {
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
-
-  const acceptedCount = useAppSelector(selectAcceptedCount);
-  const hasAcceptedApplications = useAppSelector(selectHasAcceptedApplications);
-  const shouldShowSendToLandlordButton = hasAcceptedApplications;
-
   return (
     <div className={className}>
       <TopBar
