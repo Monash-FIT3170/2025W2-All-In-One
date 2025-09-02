@@ -57,25 +57,3 @@ export function mapLandlordTaskInsertData(task: {
     landlordId: task.userId, // Map userId to landlordId for the server
   }
 }
-
-export function mapTaskInsertData(task: {
-  name: string;
-  description: string;
-  dueDate: Date;
-  priority: TaskPriority;
-  propertyAddress: string;
-  propertyId: string;
-  userId: string;
-  userType: Role.AGENT | Role.LANDLORD;
-}) {
-  return {
-    name: task.name,
-    description: task.description,
-    dueDate: task.dueDate,
-    priority: task.priority,
-    propertyAddress: task.propertyAddress,
-    propertyId: task.propertyId,
-    userId: task.userId,
-    userType: task.userType,
-  }
-}

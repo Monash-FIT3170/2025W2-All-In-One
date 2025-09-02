@@ -21,11 +21,6 @@ import {
 } from "/app/client/library-modules/use-cases/tenant-application/SendTenantApplicationToAgentUseCase";
 import { agentAcceptApplication, agentRejectApplication, landLordApproveApplication, landLordRejectApplication } from "../../../../library-modules/use-cases/tenant-application/AcceptOrRejectTenantApplicationUseCase.ts";
 import { AppDispatch } from "/app/client/store";
-import { createTaskForAgent, updateTaskForAgent } from "../../domain-models/task/repositories/task-repository";
-import { TaskPriority } from "../../domain-models/task/TaskPriority";
-import { TenantApplicationLinkedTaskId } from "../../../../../shared/api-models/tenant-application/TenantApplicationLinkedTaskId";
-import { apiUpdateTenantApplicationLinkedTask } from "/app/client/library-modules/apis/tenant-application/tenant-application";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 const initialState: TenantSelectionUiState = {
   applicationsByProperty: {},
@@ -632,7 +627,7 @@ export const selectLandlordApprovedApplicantCountForProperty = (state: RootState
   const applications = selectApplicationsForProperty(state, propertyId);
   return applications.filter((app: DomainTenantApplication) => app.status === TenantApplicationStatus.LANDLORD_APPROVED).length;
 };
-// Step 3 background check passed applicantcount
+// Step 3 background check passed applicant count
 export const selectBackgroundPassedApplicantCountForProperty = (state: RootState, propertyId: string) => {
   const applications = selectApplicationsForProperty(state, propertyId);
   return applications.filter((app: DomainTenantApplication) => app.status === TenantApplicationStatus.BACKGROUND_CHECK_PASSED).length;

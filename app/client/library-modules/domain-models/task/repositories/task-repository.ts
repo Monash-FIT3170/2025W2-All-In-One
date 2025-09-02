@@ -1,8 +1,7 @@
 import { apiGetTaskById, apiCreateTaskForAgent, apiCreateTaskForLandlord,apiUpdateTaskForAgent, apiUpdateTaskForLandlord } from "../../../apis/task/task-api";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
-import { mapApiTaskToTask, mapAgentTaskInsertData, mapLandlordTaskInsertData, mapTaskInsertData } from "./mappers/task-mapper";
+import { mapApiTaskToTask, mapAgentTaskInsertData, mapLandlordTaskInsertData } from "./mappers/task-mapper";
 import { TaskPriority } from "/app/shared/task-priority-identifier"
-import { Role } from "/app/shared/user-role-identifier"
 
 export async function getTaskById(id: string): Promise<Task> {
   const apiTask = await apiGetTaskById(id);

@@ -8,6 +8,12 @@ import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
 
+type TaskUpdateData = {
+  name?: string;
+  description?: string;
+  dueDate?: Date;
+  priority?: TaskPriority;
+};
 /**
  * Retrieves a task by its ID and returns it as an `ApiTask` DTO.
  *
@@ -232,7 +238,7 @@ const taskUpdateForAgentMethod = {
       );
     }
 
-    const updateData: any = {};
+    const updateData: TaskUpdateData = {};
 
     if (taskData.name !== undefined) {
       updateData.name = taskData.name.trim();
@@ -286,7 +292,7 @@ const taskUpdateForLandlordMethod = {
       );
     }
 
-    const updateData: any = {};
+    const updateData: TaskUpdateData = {};
 
     if (taskData.name !== undefined) {
       updateData.name = taskData.name.trim();

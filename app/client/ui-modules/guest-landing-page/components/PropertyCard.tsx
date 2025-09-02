@@ -2,33 +2,25 @@ import React from "react";
 import { BedDouble, Bath, DoorOpen, CalendarDays } from "lucide-react";
 import { CardWidget } from "../../role-dashboard/components/CardWidget";
 import { useNavigate } from "react-router";
-
+import { getFormattedDateStringFromDate } from "../../../library-modules/utils/date-utils";
 import { PropertyWithListingData } from "../../../library-modules/use-cases/property-listing/models/PropertyWithListingData";
 
-function getNextInspectionDateString(inspections?: { start_time: string }[]): string {
+function getNextInspectionDateString(inspections?: { start_time: Date }[]): string {
     if (!inspections || inspections.length === 0) {
         return "No upcoming inspections";
     }
 
     const now = new Date();
     const futureInspections = inspections
-        .filter(inspection => {
-            const inspectionDate = new Date(inspection.start_time);
-            return inspectionDate > now;
-        })
-        .sort((a, b) => {
-            const dateA = new Date(a.start_time);
-            const dateB = new Date(b.start_time);
-            return dateA.getTime() - dateB.getTime();
-        });
+        .filter(inspection => inspection.start_time > now)
+        .sort((a, b) => a.start_time.getTime() - b.start_time.getTime());
 
     if (futureInspections.length === 0) {
         return "No upcoming inspections";
     }
 
-    // Extract date part from ISO string (format "YYYY-MM-DDTHH:MM:SS.sssZ")
-    const dateString = futureInspections[0].start_time.split('T')[0];
-    return dateString;
+    return getFormattedDateStringFromDate(futureInspections[0].start_time);
+
 }
 
 export function PropertyCard(props: PropertyWithListingData) {
@@ -52,7 +44,11 @@ export function PropertyCard(props: PropertyWithListingData) {
 
     const displayImageUrl = image_urls?.[0];
 
-    const nextInspectionDate = getNextInspectionDateString(inspections);
+    const nextInspectionDate = getNextInspectionDateString(
+        inspections?.map(i => ({
+            start_time: new Date(i.start_time)
+        }))
+    );
 
     const handleClick = () => {
         if (propertyId) {

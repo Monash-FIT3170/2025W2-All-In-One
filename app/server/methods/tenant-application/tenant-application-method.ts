@@ -7,6 +7,12 @@ import { TenantApplicationStatus } from '../../../shared/api-models/tenant-appli
 import { InvalidDataError } from '/app/server/errors/InvalidDataError';
 import { meteorWrappedInvalidDataError } from '/app/server/utils/error-utils';
 
+type TenantApplicationUpdateData = {
+  status: string;
+  step: number;
+  updatedAt: Date;
+  taskId?: string;
+};
 
 async function mapTenantApplicationDocumentToDTO(
   doc: TenantApplicationDocument
@@ -123,7 +129,7 @@ const tenantApplicationUpdateStatusMethod = {
     taskId?: string
   ): Promise<void> => {
     try {
-      const updateData: any = {
+      const updateData: TenantApplicationUpdateData = {
         status,
         step,
         updatedAt: new Date(),
