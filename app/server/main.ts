@@ -2,6 +2,8 @@ import { Meteor } from "meteor/meteor";
 import "./methods/azure/blob-methods";
 import "./methods/task/task-methods";
 import "./methods/property/property-methods";
+import "./methods/messaging/messaging-methods";
+import "./publications/messaging-publications";
 import "./methods/property-listing/listing-methods";
 import {
 	PropertyCollection,
