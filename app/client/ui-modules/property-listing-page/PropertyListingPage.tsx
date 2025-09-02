@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { PropertyFeatures } from "./components/PropertyFeatures";
-import { ListingPropertyDetails } from "./components/ListingPropertyDetails";
+import { PropertyFeatures } from "/app/client/ui-modules/common/property-components/PropertyFeatures";
+import { PropertySpecifics } from "/app/client/ui-modules/common/property-components/PropertySpecifics";
 import {
   PropertyStatusPillVariant,
   ListingSummary,
 } from "./components/ListingSummary";
-import { ListingDescription } from "./components/ListingDescription";
+import { PropertyDescription } from "/app/client/ui-modules/common/property-components/PropertyDescription";
 import { LeftCircularArrowIcon } from "/app/client/ui-modules/theming/icons/LeftCircularArrowIcon";
 import { RightCircularArrowIcon } from "/app/client/ui-modules/theming/icons/RightCircularArrowIcon";
 import { ImageCarousel } from "../theming/components/ImageCarousel";
 import {
   InspectionBookingListUiState,
   PropertyInspections,
-} from "/app/client/ui-modules/property-listing-page/components/PropertyInspections";
+} from "./components/PropertyInspections";
 import { ApplyButton } from "/app/client/ui-modules/property-listing-page/components/ApplyButton";
-import { ContactAgentButton } from "/app/client/ui-modules/property-listing-page/components/ContactAgentButton";
+import { ContactAgentButton } from "/app/client/ui-modules/common/property-components/ContactAgentButton";
 import {
   ListingStatusPill,
   ListingStatusPillVariant,
@@ -33,16 +33,16 @@ import {
   submitDraftListingAsync,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
-import { useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import EditDraftListingModal from "./components/EditDraftListingModal";
 import { EditDraftListingButton } from "./components/EditDraftListingButton";
-import {
-  FormSchemaType,
-} from "/app/client/ui-modules/property-form-agent/components/FormSchema";
+import { FormSchemaType } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
 import { DynamicMap } from "../common/map/DynamicMap";
 import { SubHeading } from "../theming/components/SubHeading";
 import { BasicMarker } from "../common/map/markers/BasicMarker";
-import { PropertyMap, PropertyMapUiState } from "./components/PropertyMap";
+import { PropertyMap, PropertyMapUiState } from "/app/client/ui-modules/common/property-components/PropertyMap";
+import { NavigationPath } from "../../navigation";
+import { BACK_ROUTES, EntryPoint  } from "../../navigation";
 import {
   selectAcceptedCount,
   selectHasAcceptedApplications,
@@ -53,6 +53,7 @@ export function PropertyListingPage({
 }: {
   className?: string;
 }): React.JSX.Element {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const propertyId = searchParams.get("propertyId");
   const dispatch = useAppDispatch();
@@ -112,7 +113,12 @@ export function PropertyListingPage({
           propertyLandlordId={state.propertyLandlordId}
           propertyId={state.propertyId}
           onBack={() => {
-            console.log("back button pressed");
+            const from = searchParams.get("from") as EntryPoint | null;
+            if (from && from in BACK_ROUTES) {
+              navigate(BACK_ROUTES[from]);
+            } else {
+              navigate(NavigationPath.Home);
+            }
           }}
           onBook={(index: number) => {
             console.log(`booking button ${index} pressed`);
@@ -218,6 +224,7 @@ function ListingPageContent({
         className="mb-3"
       />
       <ListingHero
+        propertyId={propertyId}
         streetNumber={streetNumber}
         street={street}
         suburb={suburb}
@@ -312,6 +319,7 @@ function TopBar({
 }
 
 function ListingHero({
+  propertyId,
   className = "",
   streetNumber,
   street,
@@ -331,6 +339,7 @@ function ListingHero({
   onApply,
   onContactAgent,
 }: {
+  propertyId: string;
   className?: string;
   streetNumber: string;
   street: string;
@@ -370,7 +379,7 @@ function ListingHero({
           propertyStatusPillVariant={propertyStatusPillVariant}
           className="mb-2"
         />
-        <ListingPropertyDetails
+        <PropertySpecifics
           propertyType={propertyType}
           area={propertyLandArea}
           bathrooms={propertyBathrooms}
@@ -381,7 +390,8 @@ function ListingHero({
         />
         <div className="flex">
           <ApplyButton onClick={onApply} className="mr-4" />
-          <ContactAgentButton onClick={onContactAgent} />
+          <ContactAgentButton 
+           propertyId={propertyId}/>
         </div>
       </div>
     </div>
@@ -406,7 +416,7 @@ function ListingDetails({
   return (
     <div className={twMerge("flex gap-7", className)}>
       <div className="flex-1 flex flex-col">
-        <ListingDescription
+        <PropertyDescription
           description={propertyDescription}
           className="mb-4"
         />
@@ -443,10 +453,7 @@ function BottomBar({
 }): React.JSX.Element {
   return (
     <div
-      className={twMerge(
-        "flex justify-between items-center gap-2",
-        className
-      )}
+      className={twMerge("flex justify-between items-center gap-2", className)}
     >
       {/* Left side - Review Tenant Button */}
       <div className="flex">
@@ -488,14 +495,14 @@ function ListingModalEditor({
     bathroom_number: Number(state.propertyBathrooms),
     space: Number(state.areaValue),
     description: state.propertyDescription,
-    images: [],
+    images: [], // Placeholder, as we don't have image files in the current state
     available_dates: new Date(),
     lease_term: "12_months",
     show_contact_boolean: true,
     suburb: state.suburb,
     address_number: state.streetNumber,
     monthly_rent: Number(state.propertyPrice),
-    property_feature_ids: []
+    property_feature_ids: [],
   };
 
   return (
@@ -507,6 +514,7 @@ function ListingModalEditor({
         propertyForm={listingInfo}
         landlords={state.landlords}
         propertyId={state.propertyId}
+        existingImageUrls={state.listingImageUrls}
       />
     </>
   );

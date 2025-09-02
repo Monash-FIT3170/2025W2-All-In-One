@@ -9,6 +9,10 @@ export async function apiGetAgent(userId: string): Promise<ApiAgent> {
   return await Meteor.callAsync(MeteorMethodIdentifier.AGENT_GET, userId);
 }
 
+export async function apiGetAgentbyId(userId: string): Promise<ApiAgent> {
+  return await Meteor.callAsync(MeteorMethodIdentifier.AGENT_GET_BY_AGENT_ID, userId);
+}
+
 export async function apiGetTenant(userId: string): Promise<ApiTenant> {
   return await Meteor.callAsync(MeteorMethodIdentifier.TENANT_GET, userId);
 }

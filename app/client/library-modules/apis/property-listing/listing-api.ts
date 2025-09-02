@@ -54,3 +54,14 @@ export async function apiSubmitDraftListing(propertyId: string): Promise<void> {
     propertyId
   );
 }
+
+export async function apiUpdatePropertyListingImages(
+  propertyId: string,
+  imageUrls: string[]
+): Promise<{ success: boolean; propertyId: string }> {
+  return await Meteor.callAsync(
+    MeteorMethodIdentifier.LISTING_UPDATE_IMAGES,
+    propertyId,
+    imageUrls
+  );
+}

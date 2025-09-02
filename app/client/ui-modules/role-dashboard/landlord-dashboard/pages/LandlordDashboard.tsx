@@ -25,6 +25,8 @@ export function LandlordDashboard(): React.JSX.Element {
     }
   }, [currentUser]);
 
+  console.log(currentUser);
+
   return (
     <div className="min-h-screen">
       <div className="flex">
@@ -33,7 +35,7 @@ export function LandlordDashboard(): React.JSX.Element {
           <LandlordDashboardCards dashboardData={dashboardData} />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <MyProperties properties={properties} />
-            <UpcomingTasks tasks={tasks} currentUser={currentUser}/>
+            <UpcomingTasks tasks={tasks} currentUser={currentUser} />
           </div>
         </div>
       </div>
