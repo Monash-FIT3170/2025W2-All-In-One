@@ -26,6 +26,3 @@ export const getTodayISODate = (): string => {
 export const getTodayAUDate = (): string => {
   return new Date().toLocaleDateString("en-AU");
 };
-
-
-

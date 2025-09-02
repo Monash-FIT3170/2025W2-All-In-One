@@ -109,7 +109,7 @@ export async function sendApprovedApplicationsToAgentUseCase(
     if (!existingTaskId) {
         throw new Error('No linked task ID found for final approved applications');
       }
-    // Create task for agent
+    // Update task for agent
     const taskResult = await updateTaskForAgent({
       taskId: existingTaskId,
       name: updatedTaskName,

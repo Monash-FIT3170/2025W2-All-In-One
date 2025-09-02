@@ -87,6 +87,8 @@ export async function sendBackgroundPassedToLandlordUseCase(
     throw new Error('No linked task ID found for background check applications');
   }
 
+
+  // Update task for landlord
   const taskResult = await updateTaskForLandlord({
     taskId: existingTaskId,
     name: updatedTaskName,

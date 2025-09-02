@@ -1,5 +1,4 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
-import { enableMapSet } from 'immer';
 import { agentDashboardSlice } from "./ui-modules/role-dashboard/agent-dashboard/state/agent-dashboard-slice";
 import { landlordDashboardSlice } from "./ui-modules/role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
 import { guestLandingPageSlice } from "./ui-modules/guest-landing-page/state/reducers/guest-landing-page-slice";
@@ -15,10 +14,6 @@ import { propertyFormSlice } from "./ui-modules/property-form-agent/state/reduce
 import { tenantSelectionSlice } from "./ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { messagesSlice } from "./ui-modules/role-messages/state/reducers/messages-slice";
 import { searchResultsSlice } from "./ui-modules/search/state/search-result-slice";
-
-
-// Enable MapSet plugin for Immer to handle Set and Map objects
-enableMapSet();
 
 export const store = configureStore({
   reducer: {

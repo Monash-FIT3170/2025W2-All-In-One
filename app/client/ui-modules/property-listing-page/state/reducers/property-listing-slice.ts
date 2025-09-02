@@ -7,6 +7,10 @@ import { LoadPropertyWithTenantApplicationsUseCase } from "/app/client/library-m
 import { RootState } from "/app/client/store";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 import { loadTenantApplicationsForPropertyAsync } from "../../../tenant-selection/state/reducers/tenant-selection-slice";
+import {
+  getFormattedDateStringFromDate,
+  getFormattedTimeStringFromDate,
+} from "/app/client/library-modules/utils/date-utils";
 
 const initialState: PropertyListingPageUiState = {
   propertyId: "",
@@ -102,30 +106,13 @@ export const propertyListingSlice = createSlice({
         markerLongitude: action.payload.locationLongitude,
       };
 
-      state.inspectionBookingUiStateList = action.payload.inspections.length > 0
-        ? action.payload.inspections.map((inspection) => ({
-            date: inspection.start_time.split('T')[0],
-            startingTime: inspection.start_time.split('T')[1].split('.')[0],
-            endingTime: inspection.end_time.split('T')[1].split('.')[0],
-          }))
-        : [
-            // Default inspection data
-            {
-              date: "2025-09-15",
-              startingTime: "10:00:00",
-              endingTime: "11:00:00",
-            },
-            {
-              date: "2025-09-16",
-              startingTime: "14:00:00",
-              endingTime: "15:00:00",
-            },
-            {
-              date: "2025-09-17",
-              startingTime: "16:00:00",
-              endingTime: "17:00:00",
-            }
-          ];
+      state.inspectionBookingUiStateList = action.payload.inspections.map(
+        (inspection) => ({
+          date: getFormattedDateStringFromDate(inspection.start_time),
+          startingTime: getFormattedTimeStringFromDate(inspection.start_time),
+          endingTime: getFormattedTimeStringFromDate(inspection.end_time),
+        })
+      );
 
       state.listingImageUrls = action.payload.image_urls;
       state.listingStatusText = getListingStatusDisplayString(
