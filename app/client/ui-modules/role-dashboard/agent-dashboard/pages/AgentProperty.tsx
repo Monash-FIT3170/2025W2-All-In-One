@@ -11,8 +11,10 @@ import {
   setSearch,
   setStatusFilter
 } from "../state/agent-property-slice";
-import { PropertyCard } from "../../../guest-landing-page/components/PropertyCard";
+import { PropertyCard } from "/app/client/ui-modules/role-dashboard/components/PropertyCard";
 import { useNavigate } from "react-router";
+import { PropertyWithListingDataAndNames } from "../../landlord-dashboard/state/landlord-properties-slice";
+import { NavigationPath } from "/app/client/navigation";
 
 export function AgentProperty(): React.JSX.Element {
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
@@ -90,7 +92,10 @@ export function AgentProperty(): React.JSX.Element {
               <p>No properties to display yet.</p>
             )}
             {!isLoading && !error && propertiesWithListingData.length > 0 && (
-              <ul className="not-italic text-gray-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center px-4">
+              <ul
+                className="not-italic text-gray-800 grid gap-4 px-4 items-stretch"
+                style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}
+              >
                 {propertiesWithListingData
                     .filter((property) => {
                       const listingStatus = property.listing_status.toUpperCase();
@@ -116,8 +121,8 @@ export function AgentProperty(): React.JSX.Element {
                       return matchesSearch && matchesStatus;
                   })
                   .map((property) => (
-                    <li key={property.propertyId}>
-                      <PropertyCard {...property} />
+                    <li key={property.propertyId} className="h-full w-full">
+                      <PropertyCard property={property as PropertyWithListingDataAndNames} navigationPath={NavigationPath.PropertyListing} />
                     </li>
                   ))}
               </ul>

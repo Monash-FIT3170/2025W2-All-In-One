@@ -4,13 +4,15 @@ import { getAgentById } from "/app/client/library-modules/domain-models/user/rol
 import { getPropertyByAgentId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { getPropertyWithListingDataUseCase } from "/app/client/library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
 import { PropertyWithListingData } from "/app/client/library-modules/use-cases/property-listing/models/PropertyWithListingData";
+import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
+import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 
 interface AgentPropertyState {
   isLoading: boolean;
   propertiesWithListingData: PropertyWithListingData[];
   error: string | null;
   search: string;
-  statusFilter: string;
+  statusFilter: PropertyStatus | ListingStatus | "ALL";
 }
 
 const initialState: AgentPropertyState = {
