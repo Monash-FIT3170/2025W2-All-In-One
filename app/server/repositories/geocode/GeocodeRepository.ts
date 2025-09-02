@@ -19,9 +19,9 @@ export async function getGeocode(address: string, fallback?: Geocode): Promise<G
 
     if (geocodeResults.length === 0) {
       if (!fallback) {
-        throw new ExternalApiError(`No geocode results found for the address (${address}).`);
+        throw new ExternalApiError(`No geocode results (length = 0) found for the address (${address}).`);
       } else {
-        console.warn(`No geocode results found for the address (${address}), using fallback geocode: ${fallback}`);
+        console.warn(`No geocode results found for the address (${address}), using fallback: ${fallback}`);
         return fallback;
       }
     }
@@ -30,11 +30,11 @@ export async function getGeocode(address: string, fallback?: Geocode): Promise<G
 
     return geocode;
   } catch (error) {
-    console.warn(`Geocoding failed for address "${address}":`, error);
-
     if (!fallback) {
-      throw new ExternalApiError(`Geocoding failed for address "${address}": ${error}`);
+      throw new ExternalApiError(`Geocoding failed for address "${address}". No fallback defined. Error=(${error})`);
     }
+
+    console.warn(`Geocoding failed for address "${address}". Using fallback. Error=(${error})`);
 
     return fallback;
   }
