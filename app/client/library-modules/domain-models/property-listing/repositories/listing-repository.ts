@@ -1,5 +1,4 @@
-import { apiGetListingForProperty, apiSubmitDraftListing, apiGetAllListedListings, apiInsertPropertyListing, apiInsertPropertyListingInspections } from "../../../apis/property-listing/listing-api";
-import { apiGetListingForProperty, apiSubmitDraftListing, apiGetAllListedListings, apiInsertPropertyListing, apiUpdatePropertyListingImages } from "../../../apis/property-listing/listing-api";
+import { apiGetListingForProperty, apiSubmitDraftListing, apiGetAllListedListings, apiInsertPropertyListing, apiUpdatePropertyListingImages, apiInsertPropertyListingInspections } from "../../../apis/property-listing/listing-api";
 import { Listing } from "/app/client/library-modules/domain-models/property-listing/Listing";
 import { mapApiListingToListing } from "./mappers/listing-mapper";
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
