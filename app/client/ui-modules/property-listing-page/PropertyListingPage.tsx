@@ -37,9 +37,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import EditDraftListingModal from "./components/EditDraftListingModal";
 import { EditDraftListingButton } from "./components/EditDraftListingButton";
 import { FormSchemaType } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
-import { DynamicMap } from "../common/map/DynamicMap";
 import { SubHeading } from "../theming/components/SubHeading";
-import { BasicMarker } from "../common/map/markers/BasicMarker";
 import { PropertyMap, PropertyMapUiState } from "./components/PropertyMap";
 import { NavigationPath } from "../../navigation";
 import { BACK_ROUTES, EntryPoint  } from "../../navigation";
@@ -110,8 +108,6 @@ export function PropertyListingPage({
             state.shouldDisplayReviewTenantButton
           }
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
-          propertyLandlordId={state.propertyLandlordId}
-          propertyId={state.propertyId}
           onBack={() => {
             const from = searchParams.get("from") as EntryPoint | null;
             if (from && from in BACK_ROUTES) {
@@ -165,8 +161,6 @@ function ListingPageContent({
   shouldDisplaySubmitDraftButton,
   shouldDisplayReviewTenantButton,
   shouldDisplayEditListingButton,
-  propertyLandlordId,
-  propertyId,
   onBack,
   onBook,
   onApply,
@@ -199,8 +193,6 @@ function ListingPageContent({
   shouldDisplaySubmitDraftButton: boolean;
   shouldDisplayReviewTenantButton: boolean;
   shouldDisplayEditListingButton: boolean;
-  propertyLandlordId: string;
-  propertyId: string;
   onBack: () => void;
   onBook: (index: number) => void;
   onApply: () => void;
