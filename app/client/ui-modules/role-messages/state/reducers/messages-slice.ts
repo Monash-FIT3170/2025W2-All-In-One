@@ -331,7 +331,7 @@ export const messagesSlice = createSlice({
     setConversationsFromSubscription(state, action: PayloadAction<{ conversations: ApiConversation[]; currentUserId: string }>) {
       
       // Helper function to generate user avatars from names
-      const getAvatar = (name: string) => {
+      const getAvatarInitials = (name: string) => {
         const parts = name.split(' ');
         return parts.length > 1 
           ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
@@ -361,7 +361,7 @@ export const messagesSlice = createSlice({
           id: doc.conversationId,
           name: existingConversation?.name || `User ${doc.tenantId?.slice(-4) || doc.agentId?.slice(-4) || 'Unknown'}`,
           role: existingConversation?.role || (doc.tenantId ? "Tenant" : doc.agentId ? "Agent" : "User"),
-          avatar: existingConversation?.avatar || getAvatar(existingConversation?.name || 'User'),
+          avatar: existingConversation?.avatar || getAvatarInitials(existingConversation?.name || 'User'),
           lastMessage: doc.lastMessage?.text || "No messages yet",
           timestamp,
           unreadCount,

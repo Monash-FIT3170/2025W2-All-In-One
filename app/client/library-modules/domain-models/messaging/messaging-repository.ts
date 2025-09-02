@@ -15,7 +15,7 @@ import { formatConversationTimestamp } from "/app/client/ui-modules/role-message
 import { ApiProfileData } from "/app/shared/api-models/user/api-roles/ApiProfileData";
 
 // Helper function to generate avatar from name
-function getAvatar(name: string): string {
+function getAvatarInitials(name: string): string {
   const parts = name.split(' ');
   return parts.length > 1 
     ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
@@ -51,7 +51,7 @@ function convertApiConversationToDomain(
     id: apiConversation.conversationId,
     name,
     role,
-    avatar: getAvatar(name),
+    avatar: getAvatarInitials(name),
     lastMessage: apiConversation.lastMessage?.text || "No messages yet",
     timestamp,
     unreadCount: apiConversation.unreadCounts[currentUserId] || 0,
