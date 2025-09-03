@@ -14,7 +14,11 @@ import {
   sendMessage,
   setActiveConversation,
   setMessageText,
+  resetUnreadCount,
+  addActiveUser,
+  removeActiveUser,
 } from "./state/reducers/messages-slice";
+import { useMessagingSubscriptions } from "./hooks/useMessagingSubscriptions";
 
 type UserRole = 'agent' | 'landlord' | 'tenant';
 
@@ -33,23 +37,53 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
   const conversationsLoading = useAppSelector(selectConversationsLoading);
   const error = useAppSelector(selectError);
 
-  // Get current user ID for fetching conversations
-  const currentUser = useAppSelector((state) => state.currentUser.authUser);
+  // Get current user for authentication checks
+  const authUser = useAppSelector((state) => state.currentUser.authUser);
 
+  // Use real-time subscriptions for live messaging
+  const { conversationsReady, messagesReady } = useMessagingSubscriptions(activeConversationId);
+
+  // Initial fetch for conversations (fallback for when subscriptions aren't ready)
   useEffect(() => {
-    if (currentUser?.userId) {
-      dispatch(fetchConversations(currentUser.userId));
+    if (authUser && !conversationsReady) {
+      dispatch(fetchConversations());
     }
-  }, [dispatch, currentUser?.userId]);
+  }, [dispatch, authUser, conversationsReady]);
 
+  // Initial fetch for messages (fallback for when subscriptions aren't ready)
   useEffect(() => {
-    if (activeConversationId) {
+    if (activeConversationId && !messagesReady) {
       dispatch(fetchConversationMessages(activeConversationId));
     }
-  }, [dispatch, activeConversationId]);
+  }, [dispatch, activeConversationId, messagesReady]);
+
+  // Cleanup function to remove user from active users when leaving
+  useEffect(() => {
+    return () => {
+      if (activeConversationId) {
+        dispatch(removeActiveUser(activeConversationId));
+      }
+    };
+  }, [activeConversationId, dispatch]);
 
   const handleSelectConversation = (conversationId: string) => {
+    // Validate conversationId is not null/undefined
+    if (!conversationId) {
+      console.error('Cannot select conversation: conversationId is null or undefined');
+      return;
+    }
+
+    // Remove current user from previous conversation's active users (if any)
+    if (activeConversationId && activeConversationId !== conversationId) {
+      dispatch(removeActiveUser(activeConversationId));
+    }
+
     dispatch(setActiveConversation(conversationId));
+    // Reset unread count when opening a conversation
+    dispatch(resetUnreadCount(conversationId));
+
+    // Add current user to new conversation's active users
+    dispatch(addActiveUser(conversationId));
   };
 
   const handleChangeMessage = (value: string) => {
@@ -109,5 +143,3 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
     </div>
   );
 }
-
-

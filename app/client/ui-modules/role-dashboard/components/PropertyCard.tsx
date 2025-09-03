@@ -1,15 +1,16 @@
-import React from "react";
+import React from "react"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import { useNavigate } from "react-router";
 import { PropertyWithListingDataAndNames } from "../landlord-dashboard/state/landlord-properties-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { NavigationPath } from "/app/client/navigation";
-import { StatusBadge } from "../landlord-dashboard/components/StatusBadge";
+import { StatusBadge } from "./StatusBadge";
 
 interface PropertyCardProps {
   property: PropertyWithListingDataAndNames;
+  navigationPath?: NavigationPath;
 }
 
-function PropertyCard({ property }: PropertyCardProps) {
+export function PropertyCard({ property, navigationPath = NavigationPath.LandlordPropertyDetail }: PropertyCardProps) {
   const navigate = useNavigate();
 
   // Format address
@@ -21,12 +22,9 @@ function PropertyCard({ property }: PropertyCardProps) {
 
   // Handle click to navigate to property detail with property data
   const handleClick = () => {
-    navigate(
-      `${NavigationPath.LandlordPropertyDetail}?propertyId=${property.propertyId}`,
-      {
-        state: { property }, // Pass the entire property object via router state
-      }
-    );
+    navigate(`${navigationPath}?propertyId=${property.propertyId}`, {
+      state: { property },
+    });
   };
 
   return (

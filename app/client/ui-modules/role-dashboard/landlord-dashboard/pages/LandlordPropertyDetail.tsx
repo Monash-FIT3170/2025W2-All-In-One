@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router";
 import { PropertyWithListingDataAndNames } from "../state/landlord-properties-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { NavigationPath } from "/app/client/navigation";
-import { StatusBadge } from "../components/StatusBadge";
+import { StatusBadge } from "../../components/StatusBadge";
 
 export function LandlordPropertyDetail(): React.JSX.Element {
   const navigate = useNavigate();

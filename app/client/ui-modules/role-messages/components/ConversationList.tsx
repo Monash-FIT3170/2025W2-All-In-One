@@ -3,7 +3,8 @@ import { Input } from "/app/client/ui-modules/theming-shadcn/Input";
 import { Badge } from "/app/client/ui-modules/theming-shadcn/Badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Search } from "lucide-react";
-import { Conversation } from "../types";
+import { Conversation } from "/app/client/library-modules/domain-models/messaging/Conversation";
+import { formatConversationTimestamp } from "../utils/timestamp-utils";
 
 interface ConversationListProps {
   title?: string;
@@ -14,7 +15,7 @@ interface ConversationListProps {
 
 export function ConversationList({ title = "Messages", conversations, activeConversationId: activeId, onSelect }: ConversationListProps) {
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+    <div className="w-96 bg-white border-r border-gray-200 flex flex-col">
       <div className="p-4 border-b border-gray-200 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">{title}</h1>
@@ -47,14 +48,16 @@ export function ConversationList({ title = "Messages", conversations, activeConv
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-gray-900 truncate">{conversation.name}</h3>
-                      <span className="text-xs text-gray-500">{conversation.timestamp}</span>
+                      <span className="text-xs text-gray-500">
+                        {conversation.timestamp}
+                      </span>
                     </div>
                     <p className="text-sm text-gray-600 truncate">{conversation.role}</p>
                     <p className="text-sm text-gray-500 truncate mt-1">{conversation.lastMessage}</p>
                   </div>
 
-                  {conversation.unreadCount > 0 && (
-                    <Badge variant="secondary" className="ml-2">
+                  {conversation.unreadCount > 0 && activeId !== conversation.id && (
+                    <Badge variant="secondary" className="bg-black text-white text-xs px-2 py-1 min-w-[20px] h-5 flex items-center justify-center">
                       {conversation.unreadCount}
                     </Badge>
                   )}
@@ -66,4 +69,4 @@ export function ConversationList({ title = "Messages", conversations, activeConv
       </div>
     </div>
   );
-} 
+}

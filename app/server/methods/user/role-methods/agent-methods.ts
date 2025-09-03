@@ -8,6 +8,7 @@ import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { TaskDocument } from "/app/server/database/task/models/TaskDocument";
 import { TaskCollection } from "/app/server/database/task/task-collections";
+import { ProfileCollection } from "/app/server/database/user/user-collections";
 
 // -- INSERT AGENT --
 
@@ -121,9 +122,41 @@ async function getTaskDocumentsMatchingIds(
   }).fetchAsync();
 }
 
+// Get profile data by agent ID (queries agent collection first, then profile collection)
+const profileGetByAgentIdMethod = {
+  [MeteorMethodIdentifier.PROFILE_GET_BY_AGENT_ID]: async (
+    agentId: string
+  ): Promise<any> => {
+    // First get the agent document to extract profileDataId
+    const agentDoc = await AgentCollection.findOneAsync({
+      _id: agentId,
+    });
+
+    if (!agentDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Agent with ID ${agentId} not found.`)
+      );
+    }
+
+    // Then get the profile data using the profileDataId
+    const profileDoc = await ProfileCollection.findOneAsync({
+      _id: agentDoc.profileDataId,
+    });
+
+    if (!profileDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Profile with ID ${agentDoc.profileDataId} not found.`)
+      );
+    }
+
+    return profileDoc;
+  },
+};
+
 Meteor.methods({
   ...agentInsertMethod,
   ...agentGetMethod,
   ...agentUpdateTasksMethod,
+  ...profileGetByAgentIdMethod,
   ...agentGetByAgentIDMethod,
 });

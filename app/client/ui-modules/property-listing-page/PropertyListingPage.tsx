@@ -34,11 +34,10 @@ import {
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
-import { useNavigate, useSearchParams } from "react-router";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 import EditDraftListingModal from "./components/EditDraftListingModal";
 import { EditDraftListingButton } from "./components/EditDraftListingButton";
 import { FormSchemaType } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
-import { DynamicMap } from "../common/map/DynamicMap";
 import { SubHeading } from "../theming/components/SubHeading";
 import { BasicMarker } from "../common/map/markers/BasicMarker";
 import { PropertyMap, PropertyMapUiState } from "/app/client/ui-modules/common/property-components/PropertyMap";
@@ -115,6 +114,7 @@ export function PropertyListingPage({
     return (
       <>
         <ListingPageContent
+          propertyId={state.propertyId}
           streetNumber={state.streetNumber}
           street={state.street}
           suburb={state.suburb}
@@ -144,7 +144,6 @@ export function PropertyListingPage({
           }
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
           propertyLandlordId={state.propertyLandlordId}
-          propertyId={state.propertyId}
           currentUser={currentUser}
           authUser={authUser}
           profileData={profileData}
@@ -187,6 +186,7 @@ export function PropertyListingPage({
 }
 
 function ListingPageContent({
+  propertyId,
   streetNumber,
   street,
   suburb,
@@ -213,10 +213,9 @@ function ListingPageContent({
   shouldDisplayReviewTenantButton,
   shouldDisplayEditListingButton,
   propertyLandlordId,
-  propertyId,
   currentUser,
   authUser,
-  profileData,
+  profileData, // will move these elsewhere
   onBack,
   onBook,
   onApply,
@@ -225,6 +224,7 @@ function ListingPageContent({
   bookedPropertyListingInspections,
   className = "",
 }: {
+  propertyId: string;
   streetNumber: string;
   street: string;
   suburb: string;
@@ -251,7 +251,6 @@ function ListingPageContent({
   shouldDisplayReviewTenantButton: boolean;
   shouldDisplayEditListingButton: boolean;
   propertyLandlordId: string;
-  propertyId: string;
   currentUser: CurrentUserState["currentUser"];
   authUser: CurrentUserState["authUser"];
   profileData: CurrentUserState["profileData"];
@@ -656,6 +655,7 @@ function ListingModalEditor({
     address_number: state.streetNumber,
     monthly_rent: Number(state.propertyPrice),
     property_feature_ids: [],
+    inspection_times: [],
   };
 
   return (
