@@ -44,7 +44,7 @@ export function LandlordCalendar(): React.JSX.Element {
   // Fetch tasks for the current user
   useEffect(() => {
     if (currentUser?.userId) {
-      dispatch(fetchLandlordTasks(currentUser.userId));
+      dispatch(fetchLandlordTasks());
       console.log("Fetching landlord tasks");
       console.log("The current User Id is" + currentUser?.userId);
     }

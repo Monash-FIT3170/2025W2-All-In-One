@@ -62,16 +62,22 @@ const initialState: LandlordDashboardState = {
 
 export const fetchLandlordTasks = createAsyncThunk(
   "landlordDashboard/fetchLandlordTasks",
-  async (userId: string) => {
+  async (_, { getState }) => {
+    const state = getState() as RootState;
+    const userId = state.currentUser.authUser?.userId;
+
+    if (!userId) {
+      throw new Error("No current user");
+    }
+
     const landlordResponse = await getLandlordById(userId);
     console.log("fetching landlord tasks");
-    const taskDetails = [];
+
+    const taskDetails: Task[] = [];
     for (const taskId of landlordResponse.tasks) {
       try {
         const taskData = await getTaskById(taskId);
-
         if (taskData) {
-          // Format the task data for display
           taskDetails.push(taskData);
         }
       } catch (error) {
@@ -79,12 +85,10 @@ export const fetchLandlordTasks = createAsyncThunk(
       }
     }
 
-    return {
-      ...landlordResponse,
-      taskDetails: taskDetails,
-    };
+    return { ...landlordResponse, taskDetails };
   }
 );
+
 
 export const fetchLandlordDetails = createAsyncThunk(
   "landlordDashboard/fetchLandlordDetails",
