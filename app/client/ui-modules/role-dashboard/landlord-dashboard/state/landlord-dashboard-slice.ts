@@ -182,7 +182,7 @@ export const landlordDashboardSlice = createSlice({
       })
       .addCase(fetchLandlordTasks.rejected, (state) => {
         state.isLoading = false;
-        state.error = "Failed to fetch agent tasks";
+        state.error = "Failed to fetch landlord tasks";
       });
   },
 });
