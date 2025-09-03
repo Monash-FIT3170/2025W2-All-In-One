@@ -23,7 +23,7 @@ export const formSchema = z.object({
       start_time: z.coerce.date(),
       end_time: z.coerce.date(),
     })
-  ).default([]),
+  ),
   lease_term: z.string().min(1, { message: "Lease term is required" }),
   show_contact_boolean: z.boolean().optional(),
 });
