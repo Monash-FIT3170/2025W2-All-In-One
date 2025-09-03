@@ -79,3 +79,7 @@ export async function searchProperties(query: string): Promise<Property[]> {
   const apiProperties = await apiSearchPropertyByQuery(query);
   return apiProperties.map(mapApiPropertyToProperty);
 }
+
+export async function getPropertiesForLandlord(landlordId: string): Promise<Property[]> {
+  return getAllPropertiesByLandlordId(landlordId);
+}

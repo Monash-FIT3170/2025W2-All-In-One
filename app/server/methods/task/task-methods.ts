@@ -145,11 +145,13 @@ const taskInsertForLandlordMethod = {
     description: string;
     dueDate: Date;
     priority: TaskPriority;
-    landlordId: string;
+    propertyAddress: string;
+    propertyId: string;
+    userId: string;
   }): Promise<string> => {
     console.log("taskInsertForLandlordMethod called with:", taskData);
 
-    // Validate required fields
+    // Validate required fields - description can be empty
     if (!taskData.name || taskData.name.trim() === "") {
       throw meteorWrappedInvalidDataError(
         new InvalidDataError("Task name is required")
@@ -168,18 +170,20 @@ const taskInsertForLandlordMethod = {
       );
     }
 
-    if (!taskData.landlordId) {
+    if (!taskData.userId) {
       throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Landlord ID is required")
+        new InvalidDataError("User ID is required")
       );
     }
 
     const taskDocument: Omit<TaskDocument, "_id"> = {
       name: taskData.name.trim(),
-      description: taskData.description || "",
+      description: taskData.description || "", // Handle empty description
       dueDate: taskData.dueDate,
       priority: taskData.priority,
-      taskStatus: TaskStatus.NOTSTARTED,
+      taskPropertyAddress: taskData.propertyAddress,
+      taskPropertyId: taskData.propertyId,
+      taskStatus: TaskStatus.NOTSTARTED, // Default status
       createdDate: new Date(),
     };
 
@@ -191,13 +195,20 @@ const taskInsertForLandlordMethod = {
         throw new InvalidDataError("Failed to retrieve created task");
       }
 
+      // Update the landlord's task_ids array to include the new task
+      console.log("Before landlor update call");
       try {
-        await Meteor.callAsync(MeteorMethodIdentifier.LANDLORD_UPDATE_TASKS, taskData.landlordId, insertedId);
+        await Meteor.callAsync(
+          MeteorMethodIdentifier.LANDLORD_UPDATE_TASKS,
+          taskData.userId,
+          insertedId
+        );
         console.log("Landlord task_ids updated successfully");
       } catch (landlordError) {
-        console.error("Landlord not found for ID:", taskData.landlordId);
-        throw new Error("Landlord not found - cannot send tenant application");
+        console.warn("Failed to update landlord task_ids:", landlordError);
+        // Don't fail the task creation if landlord update fails - task was already created
       }
+      console.log("After landlord task update call");
 
       return insertedId;
     } catch (error) {

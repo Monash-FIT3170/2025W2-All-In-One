@@ -7,12 +7,22 @@ import { getTaskById } from "/app/client/library-modules/domain-models/task/repo
 import {
   fetchLandlordDashboardData,
   getAllPropertiesByLandlordId,
+  getPropertiesForLandlord,
 } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
+
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import {
+  PropertyOption,
+  TaskData,
+} from "../../agent-dashboard/components/TaskFormSchema";
+import { apiCreateTaskForLandlord } from "/app/client/library-modules/apis/task/task-api";
+import { createTaskForLandlord } from "../../../../library-modules/domain-models/task/repositories/task-repository";
 
 interface LandlordDashboardState {
   isLoading: boolean;
   properties: Property[];
   tasks: Task[];
+  markers: { latitude: number; longitude: number }[];
   dashboardData: {
     propertyCount: number;
     statusCounts: {
@@ -35,6 +45,7 @@ interface LandlordDashboardState {
 const initialState: LandlordDashboardState = {
   isLoading: false,
   tasks: [],
+  markers: [],
   properties: [],
   dashboardData: {
     propertyCount: 0,
@@ -57,42 +68,61 @@ const initialState: LandlordDashboardState = {
 
 export const fetchLandlordTasks = createAsyncThunk(
   "landlordDashboard/fetchLandlordTasks",
-  async (userId: string) => {
-    try {
-      const landlord = await getLandlordById(userId);
-      const tasks = await Promise.all(
-        landlord.tasks.map((taskId) => getTaskById(taskId))
-      );
-      return tasks;
-    } catch (error) {
-      console.error("Error fetching landlord tasks:", error);
-      throw new Error("Failed to fetch landlord tasks");
+  async (_, { getState }) => {
+    const state = getState() as RootState;
+    const userId = state.currentUser.authUser?.userId;
+
+    if (!userId) {
+      throw new Error("No current user");
     }
+
+    const landlordResponse = await getLandlordById(userId);
+    console.log("fetching landlord tasks");
+
+    // Fetch all tasks in parallel
+    const taskDetailsResults = await Promise.all(
+      landlordResponse.tasks.map(async (taskId) => {
+        try {
+          return await getTaskById(taskId);
+        } catch (error) {
+          console.error(`Error fetching task ${taskId}:`, error);
+          return null; // skip failed tasks
+        }
+      })
+    );
+
+    // Filter out any null results
+    const taskDetails: Task[] = taskDetailsResults.filter(
+      (task): task is Task => task !== null
+    );
+
+    return { ...landlordResponse, taskDetails };
   }
 );
 
 export const fetchLandlordDetails = createAsyncThunk(
   "landlordDashboard/fetchLandlordDetails",
-  async (userId: string) => {
-    let properties;
-    let taskDetails;
+  async (_, { getState }) => {
+    const state = getState() as RootState;
+    const userId = state.currentUser.authUser?.userId;
+
+    if (!userId) {
+      throw new Error("No current user");
+    }
+
     try {
       const landlordResponse = await getLandlordById(userId);
       const landlordId = landlordResponse?.landlordId;
-      
-      // Fetch basic properties (no listing data needed for dashboard)
-      properties = await getAllPropertiesByLandlordId(landlordResponse.landlordId);
-      
-      taskDetails = await Promise.all(
-        landlordResponse.tasks.map((taskId) => {
-          return getTaskById(taskId);
-        })
+
+      const properties = await getAllPropertiesByLandlordId(landlordId);
+      const taskDetails = await Promise.all(
+        landlordResponse.tasks.map((taskId) => getTaskById(taskId))
       );
       const dashboardData = await fetchLandlordDashboardData(landlordId);
 
       return {
-        properties: properties,
-        taskDetails: taskDetails,
+        properties,
+        taskDetails,
         propertyCount: dashboardData.totalPropertyCount,
         statusCounts: dashboardData.propertyStatusCounts,
         income: dashboardData.totalIncome,
@@ -131,6 +161,9 @@ export const landlordDashboardSlice = createSlice({
       .addCase(fetchLandlordDetails.pending, (state) => {
         state.isLoading = true;
       })
+      .addCase(fetchLandlordProperties.fulfilled, (state, action) => {
+        state.properties = action.payload;
+      })
       .addCase(fetchLandlordDetails.fulfilled, (state, action) => {
         state.isLoading = false;
         state.tasks = action.payload.taskDetails || [];
@@ -151,7 +184,7 @@ export const landlordDashboardSlice = createSlice({
       })
       .addCase(fetchLandlordTasks.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.tasks = action.payload || [];
+        state.tasks = action.payload.taskDetails || [];
       })
       .addCase(fetchLandlordTasks.rejected, (state) => {
         state.isLoading = false;
@@ -171,3 +204,64 @@ export const selectProperties = (state: RootState) =>
 export const selectLoading = (state: RootState) =>
   state.landlordDashboard.isLoading;
 export default landlordDashboardSlice.reducer;
+export const selectMarkers = (state: RootState) => state.agentDashboard.markers;
+export const fetchPropertiesForLandlord = (
+  agentId: string
+): Promise<PropertyOption[]> => {
+  return new Promise((resolve, reject) => {
+    Meteor.call(
+      MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_LANDLORD_ID,
+      agentId,
+      (err: Meteor.Error | null, result: any[]) => {
+        if (err) {
+          reject(err);
+        } else {
+          // Map full property objects to lightweight PropertyOption[]
+          const properties: PropertyOption[] = (result || []).map((p) => ({
+            _id: p._id,
+            propertyId: p.propertyId,
+            streetnumber: p.streetnumber,
+            streetname: p.streetname,
+            suburb: p.suburb,
+          }));
+          resolve(properties);
+        }
+      }
+    );
+  });
+};
+
+export const createLandlordTask = createAsyncThunk(
+  "landlordDashboard/createLandlordTask",
+  async (taskData: TaskData, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const userId = state.currentUser.authUser?.userId;
+
+    if (!userId) throw new Error("No current user found");
+
+    // Call the repo with taskData + userId
+    const createdTaskId = await createTaskForLandlord(taskData, userId);
+
+    // Refresh all landlord details after creation
+    await dispatch(fetchLandlordTasks());
+
+    return createdTaskId;
+  }
+);
+
+export const fetchLandlordProperties = createAsyncThunk(
+  "landlordDashboard/fetchLandlordProperties",
+  async (_, { getState }) => {
+    const state = getState() as RootState;
+
+    const userId = state.currentUser.authUser?.userId;
+    if (!userId) throw new Error("No current user found");
+
+    const landlordResponse = await getLandlordById(userId);
+    const landlordId = landlordResponse?.landlordId;
+    if (!landlordId) throw new Error("Landlord ID not found");
+
+    const properties = await getAllPropertiesByLandlordId(landlordId);
+    return properties;
+  }
+);

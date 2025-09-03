@@ -272,19 +272,15 @@ const propertyGetByTenantIdMethod = {
   },
 };
 
+
 const propertyGetAllByLandlordId = {
   [MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_LANDLORD_ID]: async (
     landlordId: string
   ): Promise<ApiProperty[]> => {
-    try {
-      const properties = await PropertyCollection.find({
-        landlord_id: landlordId,
-      }).fetchAsync();
-      return Promise.all(properties.map(mapPropertyDocumentToPropertyDTO));
-    } catch (error) {
-      console.error("Error in getAllPropertiesByLandlordId:", error);
-      throw meteorWrappedInvalidDataError(error as InvalidDataError);
-    }
+    const properties = await PropertyCollection.find({
+      landlord_id: landlordId,
+    }).fetchAsync();
+    return Promise.all(properties.map(mapPropertyDocumentToPropertyDTO));
   },
 };
 
