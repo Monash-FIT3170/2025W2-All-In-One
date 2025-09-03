@@ -247,10 +247,10 @@ const insertPropertyListingInspection = {
           "start_time and end_time are required"
         );
       }
-      const id = await InspectionCollection.insertAsync({
+      const id = await PropertyListingInspectionCollection.insertAsync({
         starttime: new Date(insp.start_time),
         endtime: new Date(insp.end_time),
-      } as InspectionDocument);
+      } as PropertyListingInspectionDocument);
       ids.push(id);
     }
     return ids;
