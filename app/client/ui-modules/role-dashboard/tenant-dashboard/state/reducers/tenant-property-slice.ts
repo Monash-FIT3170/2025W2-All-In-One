@@ -190,7 +190,7 @@ export const tenantPropertySlice = createSlice({
         markerLatitude: action.payload.locationLatitude,
         markerLongitude: action.payload.locationLongitude,
       }
-      state.inspectionBookingUiStateList = action.payload.inspections.map(
+      state.inspectionBookingUiStateList = (action.payload.propertyListingInspections).map(
         (inspection) => ({
           date: getFormattedDateStringFromDate(inspection.start_time),
           startingTime: getFormattedTimeStringFromDate(inspection.start_time),

@@ -145,10 +145,10 @@ async function getListingDocumentsByStatus(
 async function mapListingDocumentToListingDTO(
   listing: ListingDocument
 ): Promise<ApiListing> {
-  let inspections: InspectionDocument[] = [];
+  let propertyListingInspections: InspectionDocument[] = [];
 
   if (listing.inspection_ids.length > 0) {
-    inspections = await getInspectionDocumentsMatchingIds(
+    propertyListingInspections = await getInspectionDocumentsMatchingIds(
       listing.inspection_ids
     );
   }
@@ -167,7 +167,7 @@ async function mapListingDocumentToListingDTO(
     property_id: listing.property_id,
     image_urls: listing.image_urls,
     listing_status: listingStatusDocument.name,
-    inspections: inspections.map((inspection) => ({
+    propertyListingInspections: propertyListingInspections.map((inspection) => ({
       start_time: inspection.starttime,
       end_time: inspection.endtime,
     })),
@@ -235,6 +235,28 @@ const getListingStatusIdByName = {
   },
 };
 
+const insertPropertyListingInspection = {
+  [MeteorMethodIdentifier.INSERT_PROPERTY_LISTING_INSPECTION]: async (
+    propertyListingInspections: { start_time: Date; end_time: Date }[]
+  ): Promise<string[]> => {
+    const ids: string[] = [];
+    for (const insp of propertyListingInspections) {
+      if (!insp.start_time || !insp.end_time) {
+        throw new Meteor.Error(
+          "invalid-args",
+          "start_time and end_time are required"
+        );
+      }
+      const id = await InspectionCollection.insertAsync({
+        starttime: new Date(insp.start_time),
+        endtime: new Date(insp.end_time),
+      } as InspectionDocument);
+      ids.push(id);
+    }
+    return ids;
+  },
+};
+
 const updatePropertyListingImages = {
   [MeteorMethodIdentifier.LISTING_UPDATE_IMAGES]: async (
     propertyId: string,
@@ -285,4 +307,5 @@ Meteor.methods({
   ...submitDraftListing,
   ...getAllListedListings,
   ...updatePropertyListingImages,
+  ...insertPropertyListingInspection,
 });

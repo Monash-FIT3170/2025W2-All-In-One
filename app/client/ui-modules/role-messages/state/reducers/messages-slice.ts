@@ -386,6 +386,7 @@ export const messagesSlice = createSlice({
         isRead: doc.isRead,
       }));
       
+      // Replace messages array with subscription data (this is the authoritative source)
       state.messages = uiMessages;
     },
   },
@@ -428,8 +429,11 @@ export const messagesSlice = createSlice({
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Add message immediately for instant feedback, subscription will sync later
-        state.messages.push(action.payload.message);
+        // Only add message if it doesn't already exist (prevent duplicates from race conditions)
+        const messageExists = state.messages.some(msg => msg.id === action.payload.message.id);
+        if (!messageExists) {
+          state.messages.push(action.payload.message);
+        }
         state.messageText = "";
         
         // Update the conversation tile's last message in real-time with proper formatting

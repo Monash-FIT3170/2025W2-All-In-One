@@ -35,7 +35,7 @@ export function DynamicMap({
   markers = [],
   className = "",
 }: {
-  initialMapCoordinates?: InitialMapCoordinates;
+  initialMapCoordinates: InitialMapCoordinates;
   defaultZoom?: MapZoom;
   markers?: Array<React.JSX.Element>;
   sizeClassName?: string;
