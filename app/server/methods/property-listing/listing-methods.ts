@@ -239,12 +239,9 @@ const insertPropertyListingInspection = {
   [MeteorMethodIdentifier.INSERT_PROPERTY_LISTING_INSPECTION]: async (
     propertyListingInspections: { start_time: Date; end_time: Date }[]
   ): Promise<string[]> => {
-    if (!Array.isArray(propertyListingInspections)) {
-      throw new Meteor.Error("invalid-args", "inspections must be an array");
-    }
     const ids: string[] = [];
     for (const insp of propertyListingInspections) {
-      if (!insp?.start_time || !insp?.end_time) {
+      if (!insp.start_time || !insp.end_time) {
         throw new Meteor.Error(
           "invalid-args",
           "start_time and end_time are required"
