@@ -12,6 +12,7 @@ import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboa
 import { currentUserSlice } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
 import { propertyFormSlice } from "./ui-modules/property-form-agent/state/reducers/property-form-slice";
 import { searchResultsSlice } from "./ui-modules/search/state/search-result-slice";
+import { changePasswordSlice } from "./ui-modules/settings-page/state/reducers/change-password-slice";
 
 export const store = configureStore({
     reducer: {
@@ -27,6 +28,7 @@ export const store = configureStore({
         currentUser: currentUserSlice.reducer,
         propertyForm: propertyFormSlice.reducer,
         searchResults: searchResultsSlice.reducer,
+        changePasswordForm: changePasswordSlice.reducer,
     },
 });
 

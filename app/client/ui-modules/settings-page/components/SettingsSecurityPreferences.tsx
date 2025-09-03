@@ -6,6 +6,7 @@ import { z } from "zod"
  
 import { Toast } from "/app/client/ui-modules/settings-page/components/Toast";
 import { Button } from "/app/client/ui-modules/theming-shadcn/Button";
+import { ChangePasswordPopup } from "/app/client/ui-modules/settings-page/components/ChangePasswordPopup";
 import {
   Form,
   FormControl,
@@ -53,7 +54,7 @@ export function SettingsSecurityPreferences() {
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Button>Change Password</Button>
+                    <ChangePasswordPopup />
                   </FormControl>
                 </FormItem>
               )}
