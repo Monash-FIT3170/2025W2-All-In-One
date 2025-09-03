@@ -5,6 +5,7 @@ import {
   selectLoading,
   fetchLandlordTasks,
   selectMarkers,
+  createLandlordTask,
 } from "../../landlord-dashboard/state/landlord-dashboard-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
@@ -79,31 +80,15 @@ export function LandlordCalendar(): React.JSX.Element {
   const handleCloseModal = () => setIsModalOpen(false);
 
   const handleTaskSubmit = async (taskData: TaskData) => {
-    if (!currentUser?.userId) {
-      console.error("No current user found");
-      return;
-    }
+  try {
+    const createdTaskId = await dispatch(createLandlordTask(taskData)).unwrap();
+    console.log("Task created successfully with ID:", createdTaskId);
+    setIsModalOpen(false);
+  } catch (error) {
+    console.error("Error creating task:", error);
+  }
+};
 
-    try {
-      const apiData = {
-        name: taskData.name,
-        description: taskData.description,
-        dueDate: new Date(taskData.dueDate),
-        priority: taskData.priority,
-        userId: currentUser.userId,
-        propertyAddress: taskData.propertyAddress,
-        propertyId: taskData.propertyId || "",
-      };
-
-      const createdTaskId = await apiCreateTaskForLandlord(apiData);
-      console.log("Task created successfully with ID:", createdTaskId);
-
-      setIsModalOpen(false);
-      dispatch(fetchLandlordTasks());
-    } catch (error) {
-      console.error("Error creating task:", error);
-    }
-  };
 
   if (loading) return <div>Loading...</div>;
 

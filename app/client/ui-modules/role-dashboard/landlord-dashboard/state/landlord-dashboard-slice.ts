@@ -10,7 +10,8 @@ import {
 } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { PropertyOption } from "../../agent-dashboard/components/TaskFormSchema";
+import { PropertyOption, TaskData } from "../../agent-dashboard/components/TaskFormSchema";
+import { apiCreateTaskForLandlord } from "/app/client/library-modules/apis/task/task-api";
 
 interface LandlordDashboardState {
   isLoading: boolean;
@@ -216,3 +217,32 @@ export const fetchPropertiesForLandlord = (
     );
   });
 };
+
+export const createLandlordTask = createAsyncThunk(
+  "landlordDashboard/createLandlordTask",
+  async (taskData: TaskData, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const userId = state.currentUser.authUser?.userId;
+
+    if (!userId) {
+      throw new Error("No current user found");
+    }
+
+    const apiData = {
+      name: taskData.name,
+      description: taskData.description,
+      dueDate: new Date(taskData.dueDate),
+      priority: taskData.priority,
+      userId,
+      propertyAddress: taskData.propertyAddress,
+      propertyId: taskData.propertyId || "",
+    };
+
+    const createdTaskId = await apiCreateTaskForLandlord(apiData);
+
+    // Instead of just refetching tasks, refresh *all* landlord details
+    await dispatch(fetchLandlordDetails());
+
+    return createdTaskId;
+  }
+);
