@@ -5,8 +5,8 @@ import { useNavigate } from "react-router";
 import { getFormattedDateStringFromDate } from "../../../library-modules/utils/date-utils";
 import { PropertyWithListingData } from "../../../library-modules/use-cases/property-listing/models/PropertyWithListingData";
 
-function getNextInspectionDateString(propertyListingInspections?: { start_time: Date }[]): string { 
-    if (!propertyListingInspections || propertyListingInspections.length === 0) {
+function getNextInspectionDateString(propertyListingInspections: { start_time: Date }[] = []): string { 
+    if (propertyListingInspections.length === 0) {
         return "No upcoming inspections";
     }
 
