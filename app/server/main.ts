@@ -3,6 +3,7 @@ import "./methods/azure/blob-methods";
 import "./methods/task/task-methods";
 import "./methods/property/property-methods";
 import "./methods/property-listing/listing-methods";
+import "./methods/user-documents/lease-agreement-methods";
 import {
 	PropertyCollection,
 	PropertyCoordinatesCollection,
@@ -43,6 +44,7 @@ import { PropertyStatus } from "../shared/api-models/property/PropertyStatus";
 import "/app/server/methods/property/property-features/property-features-methods";
 import { ListingStatus } from "../shared/api-models/property-listing/ListingStatus";
 import { PropertyDocument } from "./database/property/models/PropertyDocument";
+import { LeaseAgreementCollection } from "./database/user-documents/user-documents-collections";
 
 let globalAgent: ApiAgent;
 let globalTenant: ApiTenant;
@@ -61,6 +63,7 @@ Meteor.startup(async () => {
 	await tempSeedTaskData();
 	await seedPropertyCoordinatesForTempProperties();
 	await seedListedProperties(globalAgent, globalLandlord, globalTenant);
+	await seedLeaseAgreements(globalAgent);
 });
 
 async function tempSeedUserAndRoleData(): Promise<void> {
@@ -726,6 +729,47 @@ async function permSeedListingStatusData(): Promise<void> {
 		});
 	}
 }
+
+async function seedLeaseAgreements(agent: ApiAgent): Promise<void> {
+	if ((await LeaseAgreementCollection.find().countAsync()) === 0) {
+		console.log("Seeding lease agreement data...");
+		
+		// Create a sample lease agreement for Amanda (the agent)
+		// Create multiple sample lease agreements for Amanda (the agent)
+		await LeaseAgreementCollection.insertAsync({
+			_id: "lease_1",
+			propertyId: "1", // 23 Spring St, Glen Waverley
+			agentId: agent?.agentId || "",
+			uploadedDate: new Date(),
+			validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+			documentUrl: "https://example.com/sample-lease-agreement.pdf",
+			tenantName: "Todd Toolgate",
+		});
+
+		await LeaseAgreementCollection.insertAsync({
+			_id: "lease_2",
+			propertyId: "2", // 598 Heatherton Road, Noble Park
+			agentId: agent?.agentId || "",
+			uploadedDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
+			validUntil: new Date(Date.now() + 300 * 24 * 60 * 60 * 1000), // 10 months from now
+			documentUrl: "https://example.com/another-lease-agreement.pdf",
+			tenantName: "Sarah Johnson",
+		});
+
+		await LeaseAgreementCollection.insertAsync({
+			_id: "lease_3",
+			propertyId: "3", // 23 Pine Rd, Clayton
+			agentId: agent?.agentId || "",
+			uploadedDate: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 2 weeks ago
+			validUntil: new Date(Date.now() + 350 * 24 * 60 * 60 * 1000), // 11.5 months from now
+			documentUrl: "https://example.com/third-lease-agreement.pdf",
+			tenantName: "Mike Chen",
+		});
+
+		console.log("Lease agreement seeded successfully.");
+	}
+}
+
 async function removeAllCollections(): Promise<void> {
 	console.log("Removing all collections...");
 	await Meteor.users.removeAsync({});
@@ -743,6 +787,7 @@ async function removeAllCollections(): Promise<void> {
 	await ListingCollection.removeAsync({});
 	await ListingStatusCollection.removeAsync({});
 	await TaskCollection.removeAsync({});
+	await LeaseAgreementCollection.removeAsync({});
 }
 async function permSeedPropertyFeaturesData(): Promise<void> {
 	const features = [

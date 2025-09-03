@@ -12,5 +12,6 @@ export function mapApiLeaseAgreementToLeaseAgreement(
 		uploadedDate: new Date(leaseAgreement.uploadedDate),
 		validUntil: new Date(leaseAgreement.validUntil),
 		documentUrl: leaseAgreement.documentUrl,
+		tenantName: leaseAgreement.tenantName,
 	};
 }

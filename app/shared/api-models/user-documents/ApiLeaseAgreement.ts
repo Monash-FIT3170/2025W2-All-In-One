@@ -5,6 +5,7 @@ export type ApiLeaseAgreement = {
 	uploadedDate: Date; // Date when the document was uploaded
 	validUntil: Date;
 	documentUrl: string; // URL to access the document
+	tenantName?: string; // Optional tenant name for display purposes
 };
 
 export type InsertLeaseAgreementPayload = {

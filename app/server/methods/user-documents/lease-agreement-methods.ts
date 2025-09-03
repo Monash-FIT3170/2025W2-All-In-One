@@ -1,4 +1,5 @@
 import { Meteor } from "meteor/meteor";
+import { check } from "meteor/check";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { LeaseAgreementCollection } from "/app/server/database/user-documents/user-documents-collections";
 import { LeaseAgreementDocument } from "/app/server/database/user-documents/LeaseAgreementDocument";
@@ -102,6 +103,7 @@ const leaseAgreementDeleteMethod = {
 	[MeteorMethodIdentifier.LEASE_AGREEMENT_DELETE]: async (
 		id: string
 	): Promise<number> => {
+		check(id, String);
 		try {
 			const removedCount = await LeaseAgreementCollection.removeAsync({
 				_id: id,
@@ -126,6 +128,7 @@ export const mapLeaseAgreementDocumentToDTO = (
 	uploadedDate: doc.uploadedDate,
 	documentUrl: doc.documentUrl,
 	validUntil: doc.validUntil,
+	tenantName: doc.tenantName,
 });
 
 Meteor.methods({

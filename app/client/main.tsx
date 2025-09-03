@@ -12,6 +12,7 @@ import { AgentCalendar } from "./ui-modules/role-dashboard/agent-dashboard/pages
 import { AgentMessagePage } from "./ui-modules/role-messages/AgentMessagePage";
 import { AgentTask } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentTask";
 import { AgentProperty } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentProperty";
+import AgentDocumentManagement from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentDocumentManagement";
 import { LandlordDashboard } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordDashboard";
 import { LandlordCalendar } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordCalendar";
 import { LandlordTask } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordTask";
@@ -143,6 +144,14 @@ function AppRoot(): React.JSX.Element {
                         element={
                             <AgentRoute>
                                 <AgentTask />
+                            </AgentRoute>
+                        }
+                    />
+                    <Route
+                        path={NavigationPath.AgentDocuments}
+                        element={
+                            <AgentRoute>
+                                <AgentDocumentManagement />
                             </AgentRoute>
                         }
                     />

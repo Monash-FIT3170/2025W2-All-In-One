@@ -5,6 +5,7 @@ export enum NavigationPath {
     AgentCalendar = "/agent-calendar",
     AgentMessages = "/agent-messages",
     AgentTasks = "/agent-tasks",
+    AgentDocuments = "/agent-documents",
     LandlordDashboard = "/landlord-dashboard",
     LandlordProperties = "/landlord-properties",
     LandlordCalendar = "/landlord-calendar",

@@ -5,4 +5,5 @@ export type LeaseAgreementDocument = {
 	uploadedDate: Date; // Date when the document was uploaded
 	validUntil: Date; // Expiry date of the lease agreement
 	documentUrl: string; // URL to access the document
+	tenantName?: string; // Optional tenant name for display purposes
 };
