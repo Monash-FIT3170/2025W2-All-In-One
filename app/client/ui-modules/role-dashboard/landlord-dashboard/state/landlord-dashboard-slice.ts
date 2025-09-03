@@ -89,28 +89,29 @@ export const fetchLandlordTasks = createAsyncThunk(
   }
 );
 
-
 export const fetchLandlordDetails = createAsyncThunk(
   "landlordDashboard/fetchLandlordDetails",
-  async (userId: string) => {
-    let properties;
-    let taskDetails;
+  async (_, { getState }) => {
+    const state = getState() as RootState;
+    const userId = state.currentUser.authUser?.userId;
+
+    if (!userId) {
+      throw new Error("No current user");
+    }
+
     try {
       const landlordResponse = await getLandlordById(userId);
       const landlordId = landlordResponse?.landlordId;
-      properties = await getAllPropertiesByLandlordId(
-        landlordResponse.landlordId
-      );
-      taskDetails = await Promise.all(
-        landlordResponse.tasks.map((taskId) => {
-          return getTaskById(taskId);
-        })
+
+      const properties = await getAllPropertiesByLandlordId(landlordId);
+      const taskDetails = await Promise.all(
+        landlordResponse.tasks.map((taskId) => getTaskById(taskId))
       );
       const dashboardData = await fetchLandlordDashboardData(landlordId);
 
       return {
-        properties: properties,
-        taskDetails: taskDetails,
+        properties,
+        taskDetails,
         propertyCount: dashboardData.totalPropertyCount,
         statusCounts: dashboardData.propertyStatusCounts,
         income: dashboardData.totalIncome,

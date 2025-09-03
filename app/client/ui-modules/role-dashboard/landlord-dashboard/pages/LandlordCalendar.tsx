@@ -99,7 +99,7 @@ export function LandlordCalendar(): React.JSX.Element {
       console.log("Task created successfully with ID:", createdTaskId);
 
       setIsModalOpen(false);
-      dispatch(fetchLandlordTasks(currentUser.userId));
+      dispatch(fetchLandlordTasks());
     } catch (error) {
       console.error("Error creating task:", error);
     }
