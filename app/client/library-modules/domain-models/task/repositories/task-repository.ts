@@ -2,6 +2,7 @@ import { apiGetTaskById, apiCreateTaskForAgent, apiCreateTaskForLandlord,apiUpda
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { mapApiTaskToTask, mapAgentTaskInsertData, mapLandlordTaskInsertData } from "./mappers/task-mapper";
 import { TaskPriority } from "/app/shared/task-priority-identifier"
+import { TaskData } from "../../../../ui-modules/role-dashboard/agent-dashboard/components/TaskFormSchema"
 
 export async function getTaskById(id: string): Promise<Task> {
   const apiTask = await apiGetTaskById(id);
@@ -32,8 +33,8 @@ export async function createTaskForLandlord(task: {
   propertyAddress: string;
   propertyId: string;
 }): Promise<string> {
-  const payload = mapLandlordTaskInsertData(task)
-  return await apiCreateTaskForLandlord(payload)
+  const payload = mapLandlordTaskInsertData(task);
+  return await apiCreateTaskForLandlord(payload);
 }
 
 export async function updateTaskForAgent(task: {
@@ -54,4 +55,21 @@ export async function updateTaskForLandlord(task: {
   priority: TaskPriority;
 }): Promise<string> {
   return await apiUpdateTaskForLandlord(task);
+}
+
+
+// temp fix ---> will need to update in M4
+export async function createTaskForLandlordOnCalendar(
+  taskData: TaskData,
+  userId: string
+): Promise<string> {
+  const apiData = {
+    ...taskData,
+    userId, // add userId
+    dueDate: new Date(taskData.dueDate), // ensure date is Date type
+    propertyId: taskData.propertyId || "", // default if missing
+  };
+
+  const createdTaskId = await apiCreateTaskForLandlord(apiData);
+  return createdTaskId;
 }

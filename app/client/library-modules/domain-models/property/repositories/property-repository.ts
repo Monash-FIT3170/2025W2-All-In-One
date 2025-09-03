@@ -83,3 +83,6 @@ export async function searchProperties(query: string): Promise<Property[]> {
 export async function updatePropertyTenantId(propertyId: string, tenantId: string): Promise<void> {
   return await apiUpdatePropertyTenantId(propertyId, tenantId);
 }
+export async function getPropertiesForLandlord(landlordId: string): Promise<Property[]> {
+  return getAllPropertiesByLandlordId(landlordId);
+}

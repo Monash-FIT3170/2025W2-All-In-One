@@ -54,6 +54,8 @@ export function mapLandlordTaskInsertData(task: {
     description: task.description,
     dueDate: task.dueDate,
     priority: task.priority,
-    landlordId: task.userId, // Map userId to landlordId for the server
+    userId: task.userId,
+    propertyAddress: task.propertyAddress,
+    propertyId: task.propertyId,
   }
 }
