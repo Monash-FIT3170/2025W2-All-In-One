@@ -4,6 +4,7 @@ import { getPropertyById, updatePropertyTenantId } from "/app/client/library-mod
 import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
 import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
+import { calculateDueDate } from "/app/client/library-modules/utils/date-utils";
 
 /*WILL SEPARATE THESE USE CASES INTO SEPARATE FILES LATER*/
 
@@ -25,8 +26,7 @@ export async function sendApprovedApplicationsToAgentUseCase(
       `Perform background checks on ${approvedApplications.length} landlord approved tenant application(s) ` +
       `for property at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}. ` +
       `Applicants: ${approvedApplications.map((app: TenantApplication) => app.applicantName).join(', ')}`;
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 7);
+    const dueDate = calculateDueDate(7);
 
     // Get property to find agent ID
     const property = await getPropertyById(propertyId);
@@ -52,9 +52,11 @@ export async function sendApprovedApplicationsToAgentUseCase(
       taskResult // This stores the taskId in the existing taskId field
     );
 
-    for (const applicationId of approvedApplicationIds) {
-        await updateTenantApplicationLinkedTaskId(applicationId, taskResult);
-    }
+    await Promise.all(
+      approvedApplicationIds.map(applicationId =>
+          updateTenantApplicationLinkedTaskId(applicationId, taskResult)
+      )
+    );
 
     console.log(`Successfully sent ${approvedApplications.length} application(s) to agent for background check for property ${propertyId}`);
 
@@ -101,8 +103,7 @@ export async function sendApprovedApplicationsToAgentUseCase(
 
     const updatedTaskName = `Process Final Tenant Selection`;
     const updatedTaskDescription = `Process final tenant selection for ${chosenApplication.applicantName} at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`;
-    const updatedDueDate = new Date();
-    updatedDueDate.setDate(updatedDueDate.getDate() + 3);
+    const updatedDueDate = calculateDueDate(3);
 
     const existingTaskId = chosenApplication.linkedTaskId;
 
@@ -145,9 +146,9 @@ function validateTaskInputs(propertyId: string, propertyLandlordId: string): voi
   }
 }
 
-function ensureNonEmptyApplications(applications: TenantApplication[], errorMessage: string): void {
-  if (applications.length === 0) {
-    throw new Error(errorMessage);
+function ensureNonEmptyApplications(apps: TenantApplication[], message: string): void {
+  if (!Array.isArray(apps) || apps.length === 0) {
+    throw new Error(message);
   }
 }
 
@@ -160,3 +161,4 @@ function ensureSingleFinalApprovedApplication(applications: TenantApplication[])
       throw new Error('Only one applicant can be chosen for final approval');
     }
   }
+

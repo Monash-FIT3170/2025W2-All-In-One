@@ -3,6 +3,7 @@ import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
 import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
 import { createTaskForLandlord, updateTaskForLandlord } from "../../domain-models/task/repositories/task-repository";
+import { calculateDueDate } from "/app/client/library-modules/utils/date-utils";
 
 /*WILL SEPARATE THESE USE CASES INTO SEPARATE FILES LATER*/
 
@@ -22,8 +23,7 @@ export async function sendAcceptedApplicationsToLandlordUseCase(
   // Create task for landlord
   const taskName = `Review ${acceptedApplications.length} Tenant Application(s)`;
   const taskDescription = `Review ${acceptedApplications.length} accepted tenant application(s) for property at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}. Applicants: ${acceptedApplications.map((app: TenantApplication) => app.applicantName).join(', ')}`;
-  const dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + 7);
+  const dueDate = calculateDueDate(7);
 
   // Create task for landlord
   const taskResult = await createTaskForLandlord({
@@ -46,9 +46,11 @@ export async function sendAcceptedApplicationsToLandlordUseCase(
   );
 
   // Update applications to store the linkedTaskId
-  for (const applicationId of acceptedApplicationIds) {
-    await updateTenantApplicationLinkedTaskId(applicationId, taskResult);
-  }
+  await Promise.all(
+    acceptedApplicationIds.map(applicationId =>
+        updateTenantApplicationLinkedTaskId(applicationId, taskResult)
+    )
+  );
 
   console.log(`Successfully sent ${acceptedApplications.length} application(s) to landlord ${landlordId} for property ${propertyId}`);
 
@@ -78,8 +80,7 @@ export async function sendBackgroundPassedToLandlordUseCase(
 
   const updatedTaskName = `Background Check for ${passedApplications.length} Tenant Application(s)`;
   const updatedTaskDescription = `Background check for ${passedApplications.length} tenant application(s) at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}. Applicants: ${passedApplications.map(a => a.applicantName).join(', ')}`;
-  const updatedDueDate = new Date();
-  updatedDueDate.setDate(updatedDueDate.getDate() + 7);
+  const updatedDueDate = calculateDueDate(7);
 
   const existingTaskId = passedApplications[0].linkedTaskId;
 
@@ -127,10 +128,5 @@ export function ensureNonEmptyApplications(apps: TenantApplication[], message: s
   if (!Array.isArray(apps) || apps.length === 0) {
     throw new Error(message);
   }
-}
-export function calculateDueDate(daysFromNow: number): Date {
-  const dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + daysFromNow);
-  return dueDate;
 }
 

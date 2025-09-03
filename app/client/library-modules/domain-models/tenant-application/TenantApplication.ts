@@ -13,6 +13,7 @@ export type TenantApplication = {
   tenantUserId: string;
   taskId?: string;
   linkedTaskId?: string;
+  description?: string;
 };
 
 // min data required to create new tenant application
