@@ -53,18 +53,32 @@ export function PropertyCard(props: PropertyWithListingData) {
     return (
         <div
             onClick={handleClick}
-            className="cursor-pointer block hover:shadow-lg transition-shadow duration-200 ease-in-out rounded-lg"
+            className="w-full cursor-pointer block hover:shadow-lg transition-shadow duration-200 ease-in-out rounded-lg"
         >
             <CardWidget
-                className="w-full max-w-sm overflow-hidden h-full flex flex-col text-center"
+                className="w-full overflow-hidden h-full flex flex-col text-center"
                 title="" 
                 value=""
             >
-                <img
-                    src={displayImageUrl}
-                    alt={`Property at ${address}`}
-                    className="h-48 w-full object-cover"
-                />
+                <div className="relative">
+                    <img
+                        src={displayImageUrl}
+                        alt={`Property at ${address}`}
+                        className="h-48 w-full object-cover"
+                    />
+                    {/* Status pill */}
+                    {propertyStatus && (
+                        <span
+                            className={`absolute top-2 right-2 px-3 py-1 rounded-full text-xs font-semibold shadow-md
+                                ${propertyStatus === "VACANT" ? "bg-green-600 text-white" : ""}
+                                ${propertyStatus === "OCCUPIED" ? "bg-red-500 text-white" : ""}
+                            `}
+                            style={{ zIndex: 2 }}
+                        >
+                            {propertyStatus}
+                        </span>
+                    )}
+                </div>
                 <div className="p-4 flex-grow">
                     <h2 className="text-lg font-semibold truncate" title={address}>
                         {address}
@@ -84,10 +98,6 @@ export function PropertyCard(props: PropertyWithListingData) {
                         <div className="flex items-center gap-1">
                             <CalendarDays className="w-4 h-4" />
                             <span>{nextInspectionDate}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <DoorOpen className="w-4 h-4" />
-                            <span>{propertyStatus}</span>
                         </div>
                     </div>
 
