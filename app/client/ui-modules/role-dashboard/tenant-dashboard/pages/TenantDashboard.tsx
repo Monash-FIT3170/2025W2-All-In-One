@@ -6,7 +6,7 @@ import {
   selectTasks,
   selectPropertyDetails,
   fetchTenantDetails,
-} from "../../tenant-dashboard/state/tenant-dashboard-slice";
+} from "../state/reducers/tenant-dashboard-slice";
 import DashboardCards from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/TenantDashboardCard";
 import PropertyDetails from "../components/PropertyDetails";
 

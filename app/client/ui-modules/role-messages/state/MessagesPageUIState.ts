@@ -1,4 +1,5 @@
-import { Conversation, Message } from "../types";
+import { Conversation } from "/app/client/library-modules/domain-models/messaging/Conversation";
+import { Message } from "/app/client/library-modules/domain-models/messaging/Message";
 
 export interface MessagesState {
   isLoading: boolean;
@@ -9,4 +10,4 @@ export interface MessagesState {
   error: string | null;
   conversationsLoading: boolean;
   messagesLoading: boolean;
-} 
+}

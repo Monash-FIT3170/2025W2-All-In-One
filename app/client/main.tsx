@@ -15,7 +15,8 @@ import { AgentProperty } from "./ui-modules/role-dashboard/agent-dashboard/pages
 import { LandlordDashboard } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordDashboard";
 import { LandlordCalendar } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordCalendar";
 import { LandlordTask } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordTask";
-import { LandlordProperty } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordProperty";
+import { LandlordProperties } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordProperties";
+import { LandlordPropertyDetail } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordPropertyDetail";
 import { LandlordMessagePage } from "./ui-modules/role-messages/LandlordMessagePage";
 import { BottomNavbar } from "./ui-modules/navigation-bars/BottomNavbar";
 import { TopNavbar } from "./ui-modules/navigation-bars/TopNavbar";
@@ -25,7 +26,7 @@ import { SettingsPage } from "./ui-modules/settings-page/SettingsPage";
 import { PropertyFormPage } from "./ui-modules/property-form-agent/PropertyFormPage";
 import { AuthTabs } from "./ui-modules/user-authentication/AuthTabs";
 import TenantDashboard from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDashboard";
-import TenantProperty from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantProperty";
+import { TenantProperty } from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantProperty";
 import { TenantCalendar } from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantCalendar";
 import TenantMaintenance from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMaintenance";
 import { TenantMessagePage } from "./ui-modules/role-messages/TenantMessagePage";
@@ -162,7 +163,7 @@ function AppRoot(): React.JSX.Element {
             path={NavigationPath.LandlordProperties}
             element={
               <LandlordRoute>
-                <LandlordProperty />
+                <LandlordProperties />
               </LandlordRoute>
             }
           />
@@ -187,6 +188,14 @@ function AppRoot(): React.JSX.Element {
             element={
               <LandlordRoute>
                 <LandlordMessagePage />
+              </LandlordRoute>
+            }
+          />
+          <Route
+            path={NavigationPath.LandlordPropertyDetail}
+            element={
+              <LandlordRoute>
+                <LandlordPropertyDetail />
               </LandlordRoute>
             }
           />

@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../../../store";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 import { UpcomingTasks } from "../../components/UpcomingTask";
-import { fetchTenantTasks, selectLoading, selectTasks } from "../state/tenant-dashboard-slice";
+import { fetchTenantTasks, selectLoading, selectTasks } from "../state/reducers/tenant-dashboard-slice";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { getTodayISODate } from "/app/client/library-modules/utils/date-utils";
 
