@@ -75,21 +75,27 @@ export const fetchLandlordTasks = createAsyncThunk(
     const landlordResponse = await getLandlordById(userId);
     console.log("fetching landlord tasks");
 
-    const taskDetails: Task[] = [];
-    for (const taskId of landlordResponse.tasks) {
-      try {
-        const taskData = await getTaskById(taskId);
-        if (taskData) {
-          taskDetails.push(taskData);
+    // Fetch all tasks in parallel
+    const taskDetailsResults = await Promise.all(
+      landlordResponse.tasks.map(async (taskId) => {
+        try {
+          return await getTaskById(taskId);
+        } catch (error) {
+          console.error(`Error fetching task ${taskId}:`, error);
+          return null; // skip failed tasks
         }
-      } catch (error) {
-        console.error(`Error fetching task ${taskId}:`, error);
-      }
-    }
+      })
+    );
+
+    // Filter out any null results
+    const taskDetails: Task[] = taskDetailsResults.filter(
+      (task): task is Task => task !== null
+    );
 
     return { ...landlordResponse, taskDetails };
   }
 );
+
 
 export const fetchLandlordDetails = createAsyncThunk(
   "landlordDashboard/fetchLandlordDetails",
