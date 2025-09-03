@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeftIcon } from "lucide-react";
 import { formSchema, FormSchemaType } from "./components/FormSchema";
 import { formDefaultValues, PropertyForm } from "./components/PropertyForm";
-import { useAppDispatch } from "../../store";
+import { useAppDispatch, useAppSelector } from "../../store";
 import { PropertyFormPageUiState } from "./state/PropertyFormPageUIState";
 import { load, selectPropertyFormUiState, submitForm } from "./state/reducers/property-form-slice";
 import { useSelector } from "react-redux";
@@ -16,6 +15,7 @@ import { PropertyFormMode } from "./enum/PropertyFormMode";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { BackLink } from "../theming/components/BackLink";
 import { BackButtonIcon } from "../theming/icons/BackButtonIcon";
+import { getAgentById } from "../../library-modules/domain-models/user/role-repositories/agent-repository";
 
 export function PropertyFormPage() {
   const form = useForm<FormSchemaType>({
@@ -27,13 +27,32 @@ export function PropertyFormPage() {
     selectPropertyFormUiState
   );
   const navigator = useNavigate();
+  const authUser = useAppSelector((state) => state.currentUser.authUser);
+  const [agentLoaded, setAgentLoaded] = useState(false);
 
   useEffect(() => {
     dispatch(load());
   }, []);
 
+  useEffect(() => {
+    const userId = authUser?.userId;
+    if (!userId) return;
+  
+    (async () => {
+      try {
+        const agent = await getAgentById(userId);
+        form.setValue("agent", agent.agentId); 
+        setAgentLoaded(true);
+      } catch (err) {
+        console.error("Failed to load agent", err);
+      }
+    })();
+  }, [authUser?.userId, form]);
+  
+  
+
   const navigate = (propertyId: string) =>{ 
-    navigator(`${NavigationPath.PropertyListing}?propertyId=${propertyId}`);
+    navigator(`${NavigationPath.PropertyListing}?propertyId=${propertyId}&from=agent-properties`);
   }
 
   const handleSubmit = async (values: FormSchemaType) => {
