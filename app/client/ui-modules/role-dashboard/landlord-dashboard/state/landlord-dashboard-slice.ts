@@ -7,6 +7,7 @@ import { getTaskById } from "/app/client/library-modules/domain-models/task/repo
 import {
   fetchLandlordDashboardData,
   getAllPropertiesByLandlordId,
+  getPropertiesForLandlord,
 } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
@@ -244,3 +245,21 @@ export const createLandlordTask = createAsyncThunk(
     return createdTaskId;
   }
 );
+
+export const fetchLandlordProperties = createAsyncThunk(
+  "landlordDashboard/fetchLandlordProperties",
+  async (_, { getState }) => {
+    const state = getState() as RootState;
+
+    const userId = state.currentUser.authUser?.userId;
+    if (!userId) throw new Error("No current user found");
+
+    const landlordResponse = await getLandlordById(userId);
+    const landlordId = landlordResponse?.landlordId;
+    if (!landlordId) throw new Error("Landlord ID not found");
+
+    const properties = await getPropertiesForLandlord(landlordId);
+    return properties;
+  }
+);
+
