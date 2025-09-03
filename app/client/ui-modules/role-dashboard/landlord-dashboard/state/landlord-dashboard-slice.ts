@@ -243,7 +243,7 @@ export const createLandlordTask = createAsyncThunk(
     const createdTaskId = await createTaskForLandlord(taskData, userId);
 
     // Refresh all landlord details after creation
-    await dispatch(fetchLandlordDetails());
+    await dispatch(fetchLandlordTasks());
 
     return createdTaskId;
   }
@@ -261,7 +261,7 @@ export const fetchLandlordProperties = createAsyncThunk(
     const landlordId = landlordResponse?.landlordId;
     if (!landlordId) throw new Error("Landlord ID not found");
 
-    const properties = await getPropertiesForLandlord(landlordId);
+    const properties = await getAllPropertiesByLandlordId(landlordId);
     return properties;
   }
 );
