@@ -76,6 +76,7 @@ export const formDefaultValues: z.infer<typeof formSchema> = {
   property_feature_ids: [],
   images: [],
   available_dates: new Date(),
+  inspection_times: [],
   lease_term: "",
   show_contact_boolean: false,
 };

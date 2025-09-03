@@ -18,6 +18,12 @@ export const formSchema = z.object({
   property_feature_ids: z.array(z.string()),
   images: z.array(z.instanceof(File)).min(1, { message: "At least one image is required" }),
   available_dates: z.coerce.date(),
+  inspection_times: z.array(
+    z.object({
+      start_time: z.coerce.date(),
+      end_time: z.coerce.date(),
+    })
+  ).default([]),
   lease_term: z.string().min(1, { message: "Lease term is required" }),
   show_contact_boolean: z.boolean().optional(),
 });

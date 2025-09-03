@@ -23,7 +23,11 @@ export function TaskMap({
   const initialMapCoordinates = mapUiState.markers.length > 0 ? {
     initialLatitude: mapUiState.markers[0].latitude,
     initialLongitude: mapUiState.markers[0].longitude,
-  } : undefined;
+  } : null;
+
+  if (!initialMapCoordinates) {
+    return <div className={twMerge("w-full h-[350px] flex items-center justify-center bg-gray-200 text-gray-500", className)}>No tasks to display</div>;
+  }
 
   return (
       <DynamicMap
