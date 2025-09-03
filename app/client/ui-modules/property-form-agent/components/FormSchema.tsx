@@ -1,6 +1,7 @@
 import * as z from "zod";
 
 export const formSchema = z.object({
+  agent: z.string().min(1, { message: "Missing agent id" }),
   landlord: z.string().min(1, { message: "Please assign a landlord" }),
   property_type: z.string().min(1, { message: "Please select a property type" }),
   address_number: z.string().min(1, { message: "Please fill out field" }),
