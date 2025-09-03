@@ -11,9 +11,12 @@ import {
 } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import { PropertyOption, TaskData } from "../../agent-dashboard/components/TaskFormSchema";
+import {
+  PropertyOption,
+  TaskData,
+} from "../../agent-dashboard/components/TaskFormSchema";
 import { apiCreateTaskForLandlord } from "/app/client/library-modules/apis/task/task-api";
-import { createTaskForLandlord } from "../../../../library-modules/domain-models/task/repositories/task-repository"
+import { createTaskForLandlord } from "../../../../library-modules/domain-models/task/repositories/task-repository";
 
 interface LandlordDashboardState {
   isLoading: boolean;
@@ -97,7 +100,6 @@ export const fetchLandlordTasks = createAsyncThunk(
   }
 );
 
-
 export const fetchLandlordDetails = createAsyncThunk(
   "landlordDashboard/fetchLandlordDetails",
   async (_, { getState }) => {
@@ -158,6 +160,9 @@ export const landlordDashboardSlice = createSlice({
     builder
       .addCase(fetchLandlordDetails.pending, (state) => {
         state.isLoading = true;
+      })
+      .addCase(fetchLandlordProperties.fulfilled, (state, action) => {
+        state.properties = action.payload;
       })
       .addCase(fetchLandlordDetails.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -226,8 +231,6 @@ export const fetchPropertiesForLandlord = (
   });
 };
 
-
-
 export const createLandlordTask = createAsyncThunk(
   "landlordDashboard/createLandlordTask",
   async (taskData: TaskData, { getState, dispatch }) => {
@@ -262,4 +265,3 @@ export const fetchLandlordProperties = createAsyncThunk(
     return properties;
   }
 );
-
