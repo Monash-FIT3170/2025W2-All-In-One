@@ -51,7 +51,7 @@ export function PropertyFormPage() {
         <BackLink
         label="Back to properties"
         backButtonIcon={<BackButtonIcon/>}
-        onClick={() => navigator("/")}
+        onClick={() => navigator("/agent-properties")}
         className="mr-auto"
         />
         <div>
