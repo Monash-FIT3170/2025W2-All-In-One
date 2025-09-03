@@ -8,6 +8,7 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiLandlord } from "../../../../shared/api-models/user/api-roles/ApiLandlord";
 import { TaskDocument } from "/app/server/database/task/models/TaskDocument";
 import { TaskCollection } from "/app/server/database/task/task-collections";
+import { ProfileCollection } from "/app/server/database/user/user-collections";
 
 //INSERT LANDLORD
 const landlordInsertMethod = {
@@ -126,10 +127,42 @@ async function getTaskDocumentsMatchingIds(
   }).fetchAsync();
 }
 
+// Get profile data by landlord ID (queries landlord collection first, then profile collection)
+const profileGetByLandlordIdMethod = {
+  [MeteorMethodIdentifier.PROFILE_GET_BY_LANDLORD_ID]: async (
+    landlordId: string
+  ): Promise<any> => {
+    // First get the landlord document to extract profileDataId
+    const landlordDoc = await LandlordCollection.findOneAsync({
+      _id: landlordId,
+    });
+
+    if (!landlordDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Landlord with ID ${landlordId} not found.`)
+      );
+    }
+
+    // Then get the profile data using the profileDataId
+    const profileDoc = await ProfileCollection.findOneAsync({
+      _id: landlordDoc.profileDataId,
+    });
+
+    if (!profileDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Profile with ID ${landlordDoc.profileDataId} not found.`)
+      );
+    }
+
+    return profileDoc;
+  },
+};
+
 Meteor.methods({
   ...landlordInsertMethod,
   ...landlordGetMethod,
   ...landlordGetByLandlordIdMethod,
   ...landlordUpdateTasksMethod,
   ...landlordGetAllMethod,
+  ...profileGetByLandlordIdMethod,
 });

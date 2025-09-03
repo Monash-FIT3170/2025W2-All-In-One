@@ -4,3 +4,4 @@ node_modules/
 .env
 settings.json
 .DS_Store
+bundle/

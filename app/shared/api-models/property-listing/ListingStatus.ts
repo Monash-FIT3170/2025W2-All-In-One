@@ -1,6 +1,6 @@
 export enum ListingStatus {
-    DRAFT = "Draft",
-    LISTED = "Listed",
-    TENANT_SELECTION = "Selection",
-    TENANT_APPROVAL = "Approval",
+    DRAFT = "DRAFT",
+    LISTED = "LISTED",
+    TENANT_APPROVAL = "APPROVAL",
+    CLOSED = "CLOSED"
 }

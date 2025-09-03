@@ -2,6 +2,8 @@ import { Meteor } from "meteor/meteor";
 import "./methods/azure/blob-methods";
 import "./methods/task/task-methods";
 import "./methods/property/property-methods";
+import "./methods/messaging/messaging-methods";
+import "./publications/messaging-publications";
 import "./methods/property-listing/listing-methods";
 import {
 	PropertyCollection,
@@ -43,6 +45,7 @@ import { PropertyStatus } from "../shared/api-models/property/PropertyStatus";
 import "/app/server/methods/property/property-features/property-features-methods";
 import { ListingStatus } from "../shared/api-models/property-listing/ListingStatus";
 import { PropertyDocument } from "./database/property/models/PropertyDocument";
+import { TaskPriority } from "../shared/task-priority-identifier";
 
 let globalAgent: ApiAgent;
 let globalTenant: ApiTenant;
@@ -166,34 +169,30 @@ async function seedPropertyCoordinatesForTempProperties(): Promise<void> {
 }
 
 async function tempSeedProfileData(): Promise<void> {
-	if ((await ProfileCollection.find().countAsync()) === 0) {
-		ProfileCollection.insertAsync({
-			_id: "1",
-			firstName: "Steve",
-			lastName: "Minecraft",
-			email: "steve123456@gmail.com",
-			dob: "12/05/2025",
-			occupation: "Miner",
-			phone: "0432 555 222",
-			emergencyContact: "Alex",
-			employer: "The Mines",
-			workAddress: "Jungle Biome",
-			workPhone: "0122 222 123",
-			profilePicture: "img.com",
-			carMake: "Toyota",
-			carModel: "Prius",
-			carYear: "2000",
-			carPlate: "DXW003",
-		});
-	}
-	if ((await PropertyCollection.find().countAsync()) === 0) {
-		console.log("Seeding Property Data");
-		// Seed property statuses first
-		const statuses = [
-			{ _id: "1", name: PropertyStatus.VACANT },
-			{ _id: "2", name: PropertyStatus.OCCUPIED },
-			{ _id: "3", name: PropertyStatus.UNDER_MAINTENANCE },
-		];
+  if ((await ProfileCollection.find().countAsync()) === 0) {
+    ProfileCollection.insertAsync({
+      _id: "1",
+      firstName: "Steve",
+      lastName: "Minecraft",
+      email: "steve123456@gmail.com",
+      dob: "12/05/2025",
+      occupation: "Miner",
+      phone: "0432 555 222",
+      emergencyContact: "Alex",
+      employer: "The Mines",
+      workAddress: "Jungle Biome",
+      workPhone: "0122 222 123",
+      profilePicture: "img.com",
+    });
+  }
+  if ((await PropertyCollection.find().countAsync()) === 0) {
+    console.log("Seeding Property Data");
+    // Seed property statuses first
+    const statuses = [
+      { _id: "1", name: PropertyStatus.VACANT },
+      { _id: "2", name: PropertyStatus.OCCUPIED },
+      { _id: "3", name: PropertyStatus.VACANT},
+    ];
 
 		// Add new status if it doesn't exist
 		for (const status of statuses) {
@@ -614,67 +613,76 @@ async function seedListedProperties(
 
 // This function is used to seed the database with initial task data
 async function tempSeedTaskData(): Promise<void> {
-	console.log("Seeding property data...");
-	if ((await TaskCollection.find().countAsync()) === 0) {
-		// Insert tasks into the TaskCollection
-		TaskCollection.insertAsync({
-			_id: "1",
-			name: "Initial listing meeting",
-			taskStatus: TaskStatus.NOTSTARTED,
-			createdDate: new Date("2025-04-12T10:00:00Z"),
-			dueDate: new Date("2025-05-19T10:00:00Z"),
-			description:
-				"Meet with the client to discuss the property listing process and gather necessary information.",
-			priority: "High",
-		});
+  console.log("Seeding property data...");
+  if ((await TaskCollection.find().countAsync()) === 0) {
+    // Insert tasks into the TaskCollection
+    TaskCollection.insertAsync({
+      _id: "1",
+      name: "Initial listing meeting",
+      taskStatus: TaskStatus.NOTSTARTED,
+      createdDate: new Date("2025-04-12T10:00:00Z"),
+      dueDate: new Date("2025-05-19T10:00:00Z"),
+      description: "Meet with the client to discuss the property listing process and gather necessary information.",
+      priority: TaskPriority.HIGH,
+      taskPropertyAddress: "", 
+      taskPropertyId: "", 
+    });
 
-		TaskCollection.insertAsync({
-			_id: "2",
-			name: "Submit Rental Application",
-			taskStatus: TaskStatus.INPROGRESS,
-			createdDate: new Date("2025-04-20T10:00:00Z"),
-			dueDate: new Date("2025-05-27T10:00:00Z"),
-			description:
-				"Check in with the client to provide updates and address any questions.",
-			priority: "Medium",
-		});
-		await TaskCollection.insertAsync({
-			_id: "3",
-			name: "Select a tenant",
-			taskStatus: TaskStatus.INPROGRESS,
-			createdDate: new Date("2025-04-20T10:00:00Z"),
-			dueDate: new Date("2025-05-28T10:00:00Z"),
-			description: "Review the list of agent approved candidates and pick one.",
-			priority: "Medium",
-		});
-		await TaskCollection.insertAsync({
-			_id: "4",
-			name: "Follow-up with client",
-			taskStatus: TaskStatus.INPROGRESS,
-			createdDate: new Date("2025-04-20T10:00:00Z"),
-			dueDate: new Date("2025-05-27T10:00:00Z"),
-			description: "Attend a property listing meeting with agent.",
-			priority: "Medium",
-		});
-		await TaskCollection.insertAsync({
-			_id: "5",
-			name: "Property annual inspection",
-			taskStatus: TaskStatus.INPROGRESS,
-			createdDate: new Date("2025-04-20T10:00:00Z"),
-			dueDate: new Date("2025-05-27T10:00:00Z"),
-			description: "Attend the annual inspection.",
-			priority: "Medium",
-		});
-		await TaskCollection.insertAsync({
-			_id: "6",
-			name: "Sign rental agreement",
-			taskStatus: TaskStatus.INPROGRESS,
-			createdDate: new Date("2025-04-20T10:00:00Z"),
-			dueDate: new Date("2025-05-27T10:00:00Z"),
-			description:
-				"Sign the rental agreement which has had the rent increased by 5%.",
-			priority: "Medium",
-		});
+    TaskCollection.insertAsync({
+      _id: "2",
+      name: "Submit Rental Application",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
+      description: "Check in with the client to provide updates and address any questions.",
+      priority: TaskPriority.MEDIUM,
+      taskPropertyAddress: "", 
+      taskPropertyId: "", 
+    });
+    await TaskCollection.insertAsync({
+      _id: "3",
+      name: "Select a tenant",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-28T10:00:00Z"),
+      description: "Review the list of agent approved candidates and pick one.",
+      priority: TaskPriority.MEDIUM,
+      taskPropertyAddress: "", 
+      taskPropertyId: "", 
+    });
+    await TaskCollection.insertAsync({
+      _id: "4",
+      name: "Follow-up with client",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
+      description: "Attend a property listing meeting with agent.",
+      priority: TaskPriority.MEDIUM,
+      taskPropertyAddress: "", 
+      taskPropertyId: "", 
+    });
+    await TaskCollection.insertAsync({
+      _id: "5",
+      name: "Property annual inspection",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
+      description: "Attend the annual inspection.",
+      priority: TaskPriority.MEDIUM,
+      taskPropertyAddress: "", 
+      taskPropertyId: "", 
+    });
+    await TaskCollection.insertAsync({
+      _id: "6",
+      name: "Sign rental agreement",
+      taskStatus: TaskStatus.INPROGRESS,
+      createdDate: new Date("2025-04-20T10:00:00Z"),
+      dueDate: new Date("2025-05-27T10:00:00Z"),
+      description: "Sign the rental agreement which has had the rent increased by 5%.",
+      priority: TaskPriority.MEDIUM,
+      taskPropertyAddress: "", 
+      taskPropertyId: "", 
+    });
 
 		console.log("Tasks seeded successfully.");
 	}
@@ -718,7 +726,7 @@ async function permSeedListingStatusData(): Promise<void> {
 		});
 		await ListingStatusCollection.insertAsync({
 			_id: "3",
-			name: ListingStatus.TENANT_SELECTION,
+			name: ListingStatus.CLOSED,
 		});
 		await ListingStatusCollection.insertAsync({
 			_id: "4",

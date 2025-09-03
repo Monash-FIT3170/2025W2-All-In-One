@@ -33,7 +33,7 @@ import {
   submitDraftListingAsync,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
-import { useNavigate, useSearchParams } from "react-router";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 import EditDraftListingModal from "./components/EditDraftListingModal";
 import { EditDraftListingButton } from "./components/EditDraftListingButton";
 import { FormSchemaType } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
