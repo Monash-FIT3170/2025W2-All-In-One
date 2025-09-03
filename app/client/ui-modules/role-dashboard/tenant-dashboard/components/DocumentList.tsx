@@ -1,18 +1,14 @@
 import React, { useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../../../store";
+import { useAppSelector } from "../../../../store";
 import { 
   selectDocuments, 
   selectDocumentsLoading, 
-  selectDocumentsError,
-  deleteTenantDocument 
+  selectDocumentsError
 } from "../state/tenant-documents-slice";
 import { Button } from "../../../theming-shadcn/Button";
 import { Badge } from "../../../theming-shadcn/Badge";
 import { 
   FileText, 
-  Download, 
-  Trash2, 
-  Eye, 
   Calendar, 
   AlertCircle,
   ExternalLink 
@@ -25,25 +21,19 @@ interface DocumentListProps {
 }
 
 export function DocumentList({ onRefresh }: DocumentListProps) {
-  const dispatch = useAppDispatch();
   const documents = useAppSelector(selectDocuments);
   const isLoading = useAppSelector(selectDocumentsLoading);
   const error = useAppSelector(selectDocumentsError);
   
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [documentToDelete, setDocumentToDelete] = useState<any>(null);
 
   const handleViewDocument = (document: any) => {
     setSelectedDocument(document);
     setIsViewDialogOpen(true);
   };
 
-  const handleDeleteDocument = (document: any) => {
-    setDocumentToDelete(document);
-    setIsDeleteDialogOpen(true);
-  };
+
 
  
   const getDocumentStatus = (validUntil: Date) => {
@@ -214,33 +204,7 @@ export function DocumentList({ onRefresh }: DocumentListProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Document</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <p className="text-gray-600">
-              Are you sure you want to delete "{documentToDelete?.fileName}"? This action cannot be undone.
-            </p>
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setIsDeleteDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={confirmDelete}
-              >
-                Delete
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+
     </>
   );
 }

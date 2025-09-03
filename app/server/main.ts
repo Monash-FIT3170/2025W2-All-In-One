@@ -733,7 +733,7 @@ async function permSeedListingStatusData(): Promise<void> {
 async function seedLeaseAgreements(agent: ApiAgent): Promise<void> {
 	if ((await LeaseAgreementCollection.find().countAsync()) === 0) {
 		console.log("Seeding lease agreement data...");
-		
+
 		// Create a sample lease agreement for Amanda (the agent)
 		// Create multiple sample lease agreements for Amanda (the agent)
 		await LeaseAgreementCollection.insertAsync({
@@ -764,6 +764,17 @@ async function seedLeaseAgreements(agent: ApiAgent): Promise<void> {
 			validUntil: new Date(Date.now() + 350 * 24 * 60 * 60 * 1000), // 11.5 months from now
 			documentUrl: "https://example.com/third-lease-agreement.pdf",
 			tenantName: "Mike Chen",
+		});
+
+		// Add a lease agreement specifically for Todd Toolgate (tenant)
+		await LeaseAgreementCollection.insertAsync({
+			_id: "lease_4",
+			propertyId: "1", // 23 Spring St, Glen Waverley (same as lease_1 but for tenant view)
+			agentId: agent?.agentId || "",
+			uploadedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+			validUntil: new Date(Date.now() + 200 * 24 * 60 * 60 * 1000), // 6.5 months from now
+			documentUrl: "https://example.com/todd-toolgate-lease.pdf",
+			tenantName: "Todd Toolgate",
 		});
 
 		console.log("Lease agreement seeded successfully.");
