@@ -1,10 +1,10 @@
 import {
-  InspectionCollection,
+  PropertyListingInspectionCollection,
   ListingCollection,
   ListingStatusCollection,
 } from "../../database/property-listing/listing-collections";
 import { ListingDocument } from "../../database/property-listing/models/ListingDocument";
-import { InspectionDocument } from "../../database/property-listing/models/InspectionDocument";
+import { PropertyListingInspectionDocument } from "../../database/property-listing/models/PropertyListingInspectionDocument";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ListingStatusDocument } from "/app/server/database/property-listing/models/ListingStatusDocument";
@@ -145,10 +145,10 @@ async function getListingDocumentsByStatus(
 async function mapListingDocumentToListingDTO(
   listing: ListingDocument
 ): Promise<ApiListing> {
-  let inspections: InspectionDocument[] = [];
+  let propertyListingInspections: PropertyListingInspectionDocument[] = [];
 
   if (listing.inspection_ids.length > 0) {
-    inspections = await getInspectionDocumentsMatchingIds(
+    propertyListingInspections = await getPropertyListingInspectionDocumentsMatchingIds(
       listing.inspection_ids
     );
   }
@@ -167,7 +167,7 @@ async function mapListingDocumentToListingDTO(
     property_id: listing.property_id,
     image_urls: listing.image_urls,
     listing_status: listingStatusDocument.name,
-    inspections: inspections.map((inspection) => ({
+    propertyListingInspections: propertyListingInspections.map((inspection) => ({
       start_time: inspection.starttime,
       end_time: inspection.endtime,
     })),
@@ -182,10 +182,10 @@ async function getListingDocumentAssociatedWithProperty(
   });
 }
 
-async function getInspectionDocumentsMatchingIds(
+async function getPropertyListingInspectionDocumentsMatchingIds(
   ids: string[]
-): Promise<InspectionDocument[]> {
-  return await InspectionCollection.find({
+): Promise<PropertyListingInspectionDocument[]> {
+  return await PropertyListingInspectionCollection.find({
     _id: { $in: ids },
   }).fetchAsync();
 }

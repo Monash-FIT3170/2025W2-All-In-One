@@ -63,7 +63,7 @@ import {
   selectFinalApprovedApplicantCountForProperty,
   sendFinalApprovedApplicationToAgentAsync,
 } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
-import { addBookedInspection } from "./state/reducers/property-listing-slice";
+import { addBookedPropertyListingInspection } from "./state/reducers/property-listing-slice";
 import { Role } from "/app/shared/user-role-identifier";
 import { CurrentUserState } from "../user-authentication/state/CurrentUserState";
 
@@ -133,6 +133,7 @@ export function PropertyListingPage({
           propertyPrice={state.propertyPrice}
           mapUiState={state.mapUiState}
           inspectionBookingUiStateList={state.inspectionBookingUiStateList}
+          bookedPropertyListingInspections={state.bookedPropertyListingInspections}
           listingImageUrls={state.listingImageUrls}
           listingStatusText={state.listingStatusText}
           listingStatusPillVariant={state.listingStatusPillVariant}
@@ -157,7 +158,7 @@ export function PropertyListingPage({
           }}
           onBook={(index: number) => {
             console.log(`booking button ${index} pressed`);
-            dispatch(addBookedInspection(index));
+            dispatch(addBookedPropertyListingInspection(index));
           }}
           onApply={async () => {
             console.log("Apply button clicked!");
@@ -221,7 +222,7 @@ function ListingPageContent({
   onApply,
   onContactAgent,
   onSubmitDraftListing,
-  bookedInspections,
+  bookedPropertyListingInspections,
   className = "",
 }: {
   streetNumber: string;
@@ -259,7 +260,7 @@ function ListingPageContent({
   onApply: () => void;
   onContactAgent: () => void;
   onSubmitDraftListing: () => void;
-  bookedInspections?: number[];
+  bookedPropertyListingInspections?: number[];
   className?: string;
 }): React.JSX.Element {
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
@@ -373,7 +374,7 @@ function ListingPageContent({
         onBook={onBook}
         propertyFeatures={propertyFeatures}
         userRole={authUser?.role}
-        bookedInspections={bookedInspections}
+        bookedPropertyListingInspections={bookedPropertyListingInspections}
         className="mb-6"
       />
       <BottomBar
@@ -551,7 +552,7 @@ function ListingDetails({
   onBook,
   propertyFeatures,
   userRole,
-  bookedInspections,
+  bookedPropertyListingInspections,
   className = "",
 }: {
   propertyDescription: string;
@@ -560,7 +561,7 @@ function ListingDetails({
   onBook: (index: number) => void;
   propertyFeatures: string[];
   userRole: Role | undefined;
-  bookedInspections?: number[];
+  bookedPropertyListingInspections?: number[];
   className?: string;
 }): React.JSX.Element {
   return (
@@ -574,7 +575,7 @@ function ListingDetails({
           bookingUiStateList={inspectionBookingUiStateList}
           onBook={onBook}
           userRole={userRole}
-          bookedInspections={bookedInspections}
+          bookedPropertyListingInspections={bookedPropertyListingInspections}
           className="w-full"
         />
       </div>

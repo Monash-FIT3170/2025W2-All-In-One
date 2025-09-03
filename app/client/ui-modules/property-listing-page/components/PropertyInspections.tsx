@@ -20,13 +20,13 @@ export function PropertyInspections({
   bookingUiStateList,
   onBook,
   userRole,
-  bookedInspections,
+  bookedPropertyListingInspections,
   className = "",
 }: {
   bookingUiStateList: InspectionBookingListUiState[];
   onBook: (index: number) => void;
   userRole?: Role;
-  bookedInspections?: number[];
+  bookedPropertyListingInspections?: number[];
   className?: string;
 }): React.JSX.Element {
   return (
@@ -36,7 +36,7 @@ export function PropertyInspections({
         bookingUiStateList={bookingUiStateList}
         onBook={onBook}
         userRole={userRole}
-        bookedInspections={bookedInspections}
+        bookedPropertyListingInspections={bookedPropertyListingInspections}
       />
     </div>
   );
@@ -46,13 +46,13 @@ function InspectionBookingList({
   bookingUiStateList,
   onBook,
   userRole,
-  bookedInspections,
+  bookedPropertyListingInspections,
   className,
 }: {
   bookingUiStateList: InspectionBookingListUiState[];
   onBook: (index: number) => void;
   userRole?: Role;
-  bookedInspections?: number[];
+  bookedPropertyListingInspections?: number[];
   className?: string;
 }): React.JSX.Element {
   return (
@@ -63,7 +63,7 @@ function InspectionBookingList({
       )}
     >
       {bookingUiStateList.map((state, i) => {
-        const isBooked = bookedInspections?.includes(i) || false;
+        const isBooked = bookedPropertyListingInspections?.includes(i) || false;
         return (
           <BookingEntry
             key={`${state.date}${state.startingTime}`}
@@ -72,7 +72,7 @@ function InspectionBookingList({
             index={i}
             onBook={onBook}
             userRole={userRole}
-            bookedInspections={bookedInspections}
+            bookedPropertyListingInspections={bookedPropertyListingInspections}
           />
         );
       })}
@@ -86,7 +86,7 @@ function BookingEntry({
   index,
   onBook,
   userRole,
-  bookedInspections,
+  bookedPropertyListingInspections,
   className = "",
 }: {
   bookingState: InspectionBookingListUiState;
@@ -94,13 +94,13 @@ function BookingEntry({
   index: number;
   onBook: (index: number) => void;
   userRole?: Role;
-  bookedInspections?: number[];
+  bookedPropertyListingInspections?: number[];
   className?: string;
 }): React.JSX.Element {
   // Only tenants can book inspections
-  const canBookInspection = userRole === Role.TENANT;
+  const canBookPropertyListingInspection = userRole === Role.TENANT;
   const isBooked = bookingState.isBooked || false;
-  const hasAnyBooking = bookedInspections && bookedInspections.length > 0;
+  const hasAnyBooking = bookedPropertyListingInspections && bookedPropertyListingInspections.length > 0;
 
   return (
     <div className={twMerge("flex flex-col", className)}>
@@ -117,9 +117,9 @@ function BookingEntry({
         {isBooked ? (
           // Show booked state regardless of user role
           <BookingButton index={index} onClick={onBook} isBooked={true} />
-        ) : canBookInspection ? (
+        ) : canBookPropertyListingInspection ? (
           hasAnyBooking ? (
-            // Hide button for unbooked inspections when any inspection is booked
+            // Hide button for unbooked property listing inspections when any property listing inspection is booked
             null
           ) : (
             <BookingButton index={index} onClick={onBook} isBooked={false} />

@@ -5,7 +5,7 @@ export function mapApiListingToListing(data: ApiListing): Listing {
   return {
     image_urls: data.image_urls,
     listing_status: data.listing_status,
-    inspections: data.inspections.map(inspection => ({
+    propertyListingInspections: data.propertyListingInspections.map(inspection => ({
       start_time: inspection.start_time,  // Already ISO string from server
       end_time: inspection.end_time       // Already ISO string from server
     }))

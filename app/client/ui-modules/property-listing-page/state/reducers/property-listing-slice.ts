@@ -37,7 +37,7 @@ const initialState: PropertyListingPageUiState = {
     markerLongitude: 0,
   },
   inspectionBookingUiStateList: [],
-  bookedInspections: [],
+  bookedPropertyListingInspections: [],
   listingImageUrls: [],
   listingStatusText: "",
   listingStatusPillVariant: ListingStatusPillVariant.DRAFT,
@@ -63,10 +63,10 @@ export const propertyListingSlice = createSlice({
   name: "propertyListing",
   initialState: initialState,
   reducers: {
-    addBookedInspection: (state, action) => {
+    addBookedPropertyListingInspection: (state, action) => {
       const index = action.payload;
-      if (!state.bookedInspections.includes(index)) {
-        state.bookedInspections.push(index);
+      if (!state.bookedPropertyListingInspections.includes(index)) {
+        state.bookedPropertyListingInspections.push(index);
       }
     },
   },
@@ -106,7 +106,7 @@ export const propertyListingSlice = createSlice({
         markerLongitude: action.payload.locationLongitude,
       };
 
-      state.inspectionBookingUiStateList = action.payload.inspections.map(
+      state.inspectionBookingUiStateList = action.payload.propertyListingInspections.map(
         (inspection) => ({
           date: getFormattedDateStringFromDate(inspection.start_time),
           startingTime: getFormattedTimeStringFromDate(inspection.start_time),
@@ -160,7 +160,7 @@ export const propertyListingSlice = createSlice({
 })
 
 export const {
-  addBookedInspection,
+  addBookedPropertyListingInspection,
 } = propertyListingSlice.actions;
 
 function getPropertyAreaDisplayString(area: number): string {

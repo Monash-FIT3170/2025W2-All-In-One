@@ -5,21 +5,21 @@ import { useNavigate } from "react-router";
 import { getFormattedDateStringFromDate } from "../../../library-modules/utils/date-utils";
 import { PropertyWithListingData } from "../../../library-modules/use-cases/property-listing/models/PropertyWithListingData";
 
-function getNextInspectionDateString(inspections?: { start_time: Date }[]): string {
-    if (!inspections || inspections.length === 0) {
+function getNextPropertyListingInspectionDateString(propertyListingInspections?: { start_time: Date }[]): string {
+    if (!propertyListingInspections || propertyListingInspections.length === 0) {
         return "No upcoming inspections";
     }
 
     const now = new Date();
-    const futureInspections = inspections
+    const futurePropertyListingInspections = propertyListingInspections
         .filter(inspection => inspection.start_time > now)
         .sort((a, b) => a.start_time.getTime() - b.start_time.getTime());
 
-    if (futureInspections.length === 0) {
+    if (futurePropertyListingInspections.length === 0) {
         return "No upcoming inspections";
     }
 
-    return getFormattedDateStringFromDate(futureInspections[0].start_time);
+    return getFormattedDateStringFromDate(futurePropertyListingInspections[0].start_time);
 
 }
 
@@ -35,7 +35,7 @@ export function PropertyCard(props: PropertyWithListingData) {
         bathrooms,
         bedrooms,
         image_urls,
-        inspections,
+        propertyListingInspections,
     } = props;
 
     const address = `${streetnumber} ${streetname}`;
@@ -44,7 +44,7 @@ export function PropertyCard(props: PropertyWithListingData) {
 
     const displayImageUrl = image_urls?.[0];
 
-    const nextInspectionDate = getNextInspectionDateString(inspections);
+    const nextPropertyListingInspectionDate = getNextPropertyListingInspectionDateString(propertyListingInspections);
 
     const handleClick = () => {
         if (propertyId) {
@@ -85,7 +85,7 @@ export function PropertyCard(props: PropertyWithListingData) {
                         </div>
                         <div className="flex items-center gap-1">
                             <CalendarDays className="w-4 h-4" />
-                            <span>{nextInspectionDate}</span>
+                            <span>{nextPropertyListingInspectionDate}</span>
                         </div>
                         <div className="flex items-center gap-1">
                             <DoorOpen className="w-4 h-4" />
