@@ -25,6 +25,7 @@ export function AgentDocumentUpload({ onUploadSuccess }: AgentDocumentUploadProp
   const uploadProgress = useAppSelector(selectUploadProgress);
   const currentUser = useAppSelector(selectCurrentUser);
   
+  const [title, setTitle] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [validUntil, setValidUntil] = useState<Date | undefined>(undefined);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -72,13 +73,14 @@ export function AgentDocumentUpload({ onUploadSuccess }: AgentDocumentUploadProp
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !validUntil || !selectedPropertyId || !currentUser || !('agentId' in currentUser)) {
-      setError("Please select a file, set a valid until date, and choose a property.");
+    if (!title.trim() || !selectedFile || !validUntil || !selectedPropertyId || !currentUser || !('agentId' in currentUser)) {
+      setError("Please enter a title, select a file, set a valid until date, and choose a property.");
       return;
     }
 
     try {
       await dispatch(uploadAgentDocument({
+        title: title.trim(),
         file: selectedFile,
         propertyId: selectedPropertyId,
         agentId: currentUser.agentId,
@@ -86,6 +88,7 @@ export function AgentDocumentUpload({ onUploadSuccess }: AgentDocumentUploadProp
       })).unwrap();
       
       // Reset form
+      setTitle("");
       setSelectedFile(null);
       setValidUntil(undefined);
       setSelectedPropertyId("");
@@ -99,7 +102,7 @@ export function AgentDocumentUpload({ onUploadSuccess }: AgentDocumentUploadProp
     }
   };
 
-  const canUpload = selectedFile && validUntil && selectedPropertyId && !isUploading && currentUser && 'agentId' in currentUser;
+  const canUpload = title.trim() && selectedFile && validUntil && selectedPropertyId && !isUploading && currentUser && 'agentId' in currentUser;
   const selectedProperty = properties.find(p => p.propertyId === selectedPropertyId);
 
   return (
@@ -117,6 +120,20 @@ export function AgentDocumentUpload({ onUploadSuccess }: AgentDocumentUploadProp
       )}
 
       <div className="space-y-4">
+        {/* Document Title */}
+        <div className="space-y-2">
+          <Label htmlFor="document-title">Document Title</Label>
+          <input
+            id="document-title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter a title for this document"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+          />
+        </div>
+
         {/* Property Selection */}
         <div className="space-y-2">
           <Label htmlFor="property-select">Select Property</Label>

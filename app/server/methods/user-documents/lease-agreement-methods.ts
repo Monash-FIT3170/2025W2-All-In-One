@@ -124,6 +124,7 @@ export const mapLeaseAgreementDocumentToDTO = (
 ): ApiLeaseAgreement => ({
 	_id: doc._id,
 	propertyId: doc.propertyId,
+	title: doc.title,
 	agentId: doc.agentId,
 	uploadedDate: doc.uploadedDate,
 	documentUrl: doc.documentUrl,

@@ -7,6 +7,7 @@ export function mapApiLeaseAgreementToLeaseAgreement(
 ): LeaseAgreementDocument {
 	return {
 		_id: leaseAgreement._id,
+		title: leaseAgreement.title,
 		propertyId: leaseAgreement.propertyId,
 		agentId: leaseAgreement.agentId,
 		uploadedDate: new Date(leaseAgreement.uploadedDate),
