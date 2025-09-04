@@ -43,7 +43,7 @@ import { PropertyStatus } from "../shared/api-models/property/PropertyStatus";
 import "/app/server/methods/property/property-features/property-features-methods";
 import { ListingStatus } from "../shared/api-models/property-listing/ListingStatus";
 import { PropertyDocument } from "./database/property/models/PropertyDocument";
-
+import "./methods/user/user-login-history-methods";
 let globalAgent: ApiAgent;
 let globalTenant: ApiTenant;
 let globalLandlord: ApiLandlord;

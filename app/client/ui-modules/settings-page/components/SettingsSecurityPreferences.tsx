@@ -7,6 +7,7 @@ import { z } from "zod"
 import { Toast } from "/app/client/ui-modules/settings-page/components/Toast";
 import { Button } from "/app/client/ui-modules/theming-shadcn/Button";
 import { ChangePasswordPopup } from "/app/client/ui-modules/settings-page/components/ChangePasswordPopup";
+import { LoginHistoryModal } from "/app/client/ui-modules/settings-page/components/LoginHistoryModal";
 import {
   Form,
   FormControl,
@@ -22,6 +23,7 @@ const FormSchema = z.object({
 })
  
 export function SettingsSecurityPreferences() {
+  const [showLoginHistory, setShowLoginHistory] = React.useState(false);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -71,13 +73,14 @@ export function SettingsSecurityPreferences() {
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Button> View History</Button>
+                    <Button type="button" onClick={() => setShowLoginHistory(true)}> View History</Button>
                   </FormControl>
                 </FormItem>
               )}
             />
           </div>
         </div>
+        <LoginHistoryModal isOpen={showLoginHistory} onClose={() => setShowLoginHistory(false)} />
       </form>
     </Form>
   )
