@@ -6,14 +6,12 @@ import {
 	selectDocumentsByProperty,
 } from "../state/agent-documents-slice";
 import { Button } from "../../../theming-shadcn/Button";
-import { Badge } from "../../../theming-shadcn/Badge";
 import {
 	FileText,
 	Download,
 	Trash2,
 	CalendarIcon,
 	Building,
-	User,
 } from "lucide-react";
 import { format } from "date-fns";
 

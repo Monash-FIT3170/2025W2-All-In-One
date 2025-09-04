@@ -9,12 +9,6 @@ import { Button } from "../../../theming-shadcn/Button";
 import { Badge } from "../../../theming-shadcn/Badge";
 import { FileText, Calendar, AlertCircle, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-} from "../../../theming-shadcn/Dialog";
 
 interface DocumentListProps {
 	onRefresh?: () => void;
