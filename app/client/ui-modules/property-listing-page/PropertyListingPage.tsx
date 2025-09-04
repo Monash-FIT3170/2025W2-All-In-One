@@ -150,6 +150,7 @@ export function PropertyListingPage({ className = "" }: { className?: string }):
             // Change value of "1" later to property ID
             dispatch(submitDraftListingAsync(state.propertyId));
           }}
+          className={twMerge("p-5", className)}
         />
       </>
     );
