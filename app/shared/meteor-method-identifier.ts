@@ -37,4 +37,6 @@ export enum MeteorMethodIdentifier {
 	PROFILE_INSERT = "profileData.insert",
 	LISTING_SUBMIT_DRAFT = "listing.submitDraft",
 	PROPERTY_FEATURES_GET_ALL = "propertyFeatures.getAll",
+	LOGIN_HISTORY_INSERT = "loginHistory.insert",
+	LOGIN_HISTORY_GET_FOR_USER = "loginHistory.getForUser",
 }
