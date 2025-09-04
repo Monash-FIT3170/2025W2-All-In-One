@@ -19,6 +19,7 @@ import { twMerge } from "tailwind-merge";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useSelector } from "react-redux";
 import {
+  fetchTenantProperty,
   load, 
   selectTenantPropertyUiState,
   submitDraftListingAsync,
@@ -33,6 +34,7 @@ import {
 } from "../../../review-tenant-modal/state/reducers/tenant-selection-slice";
 import { fetchAgentWithProfile } from '../state/reducers/tenant-property-slice';
 import { AgentDetails } from '../components/AgentDetails';
+import { current } from "@reduxjs/toolkit";
 
 export function TenantProperty({
   className = "",
@@ -42,19 +44,49 @@ export function TenantProperty({
   const [searchParams] = useSearchParams();
   const propertyId = searchParams.get("propertyId");
   const dispatch = useAppDispatch();
+  const currentUser = useAppSelector((state) => state.currentUser.authUser);
   const state: TenantPropertyUiState = useSelector(
     selectTenantPropertyUiState
   );
 
   useEffect(() => {
-    if (!propertyId) {
-      console.log("Property ID is not provided, loading default property");
-      dispatch(load("1"));
-      return;
-    }
-    console.log(`Loading property with ID: ${propertyId}`);
-    dispatch(load(propertyId));
-  }, []);
+    if (currentUser?.userId) {
+          dispatch(fetchTenantProperty(currentUser.userId));
+        }
+        
+    // dispatch(load)
+      }, [dispatch, currentUser?.userId]);
+      
+  //   if (!currentUser) {
+  //     console.error("No user logged in");
+  //     return;
+  //   }
+
+  //   console.log(currentUser);
+  //   // If propertyId is provided in URL, use that
+  //   if (propertyId) {
+  //     console.log(`Loading property with ID: ${propertyId}`);
+  //     dispatch(load(propertyId));
+  //     return;
+  //   }
+
+  //   // Otherwise fetch the tenant's property using PROPERTY_GET_BY_TENANT_ID
+  //   dispatch(fetchTenantProperty(currentUser))
+  //     .unwrap()
+  //     .then((property) => {
+  //       if (property) {
+  //         console.log(`Loading tenant's property with ID: ${property.propertyId}`);
+  //         dispatch(load(property.propertyId));
+  //       } else {
+  //         console.error("No property assigned to this tenant");
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching tenant's property:", error);
+  //     });
+  // }, [dispatch, propertyId]);
+    // console.log(`Loading property with ID: ${propertyId}`);
+    // dispatch(load(propertyId));
 
   if (state.shouldShowLoadingState) {
     return (
