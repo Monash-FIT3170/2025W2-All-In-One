@@ -334,7 +334,7 @@ function ListingPageContent({
   };
 
   return (
-    <div className={className}>
+    <div className={twMerge("p-5", className)}>
       <TopBar
         listingStatusText={listingStatusText}
         listingStatusPillVariant={listingStatusPillVariant}
