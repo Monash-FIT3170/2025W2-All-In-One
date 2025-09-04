@@ -258,7 +258,7 @@ export const fetchTenantProperty = createAsyncThunk(
       }
       console.log(property?.propertyId)
       return {
-        propertyId: property?.propertyId,
+        property: property,
       };
     }
 );

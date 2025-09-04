@@ -47,11 +47,18 @@ export function TenantProperty({
 
   useEffect(() => {
     if (currentUser?.userId) {
-          dispatch(fetchTenantProperty(currentUser.userId));
-        }
+          dispatch(fetchTenantProperty(currentUser.userId)).unwrap().then((result) => {
+            if (result && result.property?.propertyId) {
+              dispatch(load(result.property.propertyId));
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching tenant's property:", error);
+          });
+    }
         
     // dispatch(load)
-      }, [dispatch, currentUser?.userId]);
+}, [dispatch, currentUser?.userId]);
       
   if (state.shouldShowLoadingState) {
     return (
