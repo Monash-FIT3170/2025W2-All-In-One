@@ -1,24 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { PropertyFeatures } from "/app/client/ui-modules/common/property-components/PropertyFeatures";
 import { PropertySpecifics } from "/app/client/ui-modules/common/property-components/PropertySpecifics";
-import {
-  PropertyStatusPillVariant,
-  ListingSummary,
-} from "./components/ListingSummary";
+import { PropertyStatusPillVariant, ListingSummary } from "./components/ListingSummary";
 import { PropertyDescription } from "/app/client/ui-modules/common/property-components/PropertyDescription";
 import { LeftCircularArrowIcon } from "/app/client/ui-modules/theming/icons/LeftCircularArrowIcon";
 import { RightCircularArrowIcon } from "/app/client/ui-modules/theming/icons/RightCircularArrowIcon";
 import { ImageCarousel } from "../theming/components/ImageCarousel";
-import {
-  InspectionBookingListUiState,
-  PropertyInspections,
-} from "./components/PropertyInspections";
+import { InspectionBookingListUiState, PropertyInspections } from "./components/PropertyInspections";
 import { ApplyButton } from "/app/client/ui-modules/property-listing-page/components/ApplyButton";
 import { ContactAgentButton } from "/app/client/ui-modules/common/property-components/ContactAgentButton";
-import {
-  ListingStatusPill,
-  ListingStatusPillVariant,
-} from "/app/client/ui-modules/property-listing-page/components/ListingStatusPill";
+import { ListingStatusPill, ListingStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingStatusPill";
 import { BackLink } from "../theming/components/BackLink";
 import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonIcon";
 import { twMerge } from "tailwind-merge";
@@ -34,15 +25,14 @@ import {
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
 
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
-import { useLocation, useNavigate, useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import EditDraftListingModal from "./components/EditDraftListingModal";
 import { EditDraftListingButton } from "./components/EditDraftListingButton";
 import { FormSchemaType } from "/app/client/ui-modules/property-form-agent/components/FormSchema";
 import { SubHeading } from "../theming/components/SubHeading";
-import { BasicMarker } from "../common/map/markers/BasicMarker";
 import { PropertyMap, PropertyMapUiState } from "/app/client/ui-modules/common/property-components/PropertyMap";
 import { NavigationPath } from "../../navigation";
-import { BACK_ROUTES, EntryPoint  } from "../../navigation";
+import { BACK_ROUTES, EntryPoint } from "../../navigation";
 import {
   selectAcceptedApplicantCountForProperty,
   selectHasAcceptedApplicationsForProperty,
@@ -66,25 +56,15 @@ import { addBookedPropertyListingInspection } from "./state/reducers/property-li
 import { Role } from "/app/shared/user-role-identifier";
 import { CurrentUserState } from "../user-authentication/state/CurrentUserState";
 
-
-export function PropertyListingPage({
-  className = "",
-}: {
-  className?: string;
-}): React.JSX.Element {
+export function PropertyListingPage({ className = "" }: { className?: string }): React.JSX.Element {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const propertyId = searchParams.get("propertyId");
   const dispatch = useAppDispatch();
-  const state: PropertyListingPageUiState = useSelector(
-    selectPropertyListingUiState
-  );
+  const state: PropertyListingPageUiState = useSelector(selectPropertyListingUiState);
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const profileData = useAppSelector((state) => state.currentUser.profileData);
   const authUser = useAppSelector((state) => state.currentUser.authUser);
-
-
-
 
   useEffect(() => {
     if (!propertyId) {
@@ -96,7 +76,6 @@ export function PropertyListingPage({
     dispatch(load(propertyId));
   }, []);
 
-
   // Load tenant applications when property loads
   useEffect(() => {
     if (propertyId && authUser) {
@@ -105,11 +84,7 @@ export function PropertyListingPage({
   }, [propertyId, authUser]);
 
   if (state.shouldShowLoadingState) {
-    return (
-      <ListingPageContentLoadingSkeleton
-        className={twMerge("p-5", className)}
-      />
-    );
+    return <ListingPageContentLoadingSkeleton className={twMerge("p-5", className)} />;
   } else {
     return (
       <>
@@ -139,12 +114,8 @@ export function PropertyListingPage({
           listingStatusPillVariant={state.listingStatusPillVariant}
           shouldDisplayListingStatus={state.shouldDisplayListingStatus}
           shouldDisplaySubmitDraftButton={state.shouldDisplaySubmitDraftButton}
-          shouldDisplayReviewTenantButton={
-            state.shouldDisplayReviewTenantButton
-          }
+          shouldDisplayReviewTenantButton={state.shouldDisplayReviewTenantButton}
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
-          propertyLandlordId={state.propertyLandlordId}
-          currentUser={currentUser}
           authUser={authUser}
           profileData={profileData}
           onBack={() => {
@@ -212,8 +183,6 @@ function ListingPageContent({
   shouldDisplaySubmitDraftButton,
   shouldDisplayReviewTenantButton,
   shouldDisplayEditListingButton,
-  propertyLandlordId,
-  currentUser,
   authUser,
   profileData, // will move these elsewhere
   onBack,
@@ -250,8 +219,6 @@ function ListingPageContent({
   shouldDisplaySubmitDraftButton: boolean;
   shouldDisplayReviewTenantButton: boolean;
   shouldDisplayEditListingButton: boolean;
-  propertyLandlordId: string;
-  currentUser: CurrentUserState["currentUser"];
   authUser: CurrentUserState["authUser"];
   profileData: CurrentUserState["profileData"];
   onBack: () => void;
@@ -264,7 +231,6 @@ function ListingPageContent({
 }): React.JSX.Element {
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
   const dispatch = useAppDispatch();
-
 
   const tenantApplications = useAppSelector((state) => selectFilteredApplications(state, propertyId));
   const isCreatingApplication = useAppSelector((state) => state.tenantSelection.isLoading);
@@ -281,7 +247,7 @@ function ListingPageContent({
   const landlordApprovedApplicantCount = useAppSelector((state) => selectLandlordApprovedApplicantCountForProperty(state, propertyId));
 
   const hasBackgroundPassedApplications = useAppSelector((state) => selectHasBackgroundPassedApplicationsForProperty(state, propertyId));
-  const backgroundPassedApplicantCount = useAppSelector((state) => selectBackgroundPassedApplicantCountForProperty(state, propertyId))
+  const backgroundPassedApplicantCount = useAppSelector((state) => selectBackgroundPassedApplicantCountForProperty(state, propertyId));
 
   const shouldShowSendToLandlordButton = (hasAcceptedApplications || hasBackgroundPassedApplications) && authUser?.role === Role.AGENT;
   const shouldShowSendToAgentButton = hasLandlordApprovedApplications && authUser?.role === Role.LANDLORD;
@@ -291,12 +257,12 @@ function ListingPageContent({
   const shouldShowSendFinalApprovedToAgentButton = hasFinalApprovedApplications && authUser?.role === Role.LANDLORD;
 
   const handleAccept = async (applicationId: string) => {
-  try {
-    await dispatch(intentAcceptApplicationAsync({ propertyId, applicationId })).unwrap();
-  } catch (error) {
-    console.error("Failed to accept application:", error);
-  }
-};
+    try {
+      await dispatch(intentAcceptApplicationAsync({ propertyId, applicationId })).unwrap();
+    } catch (error) {
+      console.error("Failed to accept application:", error);
+    }
+  };
 
   const handleReject = async (applicationId: string) => {
     try {
@@ -419,11 +385,7 @@ function ListingPageContent({
   );
 }
 
-function ListingPageContentLoadingSkeleton({
-  className = "",
-}: {
-  className?: string;
-}): React.JSX.Element {
+function ListingPageContentLoadingSkeleton({ className = "" }: { className?: string }): React.JSX.Element {
   return <p className={className}>Loading...</p>;
 }
 
@@ -442,18 +404,8 @@ function TopBar({
 }): React.JSX.Element {
   return (
     <div className={twMerge("flex items-start", className)}>
-      <BackLink
-        label="Back to Properties"
-        backButtonIcon={<BackButtonIcon />}
-        onClick={onBack}
-        className="mr-auto"
-      />
-      {shouldDisplayListingStatus && (
-        <ListingStatusPill
-          text={listingStatusText}
-          variant={listingStatusPillVariant}
-        />
-      )}
+      <BackLink label="Back to Properties" backButtonIcon={<BackButtonIcon />} onClick={onBack} className="mr-auto" />
+      {shouldDisplayListingStatus && <ListingStatusPill text={listingStatusText} variant={listingStatusPillVariant} />}
     </div>
   );
 }
@@ -536,8 +488,7 @@ function ListingHero({
         />
         <div className="flex">
           <ApplyButton onClick={onApply} isLoading={isApplying} userRole={userRole} hasApplied={hasApplied} className="mr-4" />
-          <ContactAgentButton
-            propertyId={propertyId} />
+          <ContactAgentButton propertyId={propertyId} />
         </div>
       </div>
     </div>
@@ -566,10 +517,7 @@ function ListingDetails({
   return (
     <div className={twMerge("flex gap-7", className)}>
       <div className="flex-1 flex flex-col">
-        <PropertyDescription
-          description={propertyDescription}
-          className="mb-4"
-        />
+        <PropertyDescription description={propertyDescription} className="mb-4" />
         <PropertyInspections
           bookingUiStateList={inspectionBookingUiStateList}
           onBook={onBook}
@@ -604,36 +552,22 @@ function BottomBar({
   className?: string;
 }): React.JSX.Element {
   return (
-    <div
-      className={twMerge("flex justify-between items-center gap-2", className)}
-    >
+    <div className={twMerge("flex justify-between items-center gap-2", className)}>
       {/* Left side - Review Tenant Button */}
-      <div className="flex">
-        {shouldDisplayReviewTenantButton && (
-          <ReviewTenantButton onClick={onReviewTenant} />
-        )}
-      </div>
+      <div className="flex">{shouldDisplayReviewTenantButton && <ReviewTenantButton onClick={onReviewTenant} />}</div>
 
       <div className="flex">
         {shouldDisplayEditListingButton && <ListingModalEditor />}
-        {shouldDisplaySubmitDraftButton && (
-          <SubmitDraftListingButton onClick={onSubmitDraftListing} />
-        )}
+        {shouldDisplaySubmitDraftButton && <SubmitDraftListingButton onClick={onSubmitDraftListing} />}
       </div>
     </div>
   );
 }
 
-function ListingModalEditor({
-  className = "",
-}: {
-  className?: string;
-}): React.JSX.Element {
+function ListingModalEditor({ className = "" }: { className?: string }): React.JSX.Element {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const toggleModal = () => setIsModalOpen(!isModalOpen);
-  const state: PropertyListingPageUiState = useSelector(
-    selectPropertyListingUiState
-  );
+  const state: PropertyListingPageUiState = useSelector(selectPropertyListingUiState);
 
   const listingInfo: FormSchemaType = {
     agent: state.agentId,
