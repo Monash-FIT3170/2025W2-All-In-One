@@ -1,8 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router";
 import { Button } from "../../../theming-shadcn/Button";
 import { CardWidget } from "../../components/CardWidget";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
+import { NavigationPath } from "/app/client/navigation";
 
 interface PropertyOverviewProps {
   properties: Property[];
@@ -11,6 +13,11 @@ interface PropertyOverviewProps {
 export function MyProperties({
   properties,
 }: PropertyOverviewProps): React.JSX.Element {
+  const navigate = useNavigate();
+
+  const handleViewAllProperties = () => {
+    navigate(NavigationPath.LandlordProperties);
+  };
   return (
     <CardWidget
       title="My Properties"
@@ -82,6 +89,7 @@ export function MyProperties({
         <Button
           variant="ghost"
           className="w-full py-3 border-transparent rounded-lg text-center hover:bg-gray-50 transition-colors"
+          onClick={handleViewAllProperties}
         >
           View All Properties
         </Button>
