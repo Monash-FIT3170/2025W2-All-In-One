@@ -7,6 +7,7 @@ import {
   fetchLandlordProperties 
 } from "../state/landlord-properties-slice";
 import PropertyCard from "../../components/PropertyCard";
+import { LoadingSpinner } from "../../../common/LoadingSpinner";
 
 export function LandlordProperties(): React.JSX.Element {
   const dispatch = useAppDispatch();
@@ -22,6 +23,7 @@ export function LandlordProperties(): React.JSX.Element {
       dispatch(fetchLandlordProperties(currentUser.userId));
     }
   }, [dispatch, currentUser?.userId]);
+  
   // Filter options
   const filterOptions = [
     { label: "All", value: "All" },
@@ -54,14 +56,7 @@ export function LandlordProperties(): React.JSX.Element {
 
   // Show loading state
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your properties...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading your properties..." />;
   }
 
   return (
