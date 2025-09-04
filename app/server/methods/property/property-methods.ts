@@ -77,6 +77,25 @@ const propertyGetAllMethod = {
     return propertyDTOs;
   },
 };
+
+const propertyUpdateTenantMethod = {
+	[MeteorMethodIdentifier.PROPERTY_TENANT_UPDATE]: async (
+		propertyId: string,
+		tenantId: string
+	): Promise<void> => {
+		try{
+			await PropertyCollection.updateAsync(propertyId, {
+				$set: {
+					tenant_id: tenantId
+				},
+			});
+		} catch (error) {
+		console.error("Error in propertyUpdateTenantMethod:", error);
+		throw meteorWrappedInvalidDataError(error as InvalidDataError);
+		}
+	},
+};
+
 async function mapPropertyDocumentToPropertyDTO(
   property: PropertyDocument
 ): Promise<ApiProperty> {
@@ -452,6 +471,7 @@ Meteor.methods({
   ...propertyGetByTenantIdMethod,
   ...propertyGetAllByLandlordId,
   ...updatePropertyData,
+	...propertyUpdateTenantMethod,
   ...getLandlordDashboardMethod,
   ...propertyGetAllMethod,
   ...propertySearchMethod,

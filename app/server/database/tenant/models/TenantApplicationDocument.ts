@@ -8,5 +8,7 @@ export type TenantApplicationDocument = {
     updatedAt: Date;
     agentId: string;
     landlordId: string;
+    tenantUserId: string;
     taskId?: string; // ID of the task created for this application
-  };
+    linkedTaskId?: string; // ID of the linked task for this application
+};

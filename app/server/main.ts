@@ -5,6 +5,8 @@ import "./methods/property/property-methods";
 import "./methods/messaging/messaging-methods";
 import "./publications/messaging-publications";
 import "./methods/property-listing/listing-methods";
+import "./methods/tenant-application/tenant-application-method";
+
 import {
 	PropertyCollection,
 	PropertyCoordinatesCollection,
@@ -13,7 +15,7 @@ import {
 	PropertyStatusCollection,
 } from "./database/property/property-collections";
 import {
-	InspectionCollection,
+	PropertyListingInspectionCollection,
 	ListingCollection,
 	ListingStatusCollection,
 } from "/app/server/database/property-listing/listing-collections";
@@ -30,6 +32,7 @@ import {
 	AgentCollection,
 	UserAccountCollection,
 } from "/app/server/database/user/user-collections";
+import { TenantApplicationCollection } from "./database/tenant/collections/TenantApplicationCollection";
 import { TenantCollection } from "./database/user/user-collections";
 import { Role } from "../shared/user-role-identifier";
 import { TaskStatus } from "../shared/task-status-identifier";
@@ -52,6 +55,8 @@ let globalTenant: ApiTenant;
 let globalLandlord: ApiLandlord;
 
 Meteor.startup(async () => {
+	await removeTenantApplicationsData();
+
 	await removeAllCollections();
 	// await tempSeedPropertyStatusData();
 	await permSeedListingStatusData();
@@ -225,24 +230,24 @@ async function tempSeedProfileData(): Promise<void> {
 			date_set: new Date(),
 		});
 
-		await InspectionCollection.insertAsync({
+		await PropertyListingInspectionCollection.insertAsync({
 			_id: "1",
 			starttime: new Date("2025-04-12T10:00:00Z"),
 			endtime: new Date("2025-04-13T11:00:00Z"),
 		});
-		await InspectionCollection.insertAsync({
+		await PropertyListingInspectionCollection.insertAsync({
 			_id: "2",
 			starttime: new Date("2025-04-14T10:00:00Z"),
 			endtime: new Date("2025-04-15T11:00:00Z"),
 		});
 
-		await InspectionCollection.insertAsync({
+		await PropertyListingInspectionCollection.insertAsync({
 			_id: "3",
 			starttime: new Date("2025-04-16T10:00:00Z"),
 			endtime: new Date("2025-04-17T11:00:00Z"),
 		});
 
-		await InspectionCollection.insertAsync({
+		await PropertyListingInspectionCollection.insertAsync({
 			_id: "4",
 			starttime: new Date("2026-04-16T10:00:00Z"),
 			endtime: new Date("2026-04-17T11:00:00Z"),
@@ -747,10 +752,16 @@ async function removeAllCollections(): Promise<void> {
 	await PropertyPriceCollection.removeAsync({});
 	await PropertyStatusCollection.removeAsync({});
 	await PropertyCoordinatesCollection.removeAsync({});
-	await InspectionCollection.removeAsync({});
+	await PropertyListingInspectionCollection.removeAsync({});
 	await ListingCollection.removeAsync({});
 	await ListingStatusCollection.removeAsync({});
 	await TaskCollection.removeAsync({});
+}
+
+async function removeTenantApplicationsData(): Promise<void> {
+	console.log("Removing tenant applications data...");
+	await TenantApplicationCollection.removeAsync({});
+	console.log("Tenant applications removed successfully.");
 }
 async function permSeedPropertyFeaturesData(): Promise<void> {
 	const features = [

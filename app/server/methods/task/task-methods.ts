@@ -8,13 +8,19 @@ import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
 
+type TaskUpdateData = {
+  name?: string;
+  description?: string;
+  dueDate?: Date;
+  priority?: TaskPriority;
+};
 /**
  * Retrieves a task by its ID and returns it as an `ApiTask` DTO.
  *
  * This Meteor method can be called from the client. It performs the following steps:
  * 1. Fetches the task document from the database using the provided ID.
  * 2. Throws an `InvalidDataError` if the task is not found.
- * 3. Maps the task document to an `ApiTask` DTO using `mapTaskDocumentTotaskDTO`.
+ * 3. Maps the task document to an `ApiTask` DTO using `mapTaskDocumentToTaskDTO`.
  * 4. Throws an `InvalidDataError` if there is an error during mapping.
  *
  * @param id - The unique identifier of the task to retrieve.
@@ -31,7 +37,7 @@ const taskGetMethod = {
       );
     }
 
-    const taskDTO = await mapTaskDocumentTotaskDTO(taskDocument).catch(
+    const taskDTO = await mapTaskDocumentToTaskDTO(taskDocument).catch(
       (error) => {
         throw meteorWrappedInvalidDataError(error);
       }
@@ -122,7 +128,7 @@ const taskInsertForAgentMethod = {
         console.log("Agent task_ids updated successfully");
       } catch (agentError) {
         console.warn("Failed to update agent task_ids:", agentError);
-        // Don't fail the task creation if agent update fails - task was already created
+
       }
       console.log("After agent update call");
 
@@ -145,6 +151,7 @@ const taskInsertForLandlordMethod = {
     description: string;
     dueDate: Date;
     priority: TaskPriority;
+    landlordId: string;
     propertyAddress: string;
     propertyId: string;
     userId: string;
@@ -196,7 +203,7 @@ const taskInsertForLandlordMethod = {
       }
 
       // Update the landlord's task_ids array to include the new task
-      console.log("Before landlor update call");
+      console.log("Before landlord update call");
       try {
         await Meteor.callAsync(
           MeteorMethodIdentifier.LANDLORD_UPDATE_TASKS,
@@ -218,6 +225,115 @@ const taskInsertForLandlordMethod = {
     }
   },
 };
+
+/**
+ * Updates an existing task for AGENT in the database and returns the task ID.
+ */
+const taskUpdateForAgentMethod = {
+  [MeteorMethodIdentifier.TASK_UPDATE_FOR_AGENT]: async (taskData: {
+    taskId: string;
+    name?: string;
+    description?: string;
+    dueDate?: Date;
+    priority?: TaskPriority;
+  }): Promise<string> => {
+    console.log("taskUpdateForAgentMethod called with:", taskData);
+
+    // Validate required fields
+    if (!taskData.taskId) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("Task ID is required")
+      );
+    }
+
+    const updateData: TaskUpdateData = {};
+
+    if (taskData.name !== undefined) {
+      updateData.name = taskData.name.trim();
+    }
+    if (taskData.description !== undefined) {
+      updateData.description = taskData.description;
+    }
+    if (taskData.dueDate !== undefined) {
+      updateData.dueDate = taskData.dueDate;
+    }
+    if (taskData.priority !== undefined) {
+      updateData.priority = taskData.priority;
+    }
+
+    try {
+      const result = await TaskCollection.updateAsync(
+        { _id: taskData.taskId },
+        { $set: updateData }
+      );
+
+      if (result === 0) {
+        throw new InvalidDataError("Task not found");
+      }
+
+      return taskData.taskId;
+    } catch (error) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Failed to update task: ${error}`)
+      );
+    }
+  },
+};
+
+/**
+ * Updates an existing task for LANDLORD in the database and returns the task ID.
+ */
+const taskUpdateForLandlordMethod = {
+  [MeteorMethodIdentifier.TASK_UPDATE_FOR_LANDLORD]: async (taskData: {
+    taskId: string;
+    name?: string;
+    description?: string;
+    dueDate?: Date;
+    priority?: TaskPriority;
+  }): Promise<string> => {
+    console.log("taskUpdateForLandlordMethod called with:", taskData);
+
+    // Validate required fields
+    if (!taskData.taskId) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("Task ID is required")
+      );
+    }
+
+    const updateData: TaskUpdateData = {};
+
+    if (taskData.name !== undefined) {
+      updateData.name = taskData.name.trim();
+    }
+    if (taskData.description !== undefined) {
+      updateData.description = taskData.description;
+    }
+    if (taskData.dueDate !== undefined) {
+      updateData.dueDate = taskData.dueDate;
+    }
+    if (taskData.priority !== undefined) {
+      updateData.priority = taskData.priority;
+    }
+
+    try {
+      const result = await TaskCollection.updateAsync(
+        { _id: taskData.taskId },
+        { $set: updateData }
+      );
+
+      if (result === 0) {
+        throw new InvalidDataError("Task not found");
+      }
+
+      return taskData.taskId;
+    } catch (error) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Failed to update task: ${error}`)
+      );
+    }
+  },
+};
+
 /**
  * Maps a TaskDocument to an ApiTask DTO.
  *
@@ -227,7 +343,7 @@ const taskInsertForLandlordMethod = {
  * @param task - The TaskDocument to be mapped.
  * @returns A promise that resolves to an ApiTask object.
  */
-async function mapTaskDocumentTotaskDTO(task: TaskDocument): Promise<ApiTask> {
+async function mapTaskDocumentToTaskDTO(task: TaskDocument): Promise<ApiTask> {
   return {
     taskId: task._id,
     name: task.name,
@@ -237,7 +353,7 @@ async function mapTaskDocumentTotaskDTO(task: TaskDocument): Promise<ApiTask> {
     description: task.description,
     priority: task.priority,
     propertyAddress: task.taskPropertyAddress,
-    propertyId: task.taskPropertyId, // Optional property ID
+    propertyId: task.taskPropertyId,
   };
 }
 
@@ -250,5 +366,7 @@ async function getTaskDocumentById(
 Meteor.methods({
   ...taskGetMethod,
   ...taskInsertForAgentMethod,
-  ...taskInsertForLandlordMethod
+  ...taskInsertForLandlordMethod,
+  ...taskUpdateForAgentMethod,
+  ...taskUpdateForLandlordMethod
 });

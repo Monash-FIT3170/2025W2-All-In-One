@@ -1,6 +1,8 @@
 export enum MeteorMethodIdentifier {
   TASK_INSERT_FOR_AGENT = "tasks.insertForAgent",
   TASK_INSERT_FOR_LANDLORD = "tasks.insertForLandlord",
+  TASK_UPDATE_FOR_AGENT = "tasks.updateForAgent",
+  TASK_UPDATE_FOR_LANDLORD = "tasks.updateForLandlord",
   TASK_GET_ALL = "tasks.getAll",
   TASK_GET = "tasks.getOne",
   TASK_GET_MULTIPLE = "tasks.getMultiple",
@@ -39,11 +41,17 @@ export enum MeteorMethodIdentifier {
   PROPERTY_GET_BY_AGENT_ID = "property.getByAgentId", // fetches all properties managed by an agent by their ID
   PROPERTY_GET_ALL_BY_LANDLORD_ID = "property.getAllByLandlordId", // fetches all properties managed by a landlord by their ID
   PROPERTY_DATA_UPDATE = "property.updateData",
+  PROPERTY_TENANT_UPDATE = "property.updateTenant",
   PROFILE_GET = "profileData.getOne",
   PROFILE_EDIT = "profileData.edit",
   PROFILE_INSERT = "profileData.insert",
   LISTING_SUBMIT_DRAFT = "listing.submitDraft",
   PROPERTY_FEATURES_GET_ALL = "propertyFeatures.getAll",
+  TENANT_APPLICATION_GET_BY_PROPERTY_ID = "tenantApplication.getByPropertyId",
+  TENANT_APPLICATION_GET_BY_LANDLORD_ID = "tenantApplications.getByLandlordId",
+  TENANT_APPLICATION_INSERT = "tenantApplications.insert",
+  TENANT_APPLICATION_UPDATE_STATUS = "tenantApplications.updateStatus",
+  TENANT_APPLICATION_UPDATE_LINKED_TASK = "tenantApplications.updateLinkedTask", // Updates the task ID when the role has an existing task related to the applications
   PROPERTY_SEARCH = "PROPERTY_SEARCH",
 	CONVERSATIONS_GET_FOR_AGENT = "conversations.getForAgent", // Get conversations for an agent based on their managed properties
 	CONVERSATIONS_GET_FOR_TENANT = "conversations.getForTenant", // Get conversations for a tenant
