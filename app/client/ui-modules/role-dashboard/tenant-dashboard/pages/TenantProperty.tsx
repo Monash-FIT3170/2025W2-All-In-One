@@ -19,7 +19,8 @@ import { twMerge } from "tailwind-merge";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useSelector } from "react-redux";
 import {
-  load,
+  fetchTenantProperty,
+  load, 
   selectTenantPropertyUiState,
   submitDraftListingAsync,
 } from "/app/client/ui-modules/role-dashboard/tenant-dashboard/state/reducers/tenant-property-slice";
@@ -29,6 +30,7 @@ import { SubHeading } from "../../../theming/components/SubHeading";
 import { PropertyMap, PropertyMapUiState } from "../../../common/property-components/PropertyMap";
 import { fetchAgentWithProfile } from '../state/reducers/tenant-property-slice';
 import { AgentDetails } from '../components/AgentDetails';
+import { current } from "@reduxjs/toolkit";
 
 export function TenantProperty({
   className = "",
@@ -38,20 +40,19 @@ export function TenantProperty({
   const [searchParams] = useSearchParams();
   const propertyId = searchParams.get("propertyId");
   const dispatch = useAppDispatch();
+  const currentUser = useAppSelector((state) => state.currentUser.authUser);
   const state: TenantPropertyUiState = useSelector(
     selectTenantPropertyUiState
   );
 
   useEffect(() => {
-    if (!propertyId) {
-      console.log("Property ID is not provided, loading default property");
-      dispatch(load("1"));
-      return;
-    }
-    console.log(`Loading property with ID: ${propertyId}`);
-    dispatch(load(propertyId));
-  }, []);
-
+    if (currentUser?.userId) {
+          dispatch(fetchTenantProperty(currentUser.userId));
+        }
+        
+    // dispatch(load)
+      }, [dispatch, currentUser?.userId]);
+      
   if (state.shouldShowLoadingState) {
     return (
       <>
