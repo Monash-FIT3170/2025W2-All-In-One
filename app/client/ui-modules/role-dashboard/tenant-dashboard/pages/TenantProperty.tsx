@@ -53,37 +53,6 @@ export function TenantProperty({
     // dispatch(load)
       }, [dispatch, currentUser?.userId]);
       
-  //   if (!currentUser) {
-  //     console.error("No user logged in");
-  //     return;
-  //   }
-
-  //   console.log(currentUser);
-  //   // If propertyId is provided in URL, use that
-  //   if (propertyId) {
-  //     console.log(`Loading property with ID: ${propertyId}`);
-  //     dispatch(load(propertyId));
-  //     return;
-  //   }
-
-  //   // Otherwise fetch the tenant's property using PROPERTY_GET_BY_TENANT_ID
-  //   dispatch(fetchTenantProperty(currentUser))
-  //     .unwrap()
-  //     .then((property) => {
-  //       if (property) {
-  //         console.log(`Loading tenant's property with ID: ${property.propertyId}`);
-  //         dispatch(load(property.propertyId));
-  //       } else {
-  //         console.error("No property assigned to this tenant");
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching tenant's property:", error);
-  //     });
-  // }, [dispatch, propertyId]);
-    // console.log(`Loading property with ID: ${propertyId}`);
-    // dispatch(load(propertyId));
-
   if (state.shouldShowLoadingState) {
     return (
       <>

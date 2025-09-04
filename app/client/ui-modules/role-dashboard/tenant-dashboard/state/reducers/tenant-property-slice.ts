@@ -15,9 +15,7 @@ import { ProfileData } from '/app/client/library-modules/domain-models/user/Prof
 import { getAgentByAgentId, getAgentById } from '/app/client/library-modules/domain-models/user/role-repositories/agent-repository';
 import { getProfileDataById } from '/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository';
 import { getPropertyById, getPropertyByTenantId } from '/app/client/library-modules/domain-models/property/repositories/property-repository';
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { getTenantById } from "/app/client/library-modules/domain-models/user/role-repositories/tenant-repository";
-import { get } from "react-hook-form";
 
 interface TenantPropertyState {
   propertyId: string;
@@ -264,21 +262,6 @@ export const fetchTenantProperty = createAsyncThunk(
       };
     }
 );
-
-// export const fetchTenantProperty = createAsyncThunk(
-//   "tenantProperty/fetchTenantProperty",
-//   async (tenantId: string, { rejectWithValue }) => {
-//     try {
-//       console.log("Fetching tenant property for user ID:", tenantId);
-//       const property = await getPropertyByTenantId(tenantId);
-//       console.log("Fetched tenant property:", property);
-//       return property;
-//     } catch (error) {
-//       console.error("Error fetching tenant property:", error);
-//       return rejectWithValue("Failed to fetch tenant property");
-//     }
-//   }
-// );
 
 export const fetchPropertyAgent = createAsyncThunk(
   "propertyListing/fetchPropertyAgent",
