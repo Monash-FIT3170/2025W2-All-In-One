@@ -10,6 +10,8 @@ import { signinFormSlice } from "./ui-modules/user-authentication/state/reducers
 import { signupFormSlice } from "./ui-modules/user-authentication/state/reducers/signup-form-slice";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { propertyListingSlice } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
+import { tenantDocumentsSlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/tenant-documents-slice";
+import { agentDocumentsSlice } from "./ui-modules/role-dashboard/agent-dashboard/state/agent-documents-slice";
 import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/reducers/tenant-dashboard-slice";
 import { currentUserSlice } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
 import { propertyFormSlice } from "./ui-modules/property-form-agent/state/reducers/property-form-slice";
@@ -19,34 +21,36 @@ import { searchResultsSlice } from "./ui-modules/search/state/search-result-slic
 import { tenantPropertySlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/reducers/tenant-property-slice";
 
 export const store = configureStore({
-  reducer: {
-    agentDashboard: agentDashboardSlice.reducer,
-    agentProperties: agentPropertySlice.reducer,
-    tenantDashboard: tenantDashboardSlice.reducer,
-    guestLandingPage: guestLandingPageSlice.reducer,
-    settingsPage: settingsPageSlice.reducer,
-    landlordDashboard: landlordDashboardSlice.reducer,
-    landlordProperties: landlordPropertiesSlice.reducer,
-    profile: profileSlice.reducer,
-    signinForm: signinFormSlice.reducer,
-    propertyListing: propertyListingSlice.reducer,
-    signupForm: signupFormSlice.reducer,
-    currentUser: currentUserSlice.reducer,
-    propertyForm: propertyFormSlice.reducer,
-    searchResults: searchResultsSlice.reducer,
-    tenantSelection: tenantSelectionSlice.reducer,
-    messages: messagesSlice.reducer,
-    tenantProperty: tenantPropertySlice.reducer,
-  },
+	reducer: {
+		agentDashboard: agentDashboardSlice.reducer,
+		agentDocuments: agentDocumentsSlice.reducer,
+		agentProperties: agentPropertySlice.reducer,
+		tenantDashboard: tenantDashboardSlice.reducer,
+		tenantDocuments: tenantDocumentsSlice.reducer,
+		guestLandingPage: guestLandingPageSlice.reducer,
+		settingsPage: settingsPageSlice.reducer,
+		landlordDashboard: landlordDashboardSlice.reducer,
+		landlordProperties: landlordPropertiesSlice.reducer,
+		profile: profileSlice.reducer,
+		signinForm: signinFormSlice.reducer,
+		propertyListing: propertyListingSlice.reducer,
+		signupForm: signupFormSlice.reducer,
+		currentUser: currentUserSlice.reducer,
+		propertyForm: propertyFormSlice.reducer,
+		searchResults: searchResultsSlice.reducer,
+		tenantSelection: tenantSelectionSlice.reducer,
+		messages: messagesSlice.reducer,
+		tenantProperty: tenantPropertySlice.reducer,
+	},
 });
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 export type AppThunk<ThunkReturnType = void> = ThunkAction<
-    ThunkReturnType,
-    RootState,
-    unknown,
-    Action
+	ThunkReturnType,
+	RootState,
+	unknown,
+	Action
 >;
 
 // Add type-safe hooks
