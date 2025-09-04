@@ -9,7 +9,7 @@ import {
   selectLeaseStatusKind,
   selectLeaseMonthsRemaining,
   LeaseStatusKind,
-} from "../state/tenant-dashboard-slice";
+} from "../state/reducers/tenant-dashboard-slice";
 import { startOfWeek, endOfWeek, parseISO, isWithinInterval } from "date-fns";
 
 interface DashboardCardsProps {

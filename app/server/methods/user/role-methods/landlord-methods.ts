@@ -8,6 +8,7 @@ import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiLandlord } from "../../../../shared/api-models/user/api-roles/ApiLandlord";
 import { TaskDocument } from "/app/server/database/task/models/TaskDocument";
 import { TaskCollection } from "/app/server/database/task/task-collections";
+import { ProfileCollection } from "/app/server/database/user/user-collections";
 
 //INSERT LANDLORD
 const landlordInsertMethod = {
@@ -68,26 +69,28 @@ const landlordGetByLandlordIdMethod = {
 // This method adds a new task ID to the landlord's task_ids array
 const landlordUpdateTasksMethod = {
   [MeteorMethodIdentifier.LANDLORD_UPDATE_TASKS]: async (
-    landlordId: string,
+    userId: string,
     taskId: string
   ): Promise<void> => {
     const landlordDoc = await LandlordCollection.findOneAsync({
-      _id: landlordId,
+      userAccountId: userId,
     });
 
     if (!landlordDoc) {
       throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Landlord with landlord ID ${landlordId} not found.`)
+        new InvalidDataError(`Landlord with user ID ${userId} not found.`)
       );
     }
 
-    const currentTaskIds = landlordDoc.task_ids || [];
-    const updatedTaskIds = [...currentTaskIds, taskId];
-
-    await LandlordCollection.updateAsync(
-      { _id: landlordId },
-      { $set: { task_ids: updatedTaskIds } }
-    );
+    // Add the task ID to the landlord's task_ids array if it doesn't already exist
+    const currentTaskIds = landlordDoc.task_ids ?? [];
+    if (!currentTaskIds.includes(taskId)) {
+      const updatedTaskIds = [...currentTaskIds, taskId];
+      await LandlordCollection.updateAsync(
+        { userAccountId: userId },
+        { $set: { task_ids: updatedTaskIds } }
+      );
+    }
   },
 };
 
@@ -126,10 +129,42 @@ async function getTaskDocumentsMatchingIds(
   }).fetchAsync();
 }
 
+// Get profile data by landlord ID (queries landlord collection first, then profile collection)
+const profileGetByLandlordIdMethod = {
+  [MeteorMethodIdentifier.PROFILE_GET_BY_LANDLORD_ID]: async (
+    landlordId: string
+  ): Promise<any> => {
+    // First get the landlord document to extract profileDataId
+    const landlordDoc = await LandlordCollection.findOneAsync({
+      _id: landlordId,
+    });
+
+    if (!landlordDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Landlord with ID ${landlordId} not found.`)
+      );
+    }
+
+    // Then get the profile data using the profileDataId
+    const profileDoc = await ProfileCollection.findOneAsync({
+      _id: landlordDoc.profileDataId,
+    });
+
+    if (!profileDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Profile with ID ${landlordDoc.profileDataId} not found.`)
+      );
+    }
+
+    return profileDoc;
+  },
+};
+
 Meteor.methods({
   ...landlordInsertMethod,
   ...landlordGetMethod,
   ...landlordGetByLandlordIdMethod,
   ...landlordUpdateTasksMethod,
   ...landlordGetAllMethod,
+  ...profileGetByLandlordIdMethod,
 });

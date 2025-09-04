@@ -2,16 +2,15 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ListingStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingStatusPill";
 import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingSummary";
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
-import { getPropertyWithListingDataUseCase } from "/app/client/library-modules/use-cases/property-listing/GetPropertyWithListingDataUseCase";
 import { submitDraftListingUseCase } from "/app/client/library-modules/use-cases/property-listing/SubmitDraftListingUseCase";
+import { LoadPropertyWithTenantApplicationsUseCase } from "/app/client/library-modules/use-cases/property-listing/LoadPropertyWithTenantApplicationsUseCase";
+import { RootState } from "/app/client/store";
+import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
+import { loadTenantApplicationsForPropertyAsync } from "../../../tenant-selection/state/reducers/tenant-selection-slice";
 import {
   getFormattedDateStringFromDate,
   getFormattedTimeStringFromDate,
 } from "/app/client/library-modules/utils/date-utils";
-import { RootState } from "/app/client/store";
-import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
-import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
-import { getAllLandlords } from "/app/client/library-modules/domain-models/user/role-repositories/landlord-repository";
 
 const initialState: PropertyListingPageUiState = {
   propertyId: "",
@@ -38,6 +37,7 @@ const initialState: PropertyListingPageUiState = {
     markerLongitude: 0,
   },
   inspectionBookingUiStateList: [],
+  bookedPropertyListingInspections: [],
   listingImageUrls: [],
   listingStatusText: "",
   listingStatusPillVariant: ListingStatusPillVariant.DRAFT,
@@ -62,7 +62,14 @@ export const submitDraftListingAsync = createAsyncThunk(
 export const propertyListingSlice = createSlice({
   name: "propertyListing",
   initialState: initialState,
-  reducers: {},
+  reducers: {
+    addBookedPropertyListingInspection: (state, action) => {
+      const index = action.payload;
+      if (!state.bookedPropertyListingInspections.includes(index)) {
+        state.bookedPropertyListingInspections.push(index);
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(load.pending, (state) => {
       state.shouldShowLoadingState = true;
@@ -97,14 +104,16 @@ export const propertyListingSlice = createSlice({
       state.mapUiState = {
         markerLatitude: action.payload.locationLatitude,
         markerLongitude: action.payload.locationLongitude,
-      }
-      state.inspectionBookingUiStateList = action.payload.inspections.map(
+      };
+
+      state.inspectionBookingUiStateList = action.payload.propertyListingInspections.map(
         (inspection) => ({
           date: getFormattedDateStringFromDate(inspection.start_time),
           startingTime: getFormattedTimeStringFromDate(inspection.start_time),
           endingTime: getFormattedTimeStringFromDate(inspection.end_time),
         })
       );
+
       state.listingImageUrls = action.payload.image_urls;
       state.listingStatusText = getListingStatusDisplayString(
         action.payload.listing_status
@@ -148,7 +157,11 @@ export const propertyListingSlice = createSlice({
       state.currentPropertyId = action.meta.arg;
     });
   },
-});
+})
+
+export const {
+  addBookedPropertyListingInspection,
+} = propertyListingSlice.actions;
 
 function getPropertyAreaDisplayString(area: number): string {
   return `${area}m²`;
@@ -167,8 +180,6 @@ function getListingStatusDisplayString(status: string): string {
       return "CURRENT LISTING";
     case ListingStatus.LISTED.toLowerCase():
       return "LISTED";
-    case ListingStatus.TENANT_SELECTION.toLowerCase():
-      return "TENANT SELECTION";
     case ListingStatus.TENANT_APPROVAL.toLowerCase():
       return "TENANT APPROVAL";
     default:
@@ -193,7 +204,6 @@ function getListingStatusPillVariant(status: string): ListingStatusPillVariant {
       return ListingStatusPillVariant.DRAFT;
     case "listed":
     case ListingStatus.LISTED.toLowerCase():
-    case ListingStatus.TENANT_SELECTION.toLowerCase():
     case ListingStatus.TENANT_APPROVAL.toLowerCase():
       return ListingStatusPillVariant.CURRENT;
     default:
@@ -203,12 +213,15 @@ function getListingStatusPillVariant(status: string): ListingStatusPillVariant {
 
 export const load = createAsyncThunk(
   "propertyListing/load",
-  async (propertyId: string) => {
-    const propertyWithListingData = await getPropertyWithListingDataUseCase(
-      propertyId
-    );
-    const landlords: Landlord[] = await getAllLandlords();
-    return { ...propertyWithListingData, landlords };
+  async (propertyId: string, { dispatch }) => {
+    const useCase = new LoadPropertyWithTenantApplicationsUseCase();
+    const result = await useCase.execute(propertyId);
+
+    if (result.shouldLoadTenantApplications) {
+      dispatch(loadTenantApplicationsForPropertyAsync(propertyId));
+    }
+
+    return { ...result.propertyWithListingData, landlords: result.landlords };
   }
 );
 

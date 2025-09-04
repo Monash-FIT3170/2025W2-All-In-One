@@ -2,8 +2,12 @@ import { Meteor } from "meteor/meteor";
 import "./methods/azure/blob-methods";
 import "./methods/task/task-methods";
 import "./methods/property/property-methods";
+import "./methods/messaging/messaging-methods";
+import "./publications/messaging-publications";
 import "./methods/property-listing/listing-methods";
 import "./methods/user-documents/lease-agreement-methods";
+import "./methods/tenant-application/tenant-application-method";
+
 import {
 	PropertyCollection,
 	PropertyCoordinatesCollection,
@@ -12,7 +16,7 @@ import {
 	PropertyStatusCollection,
 } from "./database/property/property-collections";
 import {
-	InspectionCollection,
+	PropertyListingInspectionCollection,
 	ListingCollection,
 	ListingStatusCollection,
 } from "/app/server/database/property-listing/listing-collections";
@@ -29,6 +33,7 @@ import {
 	AgentCollection,
 	UserAccountCollection,
 } from "/app/server/database/user/user-collections";
+import { TenantApplicationCollection } from "./database/tenant/collections/TenantApplicationCollection";
 import { TenantCollection } from "./database/user/user-collections";
 import { Role } from "../shared/user-role-identifier";
 import { TaskStatus } from "../shared/task-status-identifier";
@@ -45,12 +50,15 @@ import "/app/server/methods/property/property-features/property-features-methods
 import { ListingStatus } from "../shared/api-models/property-listing/ListingStatus";
 import { PropertyDocument } from "./database/property/models/PropertyDocument";
 import { LeaseAgreementCollection } from "./database/user-documents/user-documents-collections";
+import { TaskPriority } from "../shared/task-priority-identifier";
 
 let globalAgent: ApiAgent;
 let globalTenant: ApiTenant;
 let globalLandlord: ApiLandlord;
 
 Meteor.startup(async () => {
+	await removeTenantApplicationsData();
+
 	await removeAllCollections();
 	// await tempSeedPropertyStatusData();
 	await permSeedListingStatusData();
@@ -183,10 +191,6 @@ async function tempSeedProfileData(): Promise<void> {
 			workAddress: "Jungle Biome",
 			workPhone: "0122 222 123",
 			profilePicture: "img.com",
-			carMake: "Toyota",
-			carModel: "Prius",
-			carYear: "2000",
-			carPlate: "DXW003",
 		});
 	}
 	if ((await PropertyCollection.find().countAsync()) === 0) {
@@ -195,7 +199,7 @@ async function tempSeedProfileData(): Promise<void> {
 		const statuses = [
 			{ _id: "1", name: PropertyStatus.VACANT },
 			{ _id: "2", name: PropertyStatus.OCCUPIED },
-			{ _id: "3", name: PropertyStatus.UNDER_MAINTENANCE },
+			{ _id: "3", name: PropertyStatus.VACANT },
 		];
 
 		// Add new status if it doesn't exist
@@ -229,24 +233,24 @@ async function tempSeedProfileData(): Promise<void> {
 			date_set: new Date(),
 		});
 
-		await InspectionCollection.insertAsync({
+		await PropertyListingInspectionCollection.insertAsync({
 			_id: "1",
 			starttime: new Date("2025-04-12T10:00:00Z"),
 			endtime: new Date("2025-04-13T11:00:00Z"),
 		});
-		await InspectionCollection.insertAsync({
+		await PropertyListingInspectionCollection.insertAsync({
 			_id: "2",
 			starttime: new Date("2025-04-14T10:00:00Z"),
 			endtime: new Date("2025-04-15T11:00:00Z"),
 		});
 
-		await InspectionCollection.insertAsync({
+		await PropertyListingInspectionCollection.insertAsync({
 			_id: "3",
 			starttime: new Date("2025-04-16T10:00:00Z"),
 			endtime: new Date("2025-04-17T11:00:00Z"),
 		});
 
-		await InspectionCollection.insertAsync({
+		await PropertyListingInspectionCollection.insertAsync({
 			_id: "4",
 			starttime: new Date("2026-04-16T10:00:00Z"),
 			endtime: new Date("2026-04-17T11:00:00Z"),
@@ -628,7 +632,9 @@ async function tempSeedTaskData(): Promise<void> {
 			dueDate: new Date("2025-05-19T10:00:00Z"),
 			description:
 				"Meet with the client to discuss the property listing process and gather necessary information.",
-			priority: "High",
+			priority: TaskPriority.HIGH,
+			taskPropertyAddress: "",
+			taskPropertyId: "",
 		});
 
 		TaskCollection.insertAsync({
@@ -639,7 +645,9 @@ async function tempSeedTaskData(): Promise<void> {
 			dueDate: new Date("2025-05-27T10:00:00Z"),
 			description:
 				"Check in with the client to provide updates and address any questions.",
-			priority: "Medium",
+			priority: TaskPriority.MEDIUM,
+			taskPropertyAddress: "",
+			taskPropertyId: "",
 		});
 		await TaskCollection.insertAsync({
 			_id: "3",
@@ -648,7 +656,9 @@ async function tempSeedTaskData(): Promise<void> {
 			createdDate: new Date("2025-04-20T10:00:00Z"),
 			dueDate: new Date("2025-05-28T10:00:00Z"),
 			description: "Review the list of agent approved candidates and pick one.",
-			priority: "Medium",
+			priority: TaskPriority.MEDIUM,
+			taskPropertyAddress: "",
+			taskPropertyId: "",
 		});
 		await TaskCollection.insertAsync({
 			_id: "4",
@@ -657,7 +667,9 @@ async function tempSeedTaskData(): Promise<void> {
 			createdDate: new Date("2025-04-20T10:00:00Z"),
 			dueDate: new Date("2025-05-27T10:00:00Z"),
 			description: "Attend a property listing meeting with agent.",
-			priority: "Medium",
+			priority: TaskPriority.MEDIUM,
+			taskPropertyAddress: "",
+			taskPropertyId: "",
 		});
 		await TaskCollection.insertAsync({
 			_id: "5",
@@ -666,7 +678,9 @@ async function tempSeedTaskData(): Promise<void> {
 			createdDate: new Date("2025-04-20T10:00:00Z"),
 			dueDate: new Date("2025-05-27T10:00:00Z"),
 			description: "Attend the annual inspection.",
-			priority: "Medium",
+			priority: TaskPriority.MEDIUM,
+			taskPropertyAddress: "",
+			taskPropertyId: "",
 		});
 		await TaskCollection.insertAsync({
 			_id: "6",
@@ -676,7 +690,9 @@ async function tempSeedTaskData(): Promise<void> {
 			dueDate: new Date("2025-05-27T10:00:00Z"),
 			description:
 				"Sign the rental agreement which has had the rent increased by 5%.",
-			priority: "Medium",
+			priority: TaskPriority.MEDIUM,
+			taskPropertyAddress: "",
+			taskPropertyId: "",
 		});
 
 		console.log("Tasks seeded successfully.");
@@ -721,7 +737,7 @@ async function permSeedListingStatusData(): Promise<void> {
 		});
 		await ListingStatusCollection.insertAsync({
 			_id: "3",
-			name: ListingStatus.TENANT_SELECTION,
+			name: ListingStatus.CLOSED,
 		});
 		await ListingStatusCollection.insertAsync({
 			_id: "4",
@@ -744,6 +760,7 @@ async function seedLeaseAgreements(agent: ApiAgent): Promise<void> {
 			validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
 			documentUrl: "https://example.com/sample-lease-agreement.pdf",
 			tenantName: "Todd Toolgate",
+			title: "Leaase 1",
 		});
 
 		await LeaseAgreementCollection.insertAsync({
@@ -754,6 +771,7 @@ async function seedLeaseAgreements(agent: ApiAgent): Promise<void> {
 			validUntil: new Date(Date.now() + 300 * 24 * 60 * 60 * 1000), // 10 months from now
 			documentUrl: "https://example.com/another-lease-agreement.pdf",
 			tenantName: "Sarah Johnson",
+			title: "Leaase 2",
 		});
 
 		await LeaseAgreementCollection.insertAsync({
@@ -764,6 +782,7 @@ async function seedLeaseAgreements(agent: ApiAgent): Promise<void> {
 			validUntil: new Date(Date.now() + 350 * 24 * 60 * 60 * 1000), // 11.5 months from now
 			documentUrl: "https://example.com/third-lease-agreement.pdf",
 			tenantName: "Mike Chen",
+			title: "Leaase 3",
 		});
 
 		// Add a lease agreement specifically for Todd Toolgate (tenant)
@@ -775,6 +794,7 @@ async function seedLeaseAgreements(agent: ApiAgent): Promise<void> {
 			validUntil: new Date(Date.now() + 200 * 24 * 60 * 60 * 1000), // 6.5 months from now
 			documentUrl: "https://example.com/todd-toolgate-lease.pdf",
 			tenantName: "Todd Toolgate",
+			title: "Leaase 4",
 		});
 
 		console.log("Lease agreement seeded successfully.");
@@ -794,11 +814,17 @@ async function removeAllCollections(): Promise<void> {
 	await PropertyPriceCollection.removeAsync({});
 	await PropertyStatusCollection.removeAsync({});
 	await PropertyCoordinatesCollection.removeAsync({});
-	await InspectionCollection.removeAsync({});
+	await PropertyListingInspectionCollection.removeAsync({});
 	await ListingCollection.removeAsync({});
 	await ListingStatusCollection.removeAsync({});
 	await TaskCollection.removeAsync({});
 	await LeaseAgreementCollection.removeAsync({});
+}
+
+async function removeTenantApplicationsData(): Promise<void> {
+	console.log("Removing tenant applications data...");
+	await TenantApplicationCollection.removeAsync({});
+	console.log("Tenant applications removed successfully.");
 }
 async function permSeedPropertyFeaturesData(): Promise<void> {
 	const features = [

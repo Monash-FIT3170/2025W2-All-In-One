@@ -26,12 +26,13 @@ export async function apiGetAllListedListings(skip = 0, limit = 3): Promise<ApiL
 export async function apiInsertPropertyListing(
   propertyId: string,
   imageUrls: string[],
-  status: ListingStatus
+  status: ListingStatus,
+  inspectionIds: string[],
 ) {
   const data: ApiInsertListingPayload = {
     property_id: propertyId,
     image_urls: imageUrls,
-    inspection_ids: [],
+    inspection_ids: inspectionIds,
   };
   const insertedListing: string = await Meteor.callAsync(
     MeteorMethodIdentifier.INSERT_PROPERTY_LISTING,
@@ -53,4 +54,25 @@ export async function apiSubmitDraftListing(propertyId: string): Promise<void> {
     MeteorMethodIdentifier.LISTING_SUBMIT_DRAFT,
     propertyId
   );
+}
+
+export async function apiUpdatePropertyListingImages(
+  propertyId: string,
+  imageUrls: string[]
+): Promise<{ success: boolean; propertyId: string }> {
+  return await Meteor.callAsync(
+    MeteorMethodIdentifier.LISTING_UPDATE_IMAGES,
+    propertyId,
+    imageUrls
+  );
+}
+
+export async function apiInsertPropertyListingInspections(
+  propertyListingInspections: { start_time: Date; end_time: Date }[]
+): Promise<string[]> {
+  const ids = await Meteor.callAsync(
+    MeteorMethodIdentifier.INSERT_PROPERTY_LISTING_INSPECTION,
+    propertyListingInspections
+  );
+  return ids;
 }

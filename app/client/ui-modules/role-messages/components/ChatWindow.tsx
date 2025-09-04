@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { Input } from "/app/client/ui-modules/theming-shadcn/Input";
+import { Textarea } from "/app/client/ui-modules/theming-shadcn/Textarea";
 import { Button } from "/app/client/ui-modules/theming-shadcn/Button";
 import { Send } from "lucide-react";
-import { Message } from "../types";
+import { Message } from "/app/client/library-modules/domain-models/messaging/Message";
+import { formatChatMessageTimestamp } from "../utils/timestamp-utils";
 
 interface ChatWindowProps {
   header: { name: string; role: string; avatar: string } | null;
@@ -14,6 +15,16 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ header, messages, messageText, onChangeMessage, onSend }: ChatWindowProps) {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   return (
     <div className="flex-1 bg-white flex flex-col">
       {header ? (
@@ -34,7 +45,7 @@ export function ChatWindow({ header, messages, messageText, onChangeMessage, onS
 
           {/* Messages List */}
           <div className="flex-1 overflow-hidden">
-            <div className="h-full overflow-y-auto p-4"> {/* Scrollable area */}
+            <div ref={scrollContainerRef} className="h-full overflow-y-auto p-4"> {/* Scrollable area */}
               <div className="space-y-4">
                 {messages.map((m) => (
                   <div key={m.id} className={`flex ${m.isOutgoing ? "justify-end" : "justify-start"}`}>
@@ -43,27 +54,40 @@ export function ChatWindow({ header, messages, messageText, onChangeMessage, onS
                         m.isOutgoing ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
                       }`}
                     >
-                      <p className="text-sm">{m.text}</p>
-                      <div className={`flex items-center justify-between mt-1 text-xs ${m.isOutgoing ? "text-gray-300" : "text-gray-500"}`}>
-                        <span>{m.timestamp}</span>
-                        {m.isOutgoing && <span>{m.isRead ? "Read" : "Delivered"}</span>}
+                      <p className="text-sm break-words whitespace-pre-wrap mb-1">{m.text}</p>
+                      <div className={`flex items-center gap-2 text-xs ${m.isOutgoing ? "text-gray-300" : "text-gray-500"}`}>
+                        <span>{formatChatMessageTimestamp(m.timestamp)}</span>
+                        {m.isOutgoing && (
+                          <>
+                            <span>•</span>
+                            <span>{m.isRead ? "Read" : "Delivered"}</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
                 ))}
+                {/* Invisible element to scroll to */}
+                <div ref={messagesEndRef} />
               </div>
             </div>
           </div>
 
           {/* Composer */}
           <div className="p-4 border-t border-gray-200 flex-shrink-0">
-            <div className="flex items-center space-x-2">
-              <Input
+            <div className="flex items-end space-x-2">
+              <Textarea
                 placeholder="Type a message..."
                 value={messageText}
-                onChange={(e) => onChangeMessage(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && onSend()}
-                className="flex-1 h-12 text-base"
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onChangeMessage(e.target.value)}
+                onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    onSend();
+                  }
+                }}
+                className="flex-1 min-h-[48px] max-h-32 text-base resize-none"
+                rows={1}
               />
               <Button onClick={onSend} size="sm" className="h-12 px-4">
                 <Send className="h-5 w-5" />
@@ -78,4 +102,4 @@ export function ChatWindow({ header, messages, messageText, onChangeMessage, onS
       )}
     </div>
   );
-} 
+}

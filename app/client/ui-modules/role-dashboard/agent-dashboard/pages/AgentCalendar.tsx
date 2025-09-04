@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
   selectTasks,
-  selectIsLoading,
+  selectLoading,
   fetchAgentTasks,
   selectMarkers,
 } from "../state/agent-dashboard-slice";
@@ -12,7 +12,6 @@ import { AddTaskModal } from "../components/AddTaskModal";
 import { apiCreateTaskForAgent } from "/app/client/library-modules/apis/task/task-api";
 import { PropertyOption, TaskData } from "../components/TaskFormSchema";
 import { TaskStatus } from "/app/shared/task-status-identifier";
-import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { UpcomingTasks } from "../../components/UpcomingTask";
 import { TaskMap, TaskMapUiState } from "../components/TaskMap";
 import {
@@ -29,7 +28,7 @@ export function AgentCalendar(): React.JSX.Element {
   ) as Agent | undefined;
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
   const tasks = useAppSelector(selectTasks);
-  const loading = useAppSelector(selectIsLoading);
+  const loading = useAppSelector(selectLoading);
   const markers = useAppSelector(selectMarkers);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -172,7 +171,7 @@ export function AgentCalendar(): React.JSX.Element {
                   )}
                 </ul>
                 <br />
-                <TaskMap mapUiState={mapUiState} />
+                <TaskMap mapUiState={mapUiState} className="mb-3" />
                 <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
