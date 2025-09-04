@@ -168,20 +168,7 @@ export function AgentDocumentUpload({ onUploadSuccess }: AgentDocumentUploadProp
             </SelectContent>
           </Select>
           
-          {selectedProperty && (
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
-              <div className="flex items-center gap-2 text-sm text-blue-700">
-                <User className="w-4 h-4" />
-                <span>
-                  <strong>Tenant:</strong> {selectedProperty.tenantId && selectedProperty.tenantId.trim() !== "" ? (
-                    "Tenant"
-                  ) : (
-                    "No tenant assigned"
-                  )}
-                </span>
-              </div>
-            </div>
-          )}
+   
         </div>
 
         {/* File Upload */}
