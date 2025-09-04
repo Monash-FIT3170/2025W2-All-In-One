@@ -28,11 +28,6 @@ export function DocumentList({ onRefresh }: DocumentListProps) {
 	const [selectedDocument, setSelectedDocument] = useState<any>(null);
 	const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
-	const handleViewDocument = (document: any) => {
-		setSelectedDocument(document);
-		setIsViewDialogOpen(true);
-	};
-
 	const getDocumentStatus = (validUntil: Date) => {
 		const now = new Date();
 		const expiryDate = new Date(validUntil);
@@ -47,22 +42,6 @@ export function DocumentList({ onRefresh }: DocumentListProps) {
 			return { status: "Expiring Soon", variant: "secondary" as const };
 		} else {
 			return { status: "Active", variant: "default" as const };
-		}
-	};
-
-	const getFileIcon = (fileName: string) => {
-		const extension = fileName.split(".").pop()?.toLowerCase();
-		switch (extension) {
-			case "pdf":
-				return <FileText className="w-5 h-5 text-red-500" />;
-			case "jpg":
-			case "jpeg":
-			case "png":
-				return <FileText className="w-5 h-5 text-blue-500" />;
-			case "txt":
-				return <FileText className="w-5 h-5 text-green-500" />;
-			default:
-				return <FileText className="w-5 h-5 text-gray-500" />;
 		}
 	};
 
@@ -121,7 +100,7 @@ export function DocumentList({ onRefresh }: DocumentListProps) {
 							<div key={document._id} className="p-6">
 								<div className="flex items-start justify-between">
 									<div className="flex items-start gap-4 flex-1">
-										{getFileIcon(document.fileName || "")}
+										<FileText className="w-5 h-5 text-red-500" />
 
 										<div className="flex-1 min-w-0">
 											<div className="flex items-center gap-2 mb-2">
