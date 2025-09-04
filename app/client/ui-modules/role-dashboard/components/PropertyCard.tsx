@@ -8,9 +8,10 @@ import { StatusBadge } from "./StatusBadge";
 interface PropertyCardProps {
   property: PropertyWithListingDataAndNames;
   navigationPath?: NavigationPath;
+  from?: string;
 }
 
-export function PropertyCard({ property, navigationPath = NavigationPath.LandlordPropertyDetail }: PropertyCardProps) {
+export function PropertyCard({ property, navigationPath = NavigationPath.LandlordPropertyDetail, from }: PropertyCardProps) {
   const navigate = useNavigate();
 
   // Format address
@@ -22,7 +23,9 @@ export function PropertyCard({ property, navigationPath = NavigationPath.Landlor
 
   // Handle click to navigate to property detail with property data
   const handleClick = () => {
-    navigate(`${navigationPath}?propertyId=${property.propertyId}`, {
+    const baseUrl = `${navigationPath}?propertyId=${property.propertyId}`;
+    const url = from ? `${baseUrl}&from=${from}` : baseUrl;
+    navigate(url, {
       state: { property },
     });
   };

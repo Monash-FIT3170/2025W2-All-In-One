@@ -121,7 +121,11 @@ export function AgentProperty(): React.JSX.Element {
                   })
                   .map((property) => (
                     <li key={property.propertyId} className="h-full w-full">
-                      <PropertyCard property={property as PropertyWithListingDataAndNames} navigationPath={NavigationPath.PropertyListing} />
+                      <PropertyCard 
+                        property={property as PropertyWithListingDataAndNames} 
+                        navigationPath={NavigationPath.PropertyListing}
+                        from="agent-properties"
+                      />
                     </li>
                   ))}
               </ul>

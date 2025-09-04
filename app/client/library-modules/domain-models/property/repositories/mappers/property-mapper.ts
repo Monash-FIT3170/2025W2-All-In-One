@@ -48,7 +48,7 @@ export async function mapFormSchemaToPropertyInsertData(form: FormSchemaType) {
     property_feature_ids: form.property_feature_ids,
     type: form.property_type,
     area: form.space,
-    agent_id: "", // fill as needed
+    agent_id: form.agent,
     landlord_id: form.landlord,
     tenant_id: "", // fill as needed
   };

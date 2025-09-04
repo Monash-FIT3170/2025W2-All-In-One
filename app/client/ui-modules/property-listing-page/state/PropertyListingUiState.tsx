@@ -5,6 +5,7 @@ import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listi
 import { InspectionBookingListUiState } from "/app/client/ui-modules/property-listing-page/components/PropertyInspections";
 
 export type PropertyListingPageUiState = {
+  agentId: string;
   propertyId: string;
   propertyLandlordId: string;
   streetNumber: string;

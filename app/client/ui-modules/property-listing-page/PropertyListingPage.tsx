@@ -636,6 +636,7 @@ function ListingModalEditor({
   );
 
   const listingInfo: FormSchemaType = {
+    agent: state.agentId,
     landlord: state.propertyLandlordId,
     property_type: state.propertyType.toLowerCase(), // Ensure property type matches dropdown options (house or apartment)
     address: `${state.streetNumber} ${state.street}`,
