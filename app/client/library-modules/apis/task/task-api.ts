@@ -3,6 +3,7 @@ import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
 
+
 export async function apiGetTaskById(id: string): Promise<ApiTask> {
   const fetchedTask = await Meteor.callAsync(MeteorMethodIdentifier.TASK_GET, id);
 
@@ -16,7 +17,7 @@ export async function apiCreateTaskForAgent(taskData: {
   priority: TaskPriority;
   userId: string;
   propertyAddress: string;
-  propertyId: string; 
+  propertyId: string;
 }): Promise<string> {
   try {
     const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT_FOR_AGENT, taskData);
@@ -26,18 +27,53 @@ export async function apiCreateTaskForAgent(taskData: {
     throw error;
   }
 }
+
 export async function apiCreateTaskForLandlord(taskData: {
   name: string;
   description: string;
   dueDate: Date;
   priority: TaskPriority;
-  landlordId: string;
+  userId: string;
+  propertyAddress: string;
+  propertyId: string;
 }): Promise<string> {
   try {
     const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT_FOR_LANDLORD, taskData);
     return result;
   } catch (error) {
-    console.error("Failed to create landlord task:", error);
+    console.error("Failed to create task:", error);
+    throw error;
+  }
+}
+
+export async function apiUpdateTaskForAgent(taskData: {
+  taskId: string;
+  name?: string;
+  description?: string;
+  dueDate?: Date;
+  priority?: TaskPriority;
+}): Promise<string> {
+  try {
+    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_UPDATE_FOR_AGENT, taskData);
+    return result;
+  } catch (error) {
+    console.error("Failed to update agent task:", error);
+    throw error;
+  }
+}
+
+export async function apiUpdateTaskForLandlord(taskData: {
+  taskId: string;
+  name?: string;
+  description?: string;
+  dueDate?: Date;
+  priority?: TaskPriority;
+}): Promise<string> {
+  try {
+    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_UPDATE_FOR_LANDLORD, taskData);
+    return result;
+  } catch (error) {
+    console.error("Failed to update landlord task:", error);
     throw error;
   }
 }

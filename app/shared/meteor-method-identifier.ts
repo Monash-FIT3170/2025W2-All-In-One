@@ -1,6 +1,8 @@
 export enum MeteorMethodIdentifier {
   TASK_INSERT_FOR_AGENT = "tasks.insertForAgent",
   TASK_INSERT_FOR_LANDLORD = "tasks.insertForLandlord",
+  TASK_UPDATE_FOR_AGENT = "tasks.updateForAgent",
+  TASK_UPDATE_FOR_LANDLORD = "tasks.updateForLandlord",
   TASK_GET_ALL = "tasks.getAll",
   TASK_GET = "tasks.getOne",
   TASK_GET_MULTIPLE = "tasks.getMultiple",
@@ -19,6 +21,7 @@ export enum MeteorMethodIdentifier {
   LISTING_GET_ALL_LISTED = "listings.getAllListed",
   LISTING_UPDATE_IMAGES = "listings.updateImages", // Update images of a draft listing
   INSERT_PROPERTY_LISTING = "listings.insertProperty",
+  INSERT_PROPERTY_LISTING_INSPECTION = "inspections.insert",
   USER_REGISTER = "user.register",
   USER_ACCOUNT_INSERT = "users.insert",
   USER_ACCOUNT_GET = "users.getOne",
@@ -38,10 +41,30 @@ export enum MeteorMethodIdentifier {
   PROPERTY_GET_BY_AGENT_ID = "property.getByAgentId", // fetches all properties managed by an agent by their ID
   PROPERTY_GET_ALL_BY_LANDLORD_ID = "property.getAllByLandlordId", // fetches all properties managed by a landlord by their ID
   PROPERTY_DATA_UPDATE = "property.updateData",
+  PROPERTY_TENANT_UPDATE = "property.updateTenant",
   PROFILE_GET = "profileData.getOne",
   PROFILE_EDIT = "profileData.edit",
   PROFILE_INSERT = "profileData.insert",
   LISTING_SUBMIT_DRAFT = "listing.submitDraft",
   PROPERTY_FEATURES_GET_ALL = "propertyFeatures.getAll",
+  TENANT_APPLICATION_GET_BY_PROPERTY_ID = "tenantApplication.getByPropertyId",
+  TENANT_APPLICATION_GET_BY_LANDLORD_ID = "tenantApplications.getByLandlordId",
+  TENANT_APPLICATION_INSERT = "tenantApplications.insert",
+  TENANT_APPLICATION_UPDATE_STATUS = "tenantApplications.updateStatus",
+  TENANT_APPLICATION_UPDATE_LINKED_TASK = "tenantApplications.updateLinkedTask", // Updates the task ID when the role has an existing task related to the applications
   PROPERTY_SEARCH = "PROPERTY_SEARCH",
+	CONVERSATIONS_GET_FOR_AGENT = "conversations.getForAgent", // Get conversations for an agent based on their managed properties
+	CONVERSATIONS_GET_FOR_TENANT = "conversations.getForTenant", // Get conversations for a tenant
+	CONVERSATIONS_GET_FOR_LANDLORD = "conversations.getForLandlord", // Get conversations for a landlord
+	CONVERSATION_INSERT = "conversations.insert", // Create a new conversation between users
+	MESSAGES_GET_FOR_CONVERSATION = "messages.getForConversation", // Get all messages for a specific conversation
+	MESSAGE_INSERT = "messages.insert", // Send a new message in a conversation
+	MESSAGE_MARK_READ = "messages.markRead", // Mark a message as read by a user
+	CONVERSATION_RESET_UNREAD_COUNT = "conversations.resetUnreadCount", // Reset unread count for a user in a conversation
+	CONVERSATION_ADD_ACTIVE_USER = "conversations.addActiveUser", // Add user to active users list when they open a conversation
+	CONVERSATION_REMOVE_ACTIVE_USER = "conversations.removeActiveUser", // Remove user from active users list when they close a conversation
+	// Profile Methods by Role ID (for direct profile lookup from role documents)
+	PROFILE_GET_BY_AGENT_ID = "profile.getByAgentId", // Get profile data by agent ID (queries agent collection first, then profile collection)
+	PROFILE_GET_BY_LANDLORD_ID = "profile.getByLandlordId", // Get profile data by landlord ID (queries landlord collection first, then profile collection)
+	PROFILE_GET_BY_TENANT_ID = "profile.getByTenantId", // Get profile data by tenant ID (queries tenant collection first, then profile collection)
 }

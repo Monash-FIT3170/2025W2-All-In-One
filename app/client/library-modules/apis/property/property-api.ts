@@ -21,6 +21,19 @@ export async function apiGetPropertyById(id: string): Promise<ApiProperty> {
     }
 }
 
+export async function apiUpdatePropertyTenantId(propertyId: string, tenantId: string): Promise<void> {
+    try {
+        return await Meteor.callAsync(
+            MeteorMethodIdentifier.PROPERTY_TENANT_UPDATE,
+            propertyId,
+            tenantId
+        );
+    } catch (error) {
+        console.error("Error updating property tenant ID:", error);
+        throw error;
+    }
+}
+
 
 export async function mapPropertyToOption(propertyId: string): Promise<PropertyOption> {
   // Await the result properly

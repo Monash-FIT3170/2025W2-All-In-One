@@ -1,6 +1,8 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import { agentDashboardSlice } from "./ui-modules/role-dashboard/agent-dashboard/state/agent-dashboard-slice";
+import { agentPropertySlice } from "./ui-modules/role-dashboard/agent-dashboard/state/agent-property-slice";
 import { landlordDashboardSlice } from "./ui-modules/role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
+import { landlordPropertiesSlice } from "./ui-modules/role-dashboard/landlord-dashboard/state/landlord-properties-slice";
 import { guestLandingPageSlice } from "./ui-modules/guest-landing-page/state/reducers/guest-landing-page-slice";
 import { settingsPageSlice } from "./ui-modules/settings-page/state/reducers/settings-page-slice";
 import { profileSlice } from "./ui-modules/profiles/state/profile-slice";
@@ -11,7 +13,7 @@ import { propertyListingSlice } from "/app/client/ui-modules/property-listing-pa
 import { tenantDashboardSlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/reducers/tenant-dashboard-slice";
 import { currentUserSlice } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
 import { propertyFormSlice } from "./ui-modules/property-form-agent/state/reducers/property-form-slice";
-import { tenantSelectionSlice } from "./ui-modules/review-tenant-modal/state/reducers/tenant-selection-slice";
+import { tenantSelectionSlice } from "./ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { messagesSlice } from "./ui-modules/role-messages/state/reducers/messages-slice";
 import { searchResultsSlice } from "./ui-modules/search/state/search-result-slice";
 import { tenantPropertySlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/reducers/tenant-property-slice";
@@ -19,19 +21,21 @@ import { tenantPropertySlice } from "./ui-modules/role-dashboard/tenant-dashboar
 export const store = configureStore({
   reducer: {
     agentDashboard: agentDashboardSlice.reducer,
+    agentProperties: agentPropertySlice.reducer,
     tenantDashboard: tenantDashboardSlice.reducer,
     guestLandingPage: guestLandingPageSlice.reducer,
     settingsPage: settingsPageSlice.reducer,
     landlordDashboard: landlordDashboardSlice.reducer,
+    landlordProperties: landlordPropertiesSlice.reducer,
     profile: profileSlice.reducer,
     signinForm: signinFormSlice.reducer,
     propertyListing: propertyListingSlice.reducer,
     signupForm: signupFormSlice.reducer,
     currentUser: currentUserSlice.reducer,
     propertyForm: propertyFormSlice.reducer,
+    searchResults: searchResultsSlice.reducer,
     tenantSelection: tenantSelectionSlice.reducer,
     messages: messagesSlice.reducer,
-    searchResults: searchResultsSlice.reducer,
     tenantProperty: tenantPropertySlice.reducer,
   },
 });

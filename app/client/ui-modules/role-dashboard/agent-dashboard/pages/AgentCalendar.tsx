@@ -171,7 +171,7 @@ export function AgentCalendar(): React.JSX.Element {
                   )}
                 </ul>
                 <br />
-                <TaskMap mapUiState={mapUiState} />
+                <TaskMap mapUiState={mapUiState} className="mb-3" />
                 <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>

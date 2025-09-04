@@ -15,6 +15,12 @@ export function getFormattedTimeStringFromDate(date: Date): string {
   return timeString;
 }
 
+export function calculateDueDate(daysFromNow: number): Date {
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + daysFromNow);
+  return dueDate;
+}
+
 export const getISODate = (date: Date): string => {
   return date.toISOString().slice(0, 10);
 };

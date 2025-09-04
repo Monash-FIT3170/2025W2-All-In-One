@@ -8,6 +8,7 @@ import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { TaskDocument } from "/app/server/database/task/models/TaskDocument";
 import { TaskCollection } from "/app/server/database/task/task-collections";
+import { ProfileCollection } from "/app/server/database/user/user-collections";
 
 // -- INSERT TENANT --
 const tenantInsertMethod = {
@@ -66,7 +67,39 @@ async function getTaskDocumentsMatchingIds(
   }).fetchAsync();
 }
 
+// Get profile data by tenant ID (queries tenant collection first, then profile collection)
+const profileGetByTenantIdMethod = {
+  [MeteorMethodIdentifier.PROFILE_GET_BY_TENANT_ID]: async (
+    tenantId: string
+  ): Promise<any> => {
+    // First get the tenant document to extract profileDataId
+    const tenantDoc = await TenantCollection.findOneAsync({
+      _id: tenantId,
+    });
+
+    if (!tenantDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Tenant with ID ${tenantId} not found.`)
+      );
+    }
+
+    // Then get the profile data using the profileDataId
+    const profileDoc = await ProfileCollection.findOneAsync({
+      _id: tenantDoc.profileDataId,
+    });
+
+    if (!profileDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Profile with ID ${tenantDoc.profileDataId} not found.`)
+      );
+    }
+
+    return profileDoc;
+  },
+};
+
 Meteor.methods({
   ...tenantInsertMethod,
   ...tenantGetMethod,
+  ...profileGetByTenantIdMethod,
 });

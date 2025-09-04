@@ -28,10 +28,6 @@ import { TenantPropertyUiState } from "../state/TenantPropertyUiState";
 import { useSearchParams } from "react-router";
 import { SubHeading } from "../../../theming/components/SubHeading";
 import { PropertyMap, PropertyMapUiState } from "../../../common/property-components/PropertyMap";
-import {
-  selectAcceptedCount,
-  selectHasAcceptedApplications,
-} from "../../../review-tenant-modal/state/reducers/tenant-selection-slice";
 import { fetchAgentWithProfile } from '../state/reducers/tenant-property-slice';
 import { AgentDetails } from '../components/AgentDetails';
 import { current } from "@reduxjs/toolkit";
@@ -215,11 +211,6 @@ function PropertyPageContent({
   className?: string;
 }): React.JSX.Element {
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
-
-  const acceptedCount = useAppSelector(selectAcceptedCount);
-  const hasAcceptedApplications = useAppSelector(selectHasAcceptedApplications);
-  const shouldShowSendToLandlordButton = hasAcceptedApplications;
-
   return (
     <div className={className}>
       <TopBar

@@ -123,7 +123,7 @@ export const fetchAgentWithProfile = createAsyncThunk(
     try {
       // Debug log for property ID
       console.log('Fetching property with ID:', propertyId);
-      
+
       const property = await getPropertyById(propertyId);
       console.log('Found property:', property);
 
@@ -136,7 +136,7 @@ export const fetchAgentWithProfile = createAsyncThunk(
 
       // Debug log for agent ID
       console.log('Fetching agent with ID:', property.agentId);
-      
+
       const agent = await getAgentByAgentId(property.agentId);
       console.log('Found agent:', agent);
 
@@ -193,7 +193,7 @@ export const tenantPropertySlice = createSlice({
         markerLatitude: action.payload.locationLatitude,
         markerLongitude: action.payload.locationLongitude,
       }
-      state.inspectionBookingUiStateList = action.payload.inspections.map(
+      state.inspectionBookingUiStateList = action.payload.propertyListingInspections.map(
         (inspection) => ({
           date: getFormattedDateStringFromDate(inspection.start_time),
           startingTime: getFormattedTimeStringFromDate(inspection.start_time),
