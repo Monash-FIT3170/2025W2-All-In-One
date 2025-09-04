@@ -31,10 +31,10 @@ export const fetchLandlordProperties = createAsyncThunk(
   async (userId: string) => {
     try {
       const landlordResponse = await getLandlordById(userId);
-      
+
       // Fetch basic properties first
       const properties = await getAllPropertiesByLandlordId(landlordResponse.landlordId);
-      
+
       // Fetch properties with listing data using the use case
       const propertiesWithListingData = await Promise.all(
         properties.map(async (property) => {
@@ -49,12 +49,12 @@ export const fetchLandlordProperties = createAsyncThunk(
               locationLatitude: 0,
               locationLongitude: 0,
               listing_status: "DRAFT",
-              inspections: []
+              propertyListingInspections: []
             } as PropertyWithListingData;
           }
         })
       );
-      
+
       // Fetch tenant and agent names for each property
       const propertiesWithNames = await Promise.all(
         propertiesWithListingData.map(async (property) => {
@@ -90,7 +90,7 @@ export const fetchLandlordProperties = createAsyncThunk(
           } as PropertyWithListingDataAndNames;
         })
       );
-      
+
       return propertiesWithNames;
     } catch (error) {
       console.error("Error fetching landlord properties:", error);

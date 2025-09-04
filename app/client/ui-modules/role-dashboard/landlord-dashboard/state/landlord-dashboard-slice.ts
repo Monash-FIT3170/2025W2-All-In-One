@@ -16,7 +16,7 @@ import {
   TaskData,
 } from "../../agent-dashboard/components/TaskFormSchema";
 import { apiCreateTaskForLandlord } from "/app/client/library-modules/apis/task/task-api";
-import { createTaskForLandlord } from "../../../../library-modules/domain-models/task/repositories/task-repository";
+import { createTaskForLandlordOnCalendar } from "../../../../library-modules/domain-models/task/repositories/task-repository";
 
 interface LandlordDashboardState {
   isLoading: boolean;
@@ -240,7 +240,7 @@ export const createLandlordTask = createAsyncThunk(
     if (!userId) throw new Error("No current user found");
 
     // Call the repo with taskData + userId
-    const createdTaskId = await createTaskForLandlord(taskData, userId);
+    const createdTaskId = await createTaskForLandlordOnCalendar(taskData, userId);
 
     // Refresh all landlord details after creation
     await dispatch(fetchLandlordTasks());
