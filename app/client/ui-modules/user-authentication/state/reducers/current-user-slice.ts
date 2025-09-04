@@ -116,4 +116,9 @@ export const {
   setCurrentProfileData,
 } = currentUserSlice.actions;
 
+// Selectors
+export const selectCurrentUser = (state: RootState) => state.currentUser.currentUser;
+export const selectAuthUser = (state: RootState) => state.currentUser.authUser;
+export const selectProfileData = (state: RootState) => state.currentUser.profileData;
+
 export default currentUserSlice.reducer;
