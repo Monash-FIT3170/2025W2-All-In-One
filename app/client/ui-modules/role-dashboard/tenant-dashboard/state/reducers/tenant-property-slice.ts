@@ -14,7 +14,8 @@ import { Agent } from '/app/client/library-modules/domain-models/user/Agent';
 import { ProfileData } from '/app/client/library-modules/domain-models/user/ProfileData';
 import { getAgentByAgentId, getAgentById } from '/app/client/library-modules/domain-models/user/role-repositories/agent-repository';
 import { getProfileDataById } from '/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository';
-import { getPropertyById } from '/app/client/library-modules/domain-models/property/repositories/property-repository';
+import { getPropertyById, getPropertyByTenantId } from '/app/client/library-modules/domain-models/property/repositories/property-repository';
+import { getTenantById } from "/app/client/library-modules/domain-models/user/role-repositories/tenant-repository";
 
 interface TenantPropertyState {
   propertyId: string;
@@ -228,6 +229,39 @@ function getPropertyAreaDisplayString(area: number): string {
 function getPropertyPriceDisplayString(price: number): string {
   return `$${price.toString()}/month`;
 }
+export const fetchTenantProperty = createAsyncThunk(
+  "tenantProperty/fetchTenantProperty",
+  async (userId: string) => {
+      // First, get the tenant data which includes task IDs
+      let property = null;
+      
+      try {
+        const tenantResponse = await getTenantById(userId);
+        console.log(tenantResponse) 
+        
+        // Fetch tasks (if any)
+
+        
+        // Try to fetch property - this might fail if no property is assigned
+        try {
+          property = await getPropertyByTenantId(tenantResponse.tenantId);
+          console.log(property)
+          console.log(property.propertyId)
+        } catch (propertyError) {
+          console.log("No property found for tenant:", tenantResponse.tenantId);
+          // Property remains null - this is expected for tenants without assigned properties
+        }
+      }
+      catch (error) {
+        console.error("Error fetching tenant details:", error);
+        throw new Error("Failed to fetch tenant details");
+      }
+      console.log(property?.propertyId)
+      return {
+        property: property,
+      };
+    }
+);
 
 export const fetchPropertyAgent = createAsyncThunk(
   "propertyListing/fetchPropertyAgent",
