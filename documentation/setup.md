@@ -1,6 +1,36 @@
 # Setup
 This document describes how to get started with development.
 
+## Git Setup 
+Pre-requisites: 
+Please ensure you have the following setup: 
+Git
+Visual Studio Code
+GitHub account
+GitHub CLI (not mandatory but helpful) 
+VSCode Extensions: 
+GitHub Pull Requests and Issues
+GitLens
+Prettier (for formatting) 
+
+### All In One Repository Basics: 
+‘All in one’ Repository Basics: 
+To join our repository, please follow this URL:
+ https://github.com/Monash-FIT3170/2025W2-All-In-One
+This will take you to our Git repository, "All-In-One", which contains all the code for our web application.
+This repository is where all new code you write will be pushed. It allows developers to review each other's code and test it before it goes live.
+Our repository uses a main branch, which reflects the current deployed state of the application.
+ You should always create your personal branches from the main branch.
+To start developing, the first step is to copy the HTTPS URL of the repository from the link above
+ 
+Cloning the repository
+Open VScode 
+Press Control, Shift,P (Cmd, Shift, P) to open the Command Pallete
+Type and select: Git: Clone
+Paste the repository URL:  https://github.com/Monash-FIT3170/2025W2-All-In-One
+Choose the folder you would like the repository to be stored
+VSCode may ask if you want to open the cloned repository → Choose yes! 
+
 ## Pre-requisites
 * IDE: Visual studio code
 * Node.js >v22.0.0 installed (https://nodejs.org/en/download/)
