@@ -28,6 +28,7 @@ import { PropertyCoordinateDocument } from "../../database/property/models/Prope
 import { getGeocode } from "../../repositories/geocode/GeocodeRepository";
 import { Geocode } from "../../repositories/geocode/models/Geocode";
 import { ApiLandlordDashboard } from "/app/shared/api-models/landlord/ApiLandlordDashboard";
+import { ListingCollection } from "../../database/property-listing/listing-collections";
 
 // This method is used to get a property by its ID
 // It returns a promise that resolves to an ApiProperty object
@@ -79,21 +80,21 @@ const propertyGetAllMethod = {
 };
 
 const propertyUpdateTenantMethod = {
-	[MeteorMethodIdentifier.PROPERTY_TENANT_UPDATE]: async (
-		propertyId: string,
-		tenantId: string
-	): Promise<void> => {
-		try{
-			await PropertyCollection.updateAsync(propertyId, {
-				$set: {
-					tenant_id: tenantId
-				},
-			});
-		} catch (error) {
-		console.error("Error in propertyUpdateTenantMethod:", error);
-		throw meteorWrappedInvalidDataError(error as InvalidDataError);
-		}
-	},
+  [MeteorMethodIdentifier.PROPERTY_TENANT_UPDATE]: async (
+    propertyId: string,
+    tenantId: string
+  ): Promise<void> => {
+    try {
+      await PropertyCollection.updateAsync(propertyId, {
+        $set: {
+          tenant_id: tenantId,
+        },
+      });
+    } catch (error) {
+      console.error("Error in propertyUpdateTenantMethod:", error);
+      throw meteorWrappedInvalidDataError(error as InvalidDataError);
+    }
+  },
 };
 
 async function mapPropertyDocumentToPropertyDTO(
@@ -291,7 +292,6 @@ const propertyGetByTenantIdMethod = {
   },
 };
 
-
 const propertyGetAllByLandlordId = {
   [MeteorMethodIdentifier.PROPERTY_GET_ALL_BY_LANDLORD_ID]: async (
     landlordId: string
@@ -382,9 +382,28 @@ const propertySearchMethod = {
       const vacantProperties = matchingProperties.filter(
         (property) => property.property_status_id === "1" // 1 is the ID for the seeded vacant
       );
+
+      //Collect the listed properties with a "DRAFT" stauts
+      const propertyIds = vacantProperties.map((p) => p._id);
+
+      const listings = await ListingCollection.find({
+        property_id: { $in: propertyIds },
+      }).fetchAsync();
+
+      // Create a set of propertyIds that are in draft
+      const listedPropertyIds = new Set(
+        listings
+          .filter((l) => l.listing_status_id === "2")
+          .map((l) => l.property_id)
+      );
+
+      const listedAndVacant = vacantProperties.filter((p) =>
+        listedPropertyIds.has(p._id)
+      );
+
       // Map the matching properties to ApiProperty DTOs
       const dtoResults = await Promise.all(
-        vacantProperties.map(mapPropertyDocumentToPropertyDTO)
+        listedAndVacant.map(mapPropertyDocumentToPropertyDTO)
       );
 
       return dtoResults;
@@ -471,7 +490,7 @@ Meteor.methods({
   ...propertyGetByTenantIdMethod,
   ...propertyGetAllByLandlordId,
   ...updatePropertyData,
-	...propertyUpdateTenantMethod,
+  ...propertyUpdateTenantMethod,
   ...getLandlordDashboardMethod,
   ...propertyGetAllMethod,
   ...propertySearchMethod,
