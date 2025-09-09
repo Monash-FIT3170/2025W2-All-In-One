@@ -65,7 +65,7 @@ export function PropertyListingPage({ className = "" }: { className?: string }):
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const profileData = useAppSelector((state) => state.currentUser.profileData);
   const authUser = useAppSelector((state) => state.currentUser.authUser);
-
+  const role = useAppSelector((state) => state.currentUser.authUser?.role);
   useEffect(() => {
     if (!propertyId) {
       console.log("Property ID is not provided, loading default property");
@@ -114,7 +114,7 @@ export function PropertyListingPage({ className = "" }: { className?: string }):
           listingStatusPillVariant={state.listingStatusPillVariant}
           shouldDisplayListingStatus={state.shouldDisplayListingStatus}
           shouldDisplaySubmitDraftButton={state.shouldDisplaySubmitDraftButton}
-          shouldDisplayReviewTenantButton={state.shouldDisplayReviewTenantButton}
+          shouldDisplayReviewTenantButton={state.shouldDisplayReviewTenantButton && (role === Role.LANDLORD || role === Role.AGENT)}
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
           authUser={authUser}
           profileData={profileData}
