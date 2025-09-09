@@ -11,6 +11,7 @@ import {
   getFormattedDateStringFromDate,
   getFormattedTimeStringFromDate,
 } from "/app/client/library-modules/utils/date-utils";
+import { bookPropertyInspectionAsync } from "/app/server/methods/property-listing/listing-methods";
 
 const initialState: PropertyListingPageUiState = {
   propertyId: "",
@@ -108,9 +109,11 @@ export const propertyListingSlice = createSlice({
 
       state.inspectionBookingUiStateList = action.payload.propertyListingInspections.map(
         (inspection) => ({
+           _id: inspection._id,
           date: getFormattedDateStringFromDate(inspection.start_time),
           startingTime: getFormattedTimeStringFromDate(inspection.start_time),
           endingTime: getFormattedTimeStringFromDate(inspection.end_time),
+          tenant_ids: inspection.tenant_ids,
         })
       );
 
@@ -156,8 +159,21 @@ export const propertyListingSlice = createSlice({
       alert(`Failed to update listing: ${action.error.message}`);
       state.currentPropertyId = action.meta.arg;
     });
-  },
-})
+
+    builder.addCase(bookPropertyInspectionAsync.fulfilled, (state, action) => {
+      const updatedInspection = action.payload;
+      const index = state.inspectionBookingUiStateList.findIndex(
+        (i) => i._id === updatedInspection._id
+      );
+      if (index !== -1) { 
+        state.inspectionBookingUiStateList[index] = {
+          ...state.inspectionBookingUiStateList[index],
+          tenant_ids: updatedInspection.tenant_ids,
+        };
+      }
+    });
+  }
+});
 
 export const {
   addBookedPropertyListingInspection,

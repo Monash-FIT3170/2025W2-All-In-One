@@ -9,9 +9,11 @@ import { twMerge } from "tailwind-merge";
 import { SubHeading } from "/app/client/ui-modules/theming/components/SubHeading";
 
 export type InspectionBookingListUiState = {
+  _id : string;
   date: string;
   startingTime: string;
   endingTime: string;
+  tenant_ids: string[]; // array of tenant ids who have booked this inspection
 };
 
 export function PropertyInspections({

@@ -128,10 +128,6 @@ export const fetchAgentWithProfile = createAsyncThunk(
       if (!property.agentId) {
         throw new Error('No agent assigned to this property');
       }
-      // console.log('Property agent ID:', property.agentId);
-      // const user = await getUserAccountById(property.agentId);
-      // console.log('Found user account for agent:', user);
-
       // Debug log for agent ID
       console.log('Fetching agent with ID:', property.agentId);
 
@@ -193,9 +189,11 @@ export const tenantPropertySlice = createSlice({
       }
       state.inspectionBookingUiStateList = action.payload.propertyListingInspections.map(
         (inspection) => ({
+          _id: inspection._id,
           date: getFormattedDateStringFromDate(inspection.start_time),
           startingTime: getFormattedTimeStringFromDate(inspection.start_time),
           endingTime: getFormattedTimeStringFromDate(inspection.end_time),
+          tenant_ids: inspection.tenant_ids
         })
       );
       state.listingImageUrls = action.payload.image_urls;

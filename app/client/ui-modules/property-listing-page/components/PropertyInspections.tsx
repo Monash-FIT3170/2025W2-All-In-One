@@ -10,10 +10,12 @@ import { SubHeading } from "/app/client/ui-modules/theming/components/SubHeading
 import { Role } from "/app/shared/user-role-identifier";
 
 export type InspectionBookingListUiState = {
+  _id: string;
   date: string;
   startingTime: string;
   endingTime: string;
-   isBooked?: boolean;
+  tenant_ids: string[]; // array of tenant ids who have booked this inspection
+  isBooked?: boolean;
 };
 
 export function PropertyInspections({

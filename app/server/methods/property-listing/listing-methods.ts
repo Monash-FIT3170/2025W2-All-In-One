@@ -1,3 +1,4 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   PropertyListingInspectionCollection,
   ListingCollection,
@@ -329,7 +330,22 @@ export async function addTenantToInspection(
   if (!updatedInspection) throw new Error("Inspection not found after update");
 
   return updatedInspection;
-}
+};
+
+export const bookPropertyInspectionAsync = createAsyncThunk(
+  "propertyListing/bookPropertyInspection",
+  async ({
+    inspectionId,
+    tenantId,
+  }: {
+    inspectionId: string;
+    tenantId: string;
+  }): Promise<PropertyListingInspectionDocument> => {
+    const updatedInspection = await addTenantToInspection(inspectionId, tenantId);
+    return updatedInspection;
+  }
+);
+
 Meteor.methods({
   ...getListingForProperty,
   ...insertDraftListingDocumentForProperty,
