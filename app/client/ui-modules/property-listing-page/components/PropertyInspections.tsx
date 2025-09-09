@@ -13,7 +13,7 @@ export type InspectionBookingListUiState = {
   date: string;
   startingTime: string;
   endingTime: string;
-  isBooked?: boolean;
+   isBooked?: boolean;
 };
 
 export function PropertyInspections({

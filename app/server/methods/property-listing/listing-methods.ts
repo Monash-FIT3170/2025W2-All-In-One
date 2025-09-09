@@ -43,9 +43,8 @@ const submitDraftListing = {
   ): Promise<{ success: boolean; propertyId: string }> => {
     try {
       // Find the listing for this property
-      const listing = await getListingDocumentAssociatedWithProperty(
-        propertyId
-      );
+      const listing =
+        await getListingDocumentAssociatedWithProperty(propertyId);
 
       if (!listing) {
         throw meteorWrappedInvalidDataError(
@@ -98,7 +97,8 @@ const getAllListedListings = {
     limit: number = 3
   ): Promise<ApiListing[]> => {
     const listedStatus = ListingStatus.LISTED;
-    const listedStatusDocument = await getListingStatusDocumentByName(listedStatus);
+    const listedStatusDocument =
+      await getListingStatusDocumentByName(listedStatus);
 
     if (!listedStatusDocument) {
       throw meteorWrappedInvalidDataError(
@@ -148,9 +148,10 @@ async function mapListingDocumentToListingDTO(
   let propertyListingInspections: PropertyListingInspectionDocument[] = [];
 
   if (listing.inspection_ids.length > 0) {
-    propertyListingInspections = await getPropertyListingInspectionDocumentsMatchingIds(
-      listing.inspection_ids
-    );
+    propertyListingInspections =
+      await getPropertyListingInspectionDocumentsMatchingIds(
+        listing.inspection_ids
+      );
   }
 
   const listingStatusDocument = await getListingStatusDocumentById(
@@ -167,10 +168,12 @@ async function mapListingDocumentToListingDTO(
     property_id: listing.property_id,
     image_urls: listing.image_urls,
     listing_status: listingStatusDocument.name,
-    propertyListingInspections: propertyListingInspections.map((inspection) => ({
-      start_time: inspection.starttime,
-      end_time: inspection.endtime,
-    })),
+    propertyListingInspections: propertyListingInspections.map(
+      (inspection) => ({
+        start_time: inspection.starttime,
+        end_time: inspection.endtime,
+      })
+    ),
   };
 }
 
@@ -264,7 +267,8 @@ const updatePropertyListingImages = {
   ): Promise<{ success: boolean; propertyId: string }> => {
     try {
       // Find the listing for this property
-      const listing = await getListingDocumentAssociatedWithProperty(propertyId);
+      const listing =
+        await getListingDocumentAssociatedWithProperty(propertyId);
 
       if (!listing) {
         throw meteorWrappedInvalidDataError(
@@ -300,6 +304,32 @@ const updatePropertyListingImages = {
   },
 };
 
+export async function addTenantToInspection(
+  inspectionId: string,
+  tenantId: string
+): Promise<PropertyListingInspectionDocument> {
+  // Fetch the inspection document
+  const inspection = await PropertyListingInspectionCollection.findOne({
+    _id: inspectionId,
+  });
+
+  if (!inspection) throw new Error("Inspection not found");
+
+  // Add tenantId if it’s not already there
+  if (!inspection.tenant_ids.includes(tenantId)) {
+    inspection.tenant_ids.push(tenantId);
+    await PropertyListingInspectionCollection.updateAsync(
+      { _id: inspectionId },
+      { $set: { tenant_ids: inspection.tenant_ids } }
+    );
+  }
+  const updatedInspection = await PropertyListingInspectionCollection.findOne({
+    _id: inspectionId,
+  });
+  if (!updatedInspection) throw new Error("Inspection not found after update");
+
+  return updatedInspection;
+}
 Meteor.methods({
   ...getListingForProperty,
   ...insertDraftListingDocumentForProperty,
