@@ -11,8 +11,8 @@ import {
   getFormattedDateStringFromDate,
   getFormattedTimeStringFromDate,
 } from "/app/client/library-modules/utils/date-utils";
-import { bookPropertyInspectionAsync } from "/app/server/methods/property-listing/listing-methods";
 
+import { PropertyListingInspectionDocument } from "/app/server/database/property-listing/models/PropertyListingInspectionDocument";
 const initialState: PropertyListingPageUiState = {
   propertyId: "",
   propertyLandlordId: "",
@@ -241,6 +241,22 @@ export const load = createAsyncThunk(
   }
 );
 
-
+export const bookPropertyInspectionAsync = createAsyncThunk(
+  "propertyListing/bookPropertyInspection",
+  async ({
+    inspectionId,
+    tenantId,
+  }: {
+    inspectionId: string;
+    tenantId: string;
+  }): Promise<PropertyListingInspectionDocument> => {
+    const updatedInspection: PropertyListingInspectionDocument = await Meteor.callAsync(
+      "inspection.addTenant",
+      inspectionId,
+      tenantId
+    );
+    return updatedInspection;
+  }
+);
 export const selectPropertyListingUiState = (state: RootState) =>
   state.propertyListing;

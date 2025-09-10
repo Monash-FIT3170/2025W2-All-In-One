@@ -68,7 +68,7 @@ export async function apiUpdatePropertyListingImages(
 }
 
 export async function apiInsertPropertyListingInspections(
-  propertyListingInspections: { start_time: Date; end_time: Date }[]
+  propertyListingInspections: { start_time: Date; end_time: Date; tenant_ids: string[] }[]
 ): Promise<string[]> {
   const ids = await Meteor.callAsync(
     MeteorMethodIdentifier.INSERT_PROPERTY_LISTING_INSPECTION,

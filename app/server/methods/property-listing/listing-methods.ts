@@ -173,6 +173,7 @@ async function mapListingDocumentToListingDTO(
       (inspection) => ({
         start_time: inspection.starttime,
         end_time: inspection.endtime,
+        tenant_ids: inspection.tenant_ids,
       })
     ),
   };
@@ -261,6 +262,30 @@ const insertPropertyListingInspection = {
   },
 };
 
+const addTenantToInspectionMethod = {
+  [MeteorMethodIdentifier.ADD_TENANT_TO_INSPECTION]: async (
+    inspectionId: string,
+    tenantId: string
+  ): Promise<PropertyListingInspectionDocument> => {
+    const inspection = await PropertyListingInspectionCollection.findOne({ _id: inspectionId });
+    if (!inspection) throw new Meteor.Error("not-found", "Inspection not found");
+
+    if (!inspection.tenant_ids.includes(tenantId)) {
+      await PropertyListingInspectionCollection.updateAsync(
+        { _id: inspectionId },
+        { $push: { tenant_ids: tenantId } }
+      );
+    }
+
+    // return the updated doc so client thunk has fresh state
+    const updated = await PropertyListingInspectionCollection.findOne({ _id: inspectionId });
+    if (!updated) throw new Meteor.Error("update-failed", "Failed to fetch updated inspection");
+
+    return updated;
+  },
+};
+
+
 const updatePropertyListingImages = {
   [MeteorMethodIdentifier.LISTING_UPDATE_IMAGES]: async (
     propertyId: string,
@@ -305,46 +330,9 @@ const updatePropertyListingImages = {
   },
 };
 
-export async function addTenantToInspection(
-  inspectionId: string,
-  tenantId: string
-): Promise<PropertyListingInspectionDocument> {
-  // Fetch the inspection document
-  const inspection = await PropertyListingInspectionCollection.findOne({
-    _id: inspectionId,
-  });
 
-  if (!inspection) throw new Error("Inspection not found");
 
-  // Add tenantId if it’s not already there
-  if (!inspection.tenant_ids.includes(tenantId)) {
-    inspection.tenant_ids.push(tenantId);
-    await PropertyListingInspectionCollection.updateAsync(
-      { _id: inspectionId },
-      { $set: { tenant_ids: inspection.tenant_ids } }
-    );
-  }
-  const updatedInspection = await PropertyListingInspectionCollection.findOne({
-    _id: inspectionId,
-  });
-  if (!updatedInspection) throw new Error("Inspection not found after update");
 
-  return updatedInspection;
-};
-
-export const bookPropertyInspectionAsync = createAsyncThunk(
-  "propertyListing/bookPropertyInspection",
-  async ({
-    inspectionId,
-    tenantId,
-  }: {
-    inspectionId: string;
-    tenantId: string;
-  }): Promise<PropertyListingInspectionDocument> => {
-    const updatedInspection = await addTenantToInspection(inspectionId, tenantId);
-    return updatedInspection;
-  }
-);
 
 Meteor.methods({
   ...getListingForProperty,
@@ -354,4 +342,5 @@ Meteor.methods({
   ...getAllListedListings,
   ...updatePropertyListingImages,
   ...insertPropertyListingInspection,
+  ...addTenantToInspectionMethod,
 });

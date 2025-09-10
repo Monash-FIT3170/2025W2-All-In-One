@@ -32,7 +32,7 @@ export async function insertPropertyListing(
 }
 
 export async function insertPropertyListingInspections(
-  propertyListingInspections: { start_time: Date; end_time: Date }[]
+  propertyListingInspections: { start_time: Date; end_time: Date; tenant_ids: string[]; }[]
 ): Promise<string[]> {
   return apiInsertPropertyListingInspections(propertyListingInspections);
 }

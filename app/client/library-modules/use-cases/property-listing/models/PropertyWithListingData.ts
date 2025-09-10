@@ -23,9 +23,9 @@ export type PropertyWithListingData = {
   locationLongitude: number;
   listing_status: string;
   propertyListingInspections: {
-    tenant_ids: any;
-    _id: any;
+    _id: string;
     start_time: Date;
     end_time: Date;
+    tenant_ids: string[];
   }[];
 }
