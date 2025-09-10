@@ -43,9 +43,11 @@ interface TenantPropertyState {
     markerLongitude: number;
   };
   inspectionBookingUiStateList: {
+    _id: string;
     date: string;
     startingTime: string;
     endingTime: string;
+    tenant_ids: string[];
   }[];
   listingImageUrls: string[];
   listingStatusText: string;

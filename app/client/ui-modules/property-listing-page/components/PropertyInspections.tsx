@@ -8,27 +8,27 @@ import { CalendarIcon } from "/app/client/ui-modules/theming/icons/CalendarIcon"
 import { twMerge } from "tailwind-merge";
 import { SubHeading } from "/app/client/ui-modules/theming/components/SubHeading";
 import { Role } from "/app/shared/user-role-identifier";
+import { bookPropertyInspectionAsync } from "../state/reducers/property-listing-slice";
 
 export type InspectionBookingListUiState = {
   _id: string;
   date: string;
   startingTime: string;
   endingTime: string;
-  tenant_ids: string[]; // array of tenant ids who have booked this inspection
-  isBooked?: boolean;
+  tenant_ids: string[];
 };
 
 export function PropertyInspections({
   bookingUiStateList,
   onBook,
   userRole,
-  bookedPropertyListingInspections,
+  tenantId,
   className = "",
 }: {
   bookingUiStateList: InspectionBookingListUiState[];
-  onBook: (index: number) => void;
+  onBook: (inspectionId: string) => void; // <-- FIXED
   userRole?: Role;
-  bookedPropertyListingInspections?: number[];
+  tenantId?: string;
   className?: string;
 }): React.JSX.Element {
   return (
@@ -38,9 +38,48 @@ export function PropertyInspections({
         bookingUiStateList={bookingUiStateList}
         onBook={onBook}
         userRole={userRole}
-        bookedPropertyListingInspections={bookedPropertyListingInspections}
+        tenantId={tenantId}
       />
     </div>
+  );
+}
+
+export function PropertyInspectionsContainer({
+  initialBookingUiStateList,
+  userRole,
+  tenantId,
+}: {
+  initialBookingUiStateList: InspectionBookingListUiState[];
+  userRole?: Role;
+  tenantId?: string;
+}) {
+  const [bookingList, setBookingList] = React.useState(
+    initialBookingUiStateList
+  );
+
+  const handleBook = (inspectionId: string) => {
+    if (!tenantId) return;
+
+    // Optimistically update the local state
+    setBookingList((prev) =>
+      prev.map((insp) =>
+        insp._id === inspectionId
+          ? { ...insp, tenant_ids: [...insp.tenant_ids, tenantId] } // add tenantId
+          : insp
+      )
+    );
+
+    // Then call the async function (optional, for server sync)
+    bookPropertyInspectionAsync({ inspectionId, tenantId });
+  };
+
+  return (
+    <PropertyInspections
+      bookingUiStateList={bookingList}
+      onBook={handleBook}
+      userRole={userRole}
+      tenantId={tenantId}
+    />
   );
 }
 
@@ -48,33 +87,32 @@ function InspectionBookingList({
   bookingUiStateList,
   onBook,
   userRole,
-  bookedPropertyListingInspections,
+  tenantId,
   className,
 }: {
   bookingUiStateList: InspectionBookingListUiState[];
-  onBook: (index: number) => void;
+  onBook: (inspectionId: string) => void;
   userRole?: Role;
-  bookedPropertyListingInspections?: number[];
+  tenantId?: string;
   className?: string;
 }): React.JSX.Element {
   return (
     <div
       className={twMerge(
-        "flex flex-col border-[1.5px] border-(--divider-color) rounded-lg py-3 px-4",
+        "flex flex-col border-[1.5px] rounded-lg py-3 px-4",
         className
       )}
+      style={{ borderColor: "var(--divider-color)" }}
     >
       {bookingUiStateList.map((state, i) => {
-        const isBooked = bookedPropertyListingInspections?.includes(i) || false;
         return (
           <BookingEntry
-            key={`${state.date}${state.startingTime}`}
-            bookingState={{ ...state, isBooked }}
-            shouldDisplayDivider={i != 0}
-            index={i}
-            onBook={onBook}
+            key={state._id}
+            bookingState={state}
+            shouldDisplayDivider={i !== 0}
+            onBook={() => onBook(state._id)}
             userRole={userRole}
-            bookedPropertyListingInspections={bookedPropertyListingInspections}
+            tenantId={tenantId}
           />
         );
       })}
@@ -82,31 +120,29 @@ function InspectionBookingList({
   );
 }
 
+
 function BookingEntry({
   bookingState,
   shouldDisplayDivider,
-  index,
   onBook,
   userRole,
-  bookedPropertyListingInspections,
+  tenantId,
   className = "",
 }: {
   bookingState: InspectionBookingListUiState;
   shouldDisplayDivider: boolean;
-  index: number;
-  onBook: (index: number) => void;
+  onBook: (inspectionId: string) => void;
   userRole?: Role;
-  bookedPropertyListingInspections?: number[];
+  tenantId?: string;
   className?: string;
 }): React.JSX.Element {
-  // Only tenants can book inspections
-  const canBookPropertyListingInspection = userRole === Role.TENANT;
-  const isBooked = bookingState.isBooked || false;
-  const hasAnyBooking = bookedPropertyListingInspections && bookedPropertyListingInspections.length > 0;
-
+  const canBook = userRole === Role.TENANT;
+  const isBooked = tenantId ? bookingState.tenant_ids.includes(tenantId) : false;
+  console.log("isBooked:", isBooked, "for tenantId:", tenantId);
   return (
     <div className={twMerge("flex flex-col", className)}>
-      {shouldDisplayDivider ? <Divider /> : ""}
+      {shouldDisplayDivider ? <Divider /> : null}
+      {shouldDisplayDivider ? <Divider /> : null}
 
       <div className="flex flex-row items-center">
         <BookingDateTime
@@ -117,21 +153,24 @@ function BookingEntry({
         />
         <CalendarIcon className="w-[22px] h-[20px] mr-6" />
         {isBooked ? (
-          // Show booked state regardless of user role
-          <BookingButton index={index} onClick={onBook} isBooked={true} />
-        ) : canBookPropertyListingInspection ? (
-          hasAnyBooking ? (
-            // Hide button for unbooked property listing inspections when any property listing inspection is booked
-            null
-          ) : (
-            <BookingButton index={index} onClick={onBook} isBooked={false} />
-          )
+          <BookingButton
+            inspectionId={bookingState._id}
+            onClick={() => onBook(bookingState._id)}
+            isBooked={true}
+          />
+        ) : canBook ? (
+          <BookingButton
+            inspectionId={bookingState._id}
+            onClick={() => onBook(bookingState._id)}
+            isBooked={false}
+          />
         ) : (
           <div className="text-sm text-gray-500 italic">
-            {userRole === Role.AGENT ? "Agents cannot book inspections" :
-             userRole === Role.LANDLORD ? "Landlords cannot book inspections" :
-             "Login as tenant to book"}
-             {/* Will remove this later */}
+            {userRole === Role.AGENT
+              ? "Agents cannot book inspections"
+              : userRole === Role.LANDLORD
+                ? "Landlords cannot book inspections"
+                : "Login as tenant to book"}
           </div>
         )}
       </div>
@@ -159,37 +198,31 @@ function BookingDateTime({
 }
 
 function BookingButton({
-  index,
+  inspectionId,
   onClick,
-  isBooked,
+  isBooked = false,
   className = "",
 }: {
-  index: number;
-  onClick: (index: number) => void;
-  isBooked: boolean;
+  inspectionId: string;
+  onClick: () => void;
+  isBooked?: boolean;
   className?: string;
 }): React.JSX.Element {
-  if (isBooked) {
-    return (
-      <ThemedButton
-        variant={ThemedButtonVariant.TERTIARY}
-        onClick={() => {}} // No-op function for booked state
-        className={twMerge("w-[117px] h-[36px] opacity-50 cursor-not-allowed", className)}
-      >
-        Booked
-      </ThemedButton>
-    );
-  }
-
   return (
     <ThemedButton
       variant={ThemedButtonVariant.TERTIARY}
       onClick={() => {
-        onClick(index);
+        if (!isBooked) {
+          onClick();
+        }
       }}
-      className={twMerge("w-[117px] h-[36px]", className)}
+      className={twMerge(
+        "w-[117px] h-[36px]",
+        isBooked ? "bg-gray-400 text-white cursor-not-allowed" : "",
+        className
+      )}
     >
-      Book
+      {isBooked ? "Booked" : "Book"}
     </ThemedButton>
   );
 }

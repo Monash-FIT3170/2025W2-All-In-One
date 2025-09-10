@@ -9,7 +9,7 @@ import { twMerge } from "tailwind-merge";
 import { SubHeading } from "/app/client/ui-modules/theming/components/SubHeading";
 
 export type InspectionBookingListUiState = {
-  _id : string;
+  _id: string;
   date: string;
   startingTime: string;
   endingTime: string;
@@ -22,7 +22,7 @@ export function PropertyInspections({
   className = "",
 }: {
   bookingUiStateList: InspectionBookingListUiState[];
-  onBook: (index: number) => void;
+  onBook: (inspectionId: string) => void;
   className?: string;
 }): React.JSX.Element {
   return (
@@ -42,7 +42,7 @@ function InspectionBookingList({
   className,
 }: {
   bookingUiStateList: InspectionBookingListUiState[];
-  onBook: (index: number) => void;
+  onBook: (inspectionId: string) => void; // <-- FIXED
   className?: string;
 }): React.JSX.Element {
   return (
@@ -54,7 +54,7 @@ function InspectionBookingList({
     >
       {bookingUiStateList.map((state, i) => (
         <BookingEntry
-          key={`${state.date}${state.startingTime}`}
+          key={state._id}
           bookingState={state}
           shouldDisplayDivider={i != 0}
           index={i}
@@ -75,7 +75,7 @@ function BookingEntry({
   bookingState: InspectionBookingListUiState;
   shouldDisplayDivider: boolean;
   index: number;
-  onBook: (index: number) => void;
+  onBook: (inspectionId: string) => void; // <-- FIXED
   className?: string;
 }): React.JSX.Element {
   return (
@@ -90,7 +90,10 @@ function BookingEntry({
           className="mr-auto"
         />
         <CalendarIcon className="w-[22px] h-[20px] mr-6" />
-        <BookingButton index={index} onClick={onBook} />
+        <BookingButton
+          inspectionId={bookingState._id} // <-- pass string id
+          onClick={() => onBook(bookingState._id)}
+        />
       </div>
     </div>
   );
@@ -116,20 +119,18 @@ function BookingDateTime({
 }
 
 function BookingButton({
-  index,
+  inspectionId,
   onClick,
   className = "",
 }: {
-  index: number;
-  onClick: (index: number) => void;
+  inspectionId: string;
+  onClick: (inspectionId: string) => void; // correct type
   className?: string;
 }): React.JSX.Element {
   return (
     <ThemedButton
       variant={ThemedButtonVariant.TERTIARY}
-      onClick={() => {
-        onClick(index);
-      }}
+      onClick={() => onClick(inspectionId)} // call with id
       className={twMerge("w-[117px] h-[36px]", className)}
     >
       Book
