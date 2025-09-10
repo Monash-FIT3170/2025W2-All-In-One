@@ -34,6 +34,7 @@ export const landlordDashboardLinks = [
   { to: "/landlord-properties", label: "Properties" },
   { to: "/landlord-calendar", label: "Calendar" },
   { to: "/landlord-tasks", label: "Tasks" },
+  { to: "/landlord-documents", label: "Documents" },
   { to: "/landlord-messages", label: "Messages" },
 ];
 

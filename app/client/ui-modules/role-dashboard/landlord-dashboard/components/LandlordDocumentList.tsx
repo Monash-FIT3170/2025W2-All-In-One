@@ -72,7 +72,7 @@ export function LandlordDocumentList({ onRefresh }: DocumentListProps) {
             No documents found
           </h3>
           <p className="text-gray-500">
-            Upload your first lease agreement document to get started.
+            list a property with an agent to get started.
           </p>
         </div>
       </div>
