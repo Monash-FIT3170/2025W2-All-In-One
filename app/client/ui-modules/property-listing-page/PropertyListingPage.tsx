@@ -145,6 +145,7 @@ export function PropertyListingPage({
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
           authUser={authUser}
           profileData={profileData}
+          tenantId={currentUser?.userAccountId}
           onBack={() => {
             const from = searchParams.get("from") as EntryPoint | null;
             if (from && from in BACK_ROUTES) {
@@ -153,20 +154,21 @@ export function PropertyListingPage({
               navigate(NavigationPath.Home);
             }
           }}
-          onBook={(index: number) => {
-            console.log(`booking button ${index} pressed`);
-            dispatch(addBookedPropertyListingInspection(index));
-            if (state.inspectionBookingUiStateList[index]) {
-              const inspectionId =
-                state.inspectionBookingUiStateList[index]._id; // make sure each item has `id`
-              if (inspectionId && currentUser?.userAccountId) {
-                dispatch(
-                  bookPropertyInspectionAsync({
-                    inspectionId,
-                    tenantId: currentUser.userAccountId,
-                  })
-                );
-              }
+          onBook={(inspectionId: string) => {
+            console.log(`booking inspection with id ${inspectionId}`);
+            dispatch(addBookedPropertyListingInspection(inspectionId));
+
+            const inspection = state.inspectionBookingUiStateList.find(
+              (i) => i._id === inspectionId
+            );
+
+            if (inspection && currentUser?.userAccountId) {
+              dispatch(
+                bookPropertyInspectionAsync({
+                  inspectionId,
+                  tenantId: currentUser.userAccountId,
+                })
+              );
             }
           }}
           onApply={async () => {
@@ -238,6 +240,7 @@ function ListingPageContent({
   onSubmitDraftListing,
   bookedPropertyListingInspections,
   className = "",
+  tenantId,
 }: {
   propertyId: string;
   streetNumber: string;
@@ -268,12 +271,13 @@ function ListingPageContent({
   authUser: CurrentUserState["authUser"];
   profileData: CurrentUserState["profileData"];
   onBack: () => void;
-  onBook: (index: number) => void;
+  onBook: (inspectionId: string) => void;
   onApply: () => void;
   onContactAgent: () => void;
   onSubmitDraftListing: () => void;
   bookedPropertyListingInspections?: number[];
   className?: string;
+  tenantId?: string;
 }): React.JSX.Element {
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
   const dispatch = useAppDispatch();
@@ -417,11 +421,28 @@ function ListingPageContent({
         propertyDescription={propertyDescription}
         mapUiState={mapUiState}
         inspectionBookingUiStateList={inspectionBookingUiStateList}
-        onBook={onBook}
+        onBook={(inspectionId: string) => {
+          console.log(`Booking inspection with id ${inspectionId}`);
+          dispatch(addBookedPropertyListingInspection(inspectionId));
+
+          const inspection = inspectionBookingUiStateList.find(
+            (i) => i._id === inspectionId
+          );
+
+          if (inspection && tenantId) {
+            dispatch(
+              bookPropertyInspectionAsync({
+                inspectionId,
+                tenantId: tenantId,
+              })
+            );
+          }
+        }}
         propertyFeatures={propertyFeatures}
         userRole={authUser?.role}
         bookedPropertyListingInspections={bookedPropertyListingInspections}
         className="mb-6"
+        tenantId={tenantId}
       />
       <BottomBar
         shouldDisplaySubmitDraftButton={shouldDisplaySubmitDraftButton}
@@ -607,15 +628,17 @@ function ListingDetails({
   userRole,
   bookedPropertyListingInspections,
   className = "",
+  tenantId,
 }: {
   propertyDescription: string;
   mapUiState: PropertyMapUiState;
   inspectionBookingUiStateList: InspectionBookingListUiState[];
-  onBook: (index: number) => void;
+  onBook: (inspectionId: string) => void;
   propertyFeatures: string[];
   userRole: Role | undefined;
   bookedPropertyListingInspections?: number[];
   className?: string;
+  tenantId?: string;
 }): React.JSX.Element {
   return (
     <div className={twMerge("flex gap-7", className)}>
@@ -628,8 +651,8 @@ function ListingDetails({
           bookingUiStateList={inspectionBookingUiStateList}
           onBook={onBook}
           userRole={userRole}
-          bookedPropertyListingInspections={bookedPropertyListingInspections}
           className="w-full"
+          tenantId={tenantId}
         />
       </div>
 
@@ -657,6 +680,7 @@ function BottomBar({
   onReviewTenant: () => void;
   className?: string;
 }): React.JSX.Element {
+  ListingPageContent;
   return (
     <div
       className={twMerge("flex justify-between items-center gap-2", className)}
