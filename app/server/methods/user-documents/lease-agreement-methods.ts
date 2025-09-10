@@ -9,133 +9,218 @@ import { ApiLeaseAgreement } from "/app/shared/api-models/user-documents/ApiLeas
 
 // Insert (returns DTO, not just id)
 const leaseAgreementInsertMethod = {
-	[MeteorMethodIdentifier.LEASE_AGREEMENT_INSERT]: async (
-		data: Omit<LeaseAgreementDocument, "_id" | "uploadedDate">
-	): Promise<ApiLeaseAgreement> => {
-		// Align checks with message
-		if (!data.propertyId || !data.agentId) {
-			throw meteorWrappedInvalidDataError(
-				new InvalidDataError("propertyId and agentId are required")
-			);
-		}
-		if (!data.documentUrl || data.documentUrl.trim() === "") {
-			throw meteorWrappedInvalidDataError(
-				new InvalidDataError("documentUrl is required")
-			);
-		}
+  [MeteorMethodIdentifier.LEASE_AGREEMENT_INSERT]: async (
+    data: Omit<LeaseAgreementDocument, "_id" | "uploadedDate">
+  ): Promise<ApiLeaseAgreement> => {
+    // Align checks with message
+    if (!data.propertyId || !data.agentId) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("propertyId and agentId are required")
+      );
+    }
+    if (!data.documentUrl || data.documentUrl.trim() === "") {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("documentUrl is required")
+      );
+    }
 
-		const toInsert: Omit<LeaseAgreementDocument, "_id"> = {
-			...data,
-			uploadedDate: new Date(),
-		};
+    const toInsert: Omit<LeaseAgreementDocument, "_id"> = {
+      ...data,
+      uploadedDate: new Date(),
+    };
 
-		try {
-			const _id = await LeaseAgreementCollection.insertAsync(toInsert);
-			const inserted = await LeaseAgreementCollection.findOneAsync({ _id });
-			if (!inserted) throw new Error("Insert succeeded but document not found");
-			return mapLeaseAgreementDocumentToDTO(inserted);
-		} catch (error) {
-			throw meteorWrappedInvalidDataError(
-				new InvalidDataError(
-					`Failed to insert lease agreement: ${String(error)}`
-				)
-			);
-		}
-	},
+    try {
+      const _id = await LeaseAgreementCollection.insertAsync(toInsert);
+      const inserted = await LeaseAgreementCollection.findOneAsync({ _id });
+      if (!inserted) throw new Error("Insert succeeded but document not found");
+      return mapLeaseAgreementDocumentToDTO(inserted);
+    } catch (error) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(
+          `Failed to insert lease agreement: ${String(error)}`
+        )
+      );
+    }
+  },
 };
 
 const getLeaseAgreementDocumentById = async (id: string) =>
-	LeaseAgreementCollection.findOneAsync({ _id: id });
+  LeaseAgreementCollection.findOneAsync({ _id: id });
 
 const getLeaseAgreementDocumentsByProperty = async (propertyId: string) =>
-	LeaseAgreementCollection.find(
-		{ propertyId },
-		{ sort: { uploadedDate: -1 } }
-	).fetchAsync();
+  LeaseAgreementCollection.find(
+    { propertyId },
+    { sort: { uploadedDate: -1 } }
+  ).fetchAsync();
 
 const getLeaseAgreementDocumentsByAgent = async (agentId: string) =>
-	LeaseAgreementCollection.find(
-		{ agentId },
-		{ sort: { uploadedDate: -1 } }
-	).fetchAsync();
+  LeaseAgreementCollection.find(
+    { agentId },
+    { sort: { uploadedDate: -1 } }
+  ).fetchAsync();
 
 // Getter
 const leaseAgreementGetMethod = {
-	[MeteorMethodIdentifier.LEASE_AGREEMENT_GET]: async (
-		id: string
-	): Promise<ApiLeaseAgreement> => {
-		check(id, String);
-		const doc = await getLeaseAgreementDocumentById(id);
-		if (!doc) {
-			throw meteorWrappedInvalidDataError(
-				new InvalidDataError(`Lease agreement with id ${id} not found`)
-			);
-		}
-		return mapLeaseAgreementDocumentToDTO(doc);
-	},
+  [MeteorMethodIdentifier.LEASE_AGREEMENT_GET]: async (
+    id: string
+  ): Promise<ApiLeaseAgreement> => {
+    check(id, String);
+    const doc = await getLeaseAgreementDocumentById(id);
+    if (!doc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Lease agreement with id ${id} not found`)
+      );
+    }
+    return mapLeaseAgreementDocumentToDTO(doc);
+  },
 };
 
 // Will get the lease agreement(s) for a property
 const leaseAgreementsForPropertyMethod = {
-	[MeteorMethodIdentifier.LEASE_AGREEMENT_LIST_FOR_PROPERTY]: async (
-		propertyId: string
-	): Promise<ApiLeaseAgreement[]> => {
-		check(propertyId, String);
-		const docs = await getLeaseAgreementDocumentsByProperty(propertyId);
-		return docs.map(mapLeaseAgreementDocumentToDTO);
-	},
+  [MeteorMethodIdentifier.LEASE_AGREEMENT_LIST_FOR_PROPERTY]: async (
+    propertyId: string
+  ): Promise<ApiLeaseAgreement[]> => {
+    check(propertyId, String);
+    const docs = await getLeaseAgreementDocumentsByProperty(propertyId);
+    return docs.map(mapLeaseAgreementDocumentToDTO);
+  },
 };
 
 // Will get the lease agreement(s) for an agent
 const leaseAgreementsForAgentMethod = {
-	[MeteorMethodIdentifier.LEASE_AGREEMENT_LIST_FOR_AGENT]: async (
-		agentId: string
-	): Promise<ApiLeaseAgreement[]> => {
-		check(agentId, String);
-		// TODO: authz – ensure this.userId === agentId or caller has permission
-		const docs = await getLeaseAgreementDocumentsByAgent(agentId);
-		return docs.map(mapLeaseAgreementDocumentToDTO);
-	},
+  [MeteorMethodIdentifier.LEASE_AGREEMENT_LIST_FOR_AGENT]: async (
+    agentId: string
+  ): Promise<ApiLeaseAgreement[]> => {
+    check(agentId, String);
+    // TODO: authz – ensure this.userId === agentId or caller has permission
+    const docs = await getLeaseAgreementDocumentsByAgent(agentId);
+    return docs.map(mapLeaseAgreementDocumentToDTO);
+  },
 };
 
 // Delete
 const leaseAgreementDeleteMethod = {
-	[MeteorMethodIdentifier.LEASE_AGREEMENT_DELETE]: async (
-		id: string
-	): Promise<number> => {
-		check(id, String);
-		try {
-			const removedCount = await LeaseAgreementCollection.removeAsync({
-				_id: id,
-			});
-			if (!removedCount) {
-				throw new InvalidDataError(`Lease agreement with id ${id} not found`);
-			}
-			return removedCount;
-		} catch (error) {
-			throw meteorWrappedInvalidDataError(
-				new InvalidDataError(`Failed to delete lease agreement: ${error}`)
-			);
-		}
-	},
+  [MeteorMethodIdentifier.LEASE_AGREEMENT_DELETE]: async (
+    id: string
+  ): Promise<number> => {
+    check(id, String);
+    try {
+      const removedCount = await LeaseAgreementCollection.removeAsync({
+        _id: id,
+      });
+      if (!removedCount) {
+        throw new InvalidDataError(`Lease agreement with id ${id} not found`);
+      }
+      return removedCount;
+    } catch (error) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Failed to delete lease agreement: ${error}`)
+      );
+    }
+  },
 };
+
+//Agent Sign Document
+const leaseAgreementAgentSignMethod = {
+  [MeteorMethodIdentifier.AGENT_SIGN_DOCUMENT]: async (
+    id: string
+  ): Promise<number> => {
+    check(id, String);
+
+    try {
+      const result = await LeaseAgreementCollection.updateAsync(
+        { _id: id },
+        { $set: { agentSigned: true } }
+      );
+
+      if (result === 0) {
+        throw new InvalidDataError(`Lease agreement with id ${id} not found`);
+      }
+
+      return result; // number of documents updated (should be 1)
+    } catch (error) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Failed to sign lease agreement as an agent: ${error}`)
+      );
+    }
+  },
+};
+
+//Tenant Sign Document
+const leaseAgreementTenantSignMethod = {
+  [MeteorMethodIdentifier.TENANT_SIGN_DOCUMENT]: async (
+    id: string
+  ): Promise<number> => {
+    check(id, String);
+
+    try {
+      const result = await LeaseAgreementCollection.updateAsync(
+        { _id: id },
+        { $set: { tenantSigned: true } }
+      );
+
+      if (result === 0) {
+        throw new InvalidDataError(`Lease agreement with id ${id} not found`);
+      }
+
+      return result; // number of documents updated (should be 1)
+    } catch (error) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Failed to sign lease agreement as a tenant: ${error}`)
+      );
+    }
+  },
+};
+
+//Landlord Sign Document
+const leaseAgreementLandlordSignMethod = {
+  [MeteorMethodIdentifier.LANDLORD_SIGN_DOCUMENT]: async (
+    id: string
+  ): Promise<number> => {
+    check(id, String);
+
+    try {
+      const result = await LeaseAgreementCollection.updateAsync(
+        { _id: id },
+        { $set: { landlordSigned: true } }
+      );
+
+      if (result === 0) {
+        throw new InvalidDataError(`Lease agreement with id ${id} not found`);
+      }
+
+      return result; // number of documents updated (should be 1)
+    } catch (error) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Failed to sign lease agreement as a landlord: ${error}`)
+      );
+    }
+  },
+};
+
 export const mapLeaseAgreementDocumentToDTO = (
-	doc: LeaseAgreementDocument
+  doc: LeaseAgreementDocument
 ): ApiLeaseAgreement => ({
-	_id: doc._id,
-	propertyId: doc.propertyId,
-	title: doc.title,
-	agentId: doc.agentId,
-	uploadedDate: doc.uploadedDate,
-	documentUrl: doc.documentUrl,
-	validUntil: doc.validUntil,
-	tenantName: doc.tenantName,
+  _id: doc._id,
+  propertyId: doc.propertyId,
+  title: doc.title,
+  agentId: doc.agentId,
+  uploadedDate: doc.uploadedDate,
+  documentUrl: doc.documentUrl,
+  validUntil: doc.validUntil,
+  tenantName: doc.tenantName,
+  tenantSigned: doc.tenantSigned,
+  landlordSigned: doc.landlordSigned,
+  agentSigned: doc.agentSigned,
 });
 
 Meteor.methods({
-	...leaseAgreementInsertMethod,
-	...leaseAgreementGetMethod,
-	...leaseAgreementDeleteMethod,
-	...leaseAgreementsForPropertyMethod,
-	...leaseAgreementsForAgentMethod,
+  ...leaseAgreementInsertMethod,
+  ...leaseAgreementGetMethod,
+  ...leaseAgreementDeleteMethod,
+  ...leaseAgreementsForPropertyMethod,
+  ...leaseAgreementsForAgentMethod,
+  ...leaseAgreementAgentSignMethod,
+  ...leaseAgreementTenantSignMethod,
+  ...leaseAgreementLandlordSignMethod,
 });
