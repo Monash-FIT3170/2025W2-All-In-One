@@ -96,6 +96,10 @@ function InspectionBookingList({
   tenantId?: string;
   className?: string;
 }): React.JSX.Element {
+  const tenantHasBooking =
+    !!tenantId &&
+    bookingUiStateList.some((insp) => insp.tenant_ids.includes(tenantId));
+
   return (
     <div
       className={twMerge(
@@ -113,6 +117,7 @@ function InspectionBookingList({
             onBook={() => onBook(state._id)}
             userRole={userRole}
             tenantId={tenantId}
+            tenantHasBooking={tenantHasBooking}
           />
         );
       })}
@@ -120,13 +125,13 @@ function InspectionBookingList({
   );
 }
 
-
 function BookingEntry({
   bookingState,
   shouldDisplayDivider,
   onBook,
   userRole,
   tenantId,
+  tenantHasBooking,
   className = "",
 }: {
   bookingState: InspectionBookingListUiState;
@@ -134,10 +139,16 @@ function BookingEntry({
   onBook: (inspectionId: string) => void;
   userRole?: Role;
   tenantId?: string;
+  tenantHasBooking: boolean;
   className?: string;
 }): React.JSX.Element {
   const canBook = userRole === Role.TENANT;
-  const isBooked = tenantId ? bookingState.tenant_ids.includes(tenantId) : false;
+  const isBooked = tenantId
+    ? bookingState.tenant_ids.includes(tenantId)
+    : false;
+  const isThisInspectionBooked =
+    tenantId && bookingState.tenant_ids.includes(tenantId);
+
   console.log("isBooked:", isBooked, "for tenantId:", tenantId);
   return (
     <div className={twMerge("flex flex-col", className)}>
@@ -152,13 +163,13 @@ function BookingEntry({
           className="mr-auto"
         />
         <CalendarIcon className="w-[22px] h-[20px] mr-6" />
-        {isBooked ? (
+        {isThisInspectionBooked ? (
           <BookingButton
             inspectionId={bookingState._id}
             onClick={() => onBook(bookingState._id)}
             isBooked={true}
           />
-        ) : canBook ? (
+        ) : canBook && !tenantHasBooking ? (
           <BookingButton
             inspectionId={bookingState._id}
             onClick={() => onBook(bookingState._id)}
@@ -170,7 +181,9 @@ function BookingEntry({
               ? "Agents cannot book inspections"
               : userRole === Role.LANDLORD
                 ? "Landlords cannot book inspections"
-                : "Login as tenant to book"}
+                : tenantHasBooking
+                  ? "You have already booked an inspection for this property"
+                  : "Login as tenant to book"}
           </div>
         )}
       </div>

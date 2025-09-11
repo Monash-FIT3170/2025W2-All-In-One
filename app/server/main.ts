@@ -582,12 +582,18 @@ async function seedListedProperties(
       });
 
       const randomImageUrls = getRandomImageUrls(); // Get 3 random image URLs
+      function getRandomInspectionIds() {
+        const allIds = ["1", "2", "3", "4"];
+        return allIds
+          .sort(() => Math.random() - 0.5) // shuffle
+          .slice(0, 2); // pick first 2
+      }
 
       await ListingCollection.insertAsync({
         property_id: property._id,
         listing_status_id: listedStatusId, // "Listed"
         image_urls: randomImageUrls,
-        inspection_ids: ["1", "2", "3", "4"],
+        inspection_ids: getRandomInspectionIds(),
       });
 
       console.log(`[Seed] Created listed property: ${property._id}`);
