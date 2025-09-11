@@ -82,6 +82,7 @@ export const submitForm = createAsyncThunk(
       (propertyFormData.inspection_times ?? []).map((t) => ({
         start_time: t.start_time,
         end_time: t.end_time,
+        tenant_ids: [],
       }))
     );
 
