@@ -120,17 +120,17 @@ const leaseAgreementDeleteMethod = {
   },
 };
 
-//Agent Sign Document
-const leaseAgreementAgentSignMethod = {
-  [MeteorMethodIdentifier.AGENT_SIGN_DOCUMENT]: async (
-    id: string
+const leaseAgreementSignMethod = {
+  [MeteorMethodIdentifier.SIGN_DOCUMENT]: async (
+    id: string,
+    role: "agent" | "tenant" | "landlord"
   ): Promise<number> => {
     check(id, String);
 
     try {
       const result = await LeaseAgreementCollection.updateAsync(
         { _id: id },
-        { $set: { agentSigned: true } }
+        { $set: { [`${role}Signed`]: true } }
       );
 
       if (result === 0) {
@@ -140,63 +140,14 @@ const leaseAgreementAgentSignMethod = {
       return result; // number of documents updated (should be 1)
     } catch (error) {
       throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Failed to sign lease agreement as an agent: ${error}`)
+        new InvalidDataError(`Failed to sign lease agreement as a ${role}: ${error}`)
       );
     }
   },
 };
 
-//Tenant Sign Document
-const leaseAgreementTenantSignMethod = {
-  [MeteorMethodIdentifier.TENANT_SIGN_DOCUMENT]: async (
-    id: string
-  ): Promise<number> => {
-    check(id, String);
 
-    try {
-      const result = await LeaseAgreementCollection.updateAsync(
-        { _id: id },
-        { $set: { tenantSigned: true } }
-      );
 
-      if (result === 0) {
-        throw new InvalidDataError(`Lease agreement with id ${id} not found`);
-      }
-
-      return result; // number of documents updated (should be 1)
-    } catch (error) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Failed to sign lease agreement as a tenant: ${error}`)
-      );
-    }
-  },
-};
-
-//Landlord Sign Document
-const leaseAgreementLandlordSignMethod = {
-  [MeteorMethodIdentifier.LANDLORD_SIGN_DOCUMENT]: async (
-    id: string
-  ): Promise<number> => {
-    check(id, String);
-
-    try {
-      const result = await LeaseAgreementCollection.updateAsync(
-        { _id: id },
-        { $set: { landlordSigned: true } }
-      );
-
-      if (result === 0) {
-        throw new InvalidDataError(`Lease agreement with id ${id} not found`);
-      }
-
-      return result; // number of documents updated (should be 1)
-    } catch (error) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Failed to sign lease agreement as a landlord: ${error}`)
-      );
-    }
-  },
-};
 
 export const mapLeaseAgreementDocumentToDTO = (
   doc: LeaseAgreementDocument
@@ -220,7 +171,5 @@ Meteor.methods({
   ...leaseAgreementDeleteMethod,
   ...leaseAgreementsForPropertyMethod,
   ...leaseAgreementsForAgentMethod,
-  ...leaseAgreementAgentSignMethod,
-  ...leaseAgreementTenantSignMethod,
-  ...leaseAgreementLandlordSignMethod,
+  ...leaseAgreementSignMethod,
 });

@@ -73,7 +73,5 @@ export enum MeteorMethodIdentifier {
   LEASE_AGREEMENT_DELETE = "leaseAgreements.deleteOne",
   LEASE_AGREEMENT_LIST_FOR_AGENT = "leaseAgreements.listForAgent",
   LEASE_AGREEMENT_LIST_FOR_PROPERTY = "leaseAgreements.listForProperty",
-  AGENT_SIGN_DOCUMENT = "leaseAgreements.agentSign",
-  TENANT_SIGN_DOCUMENT = "leaseAgreements.tenantSign",
-  LANDLORD_SIGN_DOCUMENT = "leaseAgreements.landlordSign",
+  SIGN_DOCUMENT = "leaseAgreements.signDocument", // Generic signing method that takes role into account
 }

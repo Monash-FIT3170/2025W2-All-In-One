@@ -140,7 +140,7 @@ export function AgentDocumentList({
                   isSigned={document.agentSigned ?? false}
                   onSign={(documentId) => {
                     console.log("Agent Signing document", documentId);
-                    Meteor.callAsync(MeteorMethodIdentifier.AGENT_SIGN_DOCUMENT, documentId);
+                    Meteor.callAsync(MeteorMethodIdentifier.SIGN_DOCUMENT, documentId, "agent");
                   }}
                 />
               </div>

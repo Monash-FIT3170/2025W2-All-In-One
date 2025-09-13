@@ -49,29 +49,13 @@ export async function apiDeleteLeaseAgreement(
   );
 }
 
-export async function apiAgentSignDocument(
-  documentId: string
+export async function apiSignDocument(
+  documentId: string,
+  role: "agent" | "tenant" | "landlord"
 ): Promise<ApiLeaseAgreement> {
   return await Meteor.callAsync(
-    MeteorMethodIdentifier.AGENT_SIGN_DOCUMENT,
-    documentId
-  );
-}
-
-export async function apiTenantSignDocument(
-  documentId: string
-): Promise<ApiLeaseAgreement> {
-  return await Meteor.callAsync(
-    MeteorMethodIdentifier.TENANT_SIGN_DOCUMENT,
-    documentId
-  );
-}
-
-export async function apiLandlordSignDocument(
-  documentId: string
-): Promise<ApiLeaseAgreement> {
-  return await Meteor.callAsync(
-    MeteorMethodIdentifier.LANDLORD_SIGN_DOCUMENT,
-    documentId
+    MeteorMethodIdentifier.SIGN_DOCUMENT,
+    documentId,
+    role
   );
 }

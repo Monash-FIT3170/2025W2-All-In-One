@@ -153,7 +153,7 @@ export function DocumentList({ onRefresh }: DocumentListProps) {
                       isSigned={document.tenantSigned ?? false} // or landlordSigned depending on current user
                       onSign={(id) => {
                         console.log("Signing document as a tenant", id);
-                        Meteor.callAsync(MeteorMethodIdentifier.TENANT_SIGN_DOCUMENT, id);
+                        Meteor.callAsync(MeteorMethodIdentifier.SIGN_DOCUMENT, id, "tenant");
                       }}
                     />
                   </div>
