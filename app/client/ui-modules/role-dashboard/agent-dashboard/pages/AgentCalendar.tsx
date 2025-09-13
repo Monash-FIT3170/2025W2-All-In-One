@@ -13,6 +13,7 @@ import { apiCreateTaskForAgent } from "/app/client/library-modules/apis/task/tas
 import { PropertyOption, TaskData } from "../components/TaskFormSchema";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { UpcomingTasks } from "../../components/UpcomingTask";
+import { CalendarTasksList } from "../../components/CalendarTasksList";
 import { TaskMap, TaskMapUiState } from "../components/TaskMap";
 import {
   getTodayISODate,
@@ -123,53 +124,11 @@ export function AgentCalendar(): React.JSX.Element {
                 <h2 className="text-lg font-semibold">
                   {selectedDate ? selectedDate : getTodayAUDate()}
                 </h2>
-                <ul className="space-y-4 mt-2">
-                  {tasks
-                    .filter(
-                      (task) =>
-                        task.dueDate === (selectedDateISO || getTodayISODate())
-                    )
-                    .map((task, index) => (
-                      <li
-                        key={index}
-                        className="p-4 rounded shadow bg-white border border-gray-200"
-                      >
-                        <p className="font-bold text-lg">{task.name}</p>
-                        <p className="text-sm text-gray-600 mb-2">
-                          {task.dueDate}
-                        </p>
-                        {task.description && (
-                          <p className="text-xs text-gray-500">
-                            {task.description}
-                          </p>
-                        )}
-                        <p className="text-sm text-gray-700 mt-1">
-                          {task.propertyAddress}
-                        </p>
-                        <div className="mt-2">
-                          <span
-                            className={`text-xs px-2 py-1 rounded-full ${
-                              task.status === TaskStatus.COMPLETED
-                                ? "bg-green-100 text-green-800"
-                                : task.status === TaskStatus.INPROGRESS
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-blue-100 text-blue-800"
-                            }`}
-                          >
-                            {task.status}
-                          </span>
-                        </div>
-                      </li>
-                    ))}
-                  {tasks.filter(
-                    (task) =>
-                      task.dueDate === (selectedDateISO || getTodayISODate())
-                  ).length === 0 && (
-                    <p className="text-gray-500 italic">
-                      No tasks for this date
-                    </p>
-                  )}
-                </ul>
+                <CalendarTasksList 
+                  tasks={tasks}
+                  selectedDateISO={selectedDateISO}
+                  showPropertyAddress={true}
+                />
                 <br />
                 <TaskMap mapUiState={mapUiState} className="mb-3" />
                 <Button onClick={handleOpenModal}>Add Task</Button>

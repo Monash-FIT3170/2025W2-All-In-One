@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../../../store";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 import { UpcomingTasks } from "../../components/UpcomingTask";
+import { CalendarTasksList } from "../../components/CalendarTasksList";
 import { fetchTenantDetails, selectLoading, selectTasks } from "../state/reducers/tenant-dashboard-slice";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { getTodayISODate } from "/app/client/library-modules/utils/date-utils";
@@ -51,33 +52,11 @@ export function TenantCalendar(): React.JSX.Element {
                     ? selectedDate
                     : new Date().toLocaleDateString()}
                 </h2>
-                <ul className="space-y-4 mt-2">
-                  {tasks
-                    .filter((task) => task.dueDate === (selectedDateISO || getTodayISODate()))
-                    .map((task, index) => (
-                      <li key={index} className="p-4 rounded shadow bg-white border border-gray-200">
-                        <p className="font-bold text-lg">{task.name}</p>
-                        <p className="text-sm text-gray-600 mb-2">{task.dueDate}</p>
-                        {task.description && (
-                          <p className="text-xs text-gray-500">{task.description}</p>
-                        )}
-                        <div className="mt-2">
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            task.status === TaskStatus.COMPLETED
-                              ? "bg-green-100 text-green-800"
-                              : task.status === TaskStatus.INPROGRESS
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-blue-100 text-blue-800"
-                          }`}>
-                            {task.status}
-                          </span>
-                        </div>
-                      </li>
-                    ))}
-                  {tasks.filter(task => task.dueDate === (selectedDateISO || new Date().toISOString().slice(0,10))).length === 0 && (
-                    <p className="text-gray-500 italic">No tasks for this date</p>
-                  )}
-                </ul>
+                <CalendarTasksList 
+                  tasks={tasks}
+                  selectedDateISO={selectedDateISO}
+                  showPropertyAddress={false}
+                />
                 <br />
                 <Button>Add Task</Button>
               </div>
