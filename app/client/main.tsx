@@ -10,12 +10,10 @@ import { GuestLandingPage } from "./ui-modules/guest-landing-page/GuestLandingPa
 import { AgentDashboard } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentDashboard";
 import { AgentCalendar } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentCalendar";
 import { AgentMessagePage } from "./ui-modules/role-messages/AgentMessagePage";
-import { AgentTask } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentTask";
 import { AgentProperty } from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentProperty";
 import AgentDocumentManagement from "./ui-modules/role-dashboard/agent-dashboard/pages/AgentDocumentManagement";
 import { LandlordDashboard } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordDashboard";
 import { LandlordCalendar } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordCalendar";
-import { LandlordTask } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordTask";
 import { LandlordProperties } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordProperties";
 import { LandlordPropertyDetail } from "./ui-modules/role-dashboard/landlord-dashboard/pages/LandlordPropertyDetail";
 import { LandlordMessagePage } from "./ui-modules/role-messages/LandlordMessagePage";
@@ -29,10 +27,8 @@ import { AuthTabs } from "./ui-modules/user-authentication/AuthTabs";
 import TenantDashboard from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDashboard";
 import { TenantProperty } from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantProperty";
 import { TenantCalendar } from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantCalendar";
-import TenantMaintenance from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantMaintenance";
 import { TenantMessagePage } from "./ui-modules/role-messages/TenantMessagePage";
 import TenantDocument from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantDocument";
-import TenantSearchProperties from "./ui-modules/role-dashboard/tenant-dashboard/pages/TenantSearchProperties";
 import { ProfilePage } from "./ui-modules/profiles/ProfilePage";
 import { loadCurrentUser } from "./ui-modules/user-authentication/state/reducers/current-user-slice";
 import {
@@ -133,14 +129,6 @@ function AppRoot(): React.JSX.Element {
 							</AgentRoute>
 						}
 					/>
-					<Route
-						path={NavigationPath.AgentTasks}
-						element={
-							<AgentRoute>
-								<AgentTask />
-							</AgentRoute>
-						}
-					/>
 					{/* Agent and Landlord routes */}
 					<Route
 						path={NavigationPath.PropertyForm}
@@ -180,14 +168,6 @@ function AppRoot(): React.JSX.Element {
 						element={
 							<AgentRoute>
 								<AgentMessagePage />
-							</AgentRoute>
-						}
-					/>
-					<Route
-						path={NavigationPath.AgentTasks}
-						element={
-							<AgentRoute>
-								<AgentTask />
 							</AgentRoute>
 						}
 					/>
@@ -235,14 +215,6 @@ function AppRoot(): React.JSX.Element {
 						}
 					/>
 					<Route
-						path={NavigationPath.LandlordTasks}
-						element={
-							<LandlordRoute>
-								<LandlordTask />
-							</LandlordRoute>
-						}
-					/>
-					<Route
 						path={NavigationPath.LandlordMessages}
 						element={
 							<LandlordRoute>
@@ -285,14 +257,6 @@ function AppRoot(): React.JSX.Element {
 						}
 					/>
 					<Route
-						path={NavigationPath.TenantMaintenance}
-						element={
-							<TenantRoute>
-								<TenantMaintenance />
-							</TenantRoute>
-						}
-					/>
-					<Route
 						path={NavigationPath.TenantMessages}
 						element={
 							<TenantRoute>
@@ -305,14 +269,6 @@ function AppRoot(): React.JSX.Element {
 						element={
 							<TenantRoute>
 								<TenantDocument />
-							</TenantRoute>
-						}
-					/>
-					<Route
-						path={NavigationPath.TenantSearchProperties}
-						element={
-							<TenantRoute>
-								<TenantSearchProperties />
 							</TenantRoute>
 						}
 					/>
