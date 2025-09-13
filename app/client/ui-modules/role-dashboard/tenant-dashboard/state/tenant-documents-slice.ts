@@ -14,6 +14,9 @@ export interface TenantDocument {
 	documentType?: string;
 	propertyAddress?: string;
 	tenantName?: string;
+	agentSigned?: boolean;
+	tenantSigned?: boolean;
+	landlordSigned?: boolean;
 }
 
 interface TenantDocumentsState {
@@ -22,6 +25,9 @@ interface TenantDocumentsState {
 	error: string | null;
 	uploadProgress: number;
 	isUploading: boolean;
+	agentSigned?: boolean;
+	tenantSigned?: boolean;
+	landlordSigned?: boolean;
 }
 
 const initialState: TenantDocumentsState = {
@@ -30,6 +36,9 @@ const initialState: TenantDocumentsState = {
 	error: null,
 	uploadProgress: 0,
 	isUploading: false,
+	agentSigned: false,
+	tenantSigned: false,
+	landlordSigned: false,
 };
 
 // For tenants: fetch documents for their assigned property

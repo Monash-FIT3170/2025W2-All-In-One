@@ -14,5 +14,8 @@ export function mapApiLeaseAgreementToLeaseAgreement(
 		validUntil: new Date(leaseAgreement.validUntil),
 		documentUrl: leaseAgreement.documentUrl,
 		tenantName: leaseAgreement.tenantName,
+		tenantSigned: leaseAgreement.tenantSigned,
+		landlordSigned: leaseAgreement.landlordSigned,
+		agentSigned: leaseAgreement.agentSigned,
 	};
 }
