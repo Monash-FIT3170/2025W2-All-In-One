@@ -5,6 +5,7 @@ import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
 import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
 import { calculateDueDate } from "/app/client/library-modules/utils/date-utils";
+import { notifyRejectedApplicantsUseCase } from "./NotifyRejectedApplicantsUseCase";
 
 /*WILL SEPARATE THESE USE CASES INTO SEPARATE FILES LATER*/
 
@@ -100,6 +101,23 @@ export async function sendApprovedApplicationsToAgentUseCase(
     } else {
       console.log('No tenantUserId found in chosen application');
     }
+
+
+    // Get agent ID for messaging of rejected applicants
+    const property = await getPropertyById(propertyId);
+    const agentId = property.agentId;
+    const propertyAddress = `${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`;
+
+    // Notify all other applicants that they were not selected
+    console.log('=== NOTIFYING REJECTED APPLICANTS ===');
+    const notificationResult = await notifyRejectedApplicantsUseCase(
+      propertyId,
+      chosenApplication.id,
+      agentId,
+      propertyAddress
+    );
+    console.log('Notification result:', notificationResult);
+    console.log('=== END NOTIFICATION ===');
 
     const updatedTaskName = `Process Final Tenant Selection`;
     const updatedTaskDescription = `Process final tenant selection for ${chosenApplication.applicantName} at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`;
