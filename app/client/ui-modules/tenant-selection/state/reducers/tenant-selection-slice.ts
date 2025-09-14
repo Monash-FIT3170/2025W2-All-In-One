@@ -21,6 +21,7 @@ import {
 } from "/app/client/library-modules/use-cases/tenant-application/SendTenantApplicationToAgentUseCase";
 import { agentAcceptApplication, agentRejectApplication, landLordApproveApplication, landLordRejectApplication } from "../../../../library-modules/use-cases/tenant-application/AcceptOrRejectTenantApplicationUseCase.ts";
 import { AppDispatch } from "/app/client/store";
+import { ResetTenantApplicationDecisionUseCase } from "/app/client/library-modules/use-cases/tenant-application/ResetTenantApplicationDecisionUseCase";
 
 const initialState: TenantSelectionUiState = {
   applicationsByProperty: {},
@@ -204,7 +205,7 @@ export const sendBackgroundPassedToLandlordAsync = createAsyncThunk(
       passed
     );
   }
-)
+);
 
 export const agentBackgroundCheckPassedAsync = createAsyncThunk(
   "tenantSelection/agentBackgroundCheckPassed",
@@ -279,6 +280,15 @@ export const intentRejectApplicationAsync = createAsyncThunk(
       return;
     }
     throw new Error("Action not allowed");
+  }
+);
+
+export const intentResetApplicationDecisionAsync = createAsyncThunk(
+  "tenantSelection/intentResetApplicationDecision",
+  async (args: {applicationId: string[]; currentStatus: TenantApplicationStatus }) => {
+    const useCase = new ResetTenantApplicationDecisionUseCase();
+    await useCase.execute(args.applicationId, args.currentStatus);
+    return { applicationId: args.applicationId, newStatus: args.currentStatus };
   }
 );
 
@@ -516,7 +526,6 @@ export const tenantSelectionSlice = createSlice({
         state.isLoading = false;
         state.error = action.error.message || "Failed to send background passed applications to landlord";
       })
-
       .addCase(landLordFinalApprovedAsync.fulfilled, (state, action) => {
         updateApplicationStatus(state, action.payload.applicationId, TenantApplicationStatus.FINAL_APPROVED);
       })
@@ -534,6 +543,17 @@ export const tenantSelectionSlice = createSlice({
       .addCase(sendFinalApprovedApplicationToAgentAsync.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message || "Failed to send final approved application to agent";
+      })
+      .addCase(intentResetApplicationDecisionAsync.fulfilled, (state, action) => {
+        state.isLoading = false;
+      })
+      .addCase(intentResetApplicationDecisionAsync.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(intentResetApplicationDecisionAsync.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || "Failed to reset application decision";
       })
       // Load tenant applications for property
       .addCase(loadTenantApplicationsForPropertyAsync.pending, (state) => {
