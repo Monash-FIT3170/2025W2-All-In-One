@@ -14,8 +14,11 @@ import {
 
 import { PropertyListingInspectionDocument } from "/app/server/database/property-listing/models/PropertyListingInspectionDocument";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { AddTenantToInspectionUseCase } from "/app/client/library-modules/use-cases/property-listing/AddTenantToInspectionUseCase";
+import { ListingRepository } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
 
 const initialState: PropertyListingPageUiState = {
+  agentId: "",
   propertyId: "",
   propertyLandlordId: "",
   streetNumber: "",
@@ -244,6 +247,9 @@ export const load = createAsyncThunk(
   }
 );
 
+const listingRepo = new ListingRepository();
+const addTenantUseCase = new AddTenantToInspectionUseCase(listingRepo);
+
 export const bookPropertyInspectionAsync = createAsyncThunk(
   "propertyListing/bookPropertyInspection",
   async ({
@@ -253,15 +259,7 @@ export const bookPropertyInspectionAsync = createAsyncThunk(
     inspectionId: string;
     tenantId: string;
   }): Promise<PropertyListingInspectionDocument> => {
-    console.log("got to the bookPropertyInspectionAsync");
-    console.log("inspectionId:", inspectionId, "tenantId:", tenantId);
-    const updatedInspection: PropertyListingInspectionDocument =
-      await Meteor.callAsync(
-        MeteorMethodIdentifier.ADD_TENANT_TO_INSPECTION,
-        inspectionId,
-        tenantId
-      );
-    return updatedInspection;
+    return await addTenantUseCase.execute(inspectionId, tenantId);
   }
 );
 export const selectPropertyListingUiState = (state: RootState) =>

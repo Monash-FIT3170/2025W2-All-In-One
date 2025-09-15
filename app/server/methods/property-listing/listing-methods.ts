@@ -18,7 +18,6 @@ const getListingForProperty = {
     propertyId: string
   ): Promise<ApiListing> => {
     const listing = await getListingDocumentAssociatedWithProperty(propertyId);
-    console.log("listing-methods loaded");
     if (!listing) {
       throw meteorWrappedInvalidDataError(
         new InvalidDataError(
@@ -96,7 +95,6 @@ const getAllListedListings = {
     skip: number = 0,
     limit: number = 3
   ): Promise<ApiListing[]> => {
-    console.log("listing-methods loaded");
     const listedStatus = ListingStatus.LISTED;
     const listedStatusDocument =
       await getListingStatusDocumentByName(listedStatus);
@@ -269,7 +267,11 @@ const addTenantToInspectionMethod = {
     inspectionId: string,
     tenantId: string
   ): Promise<PropertyListingInspectionDocument> => {
-    console.log("ADD_TENANT_TO_INSPECTION method called", inspectionId, tenantId);
+    console.log(
+      "ADD_TENANT_TO_INSPECTION method called",
+      inspectionId,
+      tenantId
+    );
     const inspection = await PropertyListingInspectionCollection.findOneAsync({
       _id: inspectionId,
     });
