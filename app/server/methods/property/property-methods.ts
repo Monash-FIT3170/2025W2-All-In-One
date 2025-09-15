@@ -161,6 +161,7 @@ async function mapPropertyDocumentToPropertyDTO(
     suburb: property.suburb,
     province: property.province,
     postcode: property.postcode,
+    apartment_number: property.apartment_number,
     pricePerMonth: propertyPriceDocument.price_per_month,
     propertyStatus: propertyStatusDocument.name,
     description: property.description,
@@ -320,6 +321,7 @@ const updatePropertyData = {
   ): Promise<void> => {
     await PropertyCollection.updateAsync(property.propertyId, {
       $set: {
+        apartment_number: property.apartment_number,
         streetnumber: property.streetnumber,
         streetname: property.streetname,
         suburb: property.suburb,

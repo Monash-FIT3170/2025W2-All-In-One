@@ -13,6 +13,7 @@ export type PropertyListingPageUiState = {
   suburb: string;
   province: string;
   postcode: string;
+  apartmentNumber?: string;
   summaryDescription: string;
   areaValue: number
   propertyStatusText: string;

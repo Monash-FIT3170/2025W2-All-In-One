@@ -114,7 +114,12 @@ export function AgentProperty(): React.JSX.Element {
                           break;
                       }
                       if (!matchesStatus) return false;
-                      const matchesSearch = `${property.streetnumber} ${property.streetname}`
+                      
+                      const searchableText = property.apartment_number 
+                        ? `${property.apartment_number} ${property.streetnumber} ${property.streetname}`
+                        : `${property.streetnumber} ${property.streetname}`;
+                      
+                      const matchesSearch = searchableText
                         .toUpperCase()
                         .includes(search.trim().toUpperCase());
                       return matchesSearch && matchesStatus;

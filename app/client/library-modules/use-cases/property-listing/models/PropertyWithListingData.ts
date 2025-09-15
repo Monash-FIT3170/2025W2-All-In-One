@@ -6,6 +6,7 @@ export type PropertyWithListingData = {
   suburb: string;
   province: string;
   postcode: string;
+  apartment_number?: string;
   pricePerMonth: number;
   propertyStatus: string;
   description: string;

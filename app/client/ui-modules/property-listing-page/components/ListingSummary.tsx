@@ -11,6 +11,7 @@ export function ListingSummary({
   suburb,
   province,
   postcode,
+  apartmentNumber,
   summaryDescription,
   propertyStatusText,
   propertyStatusPillVariant,
@@ -21,6 +22,7 @@ export function ListingSummary({
   suburb: string;
   province: string;
   postcode: string;
+  apartmentNumber?: string;
   summaryDescription: string;
   propertyStatusText: string;
   propertyStatusPillVariant: PropertyStatusPillVariant;
@@ -35,6 +37,7 @@ export function ListingSummary({
           suburb={suburb}
           province={province}
           postcode={postcode}
+          apartmentNumber={apartmentNumber}
           className="mr-6"
         />
         <StatusPill text={propertyStatusText} variant={propertyStatusPillVariant} />
@@ -51,6 +54,7 @@ function Address({
   suburb,
   province,
   postcode,
+  apartmentNumber,
   className = "",
 }: {
   streetNumber: string;
@@ -58,11 +62,19 @@ function Address({
   suburb: string;
   province: string;
   postcode: string;
+  apartmentNumber?: string;
   className?: string;
 }): React.JSX.Element {
+  const formatAddress = () => {
+    if (apartmentNumber && apartmentNumber.trim() !== "") {
+      return `${apartmentNumber} ${streetNumber} ${street}`;
+    }
+    return `${streetNumber} ${street}`;
+  };
+
   return (
     <div className={twMerge("flex flex-row items-end", className)}>
-      <span className="geist-semibold text-[20px] mr-3">{`${streetNumber} ${street}`}</span>
+      <span className="geist-semibold text-[20px] mr-3">{formatAddress()}</span>
       <span className="geist-regular text-[17px]">{`${suburb}, ${province}, ${postcode}`}</span>
     </div>
   );

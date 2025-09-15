@@ -14,8 +14,15 @@ interface PropertyCardProps {
 export function PropertyCard({ property, navigationPath = NavigationPath.LandlordPropertyDetail, from }: PropertyCardProps) {
   const navigate = useNavigate();
 
-  // Format address
-  const fullAddress = `${property.streetnumber} ${property.streetname}`;
+  // Format address with apartment number
+  const formatAddress = () => {
+    if (property.apartment_number && property.apartment_number.trim() !== "") {
+      return `${property.apartment_number} ${property.streetnumber} ${property.streetname}`;
+    }
+    return `${property.streetnumber} ${property.streetname}`;
+  };
+  
+  const fullAddress = formatAddress();
   const locationText = `${property.suburb}, ${property.province}`;
 
   // Get the first image URL or use placeholder

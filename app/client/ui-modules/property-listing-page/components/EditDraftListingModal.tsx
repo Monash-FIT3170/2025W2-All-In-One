@@ -62,6 +62,7 @@ export default function EditDraftListingModal(
       suburb: values.suburb,
       province: values.state,
       postcode: values.postal_code,
+      apartment_number: values.apartment_number,
       description: values.description,
       summaryDescription: values.summary_description,
       bathrooms: values.bathroom_number,

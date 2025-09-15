@@ -99,6 +99,7 @@ export function PropertyListingPage({ className = "" }: { className?: string }):
           suburb={state.suburb}
           province={state.province}
           postcode={state.postcode}
+          apartmentNumber={state.apartmentNumber}
           summaryDescription={state.summaryDescription}
           propertyStatusText={state.propertyStatusText}
           propertyStatusPillVariant={state.propertyStatusPillVariant}
@@ -168,6 +169,7 @@ function ListingPageContent({
   suburb,
   province,
   postcode,
+  apartmentNumber,
   summaryDescription,
   propertyStatusText,
   propertyStatusPillVariant,
@@ -204,6 +206,7 @@ function ListingPageContent({
   suburb: string;
   province: string;
   postcode: string;
+  apartmentNumber?: string;
   summaryDescription: string;
   propertyStatusText: string;
   propertyStatusPillVariant: PropertyStatusPillVariant;
@@ -320,6 +323,7 @@ function ListingPageContent({
         suburb={suburb}
         province={province}
         postcode={postcode}
+        apartmentNumber={apartmentNumber}
         summaryDescription={summaryDescription}
         propertyStatusText={propertyStatusText}
         propertyStatusPillVariant={propertyStatusPillVariant}
@@ -423,6 +427,7 @@ function ListingHero({
   suburb,
   province,
   postcode,
+  apartmentNumber,
   summaryDescription,
   propertyStatusText,
   propertyStatusPillVariant,
@@ -446,6 +451,7 @@ function ListingHero({
   suburb: string;
   province: string;
   postcode: string;
+  apartmentNumber?: string;
   summaryDescription: string;
   propertyStatusText: string;
   propertyStatusPillVariant: PropertyStatusPillVariant;
@@ -477,6 +483,7 @@ function ListingHero({
           suburb={suburb}
           province={province}
           postcode={postcode}
+          apartmentNumber={apartmentNumber}
           summaryDescription={summaryDescription}
           propertyStatusText={propertyStatusText}
           propertyStatusPillVariant={propertyStatusPillVariant}
@@ -591,7 +598,7 @@ function ListingModalEditor({ className = "" }: { className?: string }): React.J
     city: state.suburb,
     state: state.province,
     postal_code: state.postcode,
-    apartment_number: "",
+    apartment_number: state.apartmentNumber || "",
     bedroom_number: Number(state.propertyBedrooms),
     bathroom_number: Number(state.propertyBathrooms),
     parking_spaces: Number(state.propertyParkingSpaces),

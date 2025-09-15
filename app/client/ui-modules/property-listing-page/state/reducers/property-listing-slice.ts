@@ -21,6 +21,7 @@ const initialState: PropertyListingPageUiState = {
   suburb: "",
   province: "",
   postcode: "",
+  apartmentNumber: "",
   summaryDescription: "",
   areaValue: 0,
   propertyStatusText: "",
@@ -86,6 +87,7 @@ export const propertyListingSlice = createSlice({
       state.suburb = action.payload.suburb;
       state.province = action.payload.province;
       state.postcode = action.payload.postcode;
+      state.apartmentNumber = action.payload.apartment_number || "";
       state.summaryDescription = action.payload.summaryDescription;
       state.areaValue = action.payload.area ?? 0;
       state.propertyStatusText = action.payload.propertyStatus;
