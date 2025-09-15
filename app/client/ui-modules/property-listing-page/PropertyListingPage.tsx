@@ -611,7 +611,7 @@ function ListingModalEditor({ className = "" }: { className?: string }): React.J
     suburb: state.suburb,
     address_number: state.streetNumber,
     monthly_rent: state.monthlyRent,
-    property_feature_ids: [],
+    property_feature_ids: state.propertyFeatureIds,
     inspection_times: [],
   };
 
@@ -623,6 +623,7 @@ function ListingModalEditor({ className = "" }: { className?: string }): React.J
         toggle={toggleModal}
         propertyForm={listingInfo}
         landlords={propertyFormState.landlords}
+        features={propertyFormState.featureOptions}
         propertyId={state.propertyId}
         existingImageUrls={state.listingImageUrls}
       />

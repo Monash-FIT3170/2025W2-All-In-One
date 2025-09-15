@@ -20,6 +20,7 @@ export type PropertyListingPageUiState = {
   propertyStatusPillVariant: PropertyStatusPillVariant;
   propertyDescription: string;
   propertyFeatures: string[];
+  propertyFeatureIds: string[];
   propertyType: string;
   propertyLandArea: string;
   propertyBathrooms: string;

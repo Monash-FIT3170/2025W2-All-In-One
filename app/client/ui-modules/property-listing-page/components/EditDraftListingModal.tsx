@@ -27,6 +27,7 @@ interface EditDraftListingModalProps {
   isOpen: boolean;
   propertyForm: FormSchemaType;
   landlords: (Landlord & { firstName: string; lastName: string })[];
+  features: { value: string; label: string }[];
   propertyId: string;
   existingImageUrls?: string[];
 }
@@ -154,9 +155,8 @@ export default function EditDraftListingModal(
                   onSubmit={handleSaveChanges}
                   form={listingInfo}
                   landlords={props.landlords}
-                  
+                  features={props.features || []}
                   mode={PropertyFormMode.EDIT}
-                  features={[]}
                 />
               </div>
             </div>

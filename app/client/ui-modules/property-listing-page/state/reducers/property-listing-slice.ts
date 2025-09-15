@@ -28,6 +28,7 @@ const initialState: PropertyListingPageUiState = {
   propertyStatusPillVariant: PropertyStatusPillVariant.VACANT,
   propertyDescription: "",
   propertyFeatures: [],
+  propertyFeatureIds: [],
   propertyType: "",
   propertyLandArea: "",
   propertyBathrooms: "",
@@ -96,6 +97,7 @@ export const propertyListingSlice = createSlice({
       );
       state.propertyDescription = action.payload.description;
       state.propertyFeatures = action.payload.features;
+      state.propertyFeatureIds = action.payload.featureIds;
       state.propertyType = action.payload.type;
       state.propertyLandArea = action.payload.area
         ? getPropertyAreaDisplayString(action.payload.area)

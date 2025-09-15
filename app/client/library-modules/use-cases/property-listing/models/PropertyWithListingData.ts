@@ -15,6 +15,7 @@ export type PropertyWithListingData = {
   bedrooms: number;
   parking: number;
   features: string[];
+  featureIds: string[];
   type: string;
   area?: number;
   agentId: string;

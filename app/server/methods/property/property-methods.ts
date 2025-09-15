@@ -170,6 +170,7 @@ async function mapPropertyDocumentToPropertyDTO(
     bedrooms: property.bedrooms,
     parking: property.parking,
     features: propertyFeaturesDocuments.map((doc) => doc.name),
+    featureIds: propertyFeaturesDocuments.map((doc) => doc._id),
     type: property.type,
     area: property.area,
     agentId: agentDocument ? agentDocument._id : "", // Always string
