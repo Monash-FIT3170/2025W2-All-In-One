@@ -17,6 +17,7 @@ import {
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useNavigate } from "react-router";
 import { signoutUser } from "../../user-authentication/state/reducers/current-user-slice";
+import { NavigationPath } from "/app/client/navigation";
 
 const FormSchema = z.object({
   marketing_emails: z.boolean().default(false).optional(),
@@ -51,6 +52,10 @@ export function SettingsAccountPreferences() {
     }
   }
 
+  function handleManageAccount() {
+    navigate(NavigationPath.Profile);
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
@@ -69,7 +74,7 @@ export function SettingsAccountPreferences() {
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Button>Manage Account</Button>
+                    <Button onClick={handleManageAccount}>Manage Account</Button>
                   </FormControl>
                 </FormItem>
               )}
