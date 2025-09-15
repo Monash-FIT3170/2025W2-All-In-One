@@ -11,6 +11,11 @@ export enum MapZoom {
   BUILDING,
 }
 
+export type InitialMapCoordinates = {
+  initialLatitude: number;
+  initialLongitude: number;
+}
+
 const zoomLevelMap: Record<MapZoom, number> = {
   [MapZoom.ENTIRE_WORLD]: 1,
   [MapZoom.LANDMASS]: 5,
@@ -25,14 +30,12 @@ const zoomLevelMap: Record<MapZoom, number> = {
  * WARNING: This component is billed, please be careful with usage. If unsure, consult system architects.
  */
 export function DynamicMap({
-  initialLatitude,
-  initialLongitude,
+  initialMapCoordinates,
   defaultZoom = MapZoom.STREET,
   markers = [],
   className = "",
 }: {
-  initialLatitude: number;
-  initialLongitude: number;
+  initialMapCoordinates: InitialMapCoordinates;
   defaultZoom?: MapZoom;
   markers?: Array<React.JSX.Element>;
   sizeClassName?: string;
@@ -40,11 +43,16 @@ export function DynamicMap({
 }): React.JSX.Element {
   const defaultSizeClassName = "h-64 w-96";
 
+  const defaultCenter = initialMapCoordinates ? {
+    lat: initialMapCoordinates.initialLatitude,
+    lng: initialMapCoordinates.initialLongitude,
+  } : undefined;
+
   return (
     <div className={twMerge(defaultSizeClassName, className)}>
       <APIProvider apiKey={getPublicEnvOrWarn("GOOGLE_MAPS_API_KEY")}>
         <Map
-          defaultCenter={{ lat: initialLatitude, lng: initialLongitude }}
+          defaultCenter={defaultCenter}
           defaultZoom={zoomLevelMap[defaultZoom]}
           mapId="DEMO_MAP_ID"
           colorScheme="LIGHT"

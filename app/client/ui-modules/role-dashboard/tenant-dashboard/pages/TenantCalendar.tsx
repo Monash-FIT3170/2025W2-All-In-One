@@ -3,8 +3,10 @@ import { useAppDispatch, useAppSelector } from "../../../../store";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 import { UpcomingTasks } from "../../components/UpcomingTask";
-import { fetchTenantTasks, selectLoading, selectTasks } from "../state/tenant-dashboard-slice";
+import { fetchTenantDetails, selectLoading, selectTasks } from "../state/reducers/tenant-dashboard-slice";
 import { TaskStatus } from "/app/shared/task-status-identifier";
+import { getTodayISODate } from "/app/client/library-modules/utils/date-utils";
+
 export function TenantCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch(); 
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
@@ -14,12 +16,12 @@ export function TenantCalendar(): React.JSX.Element {
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
   useEffect(() => { 
     if (currentUser?.userId) {
-      dispatch(fetchTenantTasks(currentUser.userId)); // Fetch tasks for the current user
+      dispatch(fetchTenantDetails(currentUser.userId)); // Fetch tasks for the current user
     }
     else {
       console.warn("No user ID found. Please log in to view the calendar.");
     }
-  },[currentUser])
+  }, [currentUser, dispatch]);
   const handleDateSelection = (formatted: string, iso: string) => {
     setSelectedDate(formatted);
     setSelectedDateISO(iso);
@@ -51,7 +53,7 @@ export function TenantCalendar(): React.JSX.Element {
                 </h2>
                 <ul className="space-y-4 mt-2">
                   {tasks
-                    .filter((task) => task.dueDate === (selectedDateISO || new Date().toISOString().slice(0, 10)))
+                    .filter((task) => task.dueDate === (selectedDateISO || getTodayISODate()))
                     .map((task, index) => (
                       <li key={index} className="p-4 rounded shadow bg-white border border-gray-200">
                         <p className="font-bold text-lg">{task.name}</p>

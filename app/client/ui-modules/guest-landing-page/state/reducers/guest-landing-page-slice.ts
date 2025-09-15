@@ -11,7 +11,6 @@ const initialState: GuestLandingPageUiState = {
   error: null,
 };
 
-
 export const fetchPropertiesAndListings = createAsyncThunk<
   PropertyWithListingData[],
   { skip: number; limit: number },
@@ -24,7 +23,9 @@ export const fetchPropertiesAndListings = createAsyncThunk<
       getPropertyWithListingDataUseCase(listing.apiListing.property_id)
     );
     const allResults = await Promise.all(propertyDataPromises);
-    return allResults;
+    return allResults.filter(
+      (property) => property.propertyStatus === "VACANT"
+    );
   }
 );
 
@@ -44,7 +45,11 @@ export const guestLandingPageSlice = createSlice({
         if (skip === 0) {
           state.properties = action.payload;
         } else {
-          state.properties = [...state.properties, ...action.payload];
+          const existingIds = new Set(state.properties.map((p) => p.propertyId));
+          const newProperties = action.payload.filter(
+            (p) => !existingIds.has(p.propertyId)
+          );
+          state.properties = [...state.properties, ...newProperties];
         }
       })
       .addCase(fetchPropertiesAndListings.rejected, (state, action) => {

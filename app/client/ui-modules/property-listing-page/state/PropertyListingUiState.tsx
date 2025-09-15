@@ -1,10 +1,11 @@
-import { PropertyMapUiState } from "../components/PropertyMap";
+import { PropertyMapUiState } from "../../common/property-components/PropertyMap";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { ListingStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingStatusPill";
 import { PropertyStatusPillVariant } from "/app/client/ui-modules/property-listing-page/components/ListingSummary";
 import { InspectionBookingListUiState } from "/app/client/ui-modules/property-listing-page/components/PropertyInspections";
 
 export type PropertyListingPageUiState = {
+  agentId: string;
   propertyId: string;
   propertyLandlordId: string;
   streetNumber: string;
@@ -26,6 +27,7 @@ export type PropertyListingPageUiState = {
   propertyPrice: string;
   mapUiState: PropertyMapUiState;
   inspectionBookingUiStateList: InspectionBookingListUiState[];
+  bookedPropertyListingInspections: number[];
   listingImageUrls: string[];
   listingStatusText: string;
   listingStatusPillVariant: ListingStatusPillVariant;

@@ -1,10 +1,10 @@
 import {
-  InspectionCollection,
+  PropertyListingInspectionCollection,
   ListingCollection,
   ListingStatusCollection,
 } from "../../database/property-listing/listing-collections";
 import { ListingDocument } from "../../database/property-listing/models/ListingDocument";
-import { InspectionDocument } from "../../database/property-listing/models/InspectionDocument";
+import { PropertyListingInspectionDocument } from "../../database/property-listing/models/PropertyListingInspectionDocument";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ListingStatusDocument } from "/app/server/database/property-listing/models/ListingStatusDocument";
@@ -145,10 +145,10 @@ async function getListingDocumentsByStatus(
 async function mapListingDocumentToListingDTO(
   listing: ListingDocument
 ): Promise<ApiListing> {
-  let inspections: InspectionDocument[] = [];
+  let propertyListingInspections: PropertyListingInspectionDocument[] = [];
 
   if (listing.inspection_ids.length > 0) {
-    inspections = await getInspectionDocumentsMatchingIds(
+    propertyListingInspections = await getPropertyListingInspectionDocumentsMatchingIds(
       listing.inspection_ids
     );
   }
@@ -167,7 +167,7 @@ async function mapListingDocumentToListingDTO(
     property_id: listing.property_id,
     image_urls: listing.image_urls,
     listing_status: listingStatusDocument.name,
-    inspections: inspections.map((inspection) => ({
+    propertyListingInspections: propertyListingInspections.map((inspection) => ({
       start_time: inspection.starttime,
       end_time: inspection.endtime,
     })),
@@ -182,10 +182,10 @@ async function getListingDocumentAssociatedWithProperty(
   });
 }
 
-async function getInspectionDocumentsMatchingIds(
+async function getPropertyListingInspectionDocumentsMatchingIds(
   ids: string[]
-): Promise<InspectionDocument[]> {
-  return await InspectionCollection.find({
+): Promise<PropertyListingInspectionDocument[]> {
+  return await PropertyListingInspectionCollection.find({
     _id: { $in: ids },
   }).fetchAsync();
 }
@@ -235,10 +235,77 @@ const getListingStatusIdByName = {
   },
 };
 
+const insertPropertyListingInspection = {
+  [MeteorMethodIdentifier.INSERT_PROPERTY_LISTING_INSPECTION]: async (
+    propertyListingInspections: { start_time: Date; end_time: Date }[]
+  ): Promise<string[]> => {
+    const ids: string[] = [];
+    for (const insp of propertyListingInspections) {
+      if (!insp.start_time || !insp.end_time) {
+        throw new Meteor.Error(
+          "invalid-args",
+          "start_time and end_time are required"
+        );
+      }
+      const id = await PropertyListingInspectionCollection.insertAsync({
+        starttime: new Date(insp.start_time),
+        endtime: new Date(insp.end_time),
+      } as PropertyListingInspectionDocument);
+      ids.push(id);
+    }
+    return ids;
+  },
+};
+
+const updatePropertyListingImages = {
+  [MeteorMethodIdentifier.LISTING_UPDATE_IMAGES]: async (
+    propertyId: string,
+    imageUrls: string[]
+  ): Promise<{ success: boolean; propertyId: string }> => {
+    try {
+      // Find the listing for this property
+      const listing = await getListingDocumentAssociatedWithProperty(propertyId);
+
+      if (!listing) {
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(
+            `No listing found for property with Id ${propertyId}`
+          )
+        );
+      }
+
+      // Update the listing images
+      const result = await ListingCollection.updateAsync(
+        { property_id: propertyId },
+        {
+          $set: {
+            image_urls: imageUrls,
+          },
+        }
+      );
+
+      if (result === 0) {
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(
+            `Failed to update listing images for property ${propertyId}`
+          )
+        );
+      }
+
+      return { success: true, propertyId };
+    } catch (error) {
+      console.error("Error updating listing images:", error);
+      throw error;
+    }
+  },
+};
+
 Meteor.methods({
   ...getListingForProperty,
   ...insertDraftListingDocumentForProperty,
   ...getListingStatusIdByName,
   ...submitDraftListing,
   ...getAllListedListings,
+  ...updatePropertyListingImages,
+  ...insertPropertyListingInspection,
 });

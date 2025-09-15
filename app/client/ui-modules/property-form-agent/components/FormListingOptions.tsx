@@ -14,7 +14,8 @@ import {
   PopoverTrigger,
 } from "../../theming-shadcn/Popover";
 import { Calendar } from "../../theming-shadcn/Calendar";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Input } from "../../theming-shadcn/Input";
+import { Calendar as CalendarIcon, X, ArrowRight } from "lucide-react";
 import {
   RadioGroup,
   RadioGroupItem,
@@ -22,14 +23,18 @@ import {
 import { Switch } from "../../theming-shadcn/Switch";
 import { Button } from "../../theming-shadcn/Button";
 import { FormSchemaType } from "./FormSchema";
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, useFieldArray } from "react-hook-form";
 import { FormHeading } from "./FormHeading";
-
+import { DateTime } from "../../theming-shadcn/Datetime";
 export default function FormListingOptions({
   form,
 }: {
   form: UseFormReturn<FormSchemaType>;
 }) {
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "inspection_times",
+  });
 
   return (
     <div className="border border-(--divider-color) w-full p-7 rounded-md mb-3">
@@ -67,7 +72,6 @@ export default function FormListingOptions({
                   mode="single"
                   selected={field.value}
                   onSelect={field.onChange}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
@@ -76,6 +80,73 @@ export default function FormListingOptions({
           </FormItem>
         )}
       />
+<FormItem className="py-2">
+  <div className="mb-3 flex items-center justify-between">
+    <FormLabel className="text-base">Inspection Times</FormLabel>
+    <Button
+      type="button"
+      variant="outline"
+      onClick={() => append({ start_time: new Date(), end_time: new Date() })}
+    >
+      Add inspection
+    </Button>
+  </div>
+
+  <div className="rounded-md border border-(--divider-color) bg-white p-4">
+    {fields.length === 0 ? (
+      <div className="text-sm text-muted-foreground">
+        No inspections added yet.
+      </div>
+    ) : (
+      <div className="space-y-3">
+        {fields.map((f, index) => (
+  <div key={f.id} className="rounded-md border border-(--divider-color) bg-white p-3">
+    <div className="mb-2 flex items-center justify-between">
+      <span className="text-sm font-medium">Inspection {index + 1}</span>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label="Remove inspection"
+        onClick={() => remove(index)}
+      >
+        <X />
+      </Button>
+    </div>
+
+    <div className="flex items-end gap-3">
+      <FormField
+        control={form.control}
+        name={`inspection_times.${index}.start_time` as const}
+        render={({ field }) => (
+          <FormItem className="basis-0 grow">
+            <FormControl>
+              <DateTime value={field.value} onChange={field.onChange} dateLabel="Start Date" timeLabel="Start Time" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name={`inspection_times.${index}.end_time` as const}
+        render={({ field }) => (
+          <FormItem className="basis-0 grow">
+            <FormControl>
+              <DateTime value={field.value} onChange={field.onChange} dateLabel="End Date" timeLabel="End Time" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
+  </div>
+))}
+      </div>
+    )}
+  </div>
+</FormItem>
+
 
       <FormField
         control={form.control}
@@ -107,7 +178,6 @@ export default function FormListingOptions({
                 ))}
               </RadioGroup>
             </FormControl>
-
             <FormMessage />
           </FormItem>
         )}

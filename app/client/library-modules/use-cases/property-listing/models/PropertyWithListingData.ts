@@ -1,4 +1,3 @@
-
 export type PropertyWithListingData = {
   propertyId: string;
   landlordId: string;
@@ -17,11 +16,13 @@ export type PropertyWithListingData = {
   features: string[];
   type: string;
   area?: number;
+  agentId: string;
+  tenantId: string;
   image_urls: string[];
   locationLatitude: number;
   locationLongitude: number;
   listing_status: string;
-  inspections: {
+  propertyListingInspections: {
     start_time: Date;
     end_time: Date;
   }[];

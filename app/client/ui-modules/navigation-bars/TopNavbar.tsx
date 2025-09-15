@@ -8,9 +8,9 @@ import { SideBarSliderIcon } from "../theming/icons/SideBarSlider";
 import { useAppSelector, useAppDispatch } from "/app/client/store";
 import { ProfileFooter } from "../navigation-bars/side-nav-bars/components/ProfileFooter";
 import { signoutUser } from "../user-authentication/state/reducers/current-user-slice";
-import { NotificationBoard } from "../theming/components/NotificationBoard";
+import { NotificationBellDropdown } from "../theming/components/NotificationBellDropdown";
 import { selectTasks as selectAgentTasks } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
-import { selectTasks as selectTenantTasks } from "../role-dashboard/tenant-dashboard/state/tenant-dashboard-slice";
+import { selectTasks as selectTenantTasks } from "../role-dashboard/tenant-dashboard/state/reducers/tenant-dashboard-slice";
 import { selectTasks as selectLandlordTasks } from "../role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
 import { Role } from "/app/shared/user-role-identifier";
 import { NavigationPath } from "../../navigation";
@@ -46,10 +46,10 @@ export function TopNavbar({
   const handleGoHome = () => navigate(NavigationPath.Home);
   const handleGoProfile = () => navigate(NavigationPath.Profile);
 
-  const [isNotificationBoardOpen, setIsNotificationBoardOpen] = useState(false);
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
 
-  const toggleNotificationBoard = () => {
-    setIsNotificationBoardOpen((prev) => !prev);
+  const toggleNotificationDropdown = () => {
+    setIsNotificationDropdownOpen((prev) => !prev);
   };
 
   return (
@@ -79,13 +79,13 @@ export function TopNavbar({
               <BellIcon
                 hasNotifications={true}
                 className="text-gray-600 cursor-pointer"
-                onClick={toggleNotificationBoard}
+                onClick={toggleNotificationDropdown}
               />
               <div className="relative">
                 {/* Notification Board */}
-                <NotificationBoard
-                  open={isNotificationBoardOpen}
-                  onClose={() => setIsNotificationBoardOpen(false)}
+                <NotificationBellDropdown
+                  open={isNotificationDropdownOpen}
+                  onClose={() => setIsNotificationDropdownOpen(false)}
                   tasks={upcomingTasks}
                 />
               </div>

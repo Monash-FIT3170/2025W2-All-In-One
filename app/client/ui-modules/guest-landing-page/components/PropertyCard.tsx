@@ -5,20 +5,22 @@ import { useNavigate } from "react-router";
 import { getFormattedDateStringFromDate } from "../../../library-modules/utils/date-utils";
 import { PropertyWithListingData } from "../../../library-modules/use-cases/property-listing/models/PropertyWithListingData";
 
-function getNextInspectionDateString(inspections?: { start_time: Date }[]): string { 
-    if (!inspections || inspections.length === 0) {
+function getNextPropertyListingInspectionDateString(propertyListingInspections: { start_time: Date }[] = []): string {
+    if (propertyListingInspections.length === 0) {
         return "No upcoming inspections";
     }
 
     const now = new Date();
-    const futureInspections = inspections
+    const futurePropertyListingInspections = propertyListingInspections
         .filter(inspection => inspection.start_time > now)
         .sort((a, b) => a.start_time.getTime() - b.start_time.getTime());
 
-    if (futureInspections.length === 0) {
+    if (futurePropertyListingInspections.length === 0) {
         return "No upcoming inspections";
     }
-    return getFormattedDateStringFromDate(futureInspections[0].start_time);
+
+    return getFormattedDateStringFromDate(futurePropertyListingInspections[0].start_time);
+
 }
 
 export function PropertyCard(props: PropertyWithListingData) {
@@ -29,11 +31,11 @@ export function PropertyCard(props: PropertyWithListingData) {
         suburb,
         postcode,
         pricePerMonth,
-        propertyStatus, 
+        propertyStatus,
         bathrooms,
         bedrooms,
         image_urls,
-        inspections,
+        propertyListingInspections,
     } = props;
 
     const address = `${streetnumber} ${streetname}`;
@@ -42,10 +44,10 @@ export function PropertyCard(props: PropertyWithListingData) {
 
     const displayImageUrl = image_urls?.[0];
 
-    const nextInspectionDate = getNextInspectionDateString(inspections);
+    const nextPropertyListingInspectionDate = getNextPropertyListingInspectionDateString(propertyListingInspections);
 
     const handleClick = () => {
-        if (propertyId) {            
+        if (propertyId) {
             navigate(`/property-listing?propertyId=${propertyId}`);
         }
     };
@@ -53,18 +55,32 @@ export function PropertyCard(props: PropertyWithListingData) {
     return (
         <div
             onClick={handleClick}
-            className="cursor-pointer block hover:shadow-lg transition-shadow duration-200 ease-in-out rounded-lg"
+            className="w-full cursor-pointer block hover:shadow-lg transition-shadow duration-200 ease-in-out rounded-lg"
         >
             <CardWidget
-                className="w-full max-w-sm overflow-hidden h-full flex flex-col text-center"
-                title="" 
+                className="w-full overflow-hidden h-full flex flex-col text-center"
+                title=""
                 value=""
             >
-                <img
-                    src={displayImageUrl}
-                    alt={`Property at ${address}`}
-                    className="h-48 w-full object-cover"
-                />
+                <div className="relative">
+                    <img
+                        src={displayImageUrl}
+                        alt={`Property at ${address}`}
+                        className="h-48 w-full object-cover"
+                    />
+                    {/* Status pill */}
+                    {propertyStatus && (
+                        <span
+                            className={`absolute top-2 right-2 px-3 py-1 rounded-full text-xs font-semibold shadow-md
+                                ${propertyStatus === "VACANT" ? "bg-green-600 text-white" : ""}
+                                ${propertyStatus === "OCCUPIED" ? "bg-red-500 text-white" : ""}
+                            `}
+                            style={{ zIndex: 2 }}
+                        >
+                            {propertyStatus}
+                        </span>
+                    )}
+                </div>
                 <div className="p-4 flex-grow">
                     <h2 className="text-lg font-semibold truncate" title={address}>
                         {address}
@@ -83,11 +99,7 @@ export function PropertyCard(props: PropertyWithListingData) {
                         </div>
                         <div className="flex items-center gap-1">
                             <CalendarDays className="w-4 h-4" />
-                            <span>{nextInspectionDate}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <DoorOpen className="w-4 h-4" />
-                            <span>{propertyStatus}</span>
+                            <span>{nextPropertyListingInspectionDate}</span>
                         </div>
                     </div>
 
