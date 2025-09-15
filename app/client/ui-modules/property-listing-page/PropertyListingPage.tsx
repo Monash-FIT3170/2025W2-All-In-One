@@ -586,7 +586,6 @@ function ListingModalEditor({ className = "" }: { className?: string }): React.J
     images: [], // Placeholder, as we don't have image files in the current state
     available_dates: new Date(),
     lease_term: "12_months",
-    show_contact_boolean: true,
     suburb: state.suburb,
     address_number: state.streetNumber,
     monthly_rent: Number(state.propertyPrice),

@@ -26,7 +26,6 @@ export const formSchema = z.object({
     })
   ),
   lease_term: z.string().min(1, { message: "Lease term is required" }),
-  show_contact_boolean: z.boolean().optional(),
 });
 
 export type FormSchemaType = z.infer<typeof formSchema>;
