@@ -14,7 +14,7 @@ import {
   FormItem,
   FormLabel,
 } from "/app/client/ui-modules/settings-page/components/Form";
-import { useAppDispatch } from "/app/client/store";
+import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useNavigate } from "react-router";
 import { signoutUser } from "../../user-authentication/state/reducers/current-user-slice";
 
@@ -26,6 +26,7 @@ const FormSchema = z.object({
 export function SettingsAccountPreferences() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const profileData = useAppSelector((state) => state.currentUser.profileData);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -64,7 +65,7 @@ export function SettingsAccountPreferences() {
                   <div className="space-y-0.5">
                     <FormLabel>Account Information</FormLabel>
                     <FormDescription>
-                      Shannon Wallis - shannonwallis@test.com
+                      {profileData ? `${profileData.firstName} ${profileData.lastName} - ${profileData.email}` : "Loading..."}
                     </FormDescription>
                   </div>
                   <FormControl>
