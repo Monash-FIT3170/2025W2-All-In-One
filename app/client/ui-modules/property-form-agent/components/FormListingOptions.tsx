@@ -64,7 +64,7 @@ export default function FormListingOptions({
                 </FormControl>
               </PopoverTrigger>
               <PopoverContent
-                className="w-auto p-0 border-(--divider-color) bg-white"
+                className="w-auto p-0 border-(--divider-color) bg-white z-[10000]"
                 align="start"
               >
                 <Calendar
