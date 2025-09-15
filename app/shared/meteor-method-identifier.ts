@@ -2,6 +2,8 @@ export enum MeteorMethodIdentifier {
 	TASK_INSERT_FOR_AGENT = "tasks.insertForAgent",
 	TASK_INSERT_FOR_LANDLORD = "tasks.insertForLandlord",
 	TASK_UPDATE_FOR_AGENT = "tasks.updateForAgent",
+	TASK_UPDATE_FOR_TENANT = "tasks.updateForTenant",
+  TASK_INSERT_FOR_TENANT = "tasks.insertForTenant",
 	TASK_UPDATE_FOR_LANDLORD = "tasks.updateForLandlord",
 	TASK_GET_ALL = "tasks.getAll",
 	TASK_GET = "tasks.getOne",
@@ -53,7 +55,8 @@ export enum MeteorMethodIdentifier {
 	TENANT_APPLICATION_INSERT = "tenantApplications.insert",
 	TENANT_APPLICATION_UPDATE_STATUS = "tenantApplications.updateStatus",
 	TENANT_APPLICATION_UPDATE_LINKED_TASK = "tenantApplications.updateLinkedTask", // Updates the task ID when the role has an existing task related to the applications
-	PROPERTY_SEARCH = "PROPERTY_SEARCH",
+	TENANT_UPDATE_TASKS = "tenants.updateTasks", // Adds the id of the newly created task to the tenant's task_ids
+  PROPERTY_SEARCH = "PROPERTY_SEARCH",
 	CONVERSATIONS_GET_FOR_AGENT = "conversations.getForAgent", // Get conversations for an agent based on their managed properties
 	CONVERSATIONS_GET_FOR_TENANT = "conversations.getForTenant", // Get conversations for a tenant
 	CONVERSATIONS_GET_FOR_LANDLORD = "conversations.getForLandlord", // Get conversations for a landlord

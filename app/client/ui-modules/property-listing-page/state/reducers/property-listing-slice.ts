@@ -16,6 +16,7 @@ import { PropertyListingInspectionDocument } from "/app/server/database/property
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 const initialState: PropertyListingPageUiState = {
+  agentId: "",
   propertyId: "",
   propertyLandlordId: "",
   streetNumber: "",
@@ -249,9 +250,11 @@ export const bookPropertyInspectionAsync = createAsyncThunk(
   async ({
     inspectionId,
     tenantId,
+    propertyId,
   }: {
     inspectionId: string;
     tenantId: string;
+    propertyId: string;
   }): Promise<PropertyListingInspectionDocument> => {
     console.log("got to the bookPropertyInspectionAsync");
     console.log("inspectionId:", inspectionId, "tenantId:", tenantId);
@@ -259,7 +262,8 @@ export const bookPropertyInspectionAsync = createAsyncThunk(
       await Meteor.callAsync(
         MeteorMethodIdentifier.ADD_TENANT_TO_INSPECTION,
         inspectionId,
-        tenantId
+        tenantId,
+        propertyId
       );
     return updatedInspection;
   }
