@@ -265,7 +265,7 @@ export const messagesSlice = createSlice({
      * Sets the currently active conversation ID
      * Used when user selects a conversation to view
      */
-    setActiveConversation(state, action: PayloadAction<string>) {
+    setActiveConversation(state, action: PayloadAction<string | null>) {
       state.activeConversationId = action.payload;
     },
 
