@@ -18,6 +18,9 @@ import { propertyFormSlice } from "./ui-modules/property-form-agent/state/reduce
 import { tenantSelectionSlice } from "./ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { messagesSlice } from "./ui-modules/role-messages/state/reducers/messages-slice";
 import { searchResultsSlice } from "./ui-modules/search/state/search-result-slice";
+import { tenantPropertySlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/reducers/tenant-property-slice";
+import { landlordDocumentsSlice } from "./ui-modules/role-dashboard/landlord-dashboard/state/landlord-document-slice";
+import { changePasswordSlice } from "./ui-modules/settings-page/state/reducers/change-password-slice";
 
 export const store = configureStore({
 	reducer: {
