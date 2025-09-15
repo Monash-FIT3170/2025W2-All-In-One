@@ -12,7 +12,6 @@ import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
 import { ApiInsertListingPayload } from "/app/shared/api-models/property-listing/ListingInsertData";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
-import { createTaskForTenant } from "/app/client/library-modules/domain-models/task/repositories/task-repository";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { PropertyCollection } from "../../database/property/property-collections";
 
@@ -301,7 +300,7 @@ const addTenantToInspectionMethod = {
     });
 
     // Create task for tenant
-    await createTaskForTenant({
+    const taskData = {
       name: "Attend open inspection",
       description: "View the property at the scheduled time",
       dueDate: inspection.starttime,
@@ -309,8 +308,9 @@ const addTenantToInspectionMethod = {
       propertyAddress: `${property?.streetname} ${property?.streetnumber}, ${property?.suburb}, ${property?.province} ${property?.postcode}`,
       propertyId: propertyId,
       userId: tenantId,
-    });
-
+      };
+    console.log("Creating task for tenant:", taskData);
+    await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT_FOR_TENANT, taskData);
     // return the updated doc so client thunk has fresh state
     const updated = await PropertyListingInspectionCollection.findOneAsync({
       _id: inspectionId,
