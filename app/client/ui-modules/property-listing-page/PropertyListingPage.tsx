@@ -313,6 +313,7 @@ function ListingPageContent({
         listingStatusText={listingStatusText}
         listingStatusPillVariant={listingStatusPillVariant}
         shouldDisplayListingStatus={shouldDisplayListingStatus}
+        shouldDisplayEditListingButton={shouldDisplayEditListingButton}
         onBack={onBack}
         className="mb-3"
       />
@@ -354,7 +355,6 @@ function ListingPageContent({
       <BottomBar
         shouldDisplaySubmitDraftButton={shouldDisplaySubmitDraftButton}
         shouldDisplayReviewTenantButton={shouldDisplayReviewTenantButton}
-        shouldDisplayEditListingButton={shouldDisplayEditListingButton}
         onSubmitDraftListing={onSubmitDraftListing}
         onReviewTenant={() => setIsReviewTenantModalOpen(true)}
       />
@@ -402,19 +402,24 @@ function TopBar({
   listingStatusText,
   listingStatusPillVariant,
   shouldDisplayListingStatus,
+  shouldDisplayEditListingButton,
   onBack,
   className = "",
 }: {
   listingStatusText: string;
   listingStatusPillVariant: ListingStatusPillVariant;
   shouldDisplayListingStatus: boolean;
+  shouldDisplayEditListingButton: boolean;
   onBack: () => void;
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={twMerge("flex items-start", className)}>
-      <BackLink label="Back to Properties" backButtonIcon={<BackButtonIcon />} onClick={onBack} className="mr-auto" />
-      {shouldDisplayListingStatus && <ListingStatusPill text={listingStatusText} variant={listingStatusPillVariant} />}
+    <div className={twMerge("flex items-start justify-between", className)}>
+      <BackLink label="Back to Properties" backButtonIcon={<BackButtonIcon />} onClick={onBack} />
+      <div className="flex items-center gap-2">
+        {shouldDisplayEditListingButton && <ListingModalEditor />}
+        {shouldDisplayListingStatus && <ListingStatusPill text={listingStatusText} variant={listingStatusPillVariant} />}
+      </div>
     </div>
   );
 }
@@ -551,14 +556,12 @@ function ListingDetails({
 function BottomBar({
   shouldDisplaySubmitDraftButton,
   shouldDisplayReviewTenantButton,
-  shouldDisplayEditListingButton,
   onSubmitDraftListing,
   onReviewTenant,
   className = "",
 }: {
   shouldDisplaySubmitDraftButton: boolean;
   shouldDisplayReviewTenantButton: boolean;
-  shouldDisplayEditListingButton: boolean;
   onSubmitDraftListing: () => void;
   onReviewTenant: () => void;
   className?: string;
@@ -569,7 +572,6 @@ function BottomBar({
       <div className="flex">{shouldDisplayReviewTenantButton && <ReviewTenantButton onClick={onReviewTenant} />}</div>
 
       <div className="flex">
-        {shouldDisplayEditListingButton && <ListingModalEditor />}
         {shouldDisplaySubmitDraftButton && <SubmitDraftListingButton onClick={onSubmitDraftListing} />}
       </div>
     </div>
