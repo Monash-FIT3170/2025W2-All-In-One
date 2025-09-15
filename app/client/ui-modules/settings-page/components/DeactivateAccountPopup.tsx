@@ -31,6 +31,7 @@ export function DeactivateAccountPopup(): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showAreYouSure, setShowAreYouSure] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -40,8 +41,14 @@ export function DeactivateAccountPopup(): React.JSX.Element {
     mode: "onSubmit",
   });
 
-  async function onSubmit(values: FormValues): Promise<void> {
+  function handleSubmitClick() {
+    // Show "Are you sure?" confirmation instead of submitting directly
+    setShowAreYouSure(true);
+  }
+
+  async function confirmSubmission(): Promise<void> {
     setIsSubmitting(true);
+    setShowAreYouSure(false);
     
     try {
       // Simulate API call - replace with actual deactivation logic
@@ -74,7 +81,7 @@ export function DeactivateAccountPopup(): React.JSX.Element {
             <DialogTitle>Deactivate Account</DialogTitle>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault(); handleSubmitClick(); }} className="space-y-4">
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
                   We're sorry to see you go. Please help us understand why you want to deactivate your account.
@@ -114,6 +121,48 @@ export function DeactivateAccountPopup(): React.JSX.Element {
               </DialogFooter>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Are You Sure Warning Dialog */}
+      <Dialog open={showAreYouSure} onOpenChange={setShowAreYouSure}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle>Are you sure you want to deactivate?</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-red-600">Warning: You may lose your account</p>
+                <p className="text-sm text-muted-foreground">
+                  This action will submit your account deactivation request. Once processed, you may lose access to your account and all associated data.
+                </p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button 
+              type="button" 
+              variant="secondary" 
+              onClick={() => setShowAreYouSure(false)}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="button" 
+              variant="destructive" 
+              onClick={confirmSubmission}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Yes, Deactivate Account"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
