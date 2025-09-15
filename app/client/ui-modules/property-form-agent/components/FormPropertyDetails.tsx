@@ -136,24 +136,31 @@ export default function FormPropertyDetails({
       <FormField
         control={form.control}
         name="property_feature_ids"
-        render={() => (
-          <FormItem className="py-4 max-w-xl">
-            <FormLabel>Property Features</FormLabel>
-            <FormControl>
-              <MultiSelect
-                options={features}
-                onValueChange={(values) =>
-                  form.setValue("property_feature_ids", values)
-                }
-                defaultValue={form.getValues("property_feature_ids") || []}
-                placeholder="Select features"
-                animation={2}
-                maxCount={5}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
+        render={() => {
+          const currentFeatureIds = form.getValues("property_feature_ids") || [];
+          
+          return (
+            <FormItem className="py-4 max-w-xl">
+              <FormLabel>Property Features</FormLabel>
+              <FormControl>
+                <MultiSelect
+                  key={`multiselect-${currentFeatureIds.join(',')}`}
+                  options={features}
+                  onValueChange={(values) => {
+                    console.log("MultiSelect onValueChange called:", values);
+                    form.setValue("property_feature_ids", values);
+                  }}
+                  defaultValue={currentFeatureIds}
+                  placeholder="Select features"
+                  animation={2}
+                  maxCount={5}
+                  modalPopover={true}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          );
+        }}
       />
     </div>
 )};
