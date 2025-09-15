@@ -13,6 +13,7 @@ import { Landlord } from "/app/client/library-modules/domain-models/user/Landlor
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { apiUpdatePropertyData } from "/app/client/library-modules/apis/property/property-api";
 import { apiUpdatePropertyListingData } from "/app/client/library-modules/apis/property-listing/listing-api";
+import { apiPropertyInsertPrice } from "/app/client/library-modules/apis/property-price/price-api";
 import { useAppDispatch } from "/app/client/store";
 import { load } from "../state/reducers/property-listing-slice";
 import { PropertyFormMode } from "../../property-form-agent/enum/PropertyFormMode";
@@ -43,24 +44,54 @@ export default function EditDraftListingModal(
   const dispatch = useAppDispatch();
   const propertyFormRef = useRef<PropertyFormRef>(null);
 
+  // Debug form state
+  useEffect(() => {
+    console.log("=== FORM VALIDATION DEBUG ===");
+    console.log("Form errors:", listingInfo.formState.errors);
+    console.log("Form is valid:", listingInfo.formState.isValid);
+    console.log("Form values:", listingInfo.getValues());
+    
+    // Show specific validation failures
+    const errors = listingInfo.formState.errors;
+    if (Object.keys(errors).length > 0) {
+      console.log("VALIDATION FAILURES:");
+      Object.entries(errors).forEach(([field, error]) => {
+        console.log(`- ${field}: ${error?.message || 'Unknown error'}`);
+      });
+      
+      // Check for nested errors (like in arrays)
+      if (errors.inspection_times) {
+        console.log("Inspection times errors:", errors.inspection_times);
+      }
+    } else {
+      console.log("SUCCESS: All validations passed!");
+    }
+    console.log("============================");
+  }, [listingInfo.formState.errors, listingInfo.formState.isValid]);
+
   // Load existing images when modal opens
   useEffect(() => {
     if (props.isOpen && props.existingImageUrls && props.existingImageUrls.length > 0) {
       console.log("Loading existing images in EditDraftListingModal:", props.existingImageUrls);
       propertyFormRef.current?.loadExistingImages(props.existingImageUrls);
     }
-  }, [props.isOpen, props.existingImageUrls]);
+    
+    // Trigger validation when modal opens
+    if (props.isOpen) {
+      console.log("Modal opened, triggering form validation...");
+      listingInfo.trigger(); // This will trigger validation for all fields
+    }
+  }, [props.isOpen, props.existingImageUrls, listingInfo]);
 
   const handleSaveChanges = async (values: FormSchemaType) => {
+    console.log("handleSaveChanges called with values:", values);
     // Update property details
     console.log("Updating listing details:", values);
 
-    const addressParts = values.address.trim().split(" ");
-
     const updatedProperty: PropertyUpdateData = {
       propertyId: props.propertyId,
-      streetnumber: addressParts[0],
-      streetname: addressParts.slice(1).join(" "),
+      streetnumber: values.address_number,
+      streetname: values.address,
       suburb: values.suburb,
       province: values.state,
       postcode: values.postal_code,
@@ -78,6 +109,11 @@ export default function EditDraftListingModal(
 
     // Update property details
     const prop = await apiUpdatePropertyData(updatedProperty);
+
+    // Update property price (insert new price record)
+    console.log("Updating property price to:", values.monthly_rent);
+    await apiPropertyInsertPrice(props.propertyId, values.monthly_rent);
+    console.log("Property price updated successfully");
 
     // Update listing-specific data (lease term and inspection times)
     const listingUpdateData = {
@@ -150,6 +186,16 @@ export default function EditDraftListingModal(
     props.toggle();
   };
 
+  const handleFormSubmit = (values: FormSchemaType) => {
+    console.log("=== FORM SUBMIT DEBUG ===");
+    console.log("Form submit triggered, calling handleSaveChanges");
+    console.log("Submitted values:", values);
+    console.log("Form errors at submit:", listingInfo.formState.errors);
+    console.log("Form is valid at submit:", listingInfo.formState.isValid);
+    console.log("========================");
+    handleSaveChanges(values);
+  };
+
   return (
     <>
       {props.isOpen && (
@@ -162,7 +208,7 @@ export default function EditDraftListingModal(
               <div className="w-full max-w-3xl mx-auto">
                 <PropertyForm
                   ref={propertyFormRef}
-                  onSubmit={handleSaveChanges}
+                  onSubmit={handleFormSubmit}
                   form={listingInfo}
                   landlords={props.landlords}
                   features={props.features || []}

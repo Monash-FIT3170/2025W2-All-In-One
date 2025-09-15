@@ -690,7 +690,7 @@ async function seedDraftProperties(
 			listing_status_id: draftStatusId, // Draft status
 			image_urls: draftImageUrls,
 			inspection_ids: [], // No inspections scheduled yet
-			lease_term: "12", // 12 month lease term (string)
+			lease_term: "12_months", // 12 month lease term (string)
 		});
 
 		console.log(`[Seed] Created draft property: ${draftProperty._id}`);

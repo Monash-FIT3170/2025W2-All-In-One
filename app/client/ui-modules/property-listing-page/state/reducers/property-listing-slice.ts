@@ -83,6 +83,7 @@ export const propertyListingSlice = createSlice({
     builder.addCase(load.fulfilled, (state, action) => {
       state.propertyId = action.payload.propertyId;
       state.propertyLandlordId = action.payload.landlordId;
+      state.agentId = action.payload.agentId;
       state.propertyId = action.payload.propertyId;
       state.streetNumber = action.payload.streetnumber;
       state.street = action.payload.streetname;

@@ -45,7 +45,26 @@ export const PropertyForm = forwardRef<PropertyFormRef, {
         <FormPropertyImages ref={formPropertyImagesRef} form={form} />
         <FormListingOptions form={form} />
         <div className="flex justify-end mt-5">
-          <Button type="submit">
+          <Button 
+            type="submit"
+            onClick={() => {
+              console.log("=== BUTTON CLICK DEBUG ===");
+              console.log("Save Changes button clicked");
+              console.log("Form errors:", form.formState.errors);
+              console.log("Form is valid:", form.formState.isValid);
+              console.log("Form is submitting:", form.formState.isSubmitting);
+              
+              // Show specific errors if any
+              const errors = form.formState.errors;
+              if (Object.keys(errors).length > 0) {
+                console.log("BUTTON CLICK - VALIDATION FAILURES:");
+                Object.entries(errors).forEach(([field, error]) => {
+                  console.log(`- ${field}: ${error?.message || 'Unknown error'}`);
+                });
+              }
+              console.log("=========================");
+            }}
+          >
             {mode === PropertyFormMode.CREATE
               ? "Create Listing"
               : "Save Changes"}

@@ -581,6 +581,7 @@ function ListingModalEditor({ className = "" }: { className?: string }): React.J
   const toggleModal = () => setIsModalOpen(!isModalOpen);
   const state: PropertyListingPageUiState = useSelector(selectPropertyListingUiState);
   const propertyFormState = useAppSelector(selectPropertyFormUiState);
+  const authUser = useAppSelector((state) => state.currentUser.authUser);
   const dispatch = useAppDispatch();
 
   // Load property form data if landlords are not available
@@ -594,7 +595,8 @@ function ListingModalEditor({ className = "" }: { className?: string }): React.J
     agent: state.agentId,
     landlord: state.propertyLandlordId,
     property_type: state.propertyType.toLowerCase(), // Ensure property type matches dropdown options (house or apartment)
-    address: `${state.streetNumber} ${state.street}`,
+    address_number: state.streetNumber,
+    address: state.street,
     city: state.suburb,
     state: state.province,
     postal_code: state.postcode,
@@ -609,7 +611,6 @@ function ListingModalEditor({ className = "" }: { className?: string }): React.J
     available_dates: new Date(),
     lease_term: state.leaseTerm,
     suburb: state.suburb,
-    address_number: state.streetNumber,
     monthly_rent: state.monthlyRent,
     property_feature_ids: state.propertyFeatureIds,
     inspection_times: state.inspectionTimes,
