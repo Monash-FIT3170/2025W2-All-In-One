@@ -100,6 +100,25 @@ export default function FormPropertyDetails({
 
       <FormField
         control={form.control}
+        name="summary_description"
+        render={({ field }) => (
+          <FormItem className="py-2">
+            <FormLabel>Summary Description</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Brief summary of the property (max 100 characters)..."
+                className="resize-none"
+                maxLength={100}
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="property_feature_ids"
         render={() => (
           <FormItem className="py-4 max-w-xl">

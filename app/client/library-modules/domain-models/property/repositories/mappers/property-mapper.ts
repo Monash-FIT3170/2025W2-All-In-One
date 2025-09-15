@@ -41,7 +41,7 @@ export async function mapFormSchemaToPropertyInsertData(form: FormSchemaType) {
     postcode: form.postal_code,
     property_status_id: await getPropertyStatusId(PropertyStatus.VACANT), // fill as needed
     description: form.description,
-    summary_description: form.description.slice(0,60), // fill as needed
+    summary_description: form.summary_description,
     bathrooms: form.bathroom_number,
     bedrooms: form.bedroom_number,
     parking: 0, // fill as needed

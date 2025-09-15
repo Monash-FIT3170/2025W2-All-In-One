@@ -16,6 +16,7 @@ export const formSchema = z.object({
   bathroom_number: z.coerce.number().min(1, { message: "Please fill out field" }),
   space: z.coerce.number().min(1, { message: "Please fill out field" }),
   description: z.string().min(1, { message: "Please fill out field" }),
+  summary_description: z.string().min(1, { message: "Please fill out field" }),
   property_feature_ids: z.array(z.string()),
   images: z.array(z.instanceof(File)).min(1, { message: "At least one image is required" }),
   available_dates: z.coerce.date(),

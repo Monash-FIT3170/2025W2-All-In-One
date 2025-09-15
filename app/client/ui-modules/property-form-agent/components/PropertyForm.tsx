@@ -74,6 +74,7 @@ export const formDefaultValues: z.infer<typeof formSchema> = {
   bathroom_number: 0,
   space: 0,
   description: "",
+  summary_description: "",
   property_feature_ids: [],
   images: [],
   available_dates: new Date(),

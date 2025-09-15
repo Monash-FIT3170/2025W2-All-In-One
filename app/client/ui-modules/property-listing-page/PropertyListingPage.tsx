@@ -596,6 +596,7 @@ function ListingModalEditor({ className = "" }: { className?: string }): React.J
     bathroom_number: Number(state.propertyBathrooms),
     space: Number(state.areaValue),
     description: state.propertyDescription,
+    summary_description: state.summaryDescription,
     images: [], // Placeholder, as we don't have image files in the current state
     available_dates: new Date(),
     lease_term: state.leaseTerm,

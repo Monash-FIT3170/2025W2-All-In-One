@@ -59,16 +59,15 @@ export default function EditDraftListingModal(
       propertyId: props.propertyId,
       streetnumber: addressParts[0],
       streetname: addressParts.slice(1).join(" "),
-      suburb: "Clayton",
+      suburb: values.suburb,
       province: values.state,
       postcode: values.postal_code,
       description: values.description,
-      summaryDescription:
-        "Modern apartment with spacious living areas and a beautiful garden.",
+      summaryDescription: values.summary_description,
       bathrooms: values.bathroom_number,
       bedrooms: values.bedroom_number,
       parking: 100,
-      features: [], // TODO: Replace with actual value if available
+      features: values.property_feature_ids, // Use actual feature IDs from form
       type: values.property_type,
       area: values.space,
       landlordId: values.landlord,
