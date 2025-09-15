@@ -25,6 +25,7 @@ export type PropertyListingPageUiState = {
   propertyParkingSpaces: string;
   propertyBedrooms: string;
   propertyPrice: string;
+  monthlyRent: number;
   mapUiState: PropertyMapUiState;
   inspectionBookingUiStateList: InspectionBookingListUiState[];
   bookedPropertyListingInspections: number[];

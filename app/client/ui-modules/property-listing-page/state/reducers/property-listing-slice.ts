@@ -13,6 +13,7 @@ import {
 } from "/app/client/library-modules/utils/date-utils";
 
 const initialState: PropertyListingPageUiState = {
+  agentId: "",
   propertyId: "",
   propertyLandlordId: "",
   streetNumber: "",
@@ -32,6 +33,7 @@ const initialState: PropertyListingPageUiState = {
   propertyParkingSpaces: "",
   propertyBedrooms: "",
   propertyPrice: "",
+  monthlyRent: 0,
   mapUiState: {
     markerLatitude: 0,
     markerLongitude: 0,
@@ -102,6 +104,7 @@ export const propertyListingSlice = createSlice({
       state.propertyPrice = getPropertyPriceDisplayString(
         action.payload.pricePerMonth
       );
+      state.monthlyRent = action.payload.pricePerMonth;
       state.mapUiState = {
         markerLatitude: action.payload.locationLatitude,
         markerLongitude: action.payload.locationLongitude,

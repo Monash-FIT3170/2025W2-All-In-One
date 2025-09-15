@@ -588,7 +588,7 @@ function ListingModalEditor({ className = "" }: { className?: string }): React.J
     lease_term: state.leaseTerm,
     suburb: state.suburb,
     address_number: state.streetNumber,
-    monthly_rent: Number(state.propertyPrice),
+    monthly_rent: state.monthlyRent,
     property_feature_ids: [],
     inspection_times: [],
   };
