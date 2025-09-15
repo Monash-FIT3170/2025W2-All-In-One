@@ -374,9 +374,10 @@ export const messagesSlice = createSlice({
     /**
      * Updates messages from real-time subscription data
      * Converts server message documents to UI format with proper isOutgoing logic
+     * Also marks previous messages as read when recipient responds
      */
     setMessagesFromSubscription(state, action: PayloadAction<{ conversationId: string; messages: ApiMessage[]; currentUserId?: string }>) {
-      
+
       // Convert API messages to Message[] for UI
       const uiMessages: Message[] = action.payload.messages.map(doc => ({
         id: doc.messageId,
@@ -385,7 +386,25 @@ export const messagesSlice = createSlice({
         isOutgoing: action.payload.currentUserId ? doc.senderId === action.payload.currentUserId : false,
         isRead: doc.isRead,
       }));
-      
+
+      // If we have a current user, mark previous outgoing messages as read
+      // when the other user sends a new message (they've clearly read the conversation)
+      if (action.payload.currentUserId && uiMessages.length > 0) {
+        // Find the latest incoming message
+        const latestIncomingMessage = uiMessages
+          .filter(msg => !msg.isOutgoing)
+          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
+
+        if (latestIncomingMessage) {
+          // Mark all previous outgoing messages as read
+          uiMessages.forEach(msg => {
+            if (msg.isOutgoing && new Date(msg.timestamp) <= new Date(latestIncomingMessage.timestamp)) {
+              msg.isRead = true;
+            }
+          });
+        }
+      }
+
       // Replace messages array with subscription data (this is the authoritative source)
       state.messages = uiMessages;
     },
