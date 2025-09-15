@@ -1,50 +1,61 @@
 import {
-	ApiLeaseAgreement,
-	InsertLeaseAgreementPayload,
+  ApiLeaseAgreement,
+  InsertLeaseAgreementPayload,
 } from "/app/shared/api-models/user-documents/ApiLeaseAgreement";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 export async function apiGetLeaseAgreement(
-	leaseId: string
+  leaseId: string
 ): Promise<ApiLeaseAgreement> {
-	return await Meteor.callAsync(
-		MeteorMethodIdentifier.LEASE_AGREEMENT_GET,
-		leaseId
-	);
+  return await Meteor.callAsync(
+    MeteorMethodIdentifier.LEASE_AGREEMENT_GET,
+    leaseId
+  );
 }
 
 export async function apiGetLeaseAgreementsForProperty(
-	propertyId: string
+  propertyId: string
 ): Promise<ApiLeaseAgreement[]> {
-	return await Meteor.callAsync(
-		MeteorMethodIdentifier.LEASE_AGREEMENT_LIST_FOR_PROPERTY,
-		propertyId
-	);
+  return await Meteor.callAsync(
+    MeteorMethodIdentifier.LEASE_AGREEMENT_LIST_FOR_PROPERTY,
+    propertyId
+  );
 }
 
 export async function apiGetLeaseAgreementsForAgent(
-	agentId: string
+  agentId: string
 ): Promise<ApiLeaseAgreement[]> {
-	return await Meteor.callAsync(
-		MeteorMethodIdentifier.LEASE_AGREEMENT_LIST_FOR_AGENT,
-		agentId
-	);
+  return await Meteor.callAsync(
+    MeteorMethodIdentifier.LEASE_AGREEMENT_LIST_FOR_AGENT,
+    agentId
+  );
 }
 
 export async function apiInsertLeaseAgreement(
-	leaseAgreement: InsertLeaseAgreementPayload
+  leaseAgreement: InsertLeaseAgreementPayload
 ): Promise<ApiLeaseAgreement> {
-	return await Meteor.callAsync(
-		MeteorMethodIdentifier.LEASE_AGREEMENT_INSERT,
-		leaseAgreement
-	);
+  return await Meteor.callAsync(
+    MeteorMethodIdentifier.LEASE_AGREEMENT_INSERT,
+    leaseAgreement
+  );
 }
 
 export async function apiDeleteLeaseAgreement(
-	leaseId: string
+  leaseId: string
 ): Promise<ApiLeaseAgreement> {
-	return await Meteor.callAsync(
-		MeteorMethodIdentifier.LEASE_AGREEMENT_DELETE,
-		leaseId
-	);
+  return await Meteor.callAsync(
+    MeteorMethodIdentifier.LEASE_AGREEMENT_DELETE,
+    leaseId
+  );
+}
+
+export async function apiSignDocument(
+  documentId: string,
+  role: "agent" | "tenant" | "landlord"
+): Promise<ApiLeaseAgreement> {
+  return await Meteor.callAsync(
+    MeteorMethodIdentifier.SIGN_DOCUMENT,
+    documentId,
+    role
+  );
 }

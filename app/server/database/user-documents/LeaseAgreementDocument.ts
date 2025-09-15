@@ -7,4 +7,7 @@ export type LeaseAgreementDocument = {
 	validUntil: Date; // Expiry date of the lease agreement
 	documentUrl: string; // URL to access the document
 	tenantName?: string; // Optional tenant name for display purposes
+	tenantSigned?: boolean; // Indicates if the tenant has signed the agreement
+	landlordSigned?: boolean; // Indicates if the landlord has signed the agreement
+	agentSigned?: boolean; // Indicates if the agent has signed the agreement
 };
