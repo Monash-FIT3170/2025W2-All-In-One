@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
-  selectTasks,
-  selectLoading,
-  fetchAgentTasks,
-  selectMarkers,
-} from "../state/agent-dashboard-slice";
+  selectCalendarTasks,
+  selectCalendarLoading,
+  fetchAgentCalendarTasks,
+  selectCalendarMarkers,
+} from "../state/agent-calendar-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 import { AddTaskModal } from "../components/AddTaskModal";
@@ -19,18 +19,19 @@ import {
   getTodayISODate,
   getTodayAUDate,
 } from "/app/client/library-modules/utils/date-utils";
-import { fetchPropertiesForAgent } from "../state/agent-dashboard-slice";
+import { fetchPropertiesForAgentCalendar } from "../state/agent-calendar-slice";
 import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
-import { fetchMarkersForDate } from "../state/agent-dashboard-slice";
+import { fetchCalendarMarkersForDate } from "../state/agent-calendar-slice";
+import { LoadingSpinner } from "../../../common/LoadingSpinner";
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const currentAgent = useAppSelector(
     (state) => state.currentUser.currentUser
   ) as Agent | undefined;
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
-  const tasks = useAppSelector(selectTasks);
-  const loading = useAppSelector(selectLoading);
-  const markers = useAppSelector(selectMarkers);
+  const tasks = useAppSelector(selectCalendarTasks);
+  const loading = useAppSelector(selectCalendarLoading);
+  const markers = useAppSelector(selectCalendarMarkers);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
@@ -45,15 +46,15 @@ export function AgentCalendar(): React.JSX.Element {
   // Fetch tasks for the current user
   useEffect(() => {
     if (currentUser?.userId) {
-      dispatch(fetchAgentTasks(currentUser.userId));
-      console.log("Fetching agent tasks");
+      dispatch(fetchAgentCalendarTasks(currentUser.userId));
+      console.log("Fetching agent calendar tasks");
     }
   }, [dispatch, currentUser?.userId]);
 
   // Fetch properties for the agent
   useEffect(() => {
     if (!currentAgent?.agentId) return;
-    fetchPropertiesForAgent(currentAgent.agentId)
+    fetchPropertiesForAgentCalendar(currentAgent.agentId)
       .then(setProperties)
       .catch((err) => console.error("Failed to fetch properties:", err));
   }, [currentAgent?.agentId]);
@@ -62,7 +63,7 @@ export function AgentCalendar(): React.JSX.Element {
 
   useEffect(() => {
     dispatch(
-      fetchMarkersForDate({
+      fetchCalendarMarkersForDate({
         tasks,
         selectedDateISO: selectedDateISO ?? undefined,
       })
@@ -99,13 +100,13 @@ export function AgentCalendar(): React.JSX.Element {
       console.log("Task created successfully with ID:", createdTaskId);
 
       setIsModalOpen(false);
-      dispatch(fetchAgentTasks(currentUser.userId));
+      dispatch(fetchAgentCalendarTasks(currentUser.userId));
     } catch (error) {
       console.error("Error creating task:", error);
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingSpinner message="Loading your calendar..." />;
 
   return (
     <div className="min-h-screen">

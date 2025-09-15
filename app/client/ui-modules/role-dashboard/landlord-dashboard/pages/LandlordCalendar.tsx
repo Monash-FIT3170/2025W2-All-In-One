@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
-  selectTasks,
-  selectLoading,
-  fetchLandlordTasks,
-  selectMarkers,
-  createLandlordTask,
-} from "../../landlord-dashboard/state/landlord-dashboard-slice";
+  selectLandlordCalendarTasks,
+  selectLandlordCalendarLoading,
+  fetchLandlordCalendarTasks,
+  selectLandlordCalendarMarkers,
+} from "../../landlord-dashboard/state/landlord-calendar-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 import { AddTaskModal } from "../../agent-dashboard/components/AddTaskModal";
@@ -20,18 +19,18 @@ import {
   getTodayISODate,
   getTodayAUDate,
 } from "/app/client/library-modules/utils/date-utils";
-import { fetchPropertiesForLandlord } from "../../landlord-dashboard/state/landlord-dashboard-slice";
+import { fetchPropertiesForLandlordCalendar } from "../../landlord-dashboard/state/landlord-calendar-slice";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
-import { fetchMarkersForDate } from "../../agent-dashboard/state/agent-dashboard-slice";
+import { fetchLandlordCalendarMarkersForDate } from "../../landlord-dashboard/state/landlord-calendar-slice";
 export function LandlordCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const currentLandlord = useAppSelector(
     (state) => state.currentUser.currentUser
   ) as Landlord | undefined;
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
-  const tasks = useAppSelector(selectTasks);
-  const loading = useAppSelector(selectLoading);
-  const markers = useAppSelector(selectMarkers);
+  const tasks = useAppSelector(selectLandlordCalendarTasks);
+  const loading = useAppSelector(selectLandlordCalendarLoading);
+  const markers = useAppSelector(selectLandlordCalendarMarkers);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
@@ -46,8 +45,8 @@ export function LandlordCalendar(): React.JSX.Element {
   // Fetch tasks for the current user
   useEffect(() => {
     if (currentUser?.userId) {
-      dispatch(fetchLandlordTasks());
-      console.log("Fetching landlord tasks");
+      dispatch(fetchLandlordCalendarTasks());
+      console.log("Fetching landlord calendar tasks");
       console.log("The current User Id is" + currentUser?.userId);
     }
   }, [dispatch, currentUser?.userId]);
@@ -55,7 +54,7 @@ export function LandlordCalendar(): React.JSX.Element {
   // Fetch properties for the landlord
   useEffect(() => {
     if (!currentLandlord?.landlordId) return;
-    fetchPropertiesForLandlord(currentLandlord.landlordId)
+    fetchPropertiesForLandlordCalendar(currentLandlord.landlordId)
       .then(setProperties)
       .catch((err) => console.error("Failed to fetch properties:", err));
   }, [currentLandlord?.landlordId]);
@@ -64,7 +63,7 @@ export function LandlordCalendar(): React.JSX.Element {
 
   useEffect(() => {
     dispatch(
-      fetchMarkersForDate({
+      fetchLandlordCalendarMarkersForDate({
         tasks,
         selectedDateISO: selectedDateISO ?? undefined,
       })
@@ -81,14 +80,32 @@ export function LandlordCalendar(): React.JSX.Element {
   const handleCloseModal = () => setIsModalOpen(false);
 
   const handleTaskSubmit = async (taskData: TaskData) => {
-  try {
-    const createdTaskId = await dispatch(createLandlordTask(taskData)).unwrap();
-    console.log("Task created successfully with ID:", createdTaskId);
-    setIsModalOpen(false);
-  } catch (error) {
-    console.error("Error creating task:", error);
-  }
-};
+    if (!currentUser?.userId) {
+      console.error("No current user found");
+      return;
+    }
+
+    try {
+      const apiData = {
+        name: taskData.name,
+        description: taskData.description,
+        dueDate: new Date(taskData.dueDate),
+        priority: taskData.priority,
+        userId: currentUser.userId,
+        propertyAddress: taskData.propertyAddress,
+        propertyId: taskData.propertyId || "",
+      };
+
+      const createdTaskId = await apiCreateTaskForLandlord(apiData);
+      console.log("Task created successfully with ID:", createdTaskId);
+      
+      setIsModalOpen(false);
+      // Refresh calendar tasks to show the newly created task
+      dispatch(fetchLandlordCalendarTasks());
+    } catch (error) {
+      console.error("Error creating task:", error);
+    }
+  };
 
 
   if (loading) return <div>Loading...</div>;

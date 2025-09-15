@@ -4,20 +4,24 @@ import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 import { UpcomingTasks } from "../../components/UpcomingTask";
 import { CalendarTasksList } from "../../components/CalendarTasksList";
-import { fetchTenantDetails, selectLoading, selectTasks } from "../state/reducers/tenant-dashboard-slice";
+import { 
+  fetchTenantCalendarTasks, 
+  selectTenantCalendarLoading, 
+  selectTenantCalendarTasks 
+} from "../state/reducers/tenant-calendar-slice";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { getTodayISODate } from "/app/client/library-modules/utils/date-utils";
 
 export function TenantCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch(); 
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
-  const tasks = useAppSelector(selectTasks); // Retrieve tasks from Redux store
-  const loading = useAppSelector(selectLoading);
+  const tasks = useAppSelector(selectTenantCalendarTasks); // Retrieve tasks from Redux store
+  const loading = useAppSelector(selectTenantCalendarLoading);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
   useEffect(() => { 
     if (currentUser?.userId) {
-      dispatch(fetchTenantDetails(currentUser.userId)); // Fetch tasks for the current user
+      dispatch(fetchTenantCalendarTasks(currentUser.userId)); // Fetch tasks for the current user
     }
     else {
       console.warn("No user ID found. Please log in to view the calendar.");
@@ -36,7 +40,7 @@ export function TenantCalendar(): React.JSX.Element {
     <div className="min-h-screen">
       <div className="flex">
         <div className="flex-1 p-6">
-          <h1 className="text-2xl font-bold mb-6">Agent Calendar</h1>
+          <h1 className="text-2xl font-bold mb-6">Tenant Calendar</h1>
           <div className="flex gap-6">
             {/* Left: Calendar */}
             <div className="flex-1">
