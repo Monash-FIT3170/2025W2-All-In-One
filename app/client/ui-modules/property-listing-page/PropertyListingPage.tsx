@@ -23,6 +23,10 @@ import {
   selectPropertyListingUiState,
   submitDraftListingAsync,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
+import { 
+  load as loadPropertyForm, 
+  selectPropertyFormUiState 
+} from "/app/client/ui-modules/property-form-agent/state/reducers/property-form-slice";
 
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import { useNavigate, useSearchParams } from "react-router";
@@ -569,6 +573,15 @@ function ListingModalEditor({ className = "" }: { className?: string }): React.J
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const toggleModal = () => setIsModalOpen(!isModalOpen);
   const state: PropertyListingPageUiState = useSelector(selectPropertyListingUiState);
+  const propertyFormState = useAppSelector(selectPropertyFormUiState);
+  const dispatch = useAppDispatch();
+
+  // Load property form data if landlords are not available
+  React.useEffect(() => {
+    if (propertyFormState.landlords.length === 0) {
+      dispatch(loadPropertyForm());
+    }
+  }, [dispatch, propertyFormState.landlords.length]);
 
   const listingInfo: FormSchemaType = {
     agent: state.agentId,
@@ -600,7 +613,7 @@ function ListingModalEditor({ className = "" }: { className?: string }): React.J
         isOpen={isModalOpen}
         toggle={toggleModal}
         propertyForm={listingInfo}
-        landlords={state.landlords}
+        landlords={propertyFormState.landlords}
         propertyId={state.propertyId}
         existingImageUrls={state.listingImageUrls}
       />

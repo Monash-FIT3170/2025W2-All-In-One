@@ -26,7 +26,7 @@ interface EditDraftListingModalProps {
   toggle: () => void;
   isOpen: boolean;
   propertyForm: FormSchemaType;
-  landlords: Landlord[];
+  landlords: (Landlord & { firstName: string; lastName: string })[];
   propertyId: string;
   existingImageUrls?: string[];
 }
@@ -153,11 +153,8 @@ export default function EditDraftListingModal(
                   ref={propertyFormRef}
                   onSubmit={handleSaveChanges}
                   form={listingInfo}
-                  landlords={props.landlords.map(l => ({
-                    ...l,
-                    firstName: (l as any).firstName ?? "",
-                    lastName: (l as any).lastName ?? "",
-                  }))}
+                  landlords={props.landlords}
+                  
                   mode={PropertyFormMode.EDIT}
                   features={[]}
                 />
