@@ -91,7 +91,7 @@ export function TopNavbar({
                   open={isNotificationDropdownOpen}
                   onClose={() => setIsNotificationDropdownOpen(false)}
                   tasks={upcomingTasks}
-                  unreadMessagesCount={totalUnreadMessages}
+                  conversations={conversations}
                 />
               </div>
               <div className="cursor-pointer" onClick={handleGoProfile}>

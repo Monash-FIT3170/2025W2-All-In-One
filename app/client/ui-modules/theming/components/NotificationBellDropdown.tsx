@@ -2,16 +2,17 @@ import React from 'react';
 import { TaskStatus } from '/app/shared/task-status-identifier';
 import { parse, format, compareAsc } from "date-fns";
 import { Task } from '/app/client/library-modules/domain-models/task/Task';
+import { Conversation } from '/app/client/library-modules/domain-models/messaging/Conversation';
 import { useRef, useEffect } from 'react';
 
 interface NotificationDropdownProps {
   open: boolean;
   onClose: () => void;
   tasks: Task[];
-  unreadMessagesCount: number;
+  conversations: Conversation[];
 }
 
-export function NotificationBellDropdown({ open, onClose, tasks, unreadMessagesCount }: NotificationDropdownProps) {
+export function NotificationBellDropdown({ open, onClose, tasks, conversations }: NotificationDropdownProps) {
   const popupRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -101,15 +102,40 @@ export function NotificationBellDropdown({ open, onClose, tasks, unreadMessagesC
             </div>
           ))
         )}
-        {/* Unread Messages Section */}
-        <div className="px-4 py-3 border-t border-gray-100">
-          <div className="flex justify-between items-center">
-            <span className="font-medium text-base text-gray-900">Unread Messages</span>
-            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-              {unreadMessagesCount}
-            </span>
-          </div>
-        </div>
+        {/* New Messages Section */}
+        {(() => {
+          const newMessageConversations = conversations.filter(conv => conv.unreadCount > 0);
+          const totalUnreadCount = newMessageConversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
+          const latestConversation = newMessageConversations.sort((a, b) => {
+            if (!a.timestamp && !b.timestamp) return 0;
+            if (!a.timestamp) return 1;
+            if (!b.timestamp) return -1;
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+          })[0];
+
+          return newMessageConversations.length > 0 ? (
+            <div className="px-4 py-3 border-t border-gray-100 hover:bg-gray-50 transition">
+              <div className="flex justify-between items-start mb-1">
+                <div className="font-medium text-base text-gray-900">New Messages</div>
+                <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                  {totalUnreadCount}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                <span>Last: {latestConversation?.timestamp || 'Unknown'}</span>
+                {latestConversation && (
+                  <>
+                    <span>•</span>
+                    <span>{latestConversation.name}</span>
+                  </>
+                )}
+              </div>
+              <div className="text-sm text-gray-900 font-normal">
+                Click here to view messages
+              </div>
+            </div>
+          ) : null;
+        })()}
       </div>
       <div className="px-4 py-2 border-t border-gray-100 text-center">
         <button
