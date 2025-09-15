@@ -28,8 +28,6 @@ import "./methods/user/user-account-methods";
 import "./methods/user/role-methods/agent-methods";
 import "./methods/user/role-methods/tenant-methods";
 import "./methods/user/role-methods/landlord-methods";
-import "./methods/property-listing/listing-methods";
-import "./methods/property-listing/listing-methods";
 import { TaskCollection } from "/app/server/database/task/task-collections";
 import {
   AgentCollection,

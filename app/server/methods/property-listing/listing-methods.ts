@@ -275,7 +275,6 @@ const addTenantToInspectionMethod = {
     const inspection = await PropertyListingInspectionCollection.findOneAsync({
       _id: inspectionId,
     });
-    console.log("testingGotToAddTenantToInspectionMethod");
     if (!inspection)
       throw new Meteor.Error("not-found", "Inspection not found");
     console.log(
