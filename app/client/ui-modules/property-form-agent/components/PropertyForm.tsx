@@ -72,6 +72,7 @@ export const formDefaultValues: z.infer<typeof formSchema> = {
   monthly_rent: 0,
   bedroom_number: 0,
   bathroom_number: 0,
+  parking_spaces: 0,
   space: 0,
   description: "",
   summary_description: "",

@@ -14,6 +14,7 @@ export const formSchema = z.object({
   monthly_rent: z.coerce.number().min(1, { message: "Please fill out field" }),
   bedroom_number: z.coerce.number().min(1, { message: "Please fill out field" }),
   bathroom_number: z.coerce.number().min(1, { message: "Please fill out field" }),
+  parking_spaces: z.coerce.number().min(0, { message: "Please enter a valid number" }),
   space: z.coerce.number().min(1, { message: "Please fill out field" }),
   description: z.string().min(1, { message: "Please fill out field" }),
   summary_description: z.string().min(1, { message: "Please fill out field" }),

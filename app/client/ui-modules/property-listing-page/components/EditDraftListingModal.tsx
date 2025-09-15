@@ -66,8 +66,8 @@ export default function EditDraftListingModal(
       summaryDescription: values.summary_description,
       bathrooms: values.bathroom_number,
       bedrooms: values.bedroom_number,
-      parking: 100,
-      features: values.property_feature_ids, // Use actual feature IDs from form
+      parking: values.parking_spaces,
+      features: values.property_feature_ids,
       type: values.property_type,
       area: values.space,
       landlordId: values.landlord,

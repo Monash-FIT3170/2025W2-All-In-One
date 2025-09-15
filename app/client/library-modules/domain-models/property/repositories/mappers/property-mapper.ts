@@ -44,7 +44,7 @@ export async function mapFormSchemaToPropertyInsertData(form: FormSchemaType) {
     summary_description: form.summary_description,
     bathrooms: form.bathroom_number,
     bedrooms: form.bedroom_number,
-    parking: 0, // fill as needed
+    parking: form.parking_spaces,
     property_feature_ids: form.property_feature_ids,
     type: form.property_type,
     area: form.space,

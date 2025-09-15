@@ -594,6 +594,7 @@ function ListingModalEditor({ className = "" }: { className?: string }): React.J
     apartment_number: "",
     bedroom_number: Number(state.propertyBedrooms),
     bathroom_number: Number(state.propertyBathrooms),
+    parking_spaces: Number(state.propertyParkingSpaces),
     space: Number(state.areaValue),
     description: state.propertyDescription,
     summary_description: state.summaryDescription,

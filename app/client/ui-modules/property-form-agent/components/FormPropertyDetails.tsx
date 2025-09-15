@@ -28,7 +28,7 @@ export default function FormPropertyDetails({
         subtitle="Enter specific details about the property"
       />
       <div className="grid grid-cols-12 gap-4">
-        <div className="col-span-4">
+        <div className="col-span-3">
           <FormField
             control={form.control}
             name="bedroom_number"
@@ -45,7 +45,7 @@ export default function FormPropertyDetails({
           />
         </div>
 
-        <div className="col-span-4">
+        <div className="col-span-3">
           <FormField
             control={form.control}
             name="bathroom_number"
@@ -61,7 +61,7 @@ export default function FormPropertyDetails({
           />
         </div>
 
-        <div className="col-span-4">
+        <div className="col-span-3">
           <FormField
             control={form.control}
             name="space"
@@ -72,6 +72,22 @@ export default function FormPropertyDetails({
                   <Input placeholder="1200" type="number" {...field} />
                 </FormControl>
 
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="col-span-3">
+          <FormField
+            control={form.control}
+            name="parking_spaces"
+            render={({ field }) => (
+              <FormItem className="py-2">
+                <FormLabel>Parking Spaces</FormLabel>
+                <FormControl>
+                  <Input placeholder="2" type="number" {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
