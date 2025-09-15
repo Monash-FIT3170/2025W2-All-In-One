@@ -130,14 +130,6 @@ function AppRoot(): React.JSX.Element {
               </AgentRoute>
             }
           />
-          <Route
-            path={NavigationPath.AgentTasks}
-            element={
-              <AgentRoute>
-                <AgentTask />
-              </AgentRoute>
-            }
-          />
           {/* Agent and Landlord routes */}
           <Route
             path={NavigationPath.PropertyForm}
@@ -177,14 +169,6 @@ function AppRoot(): React.JSX.Element {
             element={
               <AgentRoute>
                 <AgentMessagePage />
-              </AgentRoute>
-            }
-          />
-          <Route
-            path={NavigationPath.AgentTasks}
-            element={
-              <AgentRoute>
-                <AgentTask />
               </AgentRoute>
             }
           />
@@ -240,14 +224,6 @@ function AppRoot(): React.JSX.Element {
             }
           />
           <Route
-            path={NavigationPath.LandlordTasks}
-            element={
-              <LandlordRoute>
-                <LandlordTask />
-              </LandlordRoute>
-            }
-          />
-          <Route
             path={NavigationPath.LandlordMessages}
             element={
               <LandlordRoute>
@@ -290,14 +266,6 @@ function AppRoot(): React.JSX.Element {
             }
           />
           <Route
-            path={NavigationPath.TenantMaintenance}
-            element={
-              <TenantRoute>
-                <TenantMaintenance />
-              </TenantRoute>
-            }
-          />
-          <Route
             path={NavigationPath.TenantMessages}
             element={
               <TenantRoute>
@@ -313,15 +281,6 @@ function AppRoot(): React.JSX.Element {
               </TenantRoute>
             }
           />
-          <Route
-            path={NavigationPath.TenantSearchProperties}
-            element={
-              <TenantRoute>
-                <TenantSearchProperties />
-              </TenantRoute>
-            }
-          />
-
           {/* Authenticated user routes */}
           <Route
             path={NavigationPath.Settings}
