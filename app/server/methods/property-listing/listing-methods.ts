@@ -133,14 +133,6 @@ const getAllListedListings = {
   },
 };
 
-async function getListingDocumentsByStatus(
-  statusId: string
-): Promise<ListingDocument[]> {
-  return ListingCollection.find({
-    listing_status_id: statusId,
-  }).fetchAsync();
-}
-
 async function mapListingDocumentToListingDTO(
   listing: ListingDocument
 ): Promise<ApiListing> {
