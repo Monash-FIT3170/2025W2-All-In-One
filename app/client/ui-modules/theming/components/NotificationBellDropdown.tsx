@@ -106,12 +106,13 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
         {(() => {
           const newMessageConversations = conversations.filter(conv => conv.unreadCount > 0);
           const totalUnreadCount = newMessageConversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
-          const latestConversation = newMessageConversations.sort((a, b) => {
+          const sortedConversations = newMessageConversations.sort((a, b) => {
             if (!a.timestamp && !b.timestamp) return 0;
             if (!a.timestamp) return 1;
             if (!b.timestamp) return -1;
             return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-          })[0];
+          });
+          const latestConversation = sortedConversations[0];
 
           return newMessageConversations.length > 0 ? (
             <div className="px-4 py-3 border-t border-gray-100 hover:bg-gray-50 transition">
@@ -126,7 +127,12 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
                 {latestConversation && (
                   <>
                     <span>•</span>
-                    <span>{latestConversation.name}</span>
+                    <span>
+                      {latestConversation.name}
+                      {newMessageConversations.length > 1 && (
+                        <span className="text-gray-400"> +{newMessageConversations.length - 1} more</span>
+                      )}
+                    </span>
                   </>
                 )}
               </div>
