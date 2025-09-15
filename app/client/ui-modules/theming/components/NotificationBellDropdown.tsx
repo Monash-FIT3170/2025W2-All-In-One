@@ -8,9 +8,10 @@ interface NotificationDropdownProps {
   open: boolean;
   onClose: () => void;
   tasks: Task[];
+  unreadMessagesCount: number;
 }
 
-export function NotificationBellDropdown({ open, onClose, tasks }: NotificationDropdownProps) {
+export function NotificationBellDropdown({ open, onClose, tasks, unreadMessagesCount }: NotificationDropdownProps) {
   const popupRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -100,6 +101,15 @@ export function NotificationBellDropdown({ open, onClose, tasks }: NotificationD
             </div>
           ))
         )}
+        {/* Unread Messages Section */}
+        <div className="px-4 py-3 border-t border-gray-100">
+          <div className="flex justify-between items-center">
+            <span className="font-medium text-base text-gray-900">Unread Messages</span>
+            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+              {unreadMessagesCount}
+            </span>
+          </div>
+        </div>
       </div>
       <div className="px-4 py-2 border-t border-gray-100 text-center">
         <button
