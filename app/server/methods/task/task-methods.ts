@@ -508,5 +508,7 @@ Meteor.methods({
   ...taskInsertForAgentMethod,
   ...taskInsertForLandlordMethod,
   ...taskUpdateForAgentMethod,
-  ...taskUpdateForLandlordMethod
+  ...taskUpdateForLandlordMethod,
+  ...taskInsertForTenantMethod,
+  ...taskUpdateForTenantMethod,
 });
