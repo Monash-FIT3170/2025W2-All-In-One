@@ -41,6 +41,7 @@ const initialState: PropertyListingPageUiState = {
   listingImageUrls: [],
   listingStatusText: "",
   listingStatusPillVariant: ListingStatusPillVariant.DRAFT,
+  leaseTerm: "12_months",
   shouldDisplayListingStatus: true,
   shouldDisplaySubmitDraftButton: true,
   shouldDisplayReviewTenantButton: false,
@@ -121,6 +122,7 @@ export const propertyListingSlice = createSlice({
       state.listingStatusPillVariant = getListingStatusPillVariant(
         action.payload.listing_status
       );
+      state.leaseTerm = action.payload.lease_term;
 
       // Set button visibility based on listing status
       const isDraft = action.payload.listing_status.toLowerCase() === "draft";

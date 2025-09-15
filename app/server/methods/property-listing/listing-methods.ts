@@ -167,6 +167,7 @@ async function mapListingDocumentToListingDTO(
     property_id: listing.property_id,
     image_urls: listing.image_urls,
     listing_status: listingStatusDocument.name,
+    lease_term: listing.lease_term,
     propertyListingInspections: propertyListingInspections.map((inspection) => ({
       start_time: inspection.starttime,
       end_time: inspection.endtime,

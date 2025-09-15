@@ -28,11 +28,13 @@ export async function apiInsertPropertyListing(
   imageUrls: string[],
   status: ListingStatus,
   inspectionIds: string[],
+  leaseTerm: string,
 ) {
   const data: ApiInsertListingPayload = {
     property_id: propertyId,
     image_urls: imageUrls,
     inspection_ids: inspectionIds,
+    lease_term: leaseTerm,
   };
   const insertedListing: string = await Meteor.callAsync(
     MeteorMethodIdentifier.INSERT_PROPERTY_LISTING,

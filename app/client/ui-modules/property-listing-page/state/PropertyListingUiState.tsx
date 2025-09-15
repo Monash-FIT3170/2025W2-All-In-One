@@ -31,6 +31,7 @@ export type PropertyListingPageUiState = {
   listingImageUrls: string[];
   listingStatusText: string;
   listingStatusPillVariant: ListingStatusPillVariant;
+  leaseTerm: string;
   shouldDisplayListingStatus: boolean;
   shouldDisplaySubmitDraftButton: boolean;
   shouldDisplayReviewTenantButton: boolean;
