@@ -41,6 +41,7 @@ const initialState: PropertyListingPageUiState = {
     markerLongitude: 0,
   },
   inspectionBookingUiStateList: [],
+  inspectionTimes: [],
   bookedPropertyListingInspections: [],
   listingImageUrls: [],
   listingStatusText: "",
@@ -119,6 +120,13 @@ export const propertyListingSlice = createSlice({
           date: getFormattedDateStringFromDate(inspection.start_time),
           startingTime: getFormattedTimeStringFromDate(inspection.start_time),
           endingTime: getFormattedTimeStringFromDate(inspection.end_time),
+        })
+      );
+
+      state.inspectionTimes = action.payload.propertyListingInspections.map(
+        (inspection) => ({
+          start_time: inspection.start_time,
+          end_time: inspection.end_time,
         })
       );
 

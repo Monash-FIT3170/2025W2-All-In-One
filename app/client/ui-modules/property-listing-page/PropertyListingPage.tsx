@@ -612,7 +612,7 @@ function ListingModalEditor({ className = "" }: { className?: string }): React.J
     address_number: state.streetNumber,
     monthly_rent: state.monthlyRent,
     property_feature_ids: state.propertyFeatureIds,
-    inspection_times: [],
+    inspection_times: state.inspectionTimes,
   };
 
   return (
