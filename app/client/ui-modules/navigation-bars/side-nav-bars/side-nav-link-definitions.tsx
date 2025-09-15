@@ -13,7 +13,6 @@ export const agentDashboardLinks = [
   { to: "/agent-dashboard", label: "Overview" },
   { to: "/agent-properties", label: "Properties" },
   { to: "/agent-calendar", label: "Calendar" },
-  { to: "/agent-tasks", label: "Tasks" },
   { to: "/agent-messages", label: "Messages" },
   { to: "/agent-documents", label: "Documents"},
   { to: "/agent-analytics", label: "Analytics" },
@@ -23,17 +22,14 @@ export const tenantDashboardLinks = [
   { to: "/tenant-dashboard", label: "Overview" },
   { to: "/tenant-property", label: "My Property" },
   { to: "/tenant-calendar", label: "Calendar" },
-  { to: "/tenant-maintenance", label: "Maintenance" },
   { to: "/tenant-messages", label: "Messages" },
   { to: "/tenant-documents", label: "Documents" },
-  { to: "/tenant-search-properties", label: "Search Properties" },
 ];
 
 export const landlordDashboardLinks = [
   { to: "/landlord-dashboard", label: "Overview" },
   { to: "/landlord-properties", label: "Properties" },
   { to: "/landlord-calendar", label: "Calendar" },
-  { to: "/landlord-tasks", label: "Tasks" },
   { to: "/landlord-documents", label: "Documents" },
   { to: "/landlord-messages", label: "Messages" },
 ];
