@@ -193,6 +193,7 @@ export const { setLoading, setTasks, setProperties, setError } =
 export const selectLandlordDashboard = (state: RootState) =>
   state.landlordDashboard.dashboardData;
 export const selectTasks = (state: RootState) => state.landlordDashboard.tasks;
+export const selectPropertyDetails = (state: RootState) => state.landlordDashboard.properties;
 export const selectProperties = (state: RootState) =>
   state.landlordDashboard.properties;
 export const selectLoading = (state: RootState) =>

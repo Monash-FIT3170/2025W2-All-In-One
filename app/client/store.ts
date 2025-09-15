@@ -22,7 +22,7 @@ import { tenantSelectionSlice } from "./ui-modules/tenant-selection/state/reduce
 import { messagesSlice } from "./ui-modules/role-messages/state/reducers/messages-slice";
 import { searchResultsSlice } from "./ui-modules/search/state/search-result-slice";
 import { tenantPropertySlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/reducers/tenant-property-slice";
-
+import { landlordDocumentsSlice } from "./ui-modules/role-dashboard/landlord-dashboard/state/landlord-document-slice";
 export const store = configureStore({
 	reducer: {
 		agentDashboard: agentDashboardSlice.reducer,
@@ -32,6 +32,7 @@ export const store = configureStore({
 		tenantDashboard: tenantDashboardSlice.reducer,
 		tenantCalendar: tenantCalendarSlice.reducer,
 		tenantDocuments: tenantDocumentsSlice.reducer,
+		landlordDocuments: landlordDocumentsSlice.reducer,
 		guestLandingPage: guestLandingPageSlice.reducer,
 		settingsPage: settingsPageSlice.reducer,
 		landlordDashboard: landlordDashboardSlice.reducer,
