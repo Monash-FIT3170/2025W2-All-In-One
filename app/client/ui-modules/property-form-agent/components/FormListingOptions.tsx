@@ -163,7 +163,6 @@ export default function FormListingOptions({
                   ["12 Months", "12_months"],
                   ["6 Months", "6_months"],
                   ["Month-to-month", "month_to_month"],
-                  ["Custom", "custom"],
                 ].map((option, index) => (
                   <FormItem
                     className="flex items-center space-x-3 space-y-0"
