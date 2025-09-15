@@ -3,6 +3,7 @@ import { RootState } from "../../../../../store";
 import { getTenantById } from "/app/client/library-modules/domain-models/user/role-repositories/tenant-repository";
 import { getTaskById } from "/app/client/library-modules/domain-models/task/repositories/task-repository";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
+import { apiDeleteTaskForTenant } from "/app/client/library-modules/apis/task/task-api";
 
 interface TenantCalendarState {
   tasks: Task[];
@@ -51,6 +52,27 @@ export const fetchTenantCalendarTasks = createAsyncThunk(
   }
 );
 
+export const deleteTenantCalendarTask = createAsyncThunk(
+  "tenantCalendar/deleteTenantCalendarTask",
+  async (args: { taskId: string; userId: string }, { getState }) => {
+    try {
+      const result = await apiDeleteTaskForTenant({
+        taskId: args.taskId,
+        userId: args.userId
+      });
+      
+      if (result) {
+        return args.taskId; // Return the deleted task ID for removal from state
+      } else {
+        throw new Error("Failed to delete task");
+      }
+    } catch (error) {
+      console.error("Error deleting tenant task:", error);
+      throw error;
+    }
+  }
+);
+
 export const tenantCalendarSlice = createSlice({
   name: "tenantCalendar",
   initialState,
@@ -81,6 +103,16 @@ export const tenantCalendarSlice = createSlice({
       .addCase(fetchTenantCalendarTasks.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message || "Failed to fetch tenant calendar tasks";
+      })
+      .addCase(deleteTenantCalendarTask.pending, (state) => {
+        // Keep UI responsive during delete
+      })
+      .addCase(deleteTenantCalendarTask.fulfilled, (state, action) => {
+        // Remove the deleted task from state
+        state.tasks = state.tasks.filter(task => task.taskId !== action.payload);
+      })
+      .addCase(deleteTenantCalendarTask.rejected, (state, action) => {
+        state.error = action.error.message || "Failed to delete task";
       });
   },
 });

@@ -7,6 +7,7 @@ import { getTaskById } from "/app/client/library-modules/domain-models/task/repo
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { PropertyOption } from "../../agent-dashboard/components/TaskFormSchema";
 import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
+import { apiDeleteTaskForLandlord } from "/app/client/library-modules/apis/task/task-api";
 
 interface LandlordCalendarState {
   tasks: Task[];
@@ -91,6 +92,27 @@ export const fetchLandlordCalendarMarkersForDate = createAsyncThunk(
   }
 );
 
+export const deleteLandlordCalendarTask = createAsyncThunk(
+  "landlordCalendar/deleteLandlordCalendarTask",
+  async (args: { taskId: string; landlordId: string }, { getState }) => {
+    try {
+      const result = await apiDeleteTaskForLandlord({
+        taskId: args.taskId,
+        landlordId: args.landlordId
+      });
+      
+      if (result) {
+        return args.taskId; // Return the deleted task ID for removal from state
+      } else {
+        throw new Error("Failed to delete task");
+      }
+    } catch (error) {
+      console.error("Error deleting landlord task:", error);
+      throw error;
+    }
+  }
+);
+
 export const landlordCalendarSlice = createSlice({
   name: "landlordCalendar",
   initialState,
@@ -133,6 +155,16 @@ export const landlordCalendarSlice = createSlice({
       })
       .addCase(fetchLandlordCalendarMarkersForDate.rejected, (state, action) => {
         console.error("Failed to fetch landlord calendar markers:", action.error.message);
+      })
+      .addCase(deleteLandlordCalendarTask.pending, (state) => {
+        // Keep UI responsive during delete
+      })
+      .addCase(deleteLandlordCalendarTask.fulfilled, (state, action) => {
+        // Remove the deleted task from state
+        state.tasks = state.tasks.filter(task => task.taskId !== action.payload);
+      })
+      .addCase(deleteLandlordCalendarTask.rejected, (state, action) => {
+        state.error = action.error.message || "Failed to delete task";
       });
   },
 });

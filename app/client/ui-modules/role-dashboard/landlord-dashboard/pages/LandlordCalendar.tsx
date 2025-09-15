@@ -5,6 +5,7 @@ import {
   selectLandlordCalendarLoading,
   fetchLandlordCalendarTasks,
   selectLandlordCalendarMarkers,
+  deleteLandlordCalendarTask,
 } from "../../landlord-dashboard/state/landlord-calendar-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
@@ -107,6 +108,23 @@ export function LandlordCalendar(): React.JSX.Element {
     }
   };
 
+  const handleDeleteTask = async (taskId: string) => {
+    if (!currentLandlord?.landlordId) {
+      console.error("No current landlord found");
+      return;
+    }
+
+    try {
+      await dispatch(deleteLandlordCalendarTask({
+        taskId,
+        landlordId: currentLandlord.landlordId
+      }));
+      console.log("Task deleted successfully");
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+
 
   if (loading) return <div>Loading...</div>;
 
@@ -131,6 +149,7 @@ export function LandlordCalendar(): React.JSX.Element {
                   tasks={tasks}
                   selectedDateISO={selectedDateISO}
                   showPropertyAddress={true}
+                  onDeleteTask={handleDeleteTask}
                 />
                 <br />
                 <TaskMap mapUiState={mapUiState} />

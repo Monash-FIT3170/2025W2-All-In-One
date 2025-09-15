@@ -4,11 +4,15 @@ import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 import { UpcomingTasks } from "../../components/UpcomingTask";
 import { CalendarTasksList } from "../../components/CalendarTasksList";
+import { AddTaskModal } from "../../agent-dashboard/components/AddTaskModal";
+import { PropertyOption, TaskData } from "../../agent-dashboard/components/TaskFormSchema";
 import { 
   fetchTenantCalendarTasks, 
   selectTenantCalendarLoading, 
-  selectTenantCalendarTasks 
+  selectTenantCalendarTasks,
+  deleteTenantCalendarTask,
 } from "../state/reducers/tenant-calendar-slice";
+import { apiCreateTaskForTenant } from "/app/client/library-modules/apis/task/task-api";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { getTodayISODate } from "/app/client/library-modules/utils/date-utils";
 
@@ -19,6 +23,8 @@ export function TenantCalendar(): React.JSX.Element {
   const loading = useAppSelector(selectTenantCalendarLoading);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [properties] = useState<PropertyOption[]>([]); // Tenants don't manage properties, so empty array
   useEffect(() => { 
     if (currentUser?.userId) {
       dispatch(fetchTenantCalendarTasks(currentUser.userId)); // Fetch tasks for the current user
@@ -31,6 +37,55 @@ export function TenantCalendar(): React.JSX.Element {
     setSelectedDate(formatted);
     setSelectedDateISO(iso);
   };
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
+
+  const handleTaskSubmit = async (taskData: TaskData) => {
+    if (!currentUser?.userId) {
+      console.error("No current user found");
+      return;
+    }
+
+    try {
+      const apiData = {
+        name: taskData.name,
+        description: taskData.description,
+        dueDate: new Date(taskData.dueDate),
+        priority: taskData.priority,
+        userId: currentUser.userId,
+        propertyAddress: taskData.propertyAddress,
+        propertyId: taskData.propertyId || "",
+      };
+
+      const createdTaskId = await apiCreateTaskForTenant(apiData);
+      console.log("Task created successfully with ID:", createdTaskId);
+
+      setIsModalOpen(false);
+      // Refresh tasks to show the newly created task
+      dispatch(fetchTenantCalendarTasks(currentUser.userId));
+    } catch (error) {
+      console.error("Error creating task:", error);
+    }
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    if (!currentUser?.userId) {
+      console.error("No current user found");
+      return;
+    }
+
+    try {
+      await dispatch(deleteTenantCalendarTask({
+        taskId,
+        userId: currentUser.userId
+      }));
+      console.log("Task deleted successfully");
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -60,17 +115,26 @@ export function TenantCalendar(): React.JSX.Element {
                   tasks={tasks}
                   selectedDateISO={selectedDateISO}
                   showPropertyAddress={false}
+                  onDeleteTask={handleDeleteTask}
                 />
                 <br />
-                <Button>Add Task</Button>
+                <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
 
             {/* Right Section: Upcoming Tasks */}
             <UpcomingTasks tasks={tasks} />
-            </div>
           </div>
         </div>
       </div>
-)}
+
+      <AddTaskModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleTaskSubmit}
+        properties={properties} // Empty array for tenants
+      />
+    </div>
+  );
+}
 

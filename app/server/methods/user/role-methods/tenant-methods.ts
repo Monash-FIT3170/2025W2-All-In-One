@@ -98,8 +98,62 @@ const profileGetByTenantIdMethod = {
   },
 };
 
+// -- UPDATE TENANT TASKS --
+const tenantUpdateTasksMethod = {
+  [MeteorMethodIdentifier.TENANT_UPDATE_TASKS]: async (
+    userId: string,
+    tasksToAdd: string[] = [],
+    tasksToRemove: string[] = []
+  ): Promise<void> => {
+    console.log("TENANT_UPDATE_TASKS called with:", { userId, tasksToAdd, tasksToRemove });
+    
+    const tenantDoc = await TenantCollection.findOneAsync({
+      userAccountId: userId,
+    });
+
+    if (!tenantDoc) {
+      console.error("Tenant not found for userId:", userId);
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Tenant with user ID ${userId} not found.`)
+      );
+    }
+
+    console.log("Found tenant:", tenantDoc._id, "Current task_ids:", tenantDoc.task_ids);
+    let currentTasks = tenantDoc.task_ids ?? [];
+
+    // Add new tasks (avoid duplicates)
+    for (const taskId of tasksToAdd) {
+      if (!currentTasks.includes(taskId)) {
+        currentTasks.push(taskId);
+        console.log("Added task:", taskId);
+      }
+    }
+
+    // Remove tasks
+    for (const taskId of tasksToRemove) {
+      currentTasks = currentTasks.filter((id: string) => id !== taskId);
+      console.log("Removed task:", taskId);
+    }
+
+    console.log("Updating tenant with new task_ids:", currentTasks);
+    
+    // Update tenant document
+    const updateResult = await TenantCollection.updateAsync(
+      { _id: tenantDoc._id },
+      { $set: { task_ids: currentTasks } }
+    );
+    
+    console.log("Tenant update result:", updateResult);
+    
+    // Verify the update
+    const updatedTenant = await TenantCollection.findOneAsync({ _id: tenantDoc._id });
+    console.log("Verified updated tenant task_ids:", updatedTenant?.task_ids);
+  },
+};
+
 Meteor.methods({
   ...tenantInsertMethod,
   ...tenantGetMethod,
+  ...tenantUpdateTasksMethod,
   ...profileGetByTenantIdMethod,
 });

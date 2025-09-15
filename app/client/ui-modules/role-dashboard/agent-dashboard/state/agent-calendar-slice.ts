@@ -7,6 +7,7 @@ import { getTaskById } from "/app/client/library-modules/domain-models/task/repo
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { PropertyOption } from "../components/TaskFormSchema";
 import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
+import { apiDeleteTaskForAgent } from "/app/client/library-modules/apis/task/task-api";
 
 interface AgentCalendarState {
   tasks: Task[];
@@ -80,6 +81,27 @@ export const fetchCalendarMarkersForDate = createAsyncThunk(
   }
 );
 
+export const deleteCalendarTask = createAsyncThunk(
+  "agentCalendar/deleteCalendarTask",
+  async (args: { taskId: string; agentId: string }, { getState }) => {
+    try {
+      const result = await apiDeleteTaskForAgent({
+        taskId: args.taskId,
+        agentId: args.agentId
+      });
+      
+      if (result) {
+        return args.taskId; // Return the deleted task ID for removal from state
+      } else {
+        throw new Error("Failed to delete task");
+      }
+    } catch (error) {
+      console.error("Error deleting agent task:", error);
+      throw error;
+    }
+  }
+);
+
 export const agentCalendarSlice = createSlice({
   name: "agentCalendar",
   initialState,
@@ -122,6 +144,16 @@ export const agentCalendarSlice = createSlice({
       })
       .addCase(fetchCalendarMarkersForDate.rejected, (state, action) => {
         console.error("Failed to fetch calendar markers:", action.error.message);
+      })
+      .addCase(deleteCalendarTask.pending, (state) => {
+        // Keep UI responsive during delete
+      })
+      .addCase(deleteCalendarTask.fulfilled, (state, action) => {
+        // Remove the deleted task from state
+        state.tasks = state.tasks.filter(task => task.taskId !== action.payload);
+      })
+      .addCase(deleteCalendarTask.rejected, (state, action) => {
+        state.error = action.error.message || "Failed to delete task";
       });
   },
 });

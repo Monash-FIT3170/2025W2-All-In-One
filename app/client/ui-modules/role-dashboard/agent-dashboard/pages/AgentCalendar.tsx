@@ -5,6 +5,7 @@ import {
   selectCalendarLoading,
   fetchAgentCalendarTasks,
   selectCalendarMarkers,
+  deleteCalendarTask,
 } from "../state/agent-calendar-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
@@ -106,6 +107,23 @@ export function AgentCalendar(): React.JSX.Element {
     }
   };
 
+  const handleDeleteTask = async (taskId: string) => {
+    if (!currentAgent?.agentId) {
+      console.error("No current agent found");
+      return;
+    }
+
+    try {
+      await dispatch(deleteCalendarTask({
+        taskId,
+        agentId: currentAgent.agentId
+      }));
+      console.log("Task deleted successfully");
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+
   if (loading) return <LoadingSpinner message="Loading your calendar..." />;
 
   return (
@@ -129,6 +147,7 @@ export function AgentCalendar(): React.JSX.Element {
                   tasks={tasks}
                   selectedDateISO={selectedDateISO}
                   showPropertyAddress={true}
+                  onDeleteTask={handleDeleteTask}
                 />
                 <br />
                 <TaskMap mapUiState={mapUiState} className="mb-3" />
