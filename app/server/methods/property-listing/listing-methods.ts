@@ -11,6 +11,7 @@ import { ListingStatusDocument } from "/app/server/database/property-listing/mod
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
 import { ApiInsertListingPayload } from "/app/shared/api-models/property-listing/ListingInsertData";
+import { ListingUpdateData } from "/app/shared/api-models/property-listing/ListingUpdateData";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 
 const getListingForProperty = {
@@ -301,6 +302,67 @@ const updatePropertyListingImages = {
   },
 };
 
+const updatePropertyListingData = {
+  [MeteorMethodIdentifier.LISTING_UPDATE_DATA]: async (
+    updateData: ListingUpdateData
+  ): Promise<{ success: boolean; propertyId: string }> => {
+    try {
+      // Find the listing for this property
+      const listing = await getListingDocumentAssociatedWithProperty(
+        updateData.propertyId
+      );
+
+      if (!listing) {
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(
+            `No listing found for property with Id ${updateData.propertyId}`
+          )
+        );
+      }
+
+      // First, handle inspection times - insert new ones and get their IDs
+      const inspectionIds: string[] = [];
+      if (updateData.inspectionTimes && updateData.inspectionTimes.length > 0) {
+        // Delete existing inspections for this listing
+        await PropertyListingInspectionCollection.removeAsync({
+          _id: { $in: listing.inspection_ids }
+        });
+
+        // Insert new inspections
+        const inspectionDocuments = updateData.inspectionTimes.map(
+          (inspection) => ({
+            starttime: inspection.start_time,
+            endtime: inspection.end_time,
+          })
+        );
+
+        for (const inspectionDoc of inspectionDocuments) {
+          const insertedId = await PropertyListingInspectionCollection.insertAsync(inspectionDoc);
+          inspectionIds.push(insertedId);
+        }
+      }
+
+      // Update the listing document
+      const updateFields: Partial<ListingDocument> = {
+        lease_term: updateData.leaseTerm,
+        inspection_ids: inspectionIds,
+      };
+
+      await ListingCollection.updateAsync(
+        { _id: listing._id },
+        { $set: updateFields }
+      );
+
+      return { success: true, propertyId: updateData.propertyId };
+    } catch (error) {
+      console.error("Error updating property listing data:", error);
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Failed to update listing data: ${error}`)
+      );
+    }
+  },
+};
+
 Meteor.methods({
   ...getListingForProperty,
   ...insertDraftListingDocumentForProperty,
@@ -308,5 +370,6 @@ Meteor.methods({
   ...submitDraftListing,
   ...getAllListedListings,
   ...updatePropertyListingImages,
+  ...updatePropertyListingData,
   ...insertPropertyListingInspection,
 });

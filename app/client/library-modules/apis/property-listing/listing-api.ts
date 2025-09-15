@@ -1,5 +1,6 @@
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
 import { ApiInsertListingPayload } from "/app/shared/api-models/property-listing/ListingInsertData";
+import { ListingUpdateData } from "/app/shared/api-models/property-listing/ListingUpdateData";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
@@ -66,6 +67,15 @@ export async function apiUpdatePropertyListingImages(
     MeteorMethodIdentifier.LISTING_UPDATE_IMAGES,
     propertyId,
     imageUrls
+  );
+}
+
+export async function apiUpdatePropertyListingData(
+  updateData: ListingUpdateData
+): Promise<{ success: boolean; propertyId: string }> {
+  return await Meteor.callAsync(
+    MeteorMethodIdentifier.LISTING_UPDATE_DATA,
+    updateData
   );
 }
 

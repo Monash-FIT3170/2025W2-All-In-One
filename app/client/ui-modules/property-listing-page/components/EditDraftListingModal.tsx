@@ -12,6 +12,7 @@ import React, { useRef, useEffect } from "react";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { apiUpdatePropertyData } from "/app/client/library-modules/apis/property/property-api";
+import { apiUpdatePropertyListingData } from "/app/client/library-modules/apis/property-listing/listing-api";
 import { useAppDispatch } from "/app/client/store";
 import { load } from "../state/reducers/property-listing-slice";
 import { PropertyFormMode } from "../../property-form-agent/enum/PropertyFormMode";
@@ -77,6 +78,15 @@ export default function EditDraftListingModal(
 
     // Update property details
     const prop = await apiUpdatePropertyData(updatedProperty);
+
+    // Update listing-specific data (lease term and inspection times)
+    const listingUpdateData = {
+      propertyId: props.propertyId,
+      leaseTerm: values.lease_term,
+      inspectionTimes: values.inspection_times,
+    };
+
+    await apiUpdatePropertyListingData(listingUpdateData);
 
     // Handle image updates - get both existing and new images in the correct order
     const combinedImageData = propertyFormRef.current?.getCombinedImages();
