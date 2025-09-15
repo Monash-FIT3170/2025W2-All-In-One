@@ -30,7 +30,6 @@ import { SubHeading } from "../../../theming/components/SubHeading";
 import { PropertyMap, PropertyMapUiState } from "../../../common/property-components/PropertyMap";
 import { fetchAgentWithProfile } from '../state/reducers/tenant-property-slice';
 import { AgentDetails } from '../components/AgentDetails';
-import { current } from "@reduxjs/toolkit";
 
 export function TenantProperty({
   className = "",
@@ -102,8 +101,8 @@ export function TenantProperty({
           onBack={() => {
             console.log("back button pressed");
           }}
-          onBook={(index: number) => {
-            console.log(`booking button ${index} pressed`);
+          onBook={(inspectionId: string) => {
+            console.log(`booking button ${inspectionId} pressed`);
           }}
           onApply={() => {
             console.log("applied!");
@@ -180,7 +179,7 @@ function PropertyPageContent({
   propertyLandlordId: string;
   propertyId: string;
   onBack: () => void;
-  onBook: (index: number) => void;
+  onBook: (inspectionId: string) => void; // <-- FIXED
   onApply: () => void;
   onContactAgent: () => void;
   onSubmitDraftListing: () => void;
@@ -344,7 +343,7 @@ function PropertyDetails({
   propertyDescription: string;
   mapUiState: PropertyMapUiState;
   inspectionBookingUiStateList: InspectionBookingListUiState[];
-  onBook: (index: number) => void;
+  onBook: (inspectionId: string) => void; // <-- change to string
   propertyFeatures: string[];
   propertyId: string;
   className?: string;
