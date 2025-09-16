@@ -101,17 +101,17 @@ export function TopNavbar({
                   title={authUser.role || "User"}
                 />
               </div>
-              <Button variant="outline" onClick={handleSignout}>
+              <Button variant="outline" className="cursor-pointer" onClick={handleSignout}>
                 Sign out
               </Button>
             </>
           ) : (
             <div className="flex gap-4">
               <Link to="/signin">
-                <Button>Sign in</Button>
+                <Button className="cursor-pointer">Sign in</Button>
               </Link>
               <Link to="/signup">
-                <Button variant="outline">Sign up</Button>
+                <Button variant="outline" className="cursor-pointer">Sign up</Button>
               </Link>
             </div>
           )}
