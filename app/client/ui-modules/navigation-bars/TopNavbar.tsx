@@ -9,10 +9,10 @@ import { useAppSelector, useAppDispatch } from "/app/client/store";
 import { ProfileFooter } from "../navigation-bars/side-nav-bars/components/ProfileFooter";
 import { signoutUser } from "../user-authentication/state/reducers/current-user-slice";
 import { NotificationBellDropdown } from "../theming/components/NotificationBellDropdown";
-import { selectTasks as selectAgentTasks } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
-import { selectTasks as selectTenantTasks } from "../role-dashboard/tenant-dashboard/state/reducers/tenant-dashboard-slice";
-import { selectTasks as selectLandlordTasks } from "../role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
-import { selectAllConversations } from "../role-messages/state/reducers/messages-slice";
+import { selectTasks as selectAgentTasks, fetchAgentTasks } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
+import { selectTasks as selectTenantTasks, fetchTenantDetails } from "../role-dashboard/tenant-dashboard/state/reducers/tenant-dashboard-slice";
+import { selectTasks as selectLandlordTasks, fetchLandlordTasks } from "../role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
+import { selectAllConversations, fetchConversations } from "../role-messages/state/reducers/messages-slice";
 import { Role } from "/app/shared/user-role-identifier";
 import { NavigationPath } from "../../navigation";
 
@@ -33,6 +33,13 @@ export function TopNavbar({
   const tenantTasks = useAppSelector(selectTenantTasks);
   const landlordTasks = useAppSelector(selectLandlordTasks);
   const conversations = useAppSelector(selectAllConversations);
+
+  // Load conversations globally when user is authenticated (like tasks)
+  React.useEffect(() => {
+    if (authUser?.userId && authUser?.role) {
+      dispatch(fetchConversations());
+    }
+  }, [authUser?.userId, authUser?.role, dispatch]);
 
   const upcomingTasks = authUser?.role === Role.AGENT ? agentTasks : authUser?.role === Role.TENANT ? tenantTasks : authUser?.role === Role.LANDLORD ? landlordTasks : [];
 
