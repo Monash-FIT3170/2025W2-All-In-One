@@ -548,16 +548,13 @@ export const tenantSelectionSlice = createSlice({
         console.log('Reset action fulfilled:', action.payload);
         state.isLoading = false;
         const { applicationId, newStatus } = action.payload;
-        console.log('Updating application:', applicationId[0], 'to status:', newStatus);
         for (const [propertyId, applications] of Object.entries(state.applicationsByProperty)) {
           const applicationIndex = applications.findIndex(app => app.id === applicationId[0]);
           if (applicationIndex !== -1) {
-            console.log('Found application at index:', applicationIndex, 'in property:', propertyId);
             state.applicationsByProperty[propertyId][applicationIndex] = {
               ...applications[applicationIndex],
               status: newStatus
             };
-            console.log('Updated application status to:', newStatus);
             break;
           }
         }

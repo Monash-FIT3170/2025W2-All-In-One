@@ -129,15 +129,6 @@ const tenantApplicationUpdateStatusMethod = {
     taskId?: string
   ): Promise<void> => {
     try {
-      // // Check what applications exist before update
-      // const existingApps = await TenantApplicationCollection.find({ _id: { $in: applicationIds } }).fetchAsync();
-      // console.log('Existing applications before update:', existingApps.map(app => ({
-      //   id: app._id,
-      //   name: app.applicantName,
-      //   status: app.status
-      // })));
-
-
       const updateData: TenantApplicationUpdateData = {
         status,
         step,
@@ -153,13 +144,6 @@ const tenantApplicationUpdateStatusMethod = {
         { $set: updateData },
         { multi: true } // update multiple documents
       );
-      // // Check what applications exist after update
-      // const updatedApps = await TenantApplicationCollection.find({ _id: { $in: applicationIds } }).fetchAsync();
-      // console.log('Applications after update:', updatedApps.map(app => ({
-      //   id: app._id,
-      //   name: app.applicantName,
-      //   status: app.status
-      // })));
 
     } catch (error) {
       console.error("Error in tenantApplicationUpdateStatusMethod:", error);
