@@ -2,7 +2,7 @@ import { updateTenantApplicationStatus } from '../../domain-models/tenant-applic
 import { TenantApplicationStatus } from '/app/shared/api-models/tenant-application/TenantApplicationStatus';
 
 export class ResetTenantApplicationDecisionUseCase {
-    async execute(applicationIds: string[], currentStatus: TenantApplicationStatus): Promise<void> {
+    async execute(applicationIds: string[], currentStatus: TenantApplicationStatus): Promise<TenantApplicationStatus> {
         let newStatus: TenantApplicationStatus;
         let newStep: number;
 
@@ -30,7 +30,9 @@ export class ResetTenantApplicationDecisionUseCase {
             default:
                 throw new Error(`Cannot undo status: ${currentStatus}`);
         }
-
+        console.log('Calculated new status:', newStatus, 'new step:', newStep);
         await updateTenantApplicationStatus(applicationIds, newStatus, newStep);
+        console.log('updateTenantApplicationStatus completed');
+        return newStatus;
     }
 }

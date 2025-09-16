@@ -287,8 +287,8 @@ export const intentResetApplicationDecisionAsync = createAsyncThunk(
   "tenantSelection/intentResetApplicationDecision",
   async (args: {applicationId: string[]; currentStatus: TenantApplicationStatus }) => {
     const useCase = new ResetTenantApplicationDecisionUseCase();
-    await useCase.execute(args.applicationId, args.currentStatus);
-    return { applicationId: args.applicationId, newStatus: args.currentStatus };
+    const newStatus = await useCase.execute(args.applicationId, args.currentStatus);
+    return { applicationId: args.applicationId, newStatus: newStatus };
   }
 );
 
@@ -545,7 +545,22 @@ export const tenantSelectionSlice = createSlice({
         state.error = action.error.message || "Failed to send final approved application to agent";
       })
       .addCase(intentResetApplicationDecisionAsync.fulfilled, (state, action) => {
+        console.log('Reset action fulfilled:', action.payload);
         state.isLoading = false;
+        const { applicationId, newStatus } = action.payload;
+        console.log('Updating application:', applicationId[0], 'to status:', newStatus);
+        for (const [propertyId, applications] of Object.entries(state.applicationsByProperty)) {
+          const applicationIndex = applications.findIndex(app => app.id === applicationId[0]);
+          if (applicationIndex !== -1) {
+            console.log('Found application at index:', applicationIndex, 'in property:', propertyId);
+            state.applicationsByProperty[propertyId][applicationIndex] = {
+              ...applications[applicationIndex],
+              status: newStatus
+            };
+            console.log('Updated application status to:', newStatus);
+            break;
+          }
+        }
       })
       .addCase(intentResetApplicationDecisionAsync.pending, (state) => {
         state.isLoading = true;
