@@ -77,7 +77,7 @@ export function GuestSearchResultsPage() {
 								/>
 							</div>
 							<Button
-								className="h-12 rounded-none rounded-r-2xl px-5 bg-neutral-900 text-white hover:bg-neutral-800"
+								className="h-12 rounded-none rounded-r-2xl px-5 cursor-pointer bg-neutral-900 text-white hover:bg-neutral-800"
 								onClick={onSearch}
 							>
 								Search
@@ -122,7 +122,7 @@ export function GuestSearchResultsPage() {
 						{shown.length < properties.length && (
 							<div className="mt-8 flex justify-center">
 								<Button
-									className="h-11 px-6 rounded-xl"
+									className="h-11 px-6 rounded-xl cursor-pointer"
 									onClick={handleLoadMore}
 								>
 									View more

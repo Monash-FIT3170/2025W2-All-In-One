@@ -62,7 +62,7 @@ export function GuestLandingPage() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
 
-                        <Button
+                        <Button className="cursor-pointer"
                             onClick={() => {
                                 handleSearch(searchQuery, navigate);
                             }}
@@ -93,7 +93,7 @@ export function GuestLandingPage() {
                                 </div>
                                 {listedProperties.length > visibleCount && (
                                     <div className="mt-6">
-                                        <Button onClick={handleViewMore}>
+                                        <Button className="cursor-pointer" onClick={handleViewMore}>
                                             View More
                                         </Button>
                                     </div>
