@@ -22,7 +22,6 @@ export function AgentDashboardCards({
       <CardWidget
         title="Total Properties"
         value={propertyCount.toString()}
-        subtitle="+2 from last month"
       />
       <CardWidget title="Occupancy Rate" value={`${occupancyRate.toFixed(2)}%`}>
         <Progress value={occupancyRate} className="mt-2" />
@@ -35,7 +34,6 @@ export function AgentDashboardCards({
       <CardWidget
         title="Monthly Revenue"
         value={`$${monthlyRevenue.toLocaleString()}`}
-        subtitle="+5% from last month"
       />
     </div>
   );

@@ -18,7 +18,6 @@ const getListingForProperty = {
     propertyId: string
   ): Promise<ApiListing> => {
     const listing = await getListingDocumentAssociatedWithProperty(propertyId);
-
     if (!listing) {
       throw meteorWrappedInvalidDataError(
         new InvalidDataError(
@@ -43,9 +42,8 @@ const submitDraftListing = {
   ): Promise<{ success: boolean; propertyId: string }> => {
     try {
       // Find the listing for this property
-      const listing = await getListingDocumentAssociatedWithProperty(
-        propertyId
-      );
+      const listing =
+        await getListingDocumentAssociatedWithProperty(propertyId);
 
       if (!listing) {
         throw meteorWrappedInvalidDataError(
@@ -98,7 +96,8 @@ const getAllListedListings = {
     limit: number = 3
   ): Promise<ApiListing[]> => {
     const listedStatus = ListingStatus.LISTED;
-    const listedStatusDocument = await getListingStatusDocumentByName(listedStatus);
+    const listedStatusDocument =
+      await getListingStatusDocumentByName(listedStatus);
 
     if (!listedStatusDocument) {
       throw meteorWrappedInvalidDataError(
@@ -134,23 +133,16 @@ const getAllListedListings = {
   },
 };
 
-async function getListingDocumentsByStatus(
-  statusId: string
-): Promise<ListingDocument[]> {
-  return ListingCollection.find({
-    listing_status_id: statusId,
-  }).fetchAsync();
-}
-
 async function mapListingDocumentToListingDTO(
   listing: ListingDocument
 ): Promise<ApiListing> {
   let propertyListingInspections: PropertyListingInspectionDocument[] = [];
 
   if (listing.inspection_ids.length > 0) {
-    propertyListingInspections = await getPropertyListingInspectionDocumentsMatchingIds(
-      listing.inspection_ids
-    );
+    propertyListingInspections =
+      await getPropertyListingInspectionDocumentsMatchingIds(
+        listing.inspection_ids
+      );
   }
 
   const listingStatusDocument = await getListingStatusDocumentById(
@@ -167,10 +159,14 @@ async function mapListingDocumentToListingDTO(
     property_id: listing.property_id,
     image_urls: listing.image_urls,
     listing_status: listingStatusDocument.name,
-    propertyListingInspections: propertyListingInspections.map((inspection) => ({
-      start_time: inspection.starttime,
-      end_time: inspection.endtime,
-    })),
+    propertyListingInspections: propertyListingInspections.map(
+      (inspection) => ({
+        _id: inspection._id,
+        start_time: inspection.starttime,
+        end_time: inspection.endtime,
+        tenant_ids: inspection.tenant_ids,
+      })
+    ),
   };
 }
 
@@ -250,10 +246,53 @@ const insertPropertyListingInspection = {
       const id = await PropertyListingInspectionCollection.insertAsync({
         starttime: new Date(insp.start_time),
         endtime: new Date(insp.end_time),
+        tenant_ids: [""],
       } as PropertyListingInspectionDocument);
       ids.push(id);
     }
     return ids;
+  },
+};
+
+const addTenantToInspectionMethod = {
+  [MeteorMethodIdentifier.ADD_TENANT_TO_INSPECTION]: async (
+    inspectionId: string,
+    tenantId: string
+  ): Promise<PropertyListingInspectionDocument> => {
+    console.log(
+      "ADD_TENANT_TO_INSPECTION method called",
+      inspectionId,
+      tenantId
+    );
+    const inspection = await PropertyListingInspectionCollection.findOneAsync({
+      _id: inspectionId,
+    });
+    if (!inspection)
+      throw new Meteor.Error("not-found", "Inspection not found");
+    console.log(
+      "Tenant ID attempting to be added to the inspection 1" + tenantId
+    );
+    if (!inspection.tenant_ids.includes(tenantId)) {
+      console.log(
+        "Tenant ID attempting to be added to the inspection 2" + tenantId
+      );
+      await PropertyListingInspectionCollection.updateAsync(
+        { _id: inspectionId },
+        { $push: { tenant_ids: tenantId } }
+      );
+    }
+
+    // return the updated doc so client thunk has fresh state
+    const updated = await PropertyListingInspectionCollection.findOneAsync({
+      _id: inspectionId,
+    });
+    if (!updated)
+      throw new Meteor.Error(
+        "update-failed",
+        "Failed to fetch updated inspection"
+      );
+
+    return updated;
   },
 };
 
@@ -264,7 +303,8 @@ const updatePropertyListingImages = {
   ): Promise<{ success: boolean; propertyId: string }> => {
     try {
       // Find the listing for this property
-      const listing = await getListingDocumentAssociatedWithProperty(propertyId);
+      const listing =
+        await getListingDocumentAssociatedWithProperty(propertyId);
 
       if (!listing) {
         throw meteorWrappedInvalidDataError(
@@ -308,4 +348,5 @@ Meteor.methods({
   ...getAllListedListings,
   ...updatePropertyListingImages,
   ...insertPropertyListingInspection,
+  ...addTenantToInspectionMethod,
 });

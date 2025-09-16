@@ -1,3 +1,4 @@
+import { PropertyListingInspectionDocument } from "/app/server/database/property-listing/models/PropertyListingInspectionDocument";
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
 import { ApiInsertListingPayload } from "/app/shared/api-models/property-listing/ListingInsertData";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
@@ -68,7 +69,7 @@ export async function apiUpdatePropertyListingImages(
 }
 
 export async function apiInsertPropertyListingInspections(
-  propertyListingInspections: { start_time: Date; end_time: Date }[]
+  propertyListingInspections: { start_time: Date; end_time: Date; tenant_ids: string[] }[]
 ): Promise<string[]> {
   const ids = await Meteor.callAsync(
     MeteorMethodIdentifier.INSERT_PROPERTY_LISTING_INSPECTION,
@@ -76,3 +77,14 @@ export async function apiInsertPropertyListingInspections(
   );
   return ids;
 }
+
+export const addTenantToInspectionApi = async (
+  inspectionId: string,
+  tenantId: string
+): Promise<PropertyListingInspectionDocument> => {
+  return await Meteor.callAsync(
+    MeteorMethodIdentifier.ADD_TENANT_TO_INSPECTION,
+    inspectionId,
+    tenantId
+  );
+};

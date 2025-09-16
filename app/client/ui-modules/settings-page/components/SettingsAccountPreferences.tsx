@@ -68,7 +68,7 @@ export function SettingsAccountPreferences() {
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Button>Manage Account</Button>
+                    <Button className="cursor-pointer">Manage Account</Button>
                   </FormControl>
                 </FormItem>
               )}
@@ -85,7 +85,7 @@ export function SettingsAccountPreferences() {
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Button variant="destructive" onClick={handleLogout}>
+                    <Button variant="destructive" className="cursor-pointer" onClick={handleLogout}>
                       Sign Out
                     </Button>
                   </FormControl>
