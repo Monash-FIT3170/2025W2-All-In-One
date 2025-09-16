@@ -101,7 +101,7 @@ export function TopNavbar({
                   title={authUser.role || "User"}
                 />
               </div>
-              <Button variant="outline" onClick={handleSignout}>
+              <Button variant="outline" className="cursor-pointer" onClick={handleSignout}>
                 Sign out
               </Button>
             </>
