@@ -51,10 +51,12 @@ import {
   selectHasFinalApprovedApplicationForProperty,
   selectFinalApprovedApplicantCountForProperty,
   sendFinalApprovedApplicationToAgentAsync,
+  intentResetApplicationDecisionAsync,
 } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { addBookedPropertyListingInspection } from "./state/reducers/property-listing-slice";
 import { Role } from "/app/shared/user-role-identifier";
 import { CurrentUserState } from "../user-authentication/state/CurrentUserState";
+import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
 
 export function PropertyListingPage({ className = "" }: { className?: string }): React.JSX.Element {
   const navigate = useNavigate();
@@ -272,6 +274,17 @@ function ListingPageContent({
       console.error("Failed to reject application:", error);
     }
   };
+  const handleReset = async (applicationId: string, currentStatus: TenantApplicationStatus) => {
+    try {
+      const result = await dispatch(intentResetApplicationDecisionAsync({
+        applicationId: [applicationId],
+        currentStatus: currentStatus
+      })).unwrap();
+      console.log(`Application ${applicationId} reset successfully`);
+    } catch (error) {
+      console.error("Failed to reset application:", error);
+    }
+  };
 
   const handleSendToLandlord = async () => {
     try {
@@ -358,6 +371,7 @@ function ListingPageContent({
           onClose={() => setIsReviewTenantModalOpen(false)}
           onReject={handleReject}
           onAccept={handleAccept}
+          onReset={handleReset}
           onSendToLandlord={handleSendToLandlord}
           shouldShowSendToLandlordButton={shouldShowSendToLandlordButton}
           acceptedApplicantCount={acceptedApplicantCount}
@@ -373,6 +387,7 @@ function ListingPageContent({
           onClose={() => setIsReviewTenantModalOpen(false)}
           onReject={handleReject}
           onAccept={handleAccept}
+          onReset={handleReset}
           onSendToAgent={handleSendToAgent}
           onSendFinalApprovedToAgent={handleSendFinalApprovedToAgent}
           shouldShowSendToAgentButton={shouldShowSendToAgentButton}
