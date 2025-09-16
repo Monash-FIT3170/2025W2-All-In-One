@@ -9,17 +9,20 @@ import {
 } from "../state/reducers/tenant-dashboard-slice";
 import DashboardCards from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/TenantDashboardCard";
 import PropertyDetails from "../components/PropertyDetails";
+import { fetchTenantPropertyWithListingData } from "../state/reducers/tenant-property-slice";
 
 function TenantDashboard() {
   const dispatch = useAppDispatch();
   const tasks = useAppSelector(selectTasks);
   const property = useAppSelector(selectPropertyDetails);
+  const listingImages = useAppSelector((state) => state.tenantProperty.listingImageUrls);
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
   const isLoading = useAppSelector((state) => state.tenantDashboard.isLoading);
 
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchTenantDetails(currentUser.userId));
+      dispatch(fetchTenantPropertyWithListingData());
       
       // TODO: When backend is implemented, fetch and update messages and lease status:
       // Example:
@@ -44,7 +47,7 @@ function TenantDashboard() {
                   <UpcomingTasks tasks={tasks} currentUser={currentUser} />
                 </div>
                 <div className="mt-5">
-                  <PropertyDetails property={property}></PropertyDetails>
+                  <PropertyDetails property={property} listing={listingImages}></PropertyDetails>
                 </div>
               </div>
             </div>
