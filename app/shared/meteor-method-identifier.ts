@@ -22,6 +22,7 @@ export enum MeteorMethodIdentifier {
   LISTING_UPDATE_IMAGES = "listings.updateImages", // Update images of a draft listing
   INSERT_PROPERTY_LISTING = "listings.insertProperty",
   INSERT_PROPERTY_LISTING_INSPECTION = "inspections.insert",
+	ADD_TENANT_TO_INSPECTION = "inspection.addTenant",
   USER_REGISTER = "user.register",
   USER_ACCOUNT_INSERT = "users.insert",
   USER_ACCOUNT_GET = "users.getOne",
