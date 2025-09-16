@@ -108,10 +108,10 @@ export function TopNavbar({
           ) : (
             <div className="flex gap-4">
               <Link to="/signin">
-                <Button className="cursor-pointer">Sign in</Button>
+                <Button>Sign in</Button>
               </Link>
               <Link to="/signup">
-                <Button variant="outline" className="cursor-pointer">Sign up</Button>
+                <Button variant="outline">Sign up</Button>
               </Link>
             </div>
           )}
