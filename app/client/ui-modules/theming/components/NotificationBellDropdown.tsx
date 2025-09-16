@@ -154,7 +154,7 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
                 </span>
               </div>
               <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-                <span>Last: {latestConversation?.timestamp || 'Unknown'}</span>
+                <span>Last Message: {latestConversation?.timestamp || 'Unknown'}</span>
                 {latestConversation && (
                   <>
                     <span>•</span>
