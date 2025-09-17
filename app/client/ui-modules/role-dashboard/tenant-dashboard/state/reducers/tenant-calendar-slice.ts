@@ -76,20 +76,7 @@ export const deleteTenantCalendarTask = createAsyncThunk(
 export const tenantCalendarSlice = createSlice({
   name: "tenantCalendar",
   initialState,
-  reducers: {
-    setCalendarLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
-    },
-    setCalendarTasks: (state, action: PayloadAction<Task[]>) => {
-      state.tasks = action.payload;
-    },
-    setCalendarError: (state, action: PayloadAction<string | null>) => {
-      state.error = action.payload;
-    },
-    clearCalendarError: (state) => {
-      state.error = null;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchTenantCalendarTasks.pending, (state) => {
@@ -117,12 +104,7 @@ export const tenantCalendarSlice = createSlice({
   },
 });
 
-export const { 
-  setCalendarLoading, 
-  setCalendarTasks, 
-  setCalendarError, 
-  clearCalendarError 
-} = tenantCalendarSlice.actions;
+// No manual actions exported - all state updates handled through async thunks
 
 // Selectors
 export const selectTenantCalendar = (state: RootState) => state.tenantCalendar;
