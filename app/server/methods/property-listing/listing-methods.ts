@@ -20,7 +20,6 @@ const getListingForProperty = {
     propertyId: string
   ): Promise<ApiListing> => {
     const listing = await getListingDocumentAssociatedWithProperty(propertyId);
-    console.log("listing-methods loaded");
     if (!listing) {
       throw meteorWrappedInvalidDataError(
         new InvalidDataError(
@@ -98,7 +97,6 @@ const getAllListedListings = {
     skip: number = 0,
     limit: number = 3
   ): Promise<ApiListing[]> => {
-    console.log("listing-methods loaded");
     const listedStatus = ListingStatus.LISTED;
     const listedStatusDocument =
       await getListingStatusDocumentByName(listedStatus);
@@ -136,14 +134,6 @@ const getAllListedListings = {
     }
   },
 };
-
-async function getListingDocumentsByStatus(
-  statusId: string
-): Promise<ListingDocument[]> {
-  return ListingCollection.find({
-    listing_status_id: statusId,
-  }).fetchAsync();
-}
 
 async function mapListingDocumentToListingDTO(
   listing: ListingDocument
@@ -280,7 +270,6 @@ const addTenantToInspectionMethod = {
     const inspection = await PropertyListingInspectionCollection.findOneAsync({
       _id: inspectionId,
     });
-    console.log("testingGotToAddTenantToInspectionMethod");
     if (!inspection)
       throw new Meteor.Error("not-found", "Inspection not found");
     console.log(

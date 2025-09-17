@@ -28,8 +28,6 @@ import "./methods/user/user-account-methods";
 import "./methods/user/role-methods/agent-methods";
 import "./methods/user/role-methods/tenant-methods";
 import "./methods/user/role-methods/landlord-methods";
-import "./methods/property-listing/listing-methods";
-import "./methods/property-listing/listing-methods";
 import { TaskCollection } from "/app/server/database/task/task-collections";
 import {
   AgentCollection,
@@ -200,7 +198,6 @@ async function tempSeedProfileData(): Promise<void> {
     const statuses = [
       { _id: "1", name: PropertyStatus.VACANT },
       { _id: "2", name: PropertyStatus.OCCUPIED },
-      { _id: "3", name: PropertyStatus.VACANT },
     ];
 
     // Add new status if it doesn't exist
@@ -282,7 +279,7 @@ async function seedListedProperties(
         suburb: "Glen Waverley",
         province: "VIC",
         postcode: "3196",
-        property_status_id: "1", // Using the ID of VACANT status
+        property_status_id: propertyStatusVacantId,
         description: "A beautiful property",
         summary_description: "Beautiful property in a great location",
         bathrooms: 2,
@@ -303,7 +300,7 @@ async function seedListedProperties(
         suburb: "Noble Park",
         province: "VIC",
         postcode: "3174",
-        property_status_id: "2", // Using the ID of OCCUPIED status
+        property_status_id: "2",
         description: "Modern apartment",
         summary_description: "Modern apartment in the city center",
         bathrooms: 1,
@@ -324,7 +321,7 @@ async function seedListedProperties(
         suburb: "Clayton",
         province: "VIC",
         postcode: "3168",
-        property_status_id: "3", // Using the ID of UNDER_MAINTENANCE status
+        property_status_id: propertyStatusVacantId,
         description: "Spacious house",
         summary_description: "Spacious house with large garden",
         bathrooms: 3,
@@ -582,6 +579,7 @@ async function seedListedProperties(
       });
 
       const randomImageUrls = getRandomImageUrls(); // Get 3 random image URLs
+
       function getRandomInspectionIds() {
         const allIds = ["1", "2", "3", "4"];
         return allIds
@@ -604,7 +602,7 @@ async function seedListedProperties(
     _id: "1",
     starttime: new Date("2025-04-12T10:00:00Z"),
     endtime: new Date("2025-04-13T11:00:00Z"),
-    tenant_ids: [tenant?.tenantId],
+    tenant_ids: [""],
   });
   await PropertyListingInspectionCollection.insertAsync({
     _id: "2",

@@ -4,7 +4,7 @@ import {
   selectDocuments,
   selectDocumentsLoading,
   selectDocumentsError,
-} from "../state/tenant-documents-slice";
+} from "../state/landlord-document-slice";
 import { Button } from "../../../theming-shadcn/Button";
 import { Badge } from "../../../theming-shadcn/Badge";
 import { FileText, Calendar, AlertCircle, ExternalLink } from "lucide-react";
@@ -16,7 +16,7 @@ interface DocumentListProps {
   onRefresh?: () => void;
 }
 
-export function DocumentList({ onRefresh }: DocumentListProps) {
+export function LandlordDocumentList({ onRefresh }: DocumentListProps) {
   const documents = useAppSelector(selectDocuments);
   const isLoading = useAppSelector(selectDocumentsLoading);
   const error = useAppSelector(selectDocumentsError);
@@ -72,7 +72,7 @@ export function DocumentList({ onRefresh }: DocumentListProps) {
             No documents found
           </h3>
           <p className="text-gray-500">
-            Upload your first lease agreement document to get started.
+            list a property with an agent to get started.
           </p>
         </div>
       </div>
@@ -150,10 +150,10 @@ export function DocumentList({ onRefresh }: DocumentListProps) {
                   <div className="mb-2">
                     <SignButton
                       documentId={document._id}
-                      isSigned={document.tenantSigned ?? false} // or landlordSigned depending on current user
+                      isSigned={document.landlordSigned ?? false} // or landlordSigned depending on current user
                       onSign={(id) => {
-                        console.log("Signing document as a tenant", id);
-                        Meteor.callAsync(MeteorMethodIdentifier.SIGN_DOCUMENT, id, "tenant");
+                        console.log("Signing document as a landlord", id);
+                        Meteor.callAsync(MeteorMethodIdentifier.SIGN_DOCUMENT, id, "landlord");
                       }}
                     />
                   </div>
@@ -170,8 +170,8 @@ export function DocumentList({ onRefresh }: DocumentListProps) {
                     </div>
 
                     <div>
-                      <span className="font-medium">Landlord: </span>
-                      {document.landlordSigned ? (
+                      <span className="font-medium">Tenant: </span>
+                      {document.tenantSigned ? (
                         <span className="text-green-600">Signed</span>
                       ) : (
                         <span className="text-red-500">Still to Sign</span>

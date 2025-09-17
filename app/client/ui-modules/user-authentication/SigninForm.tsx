@@ -81,7 +81,7 @@ export const SigninForm = () => {
 
       <button
         type="submit"
-        className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-black/90"
+        className="w-full bg-black text-white py-2 px-4 rounded-md cursor-pointer hover:bg-black/90"
         disabled={signinState.isLoading}
       >
         {signinState.isLoading ? "signing in..." : "sign in"}
