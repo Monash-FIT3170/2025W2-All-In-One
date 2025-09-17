@@ -59,3 +59,23 @@ export function mapLandlordTaskInsertData(task: {
     propertyId: task.propertyId,
   }
 }
+
+export function mapTenantTaskInsertData(task: {
+  name: string;
+  description: string;
+  dueDate: Date;
+  priority: TaskPriority;
+  userId: string;
+  propertyAddress: string;
+  propertyId: string;
+}) {
+  return {
+    name: task.name,
+    description: task.description,
+    dueDate: task.dueDate,
+    priority: task.priority,
+    userId: task.userId,
+    propertyAddress: task.propertyAddress,
+    propertyId: task.propertyId,
+  }
+}
