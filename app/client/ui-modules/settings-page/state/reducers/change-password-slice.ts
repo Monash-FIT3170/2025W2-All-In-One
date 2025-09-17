@@ -1,6 +1,8 @@
+import { Meteor } from "meteor/meteor";
 import { Accounts } from "meteor/accounts-base";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppDispatch, RootState } from "/app/client/store";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 export type ChangePasswordUIState = {
   currentPassword: string;
@@ -42,19 +44,29 @@ export const changePassword = createAsyncThunk<
   }
 
   try {
-    await new Promise<void>((resolve, reject) => {
-      Accounts.changePassword(currentPassword, newPassword, (err) => {
-        if (err) return reject(err);
-        resolve();
-      });
-    });
+        console.log("Starting password change process...");
 
-    return;
-  } catch (err: any) {
-    return rejectWithValue(
-      err?.reason || err?.message || "Unable to change password."
-    );
-  }
+        // Try to change the password directly using Accounts.changePassword
+        // This method should handle password validation internally
+        console.log("Changing password...");
+        await new Promise<void>((resolve, reject) => {
+          Accounts.changePassword(currentPassword, newPassword, (err) => {
+            if (err) {
+              console.log("Password change error:", err);
+              return reject(err);
+            }
+            console.log("Password changed successfully");
+            resolve();
+          });
+        });
+
+        return;
+      } catch (err: any) {
+        console.log("Password change process error:", err);
+        return rejectWithValue(
+          err?.reason || err?.message || "Unable to change password."
+        );
+      }
 });
 
 export const changePasswordSlice = createSlice({

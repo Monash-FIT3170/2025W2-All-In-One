@@ -17,7 +17,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "/app/client/ui-modules/theming-shadcn/Dialog";
 import { Button } from "/app/client/ui-modules/theming-shadcn/Button";
 import { Input } from "/app/client/ui-modules/theming-shadcn/Input";
-import { Toast } from "/app/client/ui-modules/settings-page/components/Toast";
+import { FeedbackPopup } from "/app/client/ui-modules/settings-page/components/FeedbackPopup";
 import {
   Form,
   FormControl,
@@ -49,6 +49,10 @@ type FormValues = z.infer<typeof schema>;
 
 export function ChangePasswordPopup(): React.JSX.Element {
   const [open, setOpen] = React.useState(false);
+  const [feedbackOpen, setFeedbackOpen] = React.useState(false);
+  const [feedbackType, setFeedbackType] = React.useState<"success" | "error">("success");
+  const [feedbackTitle, setFeedbackTitle] = React.useState("");
+  const [feedbackMessage, setFeedbackMessage] = React.useState("");
   const dispatch = useAppDispatch();
   const changePasswordState = useAppSelector(selectChangePasswordForm);
 
@@ -72,22 +76,27 @@ export function ChangePasswordPopup(): React.JSX.Element {
       // Close popup immediately on submit as requested
       setOpen(false);
       await dispatch(changePassword()).unwrap();
-      Toast({
-        title: "Password updated",
-        content: "Your password has been changed successfully.",
-      });
+      
+      // Show success feedback
+      setFeedbackType("success");
+      setFeedbackTitle("Password Updated");
+      setFeedbackMessage("Your password has been changed successfully.");
+      setFeedbackOpen(true);
+      
       form.reset();
       dispatch(clearChangePasswordForm());
     } catch (err: any) {
-      Toast({
-        title: "Password change failed",
-        content: err || changePasswordState.error || "Unable to change password.",
-      });
+      // Show error feedback
+      setFeedbackType("error");
+      setFeedbackTitle("Password Change Failed");
+      setFeedbackMessage(err || changePasswordState.error || "Unable to change password.");
+      setFeedbackOpen(true);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>Change Password</Button>
       </DialogTrigger>
@@ -177,6 +186,15 @@ export function ChangePasswordPopup(): React.JSX.Element {
         </Form>
       </DialogContent>
     </Dialog>
+    
+    <FeedbackPopup
+      isOpen={feedbackOpen}
+      onClose={() => setFeedbackOpen(false)}
+      type={feedbackType}
+      title={feedbackTitle}
+      message={feedbackMessage}
+    />
+    </>
   );
 }
 

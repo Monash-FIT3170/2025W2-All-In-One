@@ -76,4 +76,5 @@ export enum MeteorMethodIdentifier {
   SIGN_DOCUMENT = "leaseAgreements.signDocument", // Generic signing method that takes role into account
 	LOGIN_HISTORY_INSERT = "loginHistory.insert",
 	LOGIN_HISTORY_GET_FOR_USER = "loginHistory.getForUser",
+	VALIDATE_PASSWORD = "password.validate",
 }
