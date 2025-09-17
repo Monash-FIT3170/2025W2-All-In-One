@@ -46,7 +46,7 @@ function TenantDashboard() {
                 <div className="mt-5">
                   <UpcomingTasks tasks={tasks} currentUser={currentUser} />
                 </div>
-                <div className="mt-5">
+                <div className="flex-1">
                   <PropertyDetails property={property} listing={listingImages}></PropertyDetails>
                 </div>
               </div>
