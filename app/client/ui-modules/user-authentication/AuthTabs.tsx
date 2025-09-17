@@ -6,7 +6,7 @@ import { SignupForm } from "./SignupForm";
 import { NavigationPath } from "../../navigation";
 
 const tabTriggerClass =
-  "w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all text-gray-500 data-[state=active]:bg-white data-[state=active]:text-black";
+  "w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 cursor-pointer text-sm font-medium transition-all text-gray-500 data-[state=active]:bg-white data-[state=active]:text-black";
 
 // Literal type for allowed tabs
 export type AuthTabType = typeof NavigationPath.Signin | typeof NavigationPath.Signup;

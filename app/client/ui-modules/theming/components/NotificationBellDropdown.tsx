@@ -2,16 +2,24 @@ import React from 'react';
 import { TaskStatus } from '/app/shared/task-status-identifier';
 import { parse, format, compareAsc } from "date-fns";
 import { Task } from '/app/client/library-modules/domain-models/task/Task';
+import { Conversation } from '/app/client/library-modules/domain-models/messaging/Conversation';
 import { useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import { NavigationPath } from '../../../navigation';
+import { useAppSelector } from '/app/client/store';
+import { Role } from '/app/shared/user-role-identifier';
 
 interface NotificationDropdownProps {
   open: boolean;
   onClose: () => void;
   tasks: Task[];
+  conversations: Conversation[];
 }
 
-export function NotificationBellDropdown({ open, onClose, tasks }: NotificationDropdownProps) {
+export function NotificationBellDropdown({ open, onClose, tasks, conversations }: NotificationDropdownProps) {
   const popupRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const authUser = useAppSelector((state) => state.currentUser.authUser);
 
   useEffect(() => {
     if (!open) return;
@@ -47,6 +55,28 @@ export function NotificationBellDropdown({ open, onClose, tasks }: NotificationD
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const handleMessagesClick = () => {
+    if (!authUser?.role) return;
+
+    let messagesPath: string;
+    switch (authUser.role) {
+      case Role.AGENT:
+        messagesPath = NavigationPath.AgentMessages;
+        break;
+      case Role.LANDLORD:
+        messagesPath = NavigationPath.LandlordMessages;
+        break;
+      case Role.TENANT:
+        messagesPath = NavigationPath.TenantMessages;
+        break;
+      default:
+        return; // Don't navigate if role is unknown
+    }
+
+    navigate(messagesPath);
+    onClose(); // Close the dropdown after navigation
   };
 
   const transformedTasks = tasks
@@ -100,6 +130,49 @@ export function NotificationBellDropdown({ open, onClose, tasks }: NotificationD
             </div>
           ))
         )}
+        {/* New Messages Section */}
+        {(() => {
+          const newMessageConversations = conversations.filter(conv => conv.unreadCount > 0);
+          const totalUnreadCount = newMessageConversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
+          const sortedConversations = newMessageConversations.sort((a, b) => {
+            if (!a.timestamp && !b.timestamp) return 0;
+            if (!a.timestamp) return 1;
+            if (!b.timestamp) return -1;
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+          });
+          const latestConversation = sortedConversations[0];
+
+          return newMessageConversations.length > 0 ? (
+            <div
+              className="px-4 py-3 border-t border-gray-100 hover:bg-gray-50 transition cursor-pointer"
+              onClick={handleMessagesClick}
+            >
+              <div className="flex justify-between items-start mb-1">
+                <div className="font-medium text-base text-gray-900">New Messages</div>
+                <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                  {totalUnreadCount}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                <span>Last Message: {latestConversation?.timestamp || 'Unknown'}</span>
+                {latestConversation && (
+                  <>
+                    <span>•</span>
+                    <span>
+                      {latestConversation.name}
+                      {newMessageConversations.length > 1 && (
+                        <span className="text-gray-400"> +{newMessageConversations.length - 1} more</span>
+                      )}
+                    </span>
+                  </>
+                )}
+              </div>
+              <div className="text-sm text-gray-900 font-normal">
+                Click here to view messages
+              </div>
+            </div>
+          ) : null;
+        })()}
       </div>
       <div className="px-4 py-2 border-t border-gray-100 text-center">
         <button

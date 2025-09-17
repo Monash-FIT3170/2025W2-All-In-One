@@ -13,6 +13,8 @@ import {
 } from "/app/client/library-modules/utils/date-utils";
 
 import { PropertyListingInspectionDocument } from "/app/server/database/property-listing/models/PropertyListingInspectionDocument";
+import { AddTenantToInspectionUseCase } from "/app/client/library-modules/use-cases/property-listing/AddTenantToInspectionUseCase";
+import { ListingRepository } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 const initialState: PropertyListingPageUiState = {
@@ -244,6 +246,9 @@ export const load = createAsyncThunk(
     return { ...result.propertyWithListingData, landlords: result.landlords };
   }
 );
+
+const listingRepo = new ListingRepository();
+const addTenantUseCase = new AddTenantToInspectionUseCase(listingRepo);
 
 export const bookPropertyInspectionAsync = createAsyncThunk(
   "propertyListing/bookPropertyInspection",
