@@ -1,5 +1,6 @@
 import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
 import { Role } from '/app/shared/user-role-identifier';
+import { TenantApplicationStatus } from '/app/shared/api-models/tenant-application/TenantApplicationStatus';
 
 type BaseTenantSelectionModalProps = {
   isOpen: boolean;
@@ -7,6 +8,7 @@ type BaseTenantSelectionModalProps = {
   tenantApplications?: TenantApplication[];
   onReject: (applicationId: string) => void;
   onAccept: (applicationId: string) => void;
+  onReset: (applicationId: string, currentStatus: TenantApplicationStatus) => void;
 };
 
 export type AgentTenantSelectionModalProps = BaseTenantSelectionModalProps & {
