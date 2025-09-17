@@ -87,7 +87,7 @@ export function SettingsAccountPreferences() {
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Button variant="destructive" onClick={handleLogout}>
+                    <Button variant="destructive" className="cursor-pointer" onClick={handleLogout}>
                       Sign Out
                     </Button>
                   </FormControl>
