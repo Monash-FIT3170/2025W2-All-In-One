@@ -138,7 +138,7 @@ export const landlordCalendarSlice = createSlice({
         state.markers = action.payload;
       })
       .addCase(fetchLandlordCalendarMarkersForDate.rejected, (state, action) => {
-        console.error("Failed to fetch landlord calendar markers:", action.error.message);
+        state.error = action.error.message || "Failed to fetch landlord calendar markers";
       })
       .addCase(deleteLandlordCalendarTask.pending, (state) => {
         // Keep UI responsive during delete

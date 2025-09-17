@@ -127,7 +127,7 @@ export const agentCalendarSlice = createSlice({
         state.markers = action.payload;
       })
       .addCase(fetchCalendarMarkersForDate.rejected, (state, action) => {
-        console.error("Failed to fetch calendar markers:", action.error.message);
+        state.error = action.error.message || "Failed to fetch calendar markers";
       })
       .addCase(deleteCalendarTask.pending, (state) => {
         // Keep UI responsive during delete
