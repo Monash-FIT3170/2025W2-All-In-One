@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "/app/client/ui-modules/theming-shadcn/Dialog";
 import { Button } from "/app/client/ui-modules/theming-shadcn/Button";
 import { Textarea } from "/app/client/ui-modules/theming-shadcn/Textarea";
-import { Toast } from "/app/client/ui-modules/settings-page/components/Toast";
+import { FeedbackPopup } from "/app/client/ui-modules/settings-page/components/FeedbackPopup";
 import {
   Form,
   FormControl,
@@ -32,6 +32,10 @@ export function DeactivateAccountPopup(): React.JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showAreYouSure, setShowAreYouSure] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<"success" | "error">("success");
+  const [feedbackTitle, setFeedbackTitle] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -61,10 +65,10 @@ export function DeactivateAccountPopup(): React.JSX.Element {
       // Reset form
       form.reset();
     } catch (err: any) {
-      Toast({
-        title: "Submission Failed",
-        content: "Unable to submit your deactivation request. Please try again.",
-      });
+      setFeedbackType("error");
+      setFeedbackTitle("Submission Failed");
+      setFeedbackMessage("Unable to submit your deactivation request. Please try again.");
+      setFeedbackOpen(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -195,6 +199,14 @@ export function DeactivateAccountPopup(): React.JSX.Element {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+      <FeedbackPopup
+        isOpen={feedbackOpen}
+        onClose={() => setFeedbackOpen(false)}
+        type={feedbackType}
+        title={feedbackTitle}
+        message={feedbackMessage}
+      />
     </>
   );
 }

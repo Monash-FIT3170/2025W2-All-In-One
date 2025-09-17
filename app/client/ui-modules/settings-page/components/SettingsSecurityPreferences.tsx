@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
  
-import { Toast } from "/app/client/ui-modules/settings-page/components/Toast";
 import { Button } from "/app/client/ui-modules/theming-shadcn/Button";
 import { ChangePasswordPopup } from "/app/client/ui-modules/settings-page/components/ChangePasswordPopup";
 import { LoginHistoryModal } from "/app/client/ui-modules/settings-page/components/LoginHistoryModal";
@@ -32,10 +31,7 @@ export function SettingsSecurityPreferences() {
   })
  
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    Toast({
-      title: "You submitted the following values:",
-      content: JSON.stringify(data, null, 2),
-    })
+    console.log("Security preferences updated:", data);
   }
  
   return (
