@@ -48,10 +48,12 @@ export function PropertyInspectionsContainer({
   initialBookingUiStateList,
   userRole,
   tenantId,
+  propertyId,
 }: {
   initialBookingUiStateList: InspectionBookingListUiState[];
   userRole?: Role;
   tenantId?: string;
+  propertyId: string;
 }) {
   const [bookingList, setBookingList] = React.useState(
     initialBookingUiStateList
@@ -70,7 +72,7 @@ export function PropertyInspectionsContainer({
     );
 
     // Then call the async function (optional, for server sync)
-    bookPropertyInspectionAsync({ inspectionId, tenantId });
+    bookPropertyInspectionAsync({ inspectionId, tenantId, propertyId });
   };
 
   return (
