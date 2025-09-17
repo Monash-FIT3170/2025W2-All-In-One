@@ -50,12 +50,13 @@ export function PropertyDetails({
 
       {/* Property Images */}
       {listing.length > 0 ? (
-        <div className="mb-6">
+        <div className="mb-6 w-full">
           <ImageCarousel 
             imageUrls={listing}
             leftArrowIcon={<LeftCircularArrowIcon />}
             rightArrowIcon={<RightCircularArrowIcon />}
-            className="fw-full max-w-[600px] mx-auto" />
+            className="w-full h-[300px] object-cover" 
+          />
         </div>
       ) : (
         <div className="bg-gray-100 rounded-lg mb-6 flex flex-col items-center justify-center h-64">
