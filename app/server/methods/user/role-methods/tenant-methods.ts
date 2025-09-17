@@ -98,8 +98,38 @@ const profileGetByTenantIdMethod = {
   },
 };
 
+//UPDATE TENANT TASKS
+// This method adds a new task ID to the tenant's task_ids array
+const tenantUpdateTasksMethod = {
+  [MeteorMethodIdentifier.TENANT_UPDATE_TASKS]: async (
+    userId: string,
+    taskId: string
+  ): Promise<void> => {
+    const tenantDoc = await TenantCollection.findOneAsync({
+      userAccountId: userId,
+    });
+
+    if (!tenantDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Tenant with user ID ${userId} not found.`)
+      );
+    }
+
+    // Add the task ID to the tenant's task_ids array if it doesn't already exist
+    const currentTaskIds = tenantDoc.task_ids ?? [];
+    if (!currentTaskIds.includes(taskId)) {
+      const updatedTaskIds = [...currentTaskIds, taskId];
+      await TenantCollection.updateAsync(
+        { userAccountId: userId },
+        { $set: { task_ids: updatedTaskIds } }
+      );
+    }
+  },
+};
+
 Meteor.methods({
   ...tenantInsertMethod,
   ...tenantGetMethod,
   ...profileGetByTenantIdMethod,
+  ...tenantUpdateTasksMethod
 });

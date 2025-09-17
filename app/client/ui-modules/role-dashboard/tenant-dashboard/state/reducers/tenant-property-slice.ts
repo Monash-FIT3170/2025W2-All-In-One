@@ -16,6 +16,7 @@ import { getAgentByAgentId, getAgentById } from '/app/client/library-modules/dom
 import { getProfileDataById } from '/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository';
 import { getPropertyById, getPropertyByTenantId } from '/app/client/library-modules/domain-models/property/repositories/property-repository';
 import { getTenantById } from "/app/client/library-modules/domain-models/user/role-repositories/tenant-repository";
+import { PropertyWithListingData } from "/app/client/library-modules/use-cases/property-listing/models/PropertyWithListingData";
 
 interface TenantPropertyState {
   propertyId: string;
@@ -64,6 +65,9 @@ interface TenantPropertyState {
   agentProfile: ProfileData | null;
   isLoadingAgent: boolean;
   agentError: string | null;
+  isLoading: boolean;
+  propertiesWithListingData: PropertyWithListingData[];
+  error: string | null;
 }
 
 const initialState: TenantPropertyState = {
@@ -107,6 +111,9 @@ const initialState: TenantPropertyState = {
   agentProfile: null,
   isLoadingAgent: false,
   agentError: null,
+  isLoading: false,
+  propertiesWithListingData: [],
+  error: null
 };
 
 export const submitDraftListingAsync = createAsyncThunk(
@@ -114,6 +121,27 @@ export const submitDraftListingAsync = createAsyncThunk(
   async (propertyId: string) => {
     const submitDraftListing = await submitDraftListingUseCase(propertyId);
     return submitDraftListing;
+  }
+);
+
+export const fetchTenantPropertyWithListingData = createAsyncThunk(
+  "tenantProperties/fetchTenantProperties",
+  async (_: void, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const userId = state.currentUser.authUser?.userId;
+      if (!userId) {
+        return rejectWithValue("No authenticated user");
+      }
+
+      const tenant = await getTenantById(userId);
+      const property = await getPropertyByTenantId(tenant.tenantId);
+      const listings = await getPropertyWithListingDataUseCase(property.propertyId)
+  
+      return listings.image_urls;
+    } catch {
+      return rejectWithValue("Failed to fetch agent properties");
+    }
   }
 );
 
@@ -219,6 +247,27 @@ export const tenantPropertySlice = createSlice({
         state.isLoadingAgent = false;
         state.agentError = action.error.message || 'Failed to fetch agent details';
       });
+
+    builder
+      .addCase(fetchTenantPropertyWithListingData.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(
+        fetchTenantPropertyWithListingData.fulfilled,
+        (state, action) => {
+          state.isLoading = false;
+          state.listingImageUrls = action.payload;
+        }
+      )
+      .addCase(
+        fetchTenantPropertyWithListingData.rejected,
+        (state, action) => {
+          state.isLoading = false;
+          state.error =
+            (action.payload as string) || "Failed to fetch agent properties";
+        }
+      );
   },
 });
 

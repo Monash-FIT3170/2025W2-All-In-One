@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { PropertyFeatures } from "../../../common/property-components/PropertyFeatures";
 import { PropertySpecifics } from "../../../common/property-components/PropertySpecifics";
-import {
-  PropertyStatusPillVariant,
-  PropertySummary,
-} from "../components/PropertySummary";
+import {PropertySummary} from "../components/PropertySummary";
 import { PropertyDescription } from "../../../common/property-components/PropertyDescription";
 import { LeftCircularArrowIcon } from "/app/client/ui-modules/theming/icons/LeftCircularArrowIcon";
 import { RightCircularArrowIcon } from "/app/client/ui-modules/theming/icons/RightCircularArrowIcon";
@@ -13,8 +10,6 @@ import {
   InspectionBookingListUiState,
   PropertyInspections,
 } from "../components/PropertyInspections";
-import { BackLink } from "../../../theming/components/BackLink";
-import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonIcon";
 import { twMerge } from "tailwind-merge";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useSelector } from "react-redux";
@@ -188,12 +183,6 @@ function PropertyPageContent({
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
   return (
     <div className={className}>
-      <TopBar
-        listingStatusText={listingStatusText}
-        shouldDisplayListingStatus={shouldDisplayListingStatus}
-        onBack={onBack}
-        className="mb-3"
-      />
       <PropertyHero
         streetNumber={streetNumber}
         street={street}
@@ -233,29 +222,6 @@ function PropertyPageContentLoadingSkeleton({
   className?: string;
 }): React.JSX.Element {
   return <p className={className}>Loading...</p>;
-}
-
-function TopBar({
-  listingStatusText,
-  shouldDisplayListingStatus,
-  onBack,
-  className = "",
-}: {
-  listingStatusText: string;
-  shouldDisplayListingStatus: boolean;
-  onBack: () => void;
-  className?: string;
-}): React.JSX.Element {
-  return (
-    <div className={twMerge("flex items-start", className)}>
-      <BackLink
-        label="Back to Properties"
-        backButtonIcon={<BackButtonIcon />}
-        onClick={onBack}
-        className="mr-auto"
-      />
-    </div>
-  );
 }
 
 function PropertyHero({

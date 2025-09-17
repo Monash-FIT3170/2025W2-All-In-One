@@ -12,6 +12,8 @@ import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
 import { ApiInsertListingPayload } from "/app/shared/api-models/property-listing/ListingInsertData";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
+import { TaskPriority } from "/app/shared/task-priority-identifier";
+import { PropertyCollection } from "../../database/property/property-collections";
 
 const getListingForProperty = {
   [MeteorMethodIdentifier.LISTING_GET_FOR_PROPERTY]: async (
@@ -257,7 +259,8 @@ const insertPropertyListingInspection = {
 const addTenantToInspectionMethod = {
   [MeteorMethodIdentifier.ADD_TENANT_TO_INSPECTION]: async (
     inspectionId: string,
-    tenantId: string
+    tenantId: string,
+    propertyId: string
   ): Promise<PropertyListingInspectionDocument> => {
     console.log(
       "ADD_TENANT_TO_INSPECTION method called",
@@ -281,7 +284,22 @@ const addTenantToInspectionMethod = {
         { $push: { tenant_ids: tenantId } }
       );
     }
+    const property = await PropertyCollection.findOneAsync({
+      _id: propertyId,
+    });
 
+    // Create task for tenant
+    const taskData = {
+      name: "Attend open inspection",
+      description: "View the property at the scheduled time",
+      dueDate: inspection.starttime,
+      priority: TaskPriority.MEDIUM,
+      propertyAddress: `${property?.streetname} ${property?.streetnumber}, ${property?.suburb}, ${property?.province} ${property?.postcode}`,
+      propertyId: propertyId,
+      userId: tenantId,
+      };
+    console.log("Creating task for tenant:", taskData);
+    await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT_FOR_TENANT, taskData);
     // return the updated doc so client thunk has fresh state
     const updated = await PropertyListingInspectionCollection.findOneAsync({
       _id: inspectionId,

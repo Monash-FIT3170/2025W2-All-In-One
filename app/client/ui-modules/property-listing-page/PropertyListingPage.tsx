@@ -169,6 +169,7 @@ export function PropertyListingPage({
                 bookPropertyInspectionAsync({
                   inspectionId,
                   tenantId: currentUser.userAccountId,
+                  propertyId: state.propertyId,
                 })
               );
             }
@@ -447,6 +448,7 @@ function ListingPageContent({
               bookPropertyInspectionAsync({
                 inspectionId,
                 tenantId: tenantId,
+                propertyId: propertyId,
               })
             );
           }
