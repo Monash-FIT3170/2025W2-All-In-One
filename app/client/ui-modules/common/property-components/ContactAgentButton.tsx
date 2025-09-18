@@ -23,7 +23,7 @@ export function ContactAgentButton({
   };
   return (
     <ThemedButton
-      variant={ThemedButtonVariant.PRIMARY}
+      variant={ThemedButtonVariant.SECONDARY}
       onClick={handleClick}
       className={twMerge("w-[128px]", className)}
     >
