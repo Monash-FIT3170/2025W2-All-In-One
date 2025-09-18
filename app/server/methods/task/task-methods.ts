@@ -234,92 +234,6 @@ const taskInsertForLandlordMethod = {
 
 /**
  * Creates a new task for TENANT in the database and returns the task ID.
- * */
-
-const taskInsertForTenantMethod = {
-  [MeteorMethodIdentifier.TASK_INSERT_FOR_TENANT]: async (taskData: {
-    name: string;
-    description: string;
-    dueDate: Date;
-    priority: TaskPriority;
-    landlordId: string;
-    propertyAddress: string;
-    propertyId: string;
-    userId: string;
-  }): Promise<string> => {
-    console.log("taskInsertForTenantMethod called with:", taskData);
-
-    // Validate required fields - description can be empty
-    if (!taskData.name || taskData.name.trim() === "") {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Task name is required")
-      );
-    }
-
-    if (!taskData.dueDate) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Due date is required")
-      );
-    }
-
-    if (!taskData.priority) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Priority is required")
-      );
-    }
-
-    if (!taskData.userId) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError("User ID is required")
-      );
-    }
-
-    const taskDocument: Omit<TaskDocument, "_id"> = {
-      name: taskData.name.trim(),
-      description: taskData.description || "", // Handle empty description
-      dueDate: taskData.dueDate,
-      priority: taskData.priority,
-      taskPropertyAddress: taskData.propertyAddress,
-      taskPropertyId: taskData.propertyId,
-      taskStatus: TaskStatus.NOTSTARTED, // Default status
-      createdDate: new Date(),
-    };
-
-    try {
-      const insertedId = await TaskCollection.insertAsync(taskDocument);
-      const createdTask = await getTaskDocumentById(insertedId);
-
-      if (!createdTask) {
-        throw new InvalidDataError("Failed to retrieve created task");
-      }
-
-      // Update the tenant's task_ids array to include the new task
-      console.log("Before tenant update call");
-      try {
-        await Meteor.callAsync(
-          MeteorMethodIdentifier.TENANT_UPDATE_TASKS,
-          taskData.userId,
-          insertedId
-        );
-        console.log("Tenant task_ids updated successfully");
-      } catch (tenantError) {
-        console.warn("Failed to update tenant task_ids:", tenantError);
-        // Don't fail the task creation if tenant update fails - task was already created
-      }
-      console.log("After tenant task update call");
-
-      return insertedId;
-    } catch (error) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Failed to create task: ${error}`)
-      );
-    }
-  },
-};
-
-
-/**
- * Creates a new task for TENANT in the database and returns the task ID.
  */
 const taskInsertForTenantMethod = {
   [MeteorMethodIdentifier.TASK_INSERT_FOR_TENANT]: async (taskData: {
@@ -580,56 +494,6 @@ const taskDeleteForTenantMethod = {
 
 
 
-const taskUpdateForTenantMethod = {
-  [MeteorMethodIdentifier.TASK_UPDATE_FOR_TENANT]: async (taskData: {
-    taskId: string;
-    name?: string;
-    description?: string;
-    dueDate?: Date;
-    priority?: TaskPriority;
-  }): Promise<string> => {
-    console.log("taskUpdateForLandlordMethod called with:", taskData);
-
-    // Validate required fields
-    if (!taskData.taskId) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Task ID is required")
-      );
-    }
-
-    const updateData: TaskUpdateData = {};
-
-    if (taskData.name !== undefined) {
-      updateData.name = taskData.name.trim();
-    }
-    if (taskData.description !== undefined) {
-      updateData.description = taskData.description;
-    }
-    if (taskData.dueDate !== undefined) {
-      updateData.dueDate = taskData.dueDate;
-    }
-    if (taskData.priority !== undefined) {
-      updateData.priority = taskData.priority;
-    }
-
-    try {
-      const result = await TaskCollection.updateAsync(
-        { _id: taskData.taskId },
-        { $set: updateData }
-      );
-
-      if (result === 0) {
-        throw new InvalidDataError("Task not found");
-      }
-
-      return taskData.taskId;
-    } catch (error) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Failed to update task: ${error}`)
-      );
-    }
-  },
-};
 
 /**
  * Maps a TaskDocument to an ApiTask DTO.
@@ -669,6 +533,4 @@ Meteor.methods({
   ...taskDeleteForAgentMethod,
   ...taskDeleteForLandlordMethod,
   ...taskDeleteForTenantMethod,
-  ...taskInsertForTenantMethod,
-  ...taskUpdateForTenantMethod,
 });

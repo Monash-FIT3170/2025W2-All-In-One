@@ -132,5 +132,4 @@ Meteor.methods({
   ...tenantGetMethod,
   ...tenantAddTaskMethod,
   ...profileGetByTenantIdMethod,
-  ...tenantUpdateTasksMethod
 });
