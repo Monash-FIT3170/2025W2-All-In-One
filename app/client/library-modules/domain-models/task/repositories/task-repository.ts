@@ -1,4 +1,4 @@
-import { apiGetTaskById, apiCreateTaskForTenant, apiUpdateTaskForTenant, apiCreateTaskForAgent, apiCreateTaskForLandlord,apiUpdateTaskForAgent, apiUpdateTaskForLandlord } from "../../../apis/task/task-api";
+import { apiGetTaskById, apiCreateTaskForTenant, apiCreateTaskForAgent, apiCreateTaskForLandlord, apiUpdateTask } from "../../../apis/task/task-api";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { mapApiTaskToTask, mapAgentTaskInsertData, mapLandlordTaskInsertData, mapTenantTaskInsertData } from "./mappers/task-mapper";
 import { TaskPriority } from "/app/shared/task-priority-identifier"
@@ -57,7 +57,7 @@ export async function updateTaskForAgent(task: {
   dueDate: Date;
   priority: TaskPriority;
 }): Promise<string> {
-  return await apiUpdateTaskForAgent(task);
+  return await apiUpdateTask(task);
 }
 
 export async function updateTaskForLandlord(task: {
@@ -67,7 +67,7 @@ export async function updateTaskForLandlord(task: {
   dueDate: Date;
   priority: TaskPriority;
 }): Promise<string> {
-  return await apiUpdateTaskForLandlord(task);
+  return await apiUpdateTask(task);
 }
 
 export async function updateTaskForTenant(task: {
@@ -77,7 +77,7 @@ export async function updateTaskForTenant(task: {
   dueDate: Date;
   priority: TaskPriority;
 }): Promise<string> {
-  return await apiUpdateTaskForTenant(task);
+  return await apiUpdateTask(task);
 }
 
 // temp fix ---> will need to update in M4

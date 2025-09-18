@@ -1,6 +1,7 @@
 import { Meteor } from "meteor/meteor";
 import { TaskDocument } from "../../database/task/models/TaskDocument";
 import { TaskCollection } from "../../database/task/task-collections";
+import { AgentCollection, LandlordCollection, TenantCollection } from "../../database/user/user-collections";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
@@ -117,20 +118,22 @@ const taskInsertForAgentMethod = {
         throw new InvalidDataError("Failed to retrieve created task");
       }
 
-      // Update the agent's task_ids array to include the new task
-      console.log("Before agent update call");
+      // Add the task to the agent's task_ids array
+      console.log("Before agent add task call");
       try {
         await Meteor.callAsync(
-          MeteorMethodIdentifier.AGENT_UPDATE_TASKS,
+          MeteorMethodIdentifier.AGENT_ADD_TASK,
           taskData.userId,
           insertedId
         );
         console.log("Agent task_ids updated successfully");
       } catch (agentError) {
-        console.warn("Failed to update agent task_ids:", agentError);
-
+        console.error("Failed to add task to agent:", agentError);
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(`Failed to add task to agent: ${agentError}`)
+        );
       }
-      console.log("After agent update call");
+      console.log("After agent add task call");
 
       return insertedId;
     } catch (error) {
@@ -202,20 +205,22 @@ const taskInsertForLandlordMethod = {
         throw new InvalidDataError("Failed to retrieve created task");
       }
 
-      // Update the landlord's task_ids array to include the new task
-      console.log("Before landlord update call");
+      // Add the task to the landlord's task_ids array
+      console.log("Before landlord add task call");
       try {
         await Meteor.callAsync(
-          MeteorMethodIdentifier.LANDLORD_UPDATE_TASKS,
+          MeteorMethodIdentifier.LANDLORD_ADD_TASK,
           taskData.userId,
           insertedId
         );
         console.log("Landlord task_ids updated successfully");
       } catch (landlordError) {
-        console.warn("Failed to update landlord task_ids:", landlordError);
-        // Don't fail the task creation if landlord update fails - task was already created
+        console.error("Failed to add task to landlord:", landlordError);
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(`Failed to add task to landlord: ${landlordError}`)
+        );
       }
-      console.log("After landlord task update call");
+      console.log("After landlord add task call");
 
       return insertedId;
     } catch (error) {
@@ -229,18 +234,16 @@ const taskInsertForLandlordMethod = {
 
 /**
  * Creates a new task for TENANT in the database and returns the task ID.
- * */
-
+ */
 const taskInsertForTenantMethod = {
   [MeteorMethodIdentifier.TASK_INSERT_FOR_TENANT]: async (taskData: {
     name: string;
     description: string;
     dueDate: Date;
     priority: TaskPriority;
-    landlordId: string;
-    propertyAddress: string;
-    propertyId: string;
     userId: string;
+    propertyAddress?: string;
+    propertyId?: string;
   }): Promise<string> => {
     console.log("taskInsertForTenantMethod called with:", taskData);
 
@@ -274,8 +277,8 @@ const taskInsertForTenantMethod = {
       description: taskData.description || "", // Handle empty description
       dueDate: taskData.dueDate,
       priority: taskData.priority,
-      taskPropertyAddress: taskData.propertyAddress,
-      taskPropertyId: taskData.propertyId,
+      taskPropertyAddress: taskData.propertyAddress || "",
+      taskPropertyId: taskData.propertyId || "",
       taskStatus: TaskStatus.NOTSTARTED, // Default status
       createdDate: new Date(),
     };
@@ -288,20 +291,22 @@ const taskInsertForTenantMethod = {
         throw new InvalidDataError("Failed to retrieve created task");
       }
 
-      // Update the tenant's task_ids array to include the new task
-      console.log("Before tenant update call");
+      // Add the task to the tenant's task_ids array
+      console.log("Before tenant add task call for task:", insertedId, "userId:", taskData.userId);
       try {
-        await Meteor.callAsync(
-          MeteorMethodIdentifier.TENANT_UPDATE_TASKS,
+        await Meteor.call(
+          MeteorMethodIdentifier.TENANT_ADD_TASK,
           taskData.userId,
           insertedId
         );
-        console.log("Tenant task_ids updated successfully");
+        
       } catch (tenantError) {
-        console.warn("Failed to update tenant task_ids:", tenantError);
-        // Don't fail the task creation if tenant update fails - task was already created
+        
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(`Failed to add task to tenant: ${tenantError}`)
+        );
       }
-      console.log("After tenant task update call");
+      console.log("After tenant add task call");
 
       return insertedId;
     } catch (error) {
@@ -312,110 +317,176 @@ const taskInsertForTenantMethod = {
   },
 };
 
+/**
+ * Updates an existing task in the database and returns the task ID.
+ * This method is role-agnostic since it only modifies task data, not user relationships.
+ */
+const taskUpdateMethod = {
+  [MeteorMethodIdentifier.TASK_UPDATE]: async (taskData: {
+    taskId: string;
+    name?: string;
+    description?: string;
+    dueDate?: Date;
+    priority?: TaskPriority;
+  }): Promise<string> => {
+    console.log("taskUpdateMethod called with:", taskData);
+
+    // Validate required fields
+    if (!taskData.taskId) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("Task ID is required")
+      );
+    }
+
+    const updateData: TaskUpdateData = {};
+
+    if (taskData.name !== undefined) {
+      updateData.name = taskData.name.trim();
+    }
+    if (taskData.description !== undefined) {
+      updateData.description = taskData.description;
+    }
+    if (taskData.dueDate !== undefined) {
+      updateData.dueDate = taskData.dueDate;
+    }
+    if (taskData.priority !== undefined) {
+      updateData.priority = taskData.priority;
+    }
+
+    try {
+      const result = await TaskCollection.updateAsync(
+        { _id: taskData.taskId },
+        { $set: updateData }
+      );
+
+      if (result === 0) {
+        throw new InvalidDataError("Task not found");
+      }
+
+      return taskData.taskId;
+    } catch (error) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Failed to update task: ${error}`)
+      );
+    }
+  },
+};
 
 /**
- * Updates an existing task for AGENT in the database and returns the task ID.
+ * Deletes a task for AGENT from the database and removes it from the agent's task list.
  */
-const taskUpdateForAgentMethod = {
-  [MeteorMethodIdentifier.TASK_UPDATE_FOR_AGENT]: async (taskData: {
+const taskDeleteForAgentMethod = {
+  [MeteorMethodIdentifier.TASK_DELETE_FOR_AGENT]: async (taskData: {
     taskId: string;
-    name?: string;
-    description?: string;
-    dueDate?: Date;
-    priority?: TaskPriority;
-  }): Promise<string> => {
-    console.log("taskUpdateForAgentMethod called with:", taskData);
+    agentId: string;
+  }): Promise<boolean> => {
+    console.log("taskDeleteForAgentMethod called with:", taskData);
 
     // Validate required fields
-    if (!taskData.taskId) {
+    if (!taskData.taskId || !taskData.agentId) {
       throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Task ID is required")
+        new InvalidDataError("Task ID and Agent ID are required")
       );
-    }
-
-    const updateData: TaskUpdateData = {};
-
-    if (taskData.name !== undefined) {
-      updateData.name = taskData.name.trim();
-    }
-    if (taskData.description !== undefined) {
-      updateData.description = taskData.description;
-    }
-    if (taskData.dueDate !== undefined) {
-      updateData.dueDate = taskData.dueDate;
-    }
-    if (taskData.priority !== undefined) {
-      updateData.priority = taskData.priority;
     }
 
     try {
-      const result = await TaskCollection.updateAsync(
-        { _id: taskData.taskId },
-        { $set: updateData }
-      );
-
-      if (result === 0) {
+      // Delete the task from the task collection
+      const deleteResult = await TaskCollection.removeAsync({ _id: taskData.taskId });
+      
+      if (deleteResult === 0) {
         throw new InvalidDataError("Task not found");
       }
 
-      return taskData.taskId;
+      // Remove the task from the agent's task_ids array using atomic $pull operation
+      await AgentCollection.updateAsync(
+        { _id: taskData.agentId },
+        { $pull: { task_ids: taskData.taskId } }
+      );
+
+      return true;
     } catch (error) {
       throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Failed to update task: ${error}`)
+        new InvalidDataError(`Failed to delete task: ${error}`)
       );
     }
   },
 };
 
 /**
- * Updates an existing task for LANDLORD in the database and returns the task ID.
+ * Deletes a task for LANDLORD from the database and removes it from the landlord's task list.
  */
-const taskUpdateForLandlordMethod = {
-  [MeteorMethodIdentifier.TASK_UPDATE_FOR_LANDLORD]: async (taskData: {
+const taskDeleteForLandlordMethod = {
+  [MeteorMethodIdentifier.TASK_DELETE_FOR_LANDLORD]: async (taskData: {
     taskId: string;
-    name?: string;
-    description?: string;
-    dueDate?: Date;
-    priority?: TaskPriority;
-  }): Promise<string> => {
-    console.log("taskUpdateForLandlordMethod called with:", taskData);
+    landlordId: string;
+  }): Promise<boolean> => {
+    console.log("taskDeleteForLandlordMethod called with:", taskData);
 
     // Validate required fields
-    if (!taskData.taskId) {
+    if (!taskData.taskId || !taskData.landlordId) {
       throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Task ID is required")
+        new InvalidDataError("Task ID and Landlord ID are required")
       );
-    }
-
-    const updateData: TaskUpdateData = {};
-
-    if (taskData.name !== undefined) {
-      updateData.name = taskData.name.trim();
-    }
-    if (taskData.description !== undefined) {
-      updateData.description = taskData.description;
-    }
-    if (taskData.dueDate !== undefined) {
-      updateData.dueDate = taskData.dueDate;
-    }
-    if (taskData.priority !== undefined) {
-      updateData.priority = taskData.priority;
     }
 
     try {
-      const result = await TaskCollection.updateAsync(
-        { _id: taskData.taskId },
-        { $set: updateData }
-      );
-
-      if (result === 0) {
+      // Delete the task from the task collection
+      const deleteResult = await TaskCollection.removeAsync({ _id: taskData.taskId });
+      
+      if (deleteResult === 0) {
         throw new InvalidDataError("Task not found");
       }
 
-      return taskData.taskId;
+      // Remove the task from the landlord's task_ids array using atomic $pull operation
+      await LandlordCollection.updateAsync(
+        { _id: taskData.landlordId },
+        { $pull: { task_ids: taskData.taskId } }
+      );
+
+      return true;
     } catch (error) {
       throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Failed to update task: ${error}`)
+        new InvalidDataError(`Failed to delete task: ${error}`)
+      );
+    }
+  },
+};
+
+/**
+ * Deletes a task for TENANT from the database and removes it from the tenant's task list.
+ */
+const taskDeleteForTenantMethod = {
+  [MeteorMethodIdentifier.TASK_DELETE_FOR_TENANT]: async (taskData: {
+    taskId: string;
+    tenantId: string;
+  }): Promise<boolean> => {
+    console.log("taskDeleteForTenantMethod called with:", taskData);
+
+    // Validate required fields
+    if (!taskData.taskId || !taskData.tenantId) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("Task ID and Tenant ID are required")
+      );
+    }
+
+    try {
+      // Delete the task from the task collection
+      const deleteResult = await TaskCollection.removeAsync({ _id: taskData.taskId });
+      
+      if (deleteResult === 0) {
+        throw new InvalidDataError("Task not found");
+      }
+
+      // Remove the task from the tenant's task_ids array using atomic $pull operation
+      await TenantCollection.updateAsync(
+        { _id: taskData.tenantId },
+        { $pull: { task_ids: taskData.taskId } }
+      );
+
+      return true;
+    } catch (error) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Failed to delete task: ${error}`)
       );
     }
   },
@@ -423,56 +494,6 @@ const taskUpdateForLandlordMethod = {
 
 
 
-const taskUpdateForTenantMethod = {
-  [MeteorMethodIdentifier.TASK_UPDATE_FOR_TENANT]: async (taskData: {
-    taskId: string;
-    name?: string;
-    description?: string;
-    dueDate?: Date;
-    priority?: TaskPriority;
-  }): Promise<string> => {
-    console.log("taskUpdateForLandlordMethod called with:", taskData);
-
-    // Validate required fields
-    if (!taskData.taskId) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Task ID is required")
-      );
-    }
-
-    const updateData: TaskUpdateData = {};
-
-    if (taskData.name !== undefined) {
-      updateData.name = taskData.name.trim();
-    }
-    if (taskData.description !== undefined) {
-      updateData.description = taskData.description;
-    }
-    if (taskData.dueDate !== undefined) {
-      updateData.dueDate = taskData.dueDate;
-    }
-    if (taskData.priority !== undefined) {
-      updateData.priority = taskData.priority;
-    }
-
-    try {
-      const result = await TaskCollection.updateAsync(
-        { _id: taskData.taskId },
-        { $set: updateData }
-      );
-
-      if (result === 0) {
-        throw new InvalidDataError("Task not found");
-      }
-
-      return taskData.taskId;
-    } catch (error) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Failed to update task: ${error}`)
-      );
-    }
-  },
-};
 
 /**
  * Maps a TaskDocument to an ApiTask DTO.
@@ -507,8 +528,9 @@ Meteor.methods({
   ...taskGetMethod,
   ...taskInsertForAgentMethod,
   ...taskInsertForLandlordMethod,
-  ...taskUpdateForAgentMethod,
-  ...taskUpdateForLandlordMethod,
   ...taskInsertForTenantMethod,
-  ...taskUpdateForTenantMethod,
+  ...taskUpdateMethod,
+  ...taskDeleteForAgentMethod,
+  ...taskDeleteForLandlordMethod,
+  ...taskDeleteForTenantMethod,
 });
