@@ -11,6 +11,7 @@ import {
   setFilter,
   selectActiveFilter,
 } from './state/reducers/tenant-selection-slice';
+import { TenantApplicationStatus } from '/app/shared/api-models/tenant-application/TenantApplicationStatus';
 
 export const TenantSelectionModal = (
   props: TenantSelectionModalProps
@@ -20,6 +21,7 @@ export const TenantSelectionModal = (
     onClose,
     onReject,
     onAccept,
+    onReset,
     tenantApplications = [],
   } = props;
   const dispatch = useAppDispatch();
@@ -33,6 +35,10 @@ export const TenantSelectionModal = (
 
   const handleAccept = (applicationId: string) => {
     onAccept(applicationId);
+  };
+
+  const handleReset = async (applicationId: string, currentStatus: TenantApplicationStatus) => {
+    onReset(applicationId, currentStatus);
   };
 
   const handleSendToLandlord = () => {
@@ -88,6 +94,7 @@ export const TenantSelectionModal = (
           tenantApplications={tenantApplications}
           onReject={handleReject}
           onAccept={handleAccept}
+          onReset={handleReset}
           userRole={props.role}
         />
 
