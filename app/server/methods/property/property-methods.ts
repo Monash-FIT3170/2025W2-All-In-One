@@ -375,6 +375,7 @@ const propertySearchMethod = {
             { streetname: { $regex: token, $options: "i" } },
             { streetnumber: { $regex: token, $options: "i" } },
             { province: { $regex: token, $options: "i" } },
+            { apartment_number: { $regex: token, $options: "i" } },
           ],
         })),
       };

@@ -30,6 +30,7 @@ export function PropertyCard(props: PropertyWithListingData) {
         streetname,
         suburb,
         postcode,
+        apartment_number,
         pricePerMonth,
         propertyStatus,
         bathrooms,
@@ -38,7 +39,9 @@ export function PropertyCard(props: PropertyWithListingData) {
         propertyListingInspections,
     } = props;
 
-    const address = `${streetnumber} ${streetname}`;
+    const address = apartment_number 
+        ? `${apartment_number} ${streetnumber} ${streetname}`
+        : `${streetnumber} ${streetname}`;
     const weeklyPrice = ((pricePerMonth) / 4).toFixed(0);
     const navigate = useNavigate();
 
