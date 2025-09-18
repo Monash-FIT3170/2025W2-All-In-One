@@ -141,8 +141,10 @@ const tenantApplicationUpdateStatusMethod = {
 
       await TenantApplicationCollection.updateAsync(
         { _id: { $in: applicationIds } },
-        { $set: updateData }
+        { $set: updateData },
+        { multi: true } // update multiple documents
       );
+
     } catch (error) {
       console.error("Error in tenantApplicationUpdateStatusMethod:", error);
       throw meteorWrappedInvalidDataError(error as InvalidDataError);

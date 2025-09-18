@@ -33,6 +33,10 @@ import {
   selectPropertyListingUiState,
   submitDraftListingAsync,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
+import { 
+  load as loadPropertyForm, 
+  selectPropertyFormUiState 
+} from "/app/client/ui-modules/property-form-agent/state/reducers/property-form-slice";
 
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
 import { useNavigate, useSearchParams } from "react-router";
@@ -64,10 +68,12 @@ import {
   selectHasFinalApprovedApplicationForProperty,
   selectFinalApprovedApplicantCountForProperty,
   sendFinalApprovedApplicationToAgentAsync,
+  intentResetApplicationDecisionAsync,
 } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { addBookedPropertyListingInspection } from "./state/reducers/property-listing-slice";
 import { Role } from "/app/shared/user-role-identifier";
 import { CurrentUserState } from "../user-authentication/state/CurrentUserState";
+import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
 
 export function PropertyListingPage({
   className = "",
@@ -118,6 +124,7 @@ export function PropertyListingPage({
           suburb={state.suburb}
           province={state.province}
           postcode={state.postcode}
+          apartmentNumber={state.apartmentNumber}
           summaryDescription={state.summaryDescription}
           propertyStatusText={state.propertyStatusText}
           propertyStatusPillVariant={state.propertyStatusPillVariant}
@@ -141,7 +148,7 @@ export function PropertyListingPage({
           shouldDisplaySubmitDraftButton={state.shouldDisplaySubmitDraftButton}
           shouldDisplayReviewTenantButton={
             state.shouldDisplayReviewTenantButton
-           && (role === Role.LANDLORD || role === Role.AGENT)}
+            && (role === Role.LANDLORD || role === Role.AGENT)}
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
           authUser={authUser}
           profileData={profileData}
@@ -167,6 +174,7 @@ export function PropertyListingPage({
                 bookPropertyInspectionAsync({
                   inspectionId,
                   tenantId: currentUser.userAccountId,
+                  propertyId: state.propertyId,
                 })
               );
             }
@@ -211,6 +219,7 @@ function ListingPageContent({
   suburb,
   province,
   postcode,
+  apartmentNumber,
   summaryDescription,
   propertyStatusText,
   propertyStatusPillVariant,
@@ -248,6 +257,7 @@ function ListingPageContent({
   suburb: string;
   province: string;
   postcode: string;
+  apartmentNumber?: string;
   summaryDescription: string;
   propertyStatusText: string;
   propertyStatusPillVariant: PropertyStatusPillVariant;
@@ -353,6 +363,17 @@ function ListingPageContent({
       console.error("Failed to reject application:", error);
     }
   };
+  const handleReset = async (applicationId: string, currentStatus: TenantApplicationStatus) => {
+    try {
+      const result = await dispatch(intentResetApplicationDecisionAsync({
+        applicationId: [applicationId],
+        currentStatus: currentStatus
+      })).unwrap();
+      console.log(`Application ${applicationId} reset successfully`);
+    } catch (error) {
+      console.error("Failed to reset application:", error);
+    }
+  };
 
   const handleSendToLandlord = async () => {
     try {
@@ -390,6 +411,7 @@ function ListingPageContent({
         listingStatusText={listingStatusText}
         listingStatusPillVariant={listingStatusPillVariant}
         shouldDisplayListingStatus={shouldDisplayListingStatus}
+        shouldDisplayEditListingButton={shouldDisplayEditListingButton}
         onBack={onBack}
         className="mb-3"
       />
@@ -400,6 +422,7 @@ function ListingPageContent({
         suburb={suburb}
         province={province}
         postcode={postcode}
+        apartmentNumber={apartmentNumber}
         summaryDescription={summaryDescription}
         propertyStatusText={propertyStatusText}
         propertyStatusPillVariant={propertyStatusPillVariant}
@@ -434,6 +457,7 @@ function ListingPageContent({
               bookPropertyInspectionAsync({
                 inspectionId,
                 tenantId: tenantId,
+                propertyId: propertyId,
               })
             );
           }
@@ -447,7 +471,6 @@ function ListingPageContent({
       <BottomBar
         shouldDisplaySubmitDraftButton={shouldDisplaySubmitDraftButton}
         shouldDisplayReviewTenantButton={shouldDisplayReviewTenantButton}
-        shouldDisplayEditListingButton={shouldDisplayEditListingButton}
         onSubmitDraftListing={onSubmitDraftListing}
         onReviewTenant={() => setIsReviewTenantModalOpen(true)}
       />
@@ -459,6 +482,7 @@ function ListingPageContent({
           onClose={() => setIsReviewTenantModalOpen(false)}
           onReject={handleReject}
           onAccept={handleAccept}
+          onReset={handleReset}
           onSendToLandlord={handleSendToLandlord}
           shouldShowSendToLandlordButton={shouldShowSendToLandlordButton}
           acceptedApplicantCount={acceptedApplicantCount}
@@ -474,6 +498,7 @@ function ListingPageContent({
           onClose={() => setIsReviewTenantModalOpen(false)}
           onReject={handleReject}
           onAccept={handleAccept}
+          onReset={handleReset}
           onSendToAgent={handleSendToAgent}
           onSendFinalApprovedToAgent={handleSendFinalApprovedToAgent}
           shouldShowSendToAgentButton={shouldShowSendToAgentButton}
@@ -501,29 +526,34 @@ function TopBar({
   listingStatusText,
   listingStatusPillVariant,
   shouldDisplayListingStatus,
+  shouldDisplayEditListingButton,
   onBack,
   className = "",
 }: {
   listingStatusText: string;
   listingStatusPillVariant: ListingStatusPillVariant;
   shouldDisplayListingStatus: boolean;
+  shouldDisplayEditListingButton: boolean;
   onBack: () => void;
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={twMerge("flex items-start", className)}>
+    <div className={twMerge("flex items-start justify-between", className)}>
       <BackLink
         label="Back to Properties"
         backButtonIcon={<BackButtonIcon />}
         onClick={onBack}
-        className="mr-auto"
-      />
-      {shouldDisplayListingStatus && (
+        />
+      <div className="flex items-center gap-2">
+        {shouldDisplayEditListingButton && <ListingModalEditor
+      />}
+        {shouldDisplayListingStatus && (
         <ListingStatusPill
           text={listingStatusText}
           variant={listingStatusPillVariant}
         />
       )}
+      </div>
     </div>
   );
 }
@@ -536,6 +566,7 @@ function ListingHero({
   suburb,
   province,
   postcode,
+  apartmentNumber,
   summaryDescription,
   propertyStatusText,
   propertyStatusPillVariant,
@@ -559,6 +590,7 @@ function ListingHero({
   suburb: string;
   province: string;
   postcode: string;
+  apartmentNumber?: string;
   summaryDescription: string;
   propertyStatusText: string;
   propertyStatusPillVariant: PropertyStatusPillVariant;
@@ -590,6 +622,7 @@ function ListingHero({
           suburb={suburb}
           province={province}
           postcode={postcode}
+          apartmentNumber={apartmentNumber}
           summaryDescription={summaryDescription}
           propertyStatusText={propertyStatusText}
           propertyStatusPillVariant={propertyStatusPillVariant}
@@ -605,14 +638,19 @@ function ListingHero({
           className="w-full mb-8"
         />
         <div className="flex">
-          <ApplyButton
-            onClick={onApply}
-            isLoading={isApplying}
-            userRole={userRole}
-            hasApplied={hasApplied}
-            className="mr-4"
-          />
-          <ContactAgentButton propertyId={propertyId} />
+          {(!userRole || userRole === Role.TENANT) && (
+            <ApplyButton
+              onClick={onApply}
+              isLoading={isApplying}
+              userRole={userRole}
+              hasApplied={hasApplied}
+              className="mr-4"
+            />
+          )}
+
+          {userRole === Role.TENANT && (
+            <ContactAgentButton propertyId={propertyId} />
+          )}
         </div>
       </div>
     </div>
@@ -668,14 +706,12 @@ function ListingDetails({
 function BottomBar({
   shouldDisplaySubmitDraftButton,
   shouldDisplayReviewTenantButton,
-  shouldDisplayEditListingButton,
   onSubmitDraftListing,
   onReviewTenant,
   className = "",
 }: {
   shouldDisplaySubmitDraftButton: boolean;
   shouldDisplayReviewTenantButton: boolean;
-  shouldDisplayEditListingButton: boolean;
   onSubmitDraftListing: () => void;
   onReviewTenant: () => void;
   className?: string;
@@ -693,7 +729,6 @@ function BottomBar({
       </div>
 
       <div className="flex">
-        {shouldDisplayEditListingButton && <ListingModalEditor />}
         {shouldDisplaySubmitDraftButton && (
           <SubmitDraftListingButton onClick={onSubmitDraftListing} />
         )}
@@ -712,29 +747,43 @@ function ListingModalEditor({
   const state: PropertyListingPageUiState = useSelector(
     selectPropertyListingUiState
   );
+  const propertyFormState = useAppSelector(selectPropertyFormUiState);
+  const authUser = useAppSelector((state) => state.currentUser.authUser);
+  const dispatch = useAppDispatch();
+
+  // Load property form data if landlords are not available
+  React.useEffect(() => {
+    if (propertyFormState.landlords.length === 0) {
+      dispatch(loadPropertyForm());
+    }
+  }, [dispatch, propertyFormState.landlords.length]);
 
   const listingInfo: FormSchemaType = {
     agent: state.agentId,
     landlord: state.propertyLandlordId,
     property_type: state.propertyType.toLowerCase(), // Ensure property type matches dropdown options (house or apartment)
-    address: `${state.streetNumber} ${state.street}`,
+    address_number: state.streetNumber,
+    address: state.street,
     city: state.suburb,
     state: state.province,
     postal_code: state.postcode,
-    apartment_number: "",
+    apartment_number: state.apartmentNumber || "",
     bedroom_number: Number(state.propertyBedrooms),
     bathroom_number: Number(state.propertyBathrooms),
+    parking_spaces: Number(state.propertyParkingSpaces),
     space: Number(state.areaValue),
     description: state.propertyDescription,
+    summary_description: state.summaryDescription,
     images: [], // Placeholder, as we don't have image files in the current state
     available_dates: new Date(),
-    lease_term: "12_months",
-    show_contact_boolean: true,
+    lease_term: state.leaseTerm,
     suburb: state.suburb,
-    address_number: state.streetNumber,
-    monthly_rent: Number(state.propertyPrice),
-    property_feature_ids: [],
-    inspection_times: [],
+    monthly_rent: state.monthlyRent,
+    property_feature_ids: state.propertyFeatureIds,
+    inspection_times: state.inspectionTimes.map(inspection => ({
+      start_time: new Date(inspection.start_time),
+      end_time: new Date(inspection.end_time),
+    })),
   };
 
   return (
@@ -744,7 +793,8 @@ function ListingModalEditor({
         isOpen={isModalOpen}
         toggle={toggleModal}
         propertyForm={listingInfo}
-        landlords={state.landlords}
+        landlords={propertyFormState.landlords}
+        features={propertyFormState.featureOptions}
         propertyId={state.propertyId}
         existingImageUrls={state.listingImageUrls}
       />

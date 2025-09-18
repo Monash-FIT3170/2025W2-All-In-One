@@ -47,7 +47,8 @@ export function LandlordProperties(): React.JSX.Element {
         `${property.streetnumber} ${property.streetname}`.toLowerCase().includes(search) ||
         property.suburb.toLowerCase().includes(search) ||
         property.postcode.includes(search) ||
-        property.type.toLowerCase().includes(search)
+        property.type.toLowerCase().includes(search) ||
+        (property.apartment_number && property.apartment_number.toLowerCase().includes(search))
       );
     }
 

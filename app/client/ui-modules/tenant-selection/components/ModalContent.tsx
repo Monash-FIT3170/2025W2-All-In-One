@@ -2,12 +2,13 @@ import React from 'react';
 import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
 import { TenantApplicationCard } from './TenantApplicationCard';
 import { UserAccount } from '/app/client/library-modules/domain-models/user/UserAccount';
-import { Role } from '/app/shared/user-role-identifier';
+import { TenantApplicationStatus } from '/app/shared/api-models/tenant-application/TenantApplicationStatus';
 
 type ModalContentProps = {
   tenantApplications: TenantApplication[];
   onReject: (applicationId: string) => void;
   onAccept: (applicationId: string) => void;
+  onReset: (applicationId: string, currentStatus: TenantApplicationStatus) => void;
   userRole?: UserAccount["role"];
 }
 
@@ -15,6 +16,7 @@ export function ModalContent({
   tenantApplications,
   onReject,
   onAccept,
+  onReset,
   userRole,
 }: ModalContentProps): React.JSX.Element {
   return (
@@ -31,6 +33,7 @@ export function ModalContent({
               application={application}
               onReject={onReject}
               onAccept={onAccept}
+              onReset={onReset}
               userRole={userRole}
             />
           ))}

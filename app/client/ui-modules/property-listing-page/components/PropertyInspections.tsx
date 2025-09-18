@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ThemedButton,
   ThemedButtonVariant,
@@ -9,6 +9,10 @@ import { twMerge } from "tailwind-merge";
 import { SubHeading } from "/app/client/ui-modules/theming/components/SubHeading";
 import { Role } from "/app/shared/user-role-identifier";
 import { bookPropertyInspectionAsync } from "../state/reducers/property-listing-slice";
+import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog";
+import { DialogHeader } from "../../theming-shadcn/Dialog";
+import { apiGetProfileByTenantId } from "/app/client/library-modules/apis/user/user-account-api";
+import { getTenantById } from "/app/client/library-modules/domain-models/user/role-repositories/tenant-repository";
 
 export type InspectionBookingListUiState = {
   _id: string;
@@ -48,10 +52,12 @@ export function PropertyInspectionsContainer({
   initialBookingUiStateList,
   userRole,
   tenantId,
+  propertyId,
 }: {
   initialBookingUiStateList: InspectionBookingListUiState[];
   userRole?: Role;
   tenantId?: string;
+  propertyId: string;
 }) {
   const [bookingList, setBookingList] = React.useState(
     initialBookingUiStateList
@@ -70,7 +76,7 @@ export function PropertyInspectionsContainer({
     );
 
     // Then call the async function (optional, for server sync)
-    bookPropertyInspectionAsync({ inspectionId, tenantId });
+    bookPropertyInspectionAsync({ inspectionId, tenantId, propertyId });
   };
 
   return (
@@ -142,52 +148,135 @@ function BookingEntry({
   tenantHasBooking: boolean;
   className?: string;
 }): React.JSX.Element {
+  const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
+  const [tenantProfiles, setTenantProfiles] = useState<
+    { id: string; name: string }[]
+  >([]);
+
   const canBook = userRole === Role.TENANT;
-  const isBooked = tenantId
-    ? bookingState.tenant_ids.includes(tenantId)
-    : false;
   const isThisInspectionBooked =
-    tenantId && bookingState.tenant_ids.includes(tenantId);
+    !!tenantId && bookingState.tenant_ids.includes(tenantId);
 
-  console.log("isBooked:", isBooked, "for tenantId:", tenantId);
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      if (!isAgentModalOpen || bookingState.tenant_ids.length === 0) return;
+
+      try {
+        const profiles = await Promise.all(
+          bookingState.tenant_ids.map(async (id) => {
+            try {
+              const tenant = await getTenantById(id);
+              if (!tenant) return null;
+
+              const profile = await apiGetProfileByTenantId(tenant.tenantId);
+              if (!profile) return null;
+
+              return {
+                id,
+                name: `${profile.firstName} ${profile.lastName}`,
+              };
+            } catch (err) {
+              console.warn(`Failed to fetch tenant profile for ${id}`, err);
+              return null;
+            }
+          })
+        );
+
+        setTenantProfiles(
+          profiles.filter((p): p is { id: string; name: string } => p !== null)
+        );
+      } catch (err) {
+        console.error("Error fetching tenant profiles:", err);
+        setTenantProfiles([]);
+      }
+    };
+
+    fetchProfiles();
+  }, [isAgentModalOpen, bookingState.tenant_ids]);
+
   return (
-    <div className={twMerge("flex flex-col", className)}>
-      {shouldDisplayDivider ? <Divider /> : null}
-      {shouldDisplayDivider ? <Divider /> : null}
-
-      <div className="flex flex-row items-center">
-        <BookingDateTime
-          date={bookingState.date}
-          startingTime={bookingState.startingTime}
-          endingTime={bookingState.endingTime}
-          className="mr-auto"
-        />
-        <CalendarIcon className="w-[22px] h-[20px] mr-6" />
-        {isThisInspectionBooked ? (
-          <BookingButton
-            inspectionId={bookingState._id}
-            onClick={() => onBook(bookingState._id)}
-            isBooked={true}
-          />
-        ) : canBook && !tenantHasBooking ? (
-          <BookingButton
-            inspectionId={bookingState._id}
-            onClick={() => onBook(bookingState._id)}
-            isBooked={false}
-          />
-        ) : (
-          <div className="text-sm text-gray-500 italic">
-            {userRole === Role.AGENT
-              ? "Agents cannot book inspections"
-              : userRole === Role.LANDLORD
-                ? "Landlords cannot book inspections"
-                : tenantHasBooking
-                  ? "You have already booked an inspection for this property"
-                  : "Login as tenant to book"}
-          </div>
+    <>
+      <div
+        className={twMerge(
+          "flex flex-col",
+          className,
+          userRole === Role.AGENT ? "cursor-pointer hover:bg-gray-100" : ""
         )}
+        onClick={
+          userRole === Role.AGENT ? () => setIsAgentModalOpen(true) : undefined
+        }
+      >
+        {shouldDisplayDivider ? <Divider /> : null}
+
+        <div className="flex flex-row items-center">
+          <BookingDateTime
+            date={bookingState.date}
+            startingTime={bookingState.startingTime}
+            endingTime={bookingState.endingTime}
+            className="mr-auto"
+          />
+          <CalendarIcon className="w-[22px] h-[20px] mr-6" />
+
+          {/* Tenant booking buttons */}
+          {canBook ? (
+            isThisInspectionBooked ? (
+              <BookingButton
+                inspectionId={bookingState._id}
+                onClick={() => onBook(bookingState._id)}
+                isBooked={true}
+              />
+            ) : !tenantHasBooking ? (
+              <BookingButton
+                inspectionId={bookingState._id}
+                onClick={() => onBook(bookingState._id)}
+                isBooked={false}
+              />
+            ) : (
+              <div className="text-sm text-gray-500 italic">
+                You have already booked an inspection for this property
+              </div>
+            )
+          ) : (
+            <div className="text-sm text-gray-500 italic">
+              {userRole === Role.AGENT
+                ? "Click the tile to view applied tenants"
+                : userRole === Role.LANDLORD
+                  ? "Landlords cannot book inspections"
+                  : "Login as tenant to book"}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      {/* Agent-only tenant list modal */}
+      {userRole === Role.AGENT && (
+        <Dialog open={isAgentModalOpen} onOpenChange={setIsAgentModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Applied Tenants</DialogTitle>
+            </DialogHeader>
+            <ul className="space-y-2 mt-4">
+              {tenantProfiles.length > 0 ? (
+                tenantProfiles.map((profile) => (
+                  <li
+                    key={profile.id}
+                    className="p-2 rounded-md bg-gray-50 border border-gray-200"
+                  >
+                    <div className="text-sm text-gray-700">
+                      Tenant Name: {profile.name}
+                    </div>
+                  </li>
+                ))
+              ) : (
+                <p className="text-gray-500 italic">
+                  No tenants have booked yet.
+                </p>
+              )}
+            </ul>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }
 

@@ -11,7 +11,10 @@ import { ListingStatusDocument } from "/app/server/database/property-listing/mod
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
 import { ApiInsertListingPayload } from "/app/shared/api-models/property-listing/ListingInsertData";
+import { ListingUpdateData } from "/app/shared/api-models/property-listing/ListingUpdateData";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
+import { TaskPriority } from "/app/shared/task-priority-identifier";
+import { PropertyCollection } from "../../database/property/property-collections";
 
 const getListingForProperty = {
   [MeteorMethodIdentifier.LISTING_GET_FOR_PROPERTY]: async (
@@ -159,6 +162,7 @@ async function mapListingDocumentToListingDTO(
     property_id: listing.property_id,
     image_urls: listing.image_urls,
     listing_status: listingStatusDocument.name,
+    lease_term: listing.lease_term,
     propertyListingInspections: propertyListingInspections.map(
       (inspection) => ({
         _id: inspection._id,
@@ -257,7 +261,8 @@ const insertPropertyListingInspection = {
 const addTenantToInspectionMethod = {
   [MeteorMethodIdentifier.ADD_TENANT_TO_INSPECTION]: async (
     inspectionId: string,
-    tenantId: string
+    tenantId: string,
+    propertyId: string
   ): Promise<PropertyListingInspectionDocument> => {
     console.log(
       "ADD_TENANT_TO_INSPECTION method called",
@@ -281,7 +286,22 @@ const addTenantToInspectionMethod = {
         { $push: { tenant_ids: tenantId } }
       );
     }
+    const property = await PropertyCollection.findOneAsync({
+      _id: propertyId,
+    });
 
+    // Create task for tenant
+    const taskData = {
+      name: "Attend open inspection",
+      description: "View the property at the scheduled time",
+      dueDate: inspection.starttime,
+      priority: TaskPriority.MEDIUM,
+      propertyAddress: `${property?.streetname} ${property?.streetnumber}, ${property?.suburb}, ${property?.province} ${property?.postcode}`,
+      propertyId: propertyId,
+      userId: tenantId,
+      };
+    console.log("Creating task for tenant:", taskData);
+    await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT_FOR_TENANT, taskData);
     // return the updated doc so client thunk has fresh state
     const updated = await PropertyListingInspectionCollection.findOneAsync({
       _id: inspectionId,
@@ -340,6 +360,67 @@ const updatePropertyListingImages = {
   },
 };
 
+const updatePropertyListingData = {
+  [MeteorMethodIdentifier.LISTING_UPDATE_DATA]: async (
+    updateData: ListingUpdateData
+  ): Promise<{ success: boolean; propertyId: string }> => {
+    try {
+      // Find the listing for this property
+      const listing = await getListingDocumentAssociatedWithProperty(
+        updateData.propertyId
+      );
+
+      if (!listing) {
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(
+            `No listing found for property with Id ${updateData.propertyId}`
+          )
+        );
+      }
+
+      // First, handle inspection times - insert new ones and get their IDs
+      const inspectionIds: string[] = [];
+      if (updateData.inspectionTimes && updateData.inspectionTimes.length > 0) {
+        // Delete existing inspections for this listing
+        await PropertyListingInspectionCollection.removeAsync({
+          _id: { $in: listing.inspection_ids }
+        });
+
+        // Insert new inspections
+        const inspectionDocuments = updateData.inspectionTimes.map(
+          (inspection) => ({
+            starttime: inspection.start_time,
+            endtime: inspection.end_time,
+          })
+        );
+
+        for (const inspectionDoc of inspectionDocuments) {
+          const insertedId = await PropertyListingInspectionCollection.insertAsync(inspectionDoc);
+          inspectionIds.push(insertedId);
+        }
+      }
+
+      // Update the listing document
+      const updateFields: Partial<ListingDocument> = {
+        lease_term: updateData.leaseTerm,
+        inspection_ids: inspectionIds,
+      };
+
+      await ListingCollection.updateAsync(
+        { _id: listing._id },
+        { $set: updateFields }
+      );
+
+      return { success: true, propertyId: updateData.propertyId };
+    } catch (error) {
+      console.error("Error updating property listing data:", error);
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Failed to update listing data: ${error}`)
+      );
+    }
+  },
+};
+
 Meteor.methods({
   ...getListingForProperty,
   ...insertDraftListingDocumentForProperty,
@@ -347,6 +428,7 @@ Meteor.methods({
   ...submitDraftListing,
   ...getAllListedListings,
   ...updatePropertyListingImages,
+  ...updatePropertyListingData,
   ...insertPropertyListingInspection,
   ...addTenantToInspectionMethod,
 });
