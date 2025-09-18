@@ -220,9 +220,9 @@ export const tenantPropertySlice = createSlice({
       state.inspectionBookingUiStateList = action.payload.propertyListingInspections.map(
         (inspection) => ({
           _id: inspection._id,
-          date: getFormattedDateStringFromDate(inspection.start_time),
-          startingTime: getFormattedTimeStringFromDate(inspection.start_time),
-          endingTime: getFormattedTimeStringFromDate(inspection.end_time),
+          date: getFormattedDateStringFromDate(new Date(inspection.start_time)),
+          startingTime: getFormattedTimeStringFromDate(new Date(inspection.start_time)),
+          endingTime: getFormattedTimeStringFromDate(new Date(inspection.end_time)),
           tenant_ids: inspection.tenant_ids
         })
       );
@@ -327,11 +327,22 @@ export const fetchPropertyAgent = createAsyncThunk(
 export const load = createAsyncThunk(
   "propertyListing/load",
   async (propertyId: string) => {
-    const propertyWithListingData = await getPropertyWithListingDataUseCase(
+    const result = await getPropertyWithListingDataUseCase(
       propertyId
     );
     const landlords: Landlord[] = await getAllLandlords();
-    return { ...propertyWithListingData, landlords };
+    
+    // Serialize Date objects in propertyListingInspections to avoid Redux serialization warnings
+    const serializedData = {
+      ...result,
+      propertyListingInspections: result.propertyListingInspections.map(inspection => ({
+        ...inspection,
+        start_time: inspection.start_time instanceof Date ? inspection.start_time.toISOString() : inspection.start_time,
+        end_time: inspection.end_time instanceof Date ? inspection.end_time.toISOString() : inspection.end_time,
+      })),
+    };
+    
+    return { ...serializedData, landlords };
   }
 );
 

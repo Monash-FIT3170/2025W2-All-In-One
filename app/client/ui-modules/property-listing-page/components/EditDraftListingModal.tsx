@@ -12,8 +12,9 @@ import React, { useRef, useEffect } from "react";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { apiUpdatePropertyData } from "/app/client/library-modules/apis/property/property-api";
+import { apiUpdatePropertyListingData } from "/app/client/library-modules/apis/property-listing/listing-api";
 import { useAppDispatch } from "/app/client/store";
-import { load } from "../state/reducers/property-listing-slice";
+import { load, insertPropertyPriceAsync } from "../state/reducers/property-listing-slice";
 import { PropertyFormMode } from "../../property-form-agent/enum/PropertyFormMode";
 import { PropertyForm, PropertyFormRef } from "../../property-form-agent/components/PropertyForm";
 import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
@@ -26,7 +27,8 @@ interface EditDraftListingModalProps {
   toggle: () => void;
   isOpen: boolean;
   propertyForm: FormSchemaType;
-  landlords: Landlord[];
+  landlords: (Landlord & { firstName: string; lastName: string })[];
+  features: { value: string; label: string }[];
   propertyId: string;
   existingImageUrls?: string[];
 }
@@ -44,31 +46,34 @@ export default function EditDraftListingModal(
   // Load existing images when modal opens
   useEffect(() => {
     if (props.isOpen && props.existingImageUrls && props.existingImageUrls.length > 0) {
-      console.log("Loading existing images in EditDraftListingModal:", props.existingImageUrls);
       propertyFormRef.current?.loadExistingImages(props.existingImageUrls);
     }
-  }, [props.isOpen, props.existingImageUrls]);
+    
+    // Trigger validation when modal opens
+    if (props.isOpen) {
+      console.log("Modal opened, triggering form validation...");
+      listingInfo.trigger(); // This will trigger validation for all fields
+    }
+  }, [props.isOpen, props.existingImageUrls, listingInfo]);
 
   const handleSaveChanges = async (values: FormSchemaType) => {
     // Update property details
     console.log("Updating listing details:", values);
 
-    const addressParts = values.address.trim().split(" ");
-
     const updatedProperty: PropertyUpdateData = {
       propertyId: props.propertyId,
-      streetnumber: addressParts[0],
-      streetname: addressParts.slice(1).join(" "),
-      suburb: "Clayton",
+      streetnumber: values.address_number,
+      streetname: values.address,
+      suburb: values.suburb,
       province: values.state,
       postcode: values.postal_code,
+      apartment_number: values.apartment_number,
       description: values.description,
-      summaryDescription:
-        "Modern apartment with spacious living areas and a beautiful garden.",
+      summaryDescription: values.summary_description,
       bathrooms: values.bathroom_number,
       bedrooms: values.bedroom_number,
-      parking: 100,
-      features: [], // TODO: Replace with actual value if available
+      parking: values.parking_spaces,
+      features: values.property_feature_ids,
       type: values.property_type,
       area: values.space,
       landlordId: values.landlord,
@@ -76,6 +81,26 @@ export default function EditDraftListingModal(
 
     // Update property details
     const prop = await apiUpdatePropertyData(updatedProperty);
+
+    // Update property price (insert new price record)
+    console.log("Updating property price to:", values.monthly_rent);
+    await dispatch(insertPropertyPriceAsync({ 
+      propertyId: props.propertyId, 
+      price: values.monthly_rent 
+    })).unwrap();
+    console.log("Property price updated successfully");
+
+    // Update listing-specific data (lease term and inspection times)
+    const listingUpdateData = {
+      propertyId: props.propertyId,
+      leaseTerm: values.lease_term,
+      inspectionTimes: values.inspection_times.map(inspection => ({
+        start_time: new Date(inspection.start_time),
+        end_time: new Date(inspection.end_time),
+      })),
+    };
+
+    await apiUpdatePropertyListingData(listingUpdateData);
 
     // Handle image updates - get both existing and new images in the correct order
     const combinedImageData = propertyFormRef.current?.getCombinedImages();
@@ -139,6 +164,11 @@ export default function EditDraftListingModal(
     props.toggle();
   };
 
+  const handleFormSubmit = (values: FormSchemaType) => {
+    console.log("Form submit triggered");
+    handleSaveChanges(values);
+  };
+
   return (
     <>
       {props.isOpen && (
@@ -151,15 +181,11 @@ export default function EditDraftListingModal(
               <div className="w-full max-w-3xl mx-auto">
                 <PropertyForm
                   ref={propertyFormRef}
-                  onSubmit={handleSaveChanges}
+                  onSubmit={handleFormSubmit}
                   form={listingInfo}
-                  landlords={props.landlords.map(l => ({
-                    ...l,
-                    firstName: (l as any).firstName ?? "",
-                    lastName: (l as any).lastName ?? "",
-                  }))}
+                  landlords={props.landlords}
+                  features={props.features || []}
                   mode={PropertyFormMode.EDIT}
-                  features={[]}
                 />
               </div>
             </div>

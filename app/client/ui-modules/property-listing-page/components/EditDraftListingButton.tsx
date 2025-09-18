@@ -14,7 +14,7 @@ export function EditDraftListingButton({
 }): React.JSX.Element {
   return (
     <ThemedButton
-      variant={ThemedButtonVariant.SECONDARY}
+      variant={ThemedButtonVariant.PRIMARY}
       onClick={onClick}
       className={twMerge("w-[128px]", className)}
     >

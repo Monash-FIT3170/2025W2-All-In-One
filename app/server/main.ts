@@ -72,6 +72,7 @@ Meteor.startup(async () => {
   await tempSeedTaskData();
   await seedPropertyCoordinatesForTempProperties();
   await seedListedProperties(globalAgent, globalLandlord, globalTenant);
+	await seedDraftProperties(globalAgent, globalLandlord);
   await seedLeaseAgreements(globalAgent);
 });
 
@@ -580,7 +581,7 @@ async function seedListedProperties(
         date_set: new Date(),
       });
 
-      const randomImageUrls = getRandomImageUrls(); // Get 3 random image URLs
+			const randomImageUrls = getRandomImageUrls(); // Get 3 random image URLs
 
       function getRandomInspectionIds() {
         const allIds = ["1", "2", "3", "4"];
@@ -588,13 +589,14 @@ async function seedListedProperties(
           .sort(() => Math.random() - 0.5) // shuffle
           .slice(0, 2); // pick first 2
       }
-
-      await ListingCollection.insertAsync({
-        property_id: property._id,
-        listing_status_id: listedStatusId, // "Listed"
-        image_urls: randomImageUrls,
-        inspection_ids: getRandomInspectionIds(),
-      });
+      
+			await ListingCollection.insertAsync({
+				property_id: property._id,
+				listing_status_id: listedStatusId, // "Listed"
+				image_urls: randomImageUrls,
+				inspection_ids: getRandomInspectionIds(),
+        lease_term: "12_months",
+			});
 
       console.log(`[Seed] Created listed property: ${property._id}`);
     }
@@ -628,6 +630,83 @@ async function seedListedProperties(
   });
 
   await seedProperties();
+}
+
+async function seedDraftProperties(
+	agent: ApiAgent,
+	landlord: ApiLandlord
+): Promise<void> {
+	const draftStatusId = "1"; // Draft status
+	const propertyStatusVacantId = "1";
+	const defaultFeatureIds = ["1", "2", "3"]; // Include more features for testing
+
+	// Sample image URLs for draft property
+	const draftImageUrls = [
+		"https://images.unsplash.com/photo-1560185007-cde436f6a4d0?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+		"https://images.unsplash.com/photo-1582063289852-62e3ba2747f8?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+	];
+
+	// Create a draft property
+	const draftProperty: PropertyDocument = {
+		_id: "draft-1",
+		streetnumber: "15",
+		streetname: "Draft Street",
+		apartment_number: "5A", // Include apartment number for testing
+		suburb: "Draft Suburb",
+		province: "VIC",
+		postcode: "3000",
+		property_status_id: propertyStatusVacantId,
+		description: "This is a draft property listing that needs to be completed. Modern apartment with city views and premium finishes. Features include marble countertops, hardwood floors, and a private balcony with stunning skyline views.",
+		summary_description: "Draft modern apartment with city views",
+		bathrooms: 2,
+		bedrooms: 3,
+		parking: 1,
+		property_feature_ids: defaultFeatureIds, // Include multiple features
+		type: "Apartment",
+		area: 150,
+		agent_id: agent?.agentId,
+		landlord_id: landlord?.landlordId,
+		tenant_id: "", // Empty string for draft (no tenant assigned yet)
+		property_coordinate_id: "draft-coord-1",
+	};
+
+	// Check if draft property already exists
+	const existingDraftProperty = await PropertyCollection.findOneAsync({
+		_id: draftProperty._id,
+	});
+
+	if (!existingDraftProperty) {
+		// Insert the draft property
+		await PropertyCollection.insertAsync(draftProperty);
+
+		// Add property price
+		await PropertyPriceCollection.insertAsync({
+			_id: "draft-price-1",
+			property_id: draftProperty._id,
+			price_per_month: 2500, // $2500 per month
+			date_set: new Date(),
+		});
+
+		// Add property coordinates
+		await PropertyCoordinatesCollection.insertAsync({
+			_id: "draft-coord-1",
+			latitude: -37.8136,
+			longitude: 144.9631, // Melbourne CBD coordinates
+		});
+
+		// Create the draft listing
+		await ListingCollection.insertAsync({
+			property_id: draftProperty._id,
+			listing_status_id: draftStatusId, // Draft status
+			image_urls: draftImageUrls,
+			inspection_ids: [], // No inspections scheduled yet
+			lease_term: "12_months", // 12 month lease term (string)
+		});
+
+		console.log(`[Seed] Created draft property: ${draftProperty._id}`);
+	} else {
+		console.log(`[Seed] Skipped existing draft property: ${draftProperty._id}`);
+	}
 }
 
 // This function is used to seed the database with initial task data

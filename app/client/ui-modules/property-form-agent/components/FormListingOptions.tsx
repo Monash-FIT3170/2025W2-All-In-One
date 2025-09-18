@@ -20,7 +20,6 @@ import {
   RadioGroup,
   RadioGroupItem,
 } from "../../theming-shadcn/RadioGroup";
-import { Switch } from "../../theming-shadcn/Switch";
 import { Button } from "../../theming-shadcn/Button";
 import { FormSchemaType } from "./FormSchema";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
@@ -65,7 +64,7 @@ export default function FormListingOptions({
                 </FormControl>
               </PopoverTrigger>
               <PopoverContent
-                className="w-auto p-0 border-(--divider-color) bg-white"
+                className="w-auto p-0 border-(--divider-color) bg-white z-[10000]"
                 align="start"
               >
                 <Calendar
@@ -164,7 +163,6 @@ export default function FormListingOptions({
                   ["12 Months", "12_months"],
                   ["6 Months", "6_months"],
                   ["Month-to-month", "month_to_month"],
-                  ["Custom", "custom"],
                 ].map((option, index) => (
                   <FormItem
                     className="flex items-center space-x-3 space-y-0"
@@ -179,29 +177,6 @@ export default function FormListingOptions({
               </RadioGroup>
             </FormControl>
             <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <h4 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 pb-2 py-2">
-        Contact Information
-      </h4>
-      <FormField
-        control={form.control}
-        name="show_contact_boolean"
-        render={({ field }) => (
-          <FormItem className="flex flex-row items-center justify-items-start space-x-5">
-            <FormControl>
-              <Switch
-                checked={field.value}
-                onCheckedChange={field.onChange}
-                aria-readonly
-                className="flex justify-start"
-              />
-            </FormControl>
-            <FormLabel className="font-light pb-2">
-              Show my contact information
-            </FormLabel>
           </FormItem>
         )}
       />

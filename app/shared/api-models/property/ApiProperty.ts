@@ -5,6 +5,7 @@ export type ApiProperty = {
   suburb: string;
   province: string;
   postcode: string;
+  apartment_number?: string;
   pricePerMonth: number;
   propertyStatus: string;
   description: string;
@@ -13,6 +14,7 @@ export type ApiProperty = {
   bedrooms: number;
   parking: number;
   features: string[];
+  featureIds: string[];
   type: string;
   area?: number;
   agentId: string;
