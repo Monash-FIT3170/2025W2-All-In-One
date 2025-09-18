@@ -23,6 +23,8 @@ import { messagesSlice } from "./ui-modules/role-messages/state/reducers/message
 import { searchResultsSlice } from "./ui-modules/search/state/search-result-slice";
 import { tenantPropertySlice } from "./ui-modules/role-dashboard/tenant-dashboard/state/reducers/tenant-property-slice";
 import { landlordDocumentsSlice } from "./ui-modules/role-dashboard/landlord-dashboard/state/landlord-document-slice";
+import { changePasswordSlice } from "./ui-modules/settings-page/state/reducers/change-password-slice";
+
 export const store = configureStore({
 	reducer: {
 		agentDashboard: agentDashboardSlice.reducer,
@@ -48,6 +50,7 @@ export const store = configureStore({
 		tenantSelection: tenantSelectionSlice.reducer,
 		messages: messagesSlice.reducer,
 		tenantProperty: tenantPropertySlice.reducer,
+        changePasswordForm: changePasswordSlice.reducer,
 	},
 });
 

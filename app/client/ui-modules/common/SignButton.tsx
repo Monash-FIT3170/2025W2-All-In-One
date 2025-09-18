@@ -28,7 +28,7 @@ export function SignButton({ documentId, isSigned, onSign }: SignButtonProps) {
       size="sm"
       disabled={signed}
       onClick={handleClick}
-      className="h-8 px-3"
+      className={`h-8 px-3 ${!signed ? "cursor-pointer" : "cursor-default"}`}
     >
       {signed ? "Signed" : "Sign"}
     </Button>

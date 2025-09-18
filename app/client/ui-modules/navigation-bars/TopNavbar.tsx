@@ -12,6 +12,7 @@ import { NotificationBellDropdown } from "../theming/components/NotificationBell
 import { selectTasks as selectAgentTasks } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
 import { selectTasks as selectTenantTasks } from "../role-dashboard/tenant-dashboard/state/reducers/tenant-dashboard-slice";
 import { selectTasks as selectLandlordTasks } from "../role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
+import { selectAllConversations } from "../role-messages/state/reducers/messages-slice";
 import { Role } from "/app/shared/user-role-identifier";
 import { NavigationPath } from "../../navigation";
 
@@ -31,8 +32,11 @@ export function TopNavbar({
   const agentTasks = useAppSelector(selectAgentTasks);
   const tenantTasks = useAppSelector(selectTenantTasks);
   const landlordTasks = useAppSelector(selectLandlordTasks);
+  const conversations = useAppSelector(selectAllConversations);
 
   const upcomingTasks = authUser?.role === Role.AGENT ? agentTasks : authUser?.role === Role.TENANT ? tenantTasks : authUser?.role === Role.LANDLORD ? landlordTasks : [];
+
+  const totalUnreadMessages = conversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
 
   const handleSignout = async () => {
     try {
@@ -87,6 +91,7 @@ export function TopNavbar({
                   open={isNotificationDropdownOpen}
                   onClose={() => setIsNotificationDropdownOpen(false)}
                   tasks={upcomingTasks}
+                  conversations={conversations}
                 />
               </div>
               <div className="cursor-pointer" onClick={handleGoProfile}>
@@ -96,7 +101,7 @@ export function TopNavbar({
                   title={authUser.role || "User"}
                 />
               </div>
-              <Button variant="outline" onClick={handleSignout}>
+              <Button variant="outline" className="cursor-pointer" onClick={handleSignout}>
                 Sign out
               </Button>
             </>

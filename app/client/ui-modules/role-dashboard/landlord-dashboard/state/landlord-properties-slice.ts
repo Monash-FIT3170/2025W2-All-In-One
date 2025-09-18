@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../../../store";
 import { getLandlordById } from "/app/client/library-modules/domain-models/user/role-repositories/landlord-repository";
 import { getAllPropertiesByLandlordId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
