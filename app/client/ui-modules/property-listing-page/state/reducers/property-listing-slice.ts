@@ -16,6 +16,7 @@ import { PropertyListingInspectionDocument } from "/app/server/database/property
 import { AddTenantToInspectionUseCase } from "/app/client/library-modules/use-cases/property-listing/AddTenantToInspectionUseCase";
 import { ListingRepository } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { apiPropertyInsertPrice } from "/app/client/library-modules/apis/property-price/price-api";
 
 const initialState: PropertyListingPageUiState = {
   agentId: "",
@@ -67,6 +68,14 @@ export const submitDraftListingAsync = createAsyncThunk(
   async (propertyId: string) => {
     const submitDraftListing = await submitDraftListingUseCase(propertyId);
     return submitDraftListing;
+  }
+);
+
+export const insertPropertyPriceAsync = createAsyncThunk(
+  "propertyListing/insertPropertyPrice",
+  async ({ propertyId, price }: { propertyId: string; price: number }) => {
+    const insertedPriceId = await apiPropertyInsertPrice(propertyId, price);
+    return { propertyId, price, insertedPriceId };
   }
 );
 
@@ -193,6 +202,18 @@ export const propertyListingSlice = createSlice({
           tenant_ids: updatedInspection.tenant_ids,
         };
       }
+    });
+
+    builder.addCase(insertPropertyPriceAsync.fulfilled, (state, action) => {
+      const { price } = action.payload;
+      // Update the property price in the state
+      state.propertyPrice = getPropertyPriceDisplayString(price);
+      state.monthlyRent = price;
+    });
+
+    builder.addCase(insertPropertyPriceAsync.rejected, (state, action) => {
+      console.error("Failed to update property price:", action.error.message);
+      alert(`Failed to update property price: ${action.error.message}`);
     });
   },
 });

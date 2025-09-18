@@ -13,9 +13,8 @@ import { Landlord } from "/app/client/library-modules/domain-models/user/Landlor
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { apiUpdatePropertyData } from "/app/client/library-modules/apis/property/property-api";
 import { apiUpdatePropertyListingData } from "/app/client/library-modules/apis/property-listing/listing-api";
-import { apiPropertyInsertPrice } from "/app/client/library-modules/apis/property-price/price-api";
 import { useAppDispatch } from "/app/client/store";
-import { load } from "../state/reducers/property-listing-slice";
+import { load, insertPropertyPriceAsync } from "../state/reducers/property-listing-slice";
 import { PropertyFormMode } from "../../property-form-agent/enum/PropertyFormMode";
 import { PropertyForm, PropertyFormRef } from "../../property-form-agent/components/PropertyForm";
 import { PropertyUpdateData } from "/app/shared/api-models/property/PropertyUpdateData";
@@ -112,7 +111,10 @@ export default function EditDraftListingModal(
 
     // Update property price (insert new price record)
     console.log("Updating property price to:", values.monthly_rent);
-    await apiPropertyInsertPrice(props.propertyId, values.monthly_rent);
+    await dispatch(insertPropertyPriceAsync({ 
+      propertyId: props.propertyId, 
+      price: values.monthly_rent 
+    })).unwrap();
     console.log("Property price updated successfully");
 
     // Update listing-specific data (lease term and inspection times)
