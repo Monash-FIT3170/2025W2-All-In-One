@@ -1,6 +1,7 @@
 import { Meteor } from "meteor/meteor";
 import { TaskDocument } from "../../database/task/models/TaskDocument";
 import { TaskCollection } from "../../database/task/task-collections";
+import { AgentCollection, LandlordCollection, TenantCollection } from "../../database/user/user-collections";
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
@@ -397,7 +398,6 @@ const taskDeleteForAgentMethod = {
 
       // For agents, we need to manually update the task array since there's no remove method yet
       // Get the agent document and update it directly
-      const { AgentCollection } = await import("../../database/user/user-collections");
       const agentDoc = await AgentCollection.findOneAsync({ _id: taskData.agentId });
       
       if (agentDoc) {
@@ -444,7 +444,6 @@ const taskDeleteForLandlordMethod = {
 
       // For landlords, we need to manually update the task array since there's no remove method yet
       // Get the landlord document and update it directly
-      const { LandlordCollection } = await import("../../database/user/user-collections");
       const landlordDoc = await LandlordCollection.findOneAsync({ _id: taskData.landlordId });
       
       if (landlordDoc) {
@@ -491,7 +490,6 @@ const taskDeleteForTenantMethod = {
 
       // For tenants, we need to manually update the task array (same pattern as agent/landlord)
       // Get the tenant document and update it directly
-      const { TenantCollection } = await import("../../database/user/user-collections");
       const tenantDoc = await TenantCollection.findOneAsync({ _id: taskData.tenantId });
       
       if (tenantDoc) {
