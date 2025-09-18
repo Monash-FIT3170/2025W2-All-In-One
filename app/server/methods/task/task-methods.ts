@@ -127,8 +127,10 @@ const taskInsertForAgentMethod = {
         );
         console.log("Agent task_ids updated successfully");
       } catch (agentError) {
-        console.warn("Failed to update agent task_ids:", agentError);
-
+        console.error("Failed to update agent task_ids:", agentError);
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(`Failed to link task to agent: ${agentError}`)
+        );
       }
       console.log("After agent update call");
 
@@ -212,8 +214,10 @@ const taskInsertForLandlordMethod = {
         );
         console.log("Landlord task_ids updated successfully");
       } catch (landlordError) {
-        console.warn("Failed to update landlord task_ids:", landlordError);
-        // Don't fail the task creation if landlord update fails - task was already created
+        console.error("Failed to update landlord task_ids:", landlordError);
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(`Failed to link task to landlord: ${landlordError}`)
+        );
       }
       console.log("After landlord task update call");
 
@@ -293,11 +297,12 @@ const taskInsertForTenantMethod = {
           taskData.userId,
           insertedId
         );
-        console.log("Tenant tasks updated successfully for task:", insertedId);
+        
       } catch (tenantError) {
-        console.warn("Failed to update tenant tasks:", tenantError);
-        console.warn("Error details:", JSON.stringify(tenantError));
-        // Don't fail the task creation if tenant update fails - task was already created
+        
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(`Failed to link task to tenant: ${tenantError}`)
+        );
       }
       console.log("After tenant update call");
 
