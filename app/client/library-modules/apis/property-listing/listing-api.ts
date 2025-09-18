@@ -73,11 +73,17 @@ export async function apiUpdatePropertyListingImages(
 
 export async function apiUpdatePropertyListingData(
   updateData: ListingUpdateData
-): Promise<{ success: boolean; propertyId: string }> {
-  return await Meteor.callAsync(
-    MeteorMethodIdentifier.LISTING_UPDATE_DATA,
-    updateData
-  );
+): Promise<{ propertyId: string }> {
+  try {
+    const result = await Meteor.callAsync(
+      MeteorMethodIdentifier.LISTING_UPDATE_DATA,
+      updateData
+    );
+    return result;
+  } catch (error) {
+    console.error('Failed to update property listing data:', error);
+    throw error;
+  }
 }
 
 export async function apiInsertPropertyListingInspections(
