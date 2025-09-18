@@ -5,6 +5,7 @@ import { AppDispatch, RootState } from "/app/client/store";
 import { UserAccount } from "/app/client/library-modules/domain-models/user/UserAccount";
 import { getUserAccountById } from "../../../../library-modules/domain-models/user/user-account-repositories/user-account-repository";
 import { loadCurrentUser } from "./current-user-slice";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 
 const initialState: SigninFormUIState = {
   email: "",
@@ -83,6 +84,15 @@ export const signinUser = createAsyncThunk<
     // Retrieve account to return the role for redirect
     const user: UserAccount = await getUserAccountById(userId);
     if (!user?.role) throw new Error("User role not found.");
+
+    // Record login history (non-blocking)
+    try {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      Meteor.callAsync(MeteorMethodIdentifier.LOGIN_HISTORY_INSERT, {
+        userId,
+        timezone,
+      }).catch(() => {});
+    } catch {}
     
     return user.role;
   } catch (err: any) {

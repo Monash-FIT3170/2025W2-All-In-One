@@ -77,4 +77,7 @@ export enum MeteorMethodIdentifier {
 	LEASE_AGREEMENT_DELETE = "leaseAgreements.deleteOne",
 	LEASE_AGREEMENT_LIST_FOR_AGENT = "leaseAgreements.listForAgent",
 	LEASE_AGREEMENT_LIST_FOR_PROPERTY = "leaseAgreements.listForProperty",
+	LOGIN_HISTORY_INSERT = "loginHistory.insert",
+	LOGIN_HISTORY_GET_FOR_USER = "loginHistory.getForUser",
+	VALIDATE_PASSWORD = "password.validate",
 }
