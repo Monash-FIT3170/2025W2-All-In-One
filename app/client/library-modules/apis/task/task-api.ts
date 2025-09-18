@@ -140,7 +140,7 @@ export async function apiUpdateTaskForTenant(taskData: {
 
 export async function apiDeleteTaskForTenant(taskData: {
   taskId: string;
-  userId: string;
+  tenantId: string;
 }): Promise<boolean> {
   try {
     const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_DELETE_FOR_TENANT, taskData);

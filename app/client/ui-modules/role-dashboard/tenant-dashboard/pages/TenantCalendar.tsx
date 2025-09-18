@@ -15,9 +15,13 @@ import {
 import { apiCreateTaskForTenant } from "/app/client/library-modules/apis/task/task-api";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { getTodayISODate } from "/app/client/library-modules/utils/date-utils";
+import { Tenant } from "/app/client/library-modules/domain-models/user/Tenant";
 
 export function TenantCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch(); 
+  const currentTenant = useAppSelector(
+    (state) => state.currentUser.currentUser
+  ) as Tenant | undefined;
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
   const tasks = useAppSelector(selectTenantCalendarTasks); // Retrieve tasks from Redux store
   const loading = useAppSelector(selectTenantCalendarLoading);
@@ -70,15 +74,15 @@ export function TenantCalendar(): React.JSX.Element {
   };
 
   const handleDeleteTask = async (taskId: string) => {
-    if (!currentUser?.userId) {
-      console.error("No current user found");
+    if (!currentTenant?.tenantId) {
+      console.error("No current tenant found");
       return;
     }
 
     try {
       await dispatch(deleteTenantCalendarTask({
         taskId,
-        userId: currentUser.userId
+        tenantId: currentTenant.tenantId
       }));
       console.log("Task deleted successfully");
     } catch (error) {

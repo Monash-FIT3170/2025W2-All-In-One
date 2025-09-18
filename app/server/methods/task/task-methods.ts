@@ -291,8 +291,7 @@ const taskInsertForTenantMethod = {
         await Meteor.call(
           MeteorMethodIdentifier.TENANT_UPDATE_TASKS,
           taskData.userId,
-          [insertedId],
-          [] // No tasks to remove
+          insertedId
         );
         console.log("Tenant tasks updated successfully for task:", insertedId);
       } catch (tenantError) {
@@ -501,10 +500,7 @@ const taskDeleteForAgentMethod = {
       // For agents, we need to manually update the task array since there's no remove method yet
       // Get the agent document and update it directly
       const { AgentCollection } = await import("../../database/user/user-collections");
-      let agentDoc = await AgentCollection.findOneAsync({ userAccountId: taskData.agentId });
-      if (!agentDoc) {
-        agentDoc = await AgentCollection.findOneAsync({ _id: taskData.agentId });
-      }
+      const agentDoc = await AgentCollection.findOneAsync({ _id: taskData.agentId });
       
       if (agentDoc) {
         const updatedTaskIds = (agentDoc.task_ids ?? []).filter(id => id !== taskData.taskId);
@@ -551,7 +547,7 @@ const taskDeleteForLandlordMethod = {
       // For landlords, we need to manually update the task array since there's no remove method yet
       // Get the landlord document and update it directly
       const { LandlordCollection } = await import("../../database/user/user-collections");
-      const landlordDoc = await LandlordCollection.findOneAsync({ userAccountId: taskData.landlordId });
+      const landlordDoc = await LandlordCollection.findOneAsync({ _id: taskData.landlordId });
       
       if (landlordDoc) {
         const updatedTaskIds = (landlordDoc.task_ids ?? []).filter(id => id !== taskData.taskId);
@@ -576,30 +572,18 @@ const taskDeleteForLandlordMethod = {
 const taskDeleteForTenantMethod = {
   [MeteorMethodIdentifier.TASK_DELETE_FOR_TENANT]: async (taskData: {
     taskId: string;
-    userId: string;
+    tenantId: string;
   }): Promise<boolean> => {
     console.log("taskDeleteForTenantMethod called with:", taskData);
 
     // Validate required fields
-    if (!taskData.taskId || !taskData.userId) {
+    if (!taskData.taskId || !taskData.tenantId) {
       throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Task ID and User ID are required")
+        new InvalidDataError("Task ID and Tenant ID are required")
       );
     }
 
     try {
-      // Import TenantCollection dynamically
-      const { TenantCollection } = await import("../../database/user/user-collections");
-
-      // Get tenant by user account ID
-      const tenantDoc = await TenantCollection.findOneAsync({
-        userAccountId: taskData.userId,
-      });
-
-      if (!tenantDoc) {
-        throw new InvalidDataError("Tenant not found");
-      }
-
       // Delete the task from the task collection
       const deleteResult = await TaskCollection.removeAsync({ _id: taskData.taskId });
       
@@ -607,13 +591,18 @@ const taskDeleteForTenantMethod = {
         throw new InvalidDataError("Task not found");
       }
 
-      // Remove task ID from the tenant's task array using the new update method
-      await Meteor.call(
-        MeteorMethodIdentifier.TENANT_UPDATE_TASKS,
-        taskData.userId,
-        [],
-        [taskData.taskId] // Tasks to remove
-      );
+      // For tenants, we need to manually update the task array (same pattern as agent/landlord)
+      // Get the tenant document and update it directly
+      const { TenantCollection } = await import("../../database/user/user-collections");
+      const tenantDoc = await TenantCollection.findOneAsync({ _id: taskData.tenantId });
+      
+      if (tenantDoc) {
+        const updatedTaskIds = (tenantDoc.task_ids ?? []).filter(id => id !== taskData.taskId);
+        await TenantCollection.updateAsync(
+          { _id: tenantDoc._id },
+          { $set: { task_ids: updatedTaskIds } }
+        );
+      }
 
       return true;
     } catch (error) {

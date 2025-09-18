@@ -54,11 +54,11 @@ export const fetchTenantCalendarTasks = createAsyncThunk(
 
 export const deleteTenantCalendarTask = createAsyncThunk(
   "tenantCalendar/deleteTenantCalendarTask",
-  async (args: { taskId: string; userId: string }, { getState }) => {
+  async (args: { taskId: string; tenantId: string }, { getState }) => {
     try {
       const result = await apiDeleteTaskForTenant({
         taskId: args.taskId,
-        userId: args.userId
+        tenantId: args.tenantId
       });
       
       if (result) {

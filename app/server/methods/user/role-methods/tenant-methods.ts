@@ -99,55 +99,39 @@ const profileGetByTenantIdMethod = {
 };
 
 // -- UPDATE TENANT TASKS --
+// Consistent with agent/landlord pattern - ONLY adds tasks (no remove operation)
 const tenantUpdateTasksMethod = {
   [MeteorMethodIdentifier.TENANT_UPDATE_TASKS]: async (
     userId: string,
-    tasksToAdd: string[] = [],
-    tasksToRemove: string[] = []
+    taskId: string
   ): Promise<void> => {
-    console.log("TENANT_UPDATE_TASKS called with:", { userId, tasksToAdd, tasksToRemove });
+    console.log("TENANT_UPDATE_TASKS called with:", { userId, taskId });
     
     const tenantDoc = await TenantCollection.findOneAsync({
       userAccountId: userId,
     });
 
     if (!tenantDoc) {
-      console.error("Tenant not found for userId:", userId);
+
       throw meteorWrappedInvalidDataError(
         new InvalidDataError(`Tenant with user ID ${userId} not found.`)
       );
     }
 
-    console.log("Found tenant:", tenantDoc._id, "Current task_ids:", tenantDoc.task_ids);
-    let currentTasks = tenantDoc.task_ids ?? [];
+    
+    const currentTasks = tenantDoc.task_ids ?? [];
 
-    // Add new tasks (avoid duplicates)
-    for (const taskId of tasksToAdd) {
-      if (!currentTasks.includes(taskId)) {
-        currentTasks.push(taskId);
-        console.log("Added task:", taskId);
-      }
+    // Add task if not already present (avoid duplicates) - same logic as agent/landlord
+    if (!currentTasks.includes(taskId)) {
+      const updatedTasks = [...currentTasks, taskId];
+      await TenantCollection.updateAsync(
+        { _id: tenantDoc._id },
+        { $set: { task_ids: updatedTasks } }
+      );
+      console.log("Added task:", taskId);
+    } else {
+      console.log("Task already exists, skipping:", taskId);
     }
-
-    // Remove tasks
-    for (const taskId of tasksToRemove) {
-      currentTasks = currentTasks.filter((id: string) => id !== taskId);
-      console.log("Removed task:", taskId);
-    }
-
-    console.log("Updating tenant with new task_ids:", currentTasks);
-    
-    // Update tenant document
-    const updateResult = await TenantCollection.updateAsync(
-      { _id: tenantDoc._id },
-      { $set: { task_ids: currentTasks } }
-    );
-    
-    console.log("Tenant update result:", updateResult);
-    
-    // Verify the update
-    const updatedTenant = await TenantCollection.findOneAsync({ _id: tenantDoc._id });
-    console.log("Verified updated tenant task_ids:", updatedTenant?.task_ids);
   },
 };
 
