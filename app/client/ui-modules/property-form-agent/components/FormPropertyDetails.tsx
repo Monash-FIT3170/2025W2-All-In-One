@@ -144,11 +144,15 @@ export default function FormPropertyDetails({
               <FormLabel>Property Features</FormLabel>
               <FormControl>
                 <MultiSelect
-                  key={`multiselect-${currentFeatureIds.join(',')}`}
+                  key="property-features-multiselect"
                   options={features}
                   onValueChange={(values) => {
                     console.log("MultiSelect onValueChange called:", values);
-                    form.setValue("property_feature_ids", values);
+                    form.setValue("property_feature_ids", values, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                      shouldTouch: true
+                    });
                   }}
                   defaultValue={currentFeatureIds}
                   placeholder="Select features"
