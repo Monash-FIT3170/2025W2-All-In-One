@@ -775,7 +775,10 @@ function ListingModalEditor({
     suburb: state.suburb,
     monthly_rent: state.monthlyRent,
     property_feature_ids: state.propertyFeatureIds,
-    inspection_times: state.inspectionTimes,
+    inspection_times: state.inspectionTimes.map(inspection => ({
+      start_time: new Date(inspection.start_time),
+      end_time: new Date(inspection.end_time),
+    })),
   };
 
   return (

@@ -30,7 +30,7 @@ export type PropertyListingPageUiState = {
   monthlyRent: number;
   mapUiState: PropertyMapUiState;
   inspectionBookingUiStateList: InspectionBookingListUiState[];
-  inspectionTimes: { start_time: Date; end_time: Date }[];
+  inspectionTimes: { start_time: string; end_time: string }[];
   bookedPropertyListingInspections: number[];
   listingImageUrls: string[];
   listingStatusText: string;

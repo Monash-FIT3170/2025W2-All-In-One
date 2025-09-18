@@ -121,7 +121,10 @@ export default function EditDraftListingModal(
     const listingUpdateData = {
       propertyId: props.propertyId,
       leaseTerm: values.lease_term,
-      inspectionTimes: values.inspection_times,
+      inspectionTimes: values.inspection_times.map(inspection => ({
+        start_time: new Date(inspection.start_time),
+        end_time: new Date(inspection.end_time),
+      })),
     };
 
     await apiUpdatePropertyListingData(listingUpdateData);

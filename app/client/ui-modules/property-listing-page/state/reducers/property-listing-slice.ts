@@ -135,10 +135,10 @@ export const propertyListingSlice = createSlice({
           console.log("Inspection from backend:", inspection);
           return {
             _id: inspection._id,
-            date: getFormattedDateStringFromDate(inspection.start_time),
-            startingTime: getFormattedTimeStringFromDate(inspection.start_time),
-            endingTime: getFormattedTimeStringFromDate(inspection.end_time),
-            tenant_ids: inspection.tenant_ids,
+            date: getFormattedDateStringFromDate(new Date(inspection.start_time)),
+            startingTime: getFormattedTimeStringFromDate(new Date(inspection.start_time)),
+            endingTime: getFormattedTimeStringFromDate(new Date(inspection.end_time)),
+            tenant_ids: inspection.tenant_ids || [],
           };
         });
 
@@ -281,7 +281,18 @@ export const load = createAsyncThunk(
       dispatch(loadTenantApplicationsForPropertyAsync(propertyId));
     }
 
-    return { ...result.propertyWithListingData, landlords: result.landlords };
+    // Serialize Date objects in propertyListingInspections to avoid Redux serialization warnings
+    const serializedData = {
+      ...result.propertyWithListingData,
+      propertyListingInspections: result.propertyWithListingData.propertyListingInspections.map(inspection => ({
+        ...inspection,
+        start_time: inspection.start_time instanceof Date ? inspection.start_time.toISOString() : inspection.start_time,
+        end_time: inspection.end_time instanceof Date ? inspection.end_time.toISOString() : inspection.end_time,
+      })),
+      landlords: result.landlords
+    };
+
+    return serializedData;
   }
 );
 
