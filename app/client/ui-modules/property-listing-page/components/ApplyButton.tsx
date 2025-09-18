@@ -29,7 +29,12 @@ export function ApplyButton({
   } else if (userRole === Role.LANDLORD) {
     buttonText = "Landlords cannot apply";
     isDisabled = true;
-  } else if (hasApplied) {
+  } 
+  else if (!userRole){
+    buttonText = "Sign In to Apply";
+    isDisabled = true;
+  }
+  else if (hasApplied) {
     buttonText = "Already Applied";
     isDisabled = true;
   } else if (isLoading) {
@@ -38,11 +43,11 @@ export function ApplyButton({
 
   return (
     <ThemedButton
-      variant={ThemedButtonVariant.SECONDARY}
+      variant={ThemedButtonVariant.PRIMARY}
       onClick={isDisabled ? () => {} : onClick}
       className={twMerge(
         "w-[128px]",
-        isDisabled && hasApplied ? "opacity-50 cursor-not-allowed" : "",
+        isDisabled || hasApplied ? "opacity-50 cursor-not-allowed" : "",
         className
       )}
     >

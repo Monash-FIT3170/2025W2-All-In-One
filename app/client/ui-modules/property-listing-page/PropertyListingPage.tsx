@@ -148,7 +148,7 @@ export function PropertyListingPage({
           shouldDisplaySubmitDraftButton={state.shouldDisplaySubmitDraftButton}
           shouldDisplayReviewTenantButton={
             state.shouldDisplayReviewTenantButton
-           && (role === Role.LANDLORD || role === Role.AGENT)}
+            && (role === Role.LANDLORD || role === Role.AGENT)}
           shouldDisplayEditListingButton={state.shouldDisplayEditListingButton}
           authUser={authUser}
           profileData={profileData}
@@ -638,14 +638,19 @@ function ListingHero({
           className="w-full mb-8"
         />
         <div className="flex">
-          <ApplyButton
-            onClick={onApply}
-            isLoading={isApplying}
-            userRole={userRole}
-            hasApplied={hasApplied}
-            className="mr-4"
-          />
-          <ContactAgentButton propertyId={propertyId} />
+          {(!userRole || userRole === Role.TENANT) && (
+            <ApplyButton
+              onClick={onApply}
+              isLoading={isApplying}
+              userRole={userRole}
+              hasApplied={hasApplied}
+              className="mr-4"
+            />
+          )}
+
+          {userRole === Role.TENANT && (
+            <ContactAgentButton propertyId={propertyId} />
+          )}
         </div>
       </div>
     </div>
