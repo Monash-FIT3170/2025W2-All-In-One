@@ -28,7 +28,7 @@ export default function FormPropertyDetails({
         subtitle="Enter specific details about the property"
       />
       <div className="grid grid-cols-12 gap-4">
-        <div className="col-span-4">
+        <div className="col-span-3">
           <FormField
             control={form.control}
             name="bedroom_number"
@@ -45,7 +45,7 @@ export default function FormPropertyDetails({
           />
         </div>
 
-        <div className="col-span-4">
+        <div className="col-span-3">
           <FormField
             control={form.control}
             name="bathroom_number"
@@ -61,7 +61,7 @@ export default function FormPropertyDetails({
           />
         </div>
 
-        <div className="col-span-4">
+        <div className="col-span-3">
           <FormField
             control={form.control}
             name="space"
@@ -72,6 +72,22 @@ export default function FormPropertyDetails({
                   <Input placeholder="1200" type="number" {...field} />
                 </FormControl>
 
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="col-span-3">
+          <FormField
+            control={form.control}
+            name="parking_spaces"
+            render={({ field }) => (
+              <FormItem className="py-2">
+                <FormLabel>Parking Spaces</FormLabel>
+                <FormControl>
+                  <Input placeholder="2" type="number" {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -100,25 +116,54 @@ export default function FormPropertyDetails({
 
       <FormField
         control={form.control}
-        name="property_feature_ids"
-        render={() => (
-          <FormItem className="py-4 max-w-xl">
-            <FormLabel>Property Features</FormLabel>
+        name="summary_description"
+        render={({ field }) => (
+          <FormItem className="py-2">
+            <FormLabel>Summary Description</FormLabel>
             <FormControl>
-              <MultiSelect
-                options={features}
-                onValueChange={(values) =>
-                  form.setValue("property_feature_ids", values)
-                }
-                defaultValue={form.getValues("property_feature_ids") || []}
-                placeholder="Select features"
-                animation={2}
-                maxCount={5}
+              <Textarea
+                placeholder="Brief summary of the property (max 100 characters)..."
+                className="resize-none"
+                maxLength={100}
+                {...field}
               />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
+      />
+
+      <FormField
+        control={form.control}
+        name="property_feature_ids"
+        render={() => {
+          const currentFeatureIds = form.getValues("property_feature_ids") || [];
+          
+          return (
+            <FormItem className="py-4 max-w-xl">
+              <FormLabel>Property Features</FormLabel>
+              <FormControl>
+                <MultiSelect
+                  key="property-features-multiselect"
+                  options={features}
+                  onValueChange={(values) => {
+                    form.setValue("property_feature_ids", values, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                      shouldTouch: true
+                    });
+                  }}
+                  defaultValue={currentFeatureIds}
+                  placeholder="Select features"
+                  animation={2}
+                  maxCount={5}
+                  modalPopover={true}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          );
+        }}
       />
     </div>
 )};

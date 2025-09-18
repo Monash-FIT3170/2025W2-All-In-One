@@ -86,7 +86,7 @@ export const submitForm = createAsyncThunk(
       }))
     );
 
-    await insertPropertyListing(propertyId, imageUrls, ListingStatus.DRAFT, inspectionIds);
+    await insertPropertyListing(propertyId, imageUrls, ListingStatus.DRAFT, inspectionIds, propertyFormData.lease_term);
     return { propertyId };
   }
 );

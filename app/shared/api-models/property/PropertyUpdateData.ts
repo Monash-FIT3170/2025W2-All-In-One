@@ -5,6 +5,7 @@ export type PropertyUpdateData = {
   suburb: string,
   province: string,
   postcode: string,
+  apartment_number?: string,
   description: string,
   summaryDescription: string,
   bathrooms: number,

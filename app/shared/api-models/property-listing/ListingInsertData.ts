@@ -3,10 +3,12 @@ export type ListingInsertData = {
   image_urls: string[];
   listing_status_id: string;
   inspection_ids: string[];
+  lease_term: string;
 }
 
 export type ApiInsertListingPayload = {
   property_id: string;
   image_urls: string[];
-  inspection_ids: string[]; 
+  inspection_ids: string[];
+  lease_term: string;
 }
