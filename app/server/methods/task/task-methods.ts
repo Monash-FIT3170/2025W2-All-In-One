@@ -396,17 +396,11 @@ const taskDeleteForAgentMethod = {
         throw new InvalidDataError("Task not found");
       }
 
-      // For agents, we need to manually update the task array since there's no remove method yet
-      // Get the agent document and update it directly
-      const agentDoc = await AgentCollection.findOneAsync({ _id: taskData.agentId });
-      
-      if (agentDoc) {
-        const updatedTaskIds = (agentDoc.task_ids ?? []).filter(id => id !== taskData.taskId);
-        await AgentCollection.updateAsync(
-          { _id: agentDoc._id },
-          { $set: { task_ids: updatedTaskIds } }
-        );
-      }
+      // Remove the task from the agent's task_ids array using atomic $pull operation
+      await AgentCollection.updateAsync(
+        { _id: taskData.agentId },
+        { $pull: { task_ids: taskData.taskId } }
+      );
 
       return true;
     } catch (error) {
@@ -442,17 +436,11 @@ const taskDeleteForLandlordMethod = {
         throw new InvalidDataError("Task not found");
       }
 
-      // For landlords, we need to manually update the task array since there's no remove method yet
-      // Get the landlord document and update it directly
-      const landlordDoc = await LandlordCollection.findOneAsync({ _id: taskData.landlordId });
-      
-      if (landlordDoc) {
-        const updatedTaskIds = (landlordDoc.task_ids ?? []).filter(id => id !== taskData.taskId);
-        await LandlordCollection.updateAsync(
-          { _id: landlordDoc._id },
-          { $set: { task_ids: updatedTaskIds } }
-        );
-      }
+      // Remove the task from the landlord's task_ids array using atomic $pull operation
+      await LandlordCollection.updateAsync(
+        { _id: taskData.landlordId },
+        { $pull: { task_ids: taskData.taskId } }
+      );
 
       return true;
     } catch (error) {
@@ -488,17 +476,11 @@ const taskDeleteForTenantMethod = {
         throw new InvalidDataError("Task not found");
       }
 
-      // For tenants, we need to manually update the task array (same pattern as agent/landlord)
-      // Get the tenant document and update it directly
-      const tenantDoc = await TenantCollection.findOneAsync({ _id: taskData.tenantId });
-      
-      if (tenantDoc) {
-        const updatedTaskIds = (tenantDoc.task_ids ?? []).filter(id => id !== taskData.taskId);
-        await TenantCollection.updateAsync(
-          { _id: tenantDoc._id },
-          { $set: { task_ids: updatedTaskIds } }
-        );
-      }
+      // Remove the task from the tenant's task_ids array using atomic $pull operation
+      await TenantCollection.updateAsync(
+        { _id: taskData.tenantId },
+        { $pull: { task_ids: taskData.taskId } }
+      );
 
       return true;
     } catch (error) {
