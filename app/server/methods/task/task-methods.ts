@@ -316,125 +316,18 @@ const taskInsertForTenantMethod = {
 };
 
 /**
- * Updates an existing task for AGENT in the database and returns the task ID.
+ * Updates an existing task in the database and returns the task ID.
+ * This method is role-agnostic since it only modifies task data, not user relationships.
  */
-const taskUpdateForAgentMethod = {
-  [MeteorMethodIdentifier.TASK_UPDATE_FOR_AGENT]: async (taskData: {
+const taskUpdateMethod = {
+  [MeteorMethodIdentifier.TASK_UPDATE]: async (taskData: {
     taskId: string;
     name?: string;
     description?: string;
     dueDate?: Date;
     priority?: TaskPriority;
   }): Promise<string> => {
-    console.log("taskUpdateForAgentMethod called with:", taskData);
-
-    // Validate required fields
-    if (!taskData.taskId) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Task ID is required")
-      );
-    }
-
-    const updateData: TaskUpdateData = {};
-
-    if (taskData.name !== undefined) {
-      updateData.name = taskData.name.trim();
-    }
-    if (taskData.description !== undefined) {
-      updateData.description = taskData.description;
-    }
-    if (taskData.dueDate !== undefined) {
-      updateData.dueDate = taskData.dueDate;
-    }
-    if (taskData.priority !== undefined) {
-      updateData.priority = taskData.priority;
-    }
-
-    try {
-      const result = await TaskCollection.updateAsync(
-        { _id: taskData.taskId },
-        { $set: updateData }
-      );
-
-      if (result === 0) {
-        throw new InvalidDataError("Task not found");
-      }
-
-      return taskData.taskId;
-    } catch (error) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Failed to update task: ${error}`)
-      );
-    }
-  },
-};
-
-/**
- * Updates an existing task for LANDLORD in the database and returns the task ID.
- */
-const taskUpdateForLandlordMethod = {
-  [MeteorMethodIdentifier.TASK_UPDATE_FOR_LANDLORD]: async (taskData: {
-    taskId: string;
-    name?: string;
-    description?: string;
-    dueDate?: Date;
-    priority?: TaskPriority;
-  }): Promise<string> => {
-    console.log("taskUpdateForLandlordMethod called with:", taskData);
-
-    // Validate required fields
-    if (!taskData.taskId) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError("Task ID is required")
-      );
-    }
-
-    const updateData: TaskUpdateData = {};
-
-    if (taskData.name !== undefined) {
-      updateData.name = taskData.name.trim();
-    }
-    if (taskData.description !== undefined) {
-      updateData.description = taskData.description;
-    }
-    if (taskData.dueDate !== undefined) {
-      updateData.dueDate = taskData.dueDate;
-    }
-    if (taskData.priority !== undefined) {
-      updateData.priority = taskData.priority;
-    }
-
-    try {
-      const result = await TaskCollection.updateAsync(
-        { _id: taskData.taskId },
-        { $set: updateData }
-      );
-
-      if (result === 0) {
-        throw new InvalidDataError("Task not found");
-      }
-
-      return taskData.taskId;
-    } catch (error) {
-      throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Failed to update task: ${error}`)
-      );
-    }
-  },
-};
-
-/**
- * Updates an existing task for TENANT in the database and returns the task ID.
- */
-const taskUpdateForTenantMethod = {
-  [MeteorMethodIdentifier.TASK_UPDATE_FOR_TENANT]: async (taskData: {
-    taskId: string;
-    name?: string;
-    description?: string;
-    dueDate?: Date;
-    priority?: TaskPriority;
-  }): Promise<string> => {
-    console.log("taskUpdateForTenantMethod called with:", taskData);
+    console.log("taskUpdateMethod called with:", taskData);
 
     // Validate required fields
     if (!taskData.taskId) {
@@ -652,9 +545,7 @@ Meteor.methods({
   ...taskInsertForAgentMethod,
   ...taskInsertForLandlordMethod,
   ...taskInsertForTenantMethod,
-  ...taskUpdateForAgentMethod,
-  ...taskUpdateForLandlordMethod,
-  ...taskUpdateForTenantMethod,
+  ...taskUpdateMethod,
   ...taskDeleteForAgentMethod,
   ...taskDeleteForLandlordMethod,
   ...taskDeleteForTenantMethod

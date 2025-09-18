@@ -2,9 +2,7 @@ export enum MeteorMethodIdentifier {
 	TASK_INSERT_FOR_AGENT = "tasks.insertForAgent", // Creates a new task for an agent
 	TASK_INSERT_FOR_LANDLORD = "tasks.insertForLandlord", // Creates a new task for a landlord
 	TASK_INSERT_FOR_TENANT = "tasks.insertForTenant", // Creates a new task for a tenant
-	TASK_UPDATE_FOR_AGENT = "tasks.updateForAgent", // Updates an existing task for an agent
-	TASK_UPDATE_FOR_LANDLORD = "tasks.updateForLandlord", // Updates an existing task for a landlord
-	TASK_UPDATE_FOR_TENANT = "tasks.updateForTenant", // Updates an existing task for a tenant
+	TASK_UPDATE = "tasks.update", // Updates an existing task (role-agnostic since only task data is modified)
 	TASK_DELETE_FOR_AGENT = "tasks.deleteForAgent", // Deletes a task for an agent and removes it from their task list
 	TASK_DELETE_FOR_LANDLORD = "tasks.deleteForLandlord", // Deletes a task for a landlord and removes it from their task list
 	TASK_DELETE_FOR_TENANT = "tasks.deleteForTenant", // Deletes a task for a tenant and removes it from their task list

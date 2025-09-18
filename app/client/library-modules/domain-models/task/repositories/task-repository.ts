@@ -1,4 +1,4 @@
-import { apiGetTaskById, apiCreateTaskForAgent, apiCreateTaskForLandlord,apiUpdateTaskForAgent, apiUpdateTaskForLandlord } from "../../../apis/task/task-api";
+import { apiGetTaskById, apiCreateTaskForAgent, apiCreateTaskForLandlord, apiUpdateTask } from "../../../apis/task/task-api";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { mapApiTaskToTask, mapAgentTaskInsertData, mapLandlordTaskInsertData } from "./mappers/task-mapper";
 import { TaskPriority } from "/app/shared/task-priority-identifier"
@@ -44,7 +44,7 @@ export async function updateTaskForAgent(task: {
   dueDate: Date;
   priority: TaskPriority;
 }): Promise<string> {
-  return await apiUpdateTaskForAgent(task);
+  return await apiUpdateTask(task);
 }
 
 export async function updateTaskForLandlord(task: {
@@ -54,7 +54,7 @@ export async function updateTaskForLandlord(task: {
   dueDate: Date;
   priority: TaskPriority;
 }): Promise<string> {
-  return await apiUpdateTaskForLandlord(task);
+  return await apiUpdateTask(task);
 }
 
 

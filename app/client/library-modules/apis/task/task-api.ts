@@ -46,7 +46,8 @@ export async function apiCreateTaskForLandlord(taskData: {
   }
 }
 
-export async function apiUpdateTaskForAgent(taskData: {
+// Generic task update function (role-agnostic)
+export async function apiUpdateTask(taskData: {
   taskId: string;
   name?: string;
   description?: string;
@@ -54,29 +55,14 @@ export async function apiUpdateTaskForAgent(taskData: {
   priority?: TaskPriority;
 }): Promise<string> {
   try {
-    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_UPDATE_FOR_AGENT, taskData);
+    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_UPDATE, taskData);
     return result;
   } catch (error) {
-    console.error("Failed to update agent task:", error);
+    console.error("Failed to update task:", error);
     throw error;
   }
 }
 
-export async function apiUpdateTaskForLandlord(taskData: {
-  taskId: string;
-  name?: string;
-  description?: string;
-  dueDate?: Date;
-  priority?: TaskPriority;
-}): Promise<string> {
-  try {
-    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_UPDATE_FOR_LANDLORD, taskData);
-    return result;
-  } catch (error) {
-    console.error("Failed to update landlord task:", error);
-    throw error;
-  }
-}
 
 export async function apiDeleteTaskForAgent(taskData: {
   taskId: string;
@@ -122,21 +108,6 @@ export async function apiCreateTaskForTenant(taskData: {
   }
 }
 
-export async function apiUpdateTaskForTenant(taskData: {
-  taskId: string;
-  name?: string;
-  description?: string;
-  dueDate?: Date;
-  priority?: TaskPriority;
-}): Promise<string> {
-  try {
-    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_UPDATE_FOR_TENANT, taskData);
-    return result;
-  } catch (error) {
-    console.error("Failed to update tenant task:", error);
-    throw error;
-  }
-}
 
 export async function apiDeleteTaskForTenant(taskData: {
   taskId: string;
