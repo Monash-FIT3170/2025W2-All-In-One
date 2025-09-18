@@ -13,13 +13,14 @@ import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
 import { ApiInsertListingPayload } from "/app/shared/api-models/property-listing/ListingInsertData";
 import { ListingUpdateData } from "/app/shared/api-models/property-listing/ListingUpdateData";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
+import { TaskPriority } from "/app/shared/task-priority-identifier";
+import { PropertyCollection } from "../../database/property/property-collections";
 
 const getListingForProperty = {
   [MeteorMethodIdentifier.LISTING_GET_FOR_PROPERTY]: async (
     propertyId: string
   ): Promise<ApiListing> => {
     const listing = await getListingDocumentAssociatedWithProperty(propertyId);
-
     if (!listing) {
       throw meteorWrappedInvalidDataError(
         new InvalidDataError(
@@ -44,9 +45,8 @@ const submitDraftListing = {
   ): Promise<{ success: boolean; propertyId: string }> => {
     try {
       // Find the listing for this property
-      const listing = await getListingDocumentAssociatedWithProperty(
-        propertyId
-      );
+      const listing =
+        await getListingDocumentAssociatedWithProperty(propertyId);
 
       if (!listing) {
         throw meteorWrappedInvalidDataError(
@@ -99,7 +99,8 @@ const getAllListedListings = {
     limit: number = 3
   ): Promise<ApiListing[]> => {
     const listedStatus = ListingStatus.LISTED;
-    const listedStatusDocument = await getListingStatusDocumentByName(listedStatus);
+    const listedStatusDocument =
+      await getListingStatusDocumentByName(listedStatus);
 
     if (!listedStatusDocument) {
       throw meteorWrappedInvalidDataError(
@@ -135,23 +136,16 @@ const getAllListedListings = {
   },
 };
 
-async function getListingDocumentsByStatus(
-  statusId: string
-): Promise<ListingDocument[]> {
-  return ListingCollection.find({
-    listing_status_id: statusId,
-  }).fetchAsync();
-}
-
 async function mapListingDocumentToListingDTO(
   listing: ListingDocument
 ): Promise<ApiListing> {
   let propertyListingInspections: PropertyListingInspectionDocument[] = [];
 
   if (listing.inspection_ids.length > 0) {
-    propertyListingInspections = await getPropertyListingInspectionDocumentsMatchingIds(
-      listing.inspection_ids
-    );
+    propertyListingInspections =
+      await getPropertyListingInspectionDocumentsMatchingIds(
+        listing.inspection_ids
+      );
   }
 
   const listingStatusDocument = await getListingStatusDocumentById(
@@ -169,10 +163,14 @@ async function mapListingDocumentToListingDTO(
     image_urls: listing.image_urls,
     listing_status: listingStatusDocument.name,
     lease_term: listing.lease_term,
-    propertyListingInspections: propertyListingInspections.map((inspection) => ({
-      start_time: inspection.starttime,
-      end_time: inspection.endtime,
-    })),
+    propertyListingInspections: propertyListingInspections.map(
+      (inspection) => ({
+        _id: inspection._id,
+        start_time: inspection.starttime,
+        end_time: inspection.endtime,
+        tenant_ids: inspection.tenant_ids,
+      })
+    ),
   };
 }
 
@@ -252,10 +250,69 @@ const insertPropertyListingInspection = {
       const id = await PropertyListingInspectionCollection.insertAsync({
         starttime: new Date(insp.start_time),
         endtime: new Date(insp.end_time),
+        tenant_ids: [""],
       } as PropertyListingInspectionDocument);
       ids.push(id);
     }
     return ids;
+  },
+};
+
+const addTenantToInspectionMethod = {
+  [MeteorMethodIdentifier.ADD_TENANT_TO_INSPECTION]: async (
+    inspectionId: string,
+    tenantId: string,
+    propertyId: string
+  ): Promise<PropertyListingInspectionDocument> => {
+    console.log(
+      "ADD_TENANT_TO_INSPECTION method called",
+      inspectionId,
+      tenantId
+    );
+    const inspection = await PropertyListingInspectionCollection.findOneAsync({
+      _id: inspectionId,
+    });
+    if (!inspection)
+      throw new Meteor.Error("not-found", "Inspection not found");
+    console.log(
+      "Tenant ID attempting to be added to the inspection 1" + tenantId
+    );
+    if (!inspection.tenant_ids.includes(tenantId)) {
+      console.log(
+        "Tenant ID attempting to be added to the inspection 2" + tenantId
+      );
+      await PropertyListingInspectionCollection.updateAsync(
+        { _id: inspectionId },
+        { $push: { tenant_ids: tenantId } }
+      );
+    }
+    const property = await PropertyCollection.findOneAsync({
+      _id: propertyId,
+    });
+
+    // Create task for tenant
+    const taskData = {
+      name: "Attend open inspection",
+      description: "View the property at the scheduled time",
+      dueDate: inspection.starttime,
+      priority: TaskPriority.MEDIUM,
+      propertyAddress: `${property?.streetname} ${property?.streetnumber}, ${property?.suburb}, ${property?.province} ${property?.postcode}`,
+      propertyId: propertyId,
+      userId: tenantId,
+      };
+    console.log("Creating task for tenant:", taskData);
+    await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT_FOR_TENANT, taskData);
+    // return the updated doc so client thunk has fresh state
+    const updated = await PropertyListingInspectionCollection.findOneAsync({
+      _id: inspectionId,
+    });
+    if (!updated)
+      throw new Meteor.Error(
+        "update-failed",
+        "Failed to fetch updated inspection"
+      );
+
+    return updated;
   },
 };
 
@@ -266,7 +323,8 @@ const updatePropertyListingImages = {
   ): Promise<{ success: boolean; propertyId: string }> => {
     try {
       // Find the listing for this property
-      const listing = await getListingDocumentAssociatedWithProperty(propertyId);
+      const listing =
+        await getListingDocumentAssociatedWithProperty(propertyId);
 
       if (!listing) {
         throw meteorWrappedInvalidDataError(
@@ -372,4 +430,5 @@ Meteor.methods({
   ...updatePropertyListingImages,
   ...updatePropertyListingData,
   ...insertPropertyListingInspection,
+  ...addTenantToInspectionMethod,
 });

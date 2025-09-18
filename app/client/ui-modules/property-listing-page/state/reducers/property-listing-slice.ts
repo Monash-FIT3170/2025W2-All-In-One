@@ -12,6 +12,11 @@ import {
   getFormattedTimeStringFromDate,
 } from "/app/client/library-modules/utils/date-utils";
 
+import { PropertyListingInspectionDocument } from "/app/server/database/property-listing/models/PropertyListingInspectionDocument";
+import { AddTenantToInspectionUseCase } from "/app/client/library-modules/use-cases/property-listing/AddTenantToInspectionUseCase";
+import { ListingRepository } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
+import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+
 const initialState: PropertyListingPageUiState = {
   agentId: "",
   propertyId: "",
@@ -116,13 +121,17 @@ export const propertyListingSlice = createSlice({
         markerLongitude: action.payload.locationLongitude,
       };
 
-      state.inspectionBookingUiStateList = action.payload.propertyListingInspections.map(
-        (inspection) => ({
-          date: getFormattedDateStringFromDate(inspection.start_time),
-          startingTime: getFormattedTimeStringFromDate(inspection.start_time),
-          endingTime: getFormattedTimeStringFromDate(inspection.end_time),
-        })
-      );
+      state.inspectionBookingUiStateList =
+        action.payload.propertyListingInspections.map((inspection) => {
+          console.log("Inspection from backend:", inspection);
+          return {
+            _id: inspection._id,
+            date: getFormattedDateStringFromDate(inspection.start_time),
+            startingTime: getFormattedTimeStringFromDate(inspection.start_time),
+            endingTime: getFormattedTimeStringFromDate(inspection.end_time),
+            tenant_ids: inspection.tenant_ids,
+          };
+        });
 
       state.inspectionTimes = action.payload.propertyListingInspections.map(
         (inspection) => ({
@@ -148,9 +157,7 @@ export const propertyListingSlice = createSlice({
 
       state.shouldShowLoadingState = false;
       state.landlords = action.payload.landlords;
-      })
-
-
+    });
 
     builder.addCase(submitDraftListingAsync.pending, (state, action) => {
       state.isSubmittingDraft = true;
@@ -158,7 +165,7 @@ export const propertyListingSlice = createSlice({
     });
 
     builder.addCase(submitDraftListingAsync.fulfilled, (state, action) => {
-      console.log('Draft listing submitted successfully:', action.payload);
+      console.log("Draft listing submitted successfully:", action.payload);
       state.listingStatusText = getListingStatusDisplayString("listed");
       state.listingStatusPillVariant = getListingStatusPillVariant("listed");
       state.shouldDisplaySubmitDraftButton = false;
@@ -169,17 +176,29 @@ export const propertyListingSlice = createSlice({
     });
 
     builder.addCase(submitDraftListingAsync.rejected, (state, action) => {
-      console.error('Failed to submit draft listing:', action.error.message);
+      console.error("Failed to submit draft listing:", action.error.message);
       state.isSubmittingDraft = false;
       alert(`Failed to update listing: ${action.error.message}`);
       state.currentPropertyId = action.meta.arg;
     });
-  },
-})
 
-export const {
-  addBookedPropertyListingInspection,
-} = propertyListingSlice.actions;
+    builder.addCase(bookPropertyInspectionAsync.fulfilled, (state, action) => {
+      const updatedInspection = action.payload;
+      const index = state.inspectionBookingUiStateList.findIndex(
+        (i) => i._id === updatedInspection._id
+      );
+      if (index !== -1) {
+        state.inspectionBookingUiStateList[index] = {
+          ...state.inspectionBookingUiStateList[index],
+          tenant_ids: updatedInspection.tenant_ids,
+        };
+      }
+    });
+  },
+});
+
+export const { addBookedPropertyListingInspection } =
+  propertyListingSlice.actions;
 
 function getPropertyAreaDisplayString(area: number): string {
   return `${area}m²`;
@@ -201,7 +220,9 @@ function getListingStatusDisplayString(status: string): string {
     case ListingStatus.TENANT_APPROVAL.toLowerCase():
       return "TENANT APPROVAL";
     default:
-      return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : "Unknown Status";
+      return status
+        ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
+        : "Unknown Status";
   }
 }
 
@@ -243,6 +264,31 @@ export const load = createAsyncThunk(
   }
 );
 
+const listingRepo = new ListingRepository();
+const addTenantUseCase = new AddTenantToInspectionUseCase(listingRepo);
 
+export const bookPropertyInspectionAsync = createAsyncThunk(
+  "propertyListing/bookPropertyInspection",
+  async ({
+    inspectionId,
+    tenantId,
+    propertyId,
+  }: {
+    inspectionId: string;
+    tenantId: string;
+    propertyId: string;
+  }): Promise<PropertyListingInspectionDocument> => {
+    console.log("got to the bookPropertyInspectionAsync");
+    console.log("inspectionId:", inspectionId, "tenantId:", tenantId);
+    const updatedInspection: PropertyListingInspectionDocument =
+      await Meteor.callAsync(
+        MeteorMethodIdentifier.ADD_TENANT_TO_INSPECTION,
+        inspectionId,
+        tenantId,
+        propertyId
+      );
+    return updatedInspection;
+  }
+);
 export const selectPropertyListingUiState = (state: RootState) =>
   state.propertyListing;

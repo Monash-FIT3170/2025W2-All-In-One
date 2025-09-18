@@ -26,7 +26,9 @@ export type PropertyWithListingData = {
   listing_status: string;
   lease_term: string;
   propertyListingInspections: {
+    _id: string;
     start_time: Date;
     end_time: Date;
+    tenant_ids: string[];
   }[];
 }

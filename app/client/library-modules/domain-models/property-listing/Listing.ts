@@ -6,5 +6,6 @@ export type Listing = {
   propertyListingInspections: {
     start_time: Date;
     end_time: Date;
+    tenant_ids: string[];
   }[];
 }

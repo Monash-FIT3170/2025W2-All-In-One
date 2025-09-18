@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { PropertyFeatures } from "../../../common/property-components/PropertyFeatures";
 import { PropertySpecifics } from "../../../common/property-components/PropertySpecifics";
-import {
-  PropertyStatusPillVariant,
-  PropertySummary,
-} from "../components/PropertySummary";
+import {PropertySummary} from "../components/PropertySummary";
 import { PropertyDescription } from "../../../common/property-components/PropertyDescription";
 import { LeftCircularArrowIcon } from "/app/client/ui-modules/theming/icons/LeftCircularArrowIcon";
 import { RightCircularArrowIcon } from "/app/client/ui-modules/theming/icons/RightCircularArrowIcon";
@@ -13,8 +10,6 @@ import {
   InspectionBookingListUiState,
   PropertyInspections,
 } from "../components/PropertyInspections";
-import { BackLink } from "../../../theming/components/BackLink";
-import { BackButtonIcon } from "/app/client/ui-modules/theming/icons/BackButtonIcon";
 import { twMerge } from "tailwind-merge";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useSelector } from "react-redux";
@@ -30,7 +25,6 @@ import { SubHeading } from "../../../theming/components/SubHeading";
 import { PropertyMap, PropertyMapUiState } from "../../../common/property-components/PropertyMap";
 import { fetchAgentWithProfile } from '../state/reducers/tenant-property-slice';
 import { AgentDetails } from '../components/AgentDetails';
-import { current } from "@reduxjs/toolkit";
 
 export function TenantProperty({
   className = "",
@@ -102,8 +96,8 @@ export function TenantProperty({
           onBack={() => {
             console.log("back button pressed");
           }}
-          onBook={(index: number) => {
-            console.log(`booking button ${index} pressed`);
+          onBook={(inspectionId: string) => {
+            console.log(`booking button ${inspectionId} pressed`);
           }}
           onApply={() => {
             console.log("applied!");
@@ -180,7 +174,7 @@ function PropertyPageContent({
   propertyLandlordId: string;
   propertyId: string;
   onBack: () => void;
-  onBook: (index: number) => void;
+  onBook: (inspectionId: string) => void; // <-- FIXED
   onApply: () => void;
   onContactAgent: () => void;
   onSubmitDraftListing: () => void;
@@ -189,12 +183,6 @@ function PropertyPageContent({
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
   return (
     <div className={className}>
-      <TopBar
-        listingStatusText={listingStatusText}
-        shouldDisplayListingStatus={shouldDisplayListingStatus}
-        onBack={onBack}
-        className="mb-3"
-      />
       <PropertyHero
         streetNumber={streetNumber}
         street={street}
@@ -234,29 +222,6 @@ function PropertyPageContentLoadingSkeleton({
   className?: string;
 }): React.JSX.Element {
   return <p className={className}>Loading...</p>;
-}
-
-function TopBar({
-  listingStatusText,
-  shouldDisplayListingStatus,
-  onBack,
-  className = "",
-}: {
-  listingStatusText: string;
-  shouldDisplayListingStatus: boolean;
-  onBack: () => void;
-  className?: string;
-}): React.JSX.Element {
-  return (
-    <div className={twMerge("flex items-start", className)}>
-      <BackLink
-        label="Back to Properties"
-        backButtonIcon={<BackButtonIcon />}
-        onClick={onBack}
-        className="mr-auto"
-      />
-    </div>
-  );
 }
 
 function PropertyHero({
@@ -344,7 +309,7 @@ function PropertyDetails({
   propertyDescription: string;
   mapUiState: PropertyMapUiState;
   inspectionBookingUiStateList: InspectionBookingListUiState[];
-  onBook: (index: number) => void;
+  onBook: (inspectionId: string) => void; // <-- change to string
   propertyFeatures: string[];
   propertyId: string;
   className?: string;
