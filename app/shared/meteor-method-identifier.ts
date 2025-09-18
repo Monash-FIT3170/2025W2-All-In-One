@@ -31,14 +31,14 @@ export enum MeteorMethodIdentifier {
 	AGENT_INSERT = "agents.insert",
 	AGENT_GET = "agents.getOne",
 	AGENT_GET_BY_AGENT_ID = "agents.getByAgentId", // Get agent by agent ID (not user ID)
-	AGENT_UPDATE_TASKS = "agents.updateTasks", // Adds the id of the newly created task to the agent's task_ids
+	AGENT_ADD_TASK = "agents.addTask", // Adds a task to agent's task_ids array
 	TENANT_INSERT = "tenants.insert",
 	TENANT_GET = "tenants.getOne",
-	TENANT_UPDATE_TASKS = "tenants.updateTasks",
+	TENANT_ADD_TASK = "tenants.addTask", // Adds a task to tenant's task_ids array
 	LANDLORD_INSERT = "landlords.insert",
 	LANDLORD_GET = "landlords.getOne",
 	LANDLORD_GET_BY_LANDLORD_ID = "landlords.getByLandlordId", // Get landlord by landlord ID (not user ID)
-	LANDLORD_UPDATE_TASKS = "landlords.updateTasks", // Adds the id of the newly created task to the landlord's task_ids
+	LANDLORD_ADD_TASK = "landlords.addTask", // Adds a task to landlord's task_ids array
 	LANDLORD_GET_ALL = "landlords.getAll", // Get All Landlords
 	PROPERTY_STATUS_GET = "propertyStatus.getOne", // Find ID of property status by name
 	PROPERTY_GET_BY_TENANT_ID = "property.getByTenantId",

@@ -118,22 +118,22 @@ const taskInsertForAgentMethod = {
         throw new InvalidDataError("Failed to retrieve created task");
       }
 
-      // Update the agent's task_ids array to include the new task
-      console.log("Before agent update call");
+      // Add the task to the agent's task_ids array
+      console.log("Before agent add task call");
       try {
         await Meteor.callAsync(
-          MeteorMethodIdentifier.AGENT_UPDATE_TASKS,
+          MeteorMethodIdentifier.AGENT_ADD_TASK,
           taskData.userId,
           insertedId
         );
         console.log("Agent task_ids updated successfully");
       } catch (agentError) {
-        console.error("Failed to update agent task_ids:", agentError);
+        console.error("Failed to add task to agent:", agentError);
         throw meteorWrappedInvalidDataError(
-          new InvalidDataError(`Failed to link task to agent: ${agentError}`)
+          new InvalidDataError(`Failed to add task to agent: ${agentError}`)
         );
       }
-      console.log("After agent update call");
+      console.log("After agent add task call");
 
       return insertedId;
     } catch (error) {
@@ -205,22 +205,22 @@ const taskInsertForLandlordMethod = {
         throw new InvalidDataError("Failed to retrieve created task");
       }
 
-      // Update the landlord's task_ids array to include the new task
-      console.log("Before landlord update call");
+      // Add the task to the landlord's task_ids array
+      console.log("Before landlord add task call");
       try {
         await Meteor.callAsync(
-          MeteorMethodIdentifier.LANDLORD_UPDATE_TASKS,
+          MeteorMethodIdentifier.LANDLORD_ADD_TASK,
           taskData.userId,
           insertedId
         );
         console.log("Landlord task_ids updated successfully");
       } catch (landlordError) {
-        console.error("Failed to update landlord task_ids:", landlordError);
+        console.error("Failed to add task to landlord:", landlordError);
         throw meteorWrappedInvalidDataError(
-          new InvalidDataError(`Failed to link task to landlord: ${landlordError}`)
+          new InvalidDataError(`Failed to add task to landlord: ${landlordError}`)
         );
       }
-      console.log("After landlord task update call");
+      console.log("After landlord add task call");
 
       return insertedId;
     } catch (error) {
@@ -290,11 +290,11 @@ const taskInsertForTenantMethod = {
         throw new InvalidDataError("Failed to retrieve created task");
       }
 
-      // Update the tenant's task array to include the new task
-      console.log("Before tenant update call for task:", insertedId, "userId:", taskData.userId);
+      // Add the task to the tenant's task_ids array
+      console.log("Before tenant add task call for task:", insertedId, "userId:", taskData.userId);
       try {
         await Meteor.call(
-          MeteorMethodIdentifier.TENANT_UPDATE_TASKS,
+          MeteorMethodIdentifier.TENANT_ADD_TASK,
           taskData.userId,
           insertedId
         );
@@ -302,10 +302,10 @@ const taskInsertForTenantMethod = {
       } catch (tenantError) {
         
         throw meteorWrappedInvalidDataError(
-          new InvalidDataError(`Failed to link task to tenant: ${tenantError}`)
+          new InvalidDataError(`Failed to add task to tenant: ${tenantError}`)
         );
       }
-      console.log("After tenant update call");
+      console.log("After tenant add task call");
 
       return insertedId;
     } catch (error) {

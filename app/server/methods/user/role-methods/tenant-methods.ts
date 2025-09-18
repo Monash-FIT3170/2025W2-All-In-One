@@ -98,46 +98,38 @@ const profileGetByTenantIdMethod = {
   },
 };
 
-// -- UPDATE TENANT TASKS --
-// Consistent with agent/landlord pattern - ONLY adds tasks (no remove operation)
-const tenantUpdateTasksMethod = {
-  [MeteorMethodIdentifier.TENANT_UPDATE_TASKS]: async (
+// -- ADD TASK TO TENANT --
+// Single responsibility: Only adds a task to tenant's task_ids array
+const tenantAddTaskMethod = {
+  [MeteorMethodIdentifier.TENANT_ADD_TASK]: async (
     userId: string,
     taskId: string
   ): Promise<void> => {
-    console.log("TENANT_UPDATE_TASKS called with:", { userId, taskId });
+    console.log("TENANT_ADD_TASK called with:", { userId, taskId });
     
     const tenantDoc = await TenantCollection.findOneAsync({
       userAccountId: userId,
     });
 
     if (!tenantDoc) {
-
       throw meteorWrappedInvalidDataError(
         new InvalidDataError(`Tenant with user ID ${userId} not found.`)
       );
     }
 
-    
-    const currentTasks = tenantDoc.task_ids ?? [];
-
-    // Add task if not already present (avoid duplicates) - same logic as agent/landlord
-    if (!currentTasks.includes(taskId)) {
-      const updatedTasks = [...currentTasks, taskId];
-      await TenantCollection.updateAsync(
-        { _id: tenantDoc._id },
-        { $set: { task_ids: updatedTasks } }
-      );
-      console.log("Added task:", taskId);
-    } else {
-      console.log("Task already exists, skipping:", taskId);
-    }
+    // Use $addToSet to atomically add task if not already present (prevents duplicates)
+    await TenantCollection.updateAsync(
+      { _id: tenantDoc._id },
+      { $addToSet: { task_ids: taskId } }
+    );
+    console.log("Added task to tenant:", taskId);
   },
 };
+
 
 Meteor.methods({
   ...tenantInsertMethod,
   ...tenantGetMethod,
-  ...tenantUpdateTasksMethod,
+  ...tenantAddTaskMethod,
   ...profileGetByTenantIdMethod,
 });
