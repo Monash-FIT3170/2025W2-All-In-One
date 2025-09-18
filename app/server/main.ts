@@ -49,6 +49,8 @@ import { PropertyStatus } from "../shared/api-models/property/PropertyStatus";
 import "/app/server/methods/property/property-features/property-features-methods";
 import { ListingStatus } from "../shared/api-models/property-listing/ListingStatus";
 import { PropertyDocument } from "./database/property/models/PropertyDocument";
+import "./methods/user/user-login-history-methods";
+import "./methods/user/password-methods";
 import { LeaseAgreementCollection } from "./database/user-documents/user-documents-collections";
 import { TaskPriority } from "../shared/task-priority-identifier";
 let globalAgent: ApiAgent;

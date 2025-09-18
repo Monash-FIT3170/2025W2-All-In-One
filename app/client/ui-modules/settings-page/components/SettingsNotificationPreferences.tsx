@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
  
-import { Toast } from "/app/client/ui-modules/settings-page/components/Toast";
 import { Button } from "/app/client/ui-modules/theming-shadcn/Button";
 import {
   Form,
@@ -30,10 +29,7 @@ export function SettingsNotificationPreferences() {
   })
  
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    Toast({
-      title: "You submitted the following values:",
-      content: JSON.stringify(data, null, 2),
-    })
+    console.log("Notification preferences updated:", data);
   }
  
   return (

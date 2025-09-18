@@ -4,8 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
  
-import { Toast } from "/app/client/ui-modules/settings-page/components/Toast";
 import { Button } from "/app/client/ui-modules/theming-shadcn/Button";
+import { ChangePasswordPopup } from "/app/client/ui-modules/settings-page/components/ChangePasswordPopup";
+import { LoginHistoryModal } from "/app/client/ui-modules/settings-page/components/LoginHistoryModal";
 import {
   Form,
   FormControl,
@@ -21,6 +22,7 @@ const FormSchema = z.object({
 })
  
 export function SettingsSecurityPreferences() {
+  const [showLoginHistory, setShowLoginHistory] = React.useState(false);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -29,10 +31,7 @@ export function SettingsSecurityPreferences() {
   })
  
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    Toast({
-      title: "You submitted the following values:",
-      content: JSON.stringify(data, null, 2),
-    })
+    console.log("Security preferences updated:", data);
   }
  
   return (
@@ -53,7 +52,7 @@ export function SettingsSecurityPreferences() {
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Button>Change Password</Button>
+                    <ChangePasswordPopup />
                   </FormControl>
                 </FormItem>
               )}
@@ -70,13 +69,14 @@ export function SettingsSecurityPreferences() {
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Button> View History</Button>
+                    <Button type="button" onClick={() => setShowLoginHistory(true)}> View History</Button>
                   </FormControl>
                 </FormItem>
               )}
             />
           </div>
         </div>
+        <LoginHistoryModal isOpen={showLoginHistory} onClose={() => setShowLoginHistory(false)} />
       </form>
     </Form>
   )
