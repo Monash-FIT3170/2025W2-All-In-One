@@ -147,7 +147,6 @@ export default function FormPropertyDetails({
                   key="property-features-multiselect"
                   options={features}
                   onValueChange={(values) => {
-                    console.log("MultiSelect onValueChange called:", values);
                     form.setValue("property_feature_ids", values, {
                       shouldValidate: true,
                       shouldDirty: true,

@@ -43,35 +43,9 @@ export default function EditDraftListingModal(
   const dispatch = useAppDispatch();
   const propertyFormRef = useRef<PropertyFormRef>(null);
 
-  // Debug form state
-  useEffect(() => {
-    console.log("=== FORM VALIDATION DEBUG ===");
-    console.log("Form errors:", listingInfo.formState.errors);
-    console.log("Form is valid:", listingInfo.formState.isValid);
-    console.log("Form values:", listingInfo.getValues());
-    
-    // Show specific validation failures
-    const errors = listingInfo.formState.errors;
-    if (Object.keys(errors).length > 0) {
-      console.log("VALIDATION FAILURES:");
-      Object.entries(errors).forEach(([field, error]) => {
-        console.log(`- ${field}: ${error?.message || 'Unknown error'}`);
-      });
-      
-      // Check for nested errors (like in arrays)
-      if (errors.inspection_times) {
-        console.log("Inspection times errors:", errors.inspection_times);
-      }
-    } else {
-      console.log("SUCCESS: All validations passed!");
-    }
-    console.log("============================");
-  }, [listingInfo.formState.errors, listingInfo.formState.isValid]);
-
   // Load existing images when modal opens
   useEffect(() => {
     if (props.isOpen && props.existingImageUrls && props.existingImageUrls.length > 0) {
-      console.log("Loading existing images in EditDraftListingModal:", props.existingImageUrls);
       propertyFormRef.current?.loadExistingImages(props.existingImageUrls);
     }
     
@@ -83,7 +57,6 @@ export default function EditDraftListingModal(
   }, [props.isOpen, props.existingImageUrls, listingInfo]);
 
   const handleSaveChanges = async (values: FormSchemaType) => {
-    console.log("handleSaveChanges called with values:", values);
     // Update property details
     console.log("Updating listing details:", values);
 
@@ -192,12 +165,7 @@ export default function EditDraftListingModal(
   };
 
   const handleFormSubmit = (values: FormSchemaType) => {
-    console.log("=== FORM SUBMIT DEBUG ===");
-    console.log("Form submit triggered, calling handleSaveChanges");
-    console.log("Submitted values:", values);
-    console.log("Form errors at submit:", listingInfo.formState.errors);
-    console.log("Form is valid at submit:", listingInfo.formState.isValid);
-    console.log("========================");
+    console.log("Form submit triggered");
     handleSaveChanges(values);
   };
 
