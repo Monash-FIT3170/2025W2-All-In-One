@@ -17,6 +17,7 @@ import { AddTenantToInspectionUseCase } from "/app/client/library-modules/use-ca
 import { ListingRepository } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { apiPropertyInsertPrice } from "/app/client/library-modules/apis/property-price/price-api";
+import { addTenantToInspectionApi } from "/app/client/library-modules/apis/property-listing/listing-api";
 
 const initialState: PropertyListingPageUiState = {
   agentId: "",
@@ -296,8 +297,6 @@ export const load = createAsyncThunk(
   }
 );
 
-const listingRepo = new ListingRepository();
-const addTenantUseCase = new AddTenantToInspectionUseCase(listingRepo);
 
 export const bookPropertyInspectionAsync = createAsyncThunk(
   "propertyListing/bookPropertyInspection",
@@ -312,13 +311,10 @@ export const bookPropertyInspectionAsync = createAsyncThunk(
   }): Promise<PropertyListingInspectionDocument> => {
     console.log("got to the bookPropertyInspectionAsync");
     console.log("inspectionId:", inspectionId, "tenantId:", tenantId);
-    const updatedInspection: PropertyListingInspectionDocument =
-      await Meteor.callAsync(
-        MeteorMethodIdentifier.ADD_TENANT_TO_INSPECTION,
-        inspectionId,
-        tenantId,
-        propertyId
-      );
+    const updatedInspection: PropertyListingInspectionDocument = await addTenantToInspectionApi(
+      inspectionId,
+      tenantId
+    );
     return updatedInspection;
   }
 );
