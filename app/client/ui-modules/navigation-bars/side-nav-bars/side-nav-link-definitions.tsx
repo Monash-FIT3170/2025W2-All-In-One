@@ -15,7 +15,6 @@ export const agentDashboardLinks = [
   { to: "/agent-calendar", label: "Calendar" },
   { to: "/agent-messages", label: "Messages" },
   { to: "/agent-documents", label: "Documents"},
-  { to: "/agent-analytics", label: "Analytics" },
 ];
 
 export const tenantDashboardLinks = [
