@@ -446,7 +446,6 @@ function ListingPageContent({
         inspectionBookingUiStateList={inspectionBookingUiStateList}
         onBook={(inspectionId: string) => {
           console.log(`Booking inspection with id ${inspectionId}`);
-          dispatch(addBookedPropertyListingInspection(inspectionId));
 
           const inspection = inspectionBookingUiStateList.find(
             (i) => i._id === inspectionId
