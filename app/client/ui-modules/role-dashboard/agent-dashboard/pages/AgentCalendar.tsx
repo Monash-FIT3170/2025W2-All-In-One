@@ -154,7 +154,7 @@ export function AgentCalendar(): React.JSX.Element {
                 <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
-            <UpcomingTasks tasks={tasks} />
+            <UpcomingTasks tasks={tasks} showViewAllButton={false} />
           </div>
         </div>
       </div>

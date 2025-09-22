@@ -127,7 +127,7 @@ export function TenantCalendar(): React.JSX.Element {
             </div>
 
             {/* Right Section: Upcoming Tasks */}
-            <UpcomingTasks tasks={tasks} />
+            <UpcomingTasks tasks={tasks} showViewAllButton={false} />
           </div>
         </div>
       </div>
