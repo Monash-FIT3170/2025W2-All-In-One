@@ -22,7 +22,7 @@ export const SigninForm = () => {
   // this is to be used to redirect to dashboard once a direct sign in is requested
   const authUser = useAppSelector((state) => state.currentUser.authUser);
 
-  const from = location.state?.from?.pathname;
+  const from = location.state?.from?.pathname || location.state?.from;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
