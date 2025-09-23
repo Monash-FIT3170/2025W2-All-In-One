@@ -98,8 +98,38 @@ const profileGetByTenantIdMethod = {
   },
 };
 
+// -- ADD TASK TO TENANT --
+// Single responsibility: Only adds a task to tenant's task_ids array
+const tenantAddTaskMethod = {
+  [MeteorMethodIdentifier.TENANT_ADD_TASK]: async (
+    userId: string,
+    taskId: string
+  ): Promise<void> => {
+    console.log("TENANT_ADD_TASK called with:", { userId, taskId });
+    
+    const tenantDoc = await TenantCollection.findOneAsync({
+      userAccountId: userId,
+    });
+
+    if (!tenantDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Tenant with user ID ${userId} not found.`)
+      );
+    }
+
+    // Use $addToSet to atomically add task if not already present (prevents duplicates)
+    await TenantCollection.updateAsync(
+      { _id: tenantDoc._id },
+      { $addToSet: { task_ids: taskId } }
+    );
+    console.log("Added task to tenant:", taskId);
+  },
+};
+
+
 Meteor.methods({
   ...tenantInsertMethod,
   ...tenantGetMethod,
+  ...tenantAddTaskMethod,
   ...profileGetByTenantIdMethod,
 });

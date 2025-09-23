@@ -2,6 +2,7 @@ import React, { use, useEffect } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { EyeIcon } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
+import { useLocation, useNavigate } from "react-router";
 import {
   updateField,
   clearForm,
@@ -20,6 +21,10 @@ export const SignupForm = () => {
   const dispatch = useAppDispatch();
   const formState = useAppSelector(selectSignupFormUIState);
   const redirectToDashboard = useRedirectToDashboard();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const from = location.state?.from?.pathname || location.state?.from;
 
   useEffect(() => {
     dispatch(clearForm());
@@ -30,7 +35,12 @@ export const SignupForm = () => {
     const result = await dispatch(registerUser());
 
     if (registerUser.fulfilled.match(result)) {
-      redirectToDashboard(formState.accountType);
+      if (from) {
+        // navigate to the original request
+        navigate(from, { replace: true });
+      } else {
+        redirectToDashboard(formState.accountType);
+      }
     }
   };
 
@@ -62,7 +72,7 @@ export const SignupForm = () => {
                 value={type}
                 className={`
                   flex items-center justify-center gap-2 rounded-md px-4 py-3 text-sm font-medium transition-all
-                  border border-gray-300 text-gray-700 bg-white
+                  border border-gray-300 text-gray-700 bg-white cursor-pointer
                   data-[state=active]:border-black data-[state=active]:shadow-sm
                 `}
               >
@@ -127,7 +137,7 @@ export const SignupForm = () => {
         />
         <button
           type="button"
-          className="absolute top-9 right-3 text-gray-500"
+          className="absolute top-9 right-3 cursor-pointer text-gray-500"
           onClick={() =>
             dispatch(
               updateField({
@@ -165,7 +175,7 @@ export const SignupForm = () => {
 
       <button
         type="submit"
-        className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-black/90"
+        className="w-full bg-black text-white py-2 px-4 rounded-md cursor-pointer hover:bg-black/90"
         disabled={formState.isLoading}
       >
         {formState.isLoading ? "Creating..." : "Create Account"}

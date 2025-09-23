@@ -55,10 +55,12 @@ export function formatConversationTimestamp(timestamp: Date | string): string {
 
 /**
  * Formats a timestamp for individual messages in the chat window
+ * - Today: Show only time (e.g., "10:30 AM")
+ * - Before today: Show date and time (e.g., "Mar 25, 10:30 AM")
  */
 export function formatChatMessageTimestamp(timestamp: Date | string): string {
   const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
-  
+
   if (isNaN(date.getTime())) {
     return '';
   }
@@ -67,8 +69,8 @@ export function formatChatMessageTimestamp(timestamp: Date | string): string {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const messageDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
-  // For messages in chat window, always show time for today and yesterday
-  if (messageDate.getTime() >= today.getTime() - 24 * 60 * 60 * 1000) {
+  // Check if it's today
+  if (messageDate.getTime() === today.getTime()) {
     return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
@@ -76,10 +78,11 @@ export function formatChatMessageTimestamp(timestamp: Date | string): string {
     });
   }
 
-  // For older messages in chat, show date and time
+  // For messages before today, show date and time
   return date.toLocaleDateString('en-US', {
     month: 'short',
-    day: 'numeric',
+    day: 'numeric'
+  }) + ', ' + date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true

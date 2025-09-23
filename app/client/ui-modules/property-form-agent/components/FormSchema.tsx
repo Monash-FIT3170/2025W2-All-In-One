@@ -14,10 +14,12 @@ export const formSchema = z.object({
   monthly_rent: z.coerce.number().min(1, { message: "Please fill out field" }),
   bedroom_number: z.coerce.number().min(1, { message: "Please fill out field" }),
   bathroom_number: z.coerce.number().min(1, { message: "Please fill out field" }),
+  parking_spaces: z.coerce.number().min(0, { message: "Please enter a valid number" }),
   space: z.coerce.number().min(1, { message: "Please fill out field" }),
   description: z.string().min(1, { message: "Please fill out field" }),
+  summary_description: z.string().min(1, { message: "Please fill out field" }),
   property_feature_ids: z.array(z.string()),
-  images: z.array(z.instanceof(File)).min(1, { message: "At least one image is required" }),
+  images: z.array(z.instanceof(File)).optional(),
   available_dates: z.coerce.date(),
   inspection_times: z.array(
     z.object({
@@ -26,7 +28,6 @@ export const formSchema = z.object({
     })
   ),
   lease_term: z.string().min(1, { message: "Lease term is required" }),
-  show_contact_boolean: z.boolean().optional(),
 });
 
 export type FormSchemaType = z.infer<typeof formSchema>;

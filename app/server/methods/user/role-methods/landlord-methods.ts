@@ -65,13 +65,15 @@ const landlordGetByLandlordIdMethod = {
   },
 };
 
-//UPDATE LANDLORD TASKS
-// This method adds a new task ID to the landlord's task_ids array
-const landlordUpdateTasksMethod = {
-  [MeteorMethodIdentifier.LANDLORD_UPDATE_TASKS]: async (
+// -- ADD TASK TO LANDLORD --
+// Single responsibility: Only adds a task to landlord's task_ids array
+const landlordAddTaskMethod = {
+  [MeteorMethodIdentifier.LANDLORD_ADD_TASK]: async (
     userId: string,
     taskId: string
   ): Promise<void> => {
+    console.log("LANDLORD_ADD_TASK called with:", { userId, taskId });
+    
     const landlordDoc = await LandlordCollection.findOneAsync({
       userAccountId: userId,
     });
@@ -82,17 +84,15 @@ const landlordUpdateTasksMethod = {
       );
     }
 
-    // Add the task ID to the landlord's task_ids array if it doesn't already exist
-    const currentTaskIds = landlordDoc.task_ids ?? [];
-    if (!currentTaskIds.includes(taskId)) {
-      const updatedTaskIds = [...currentTaskIds, taskId];
-      await LandlordCollection.updateAsync(
-        { userAccountId: userId },
-        { $set: { task_ids: updatedTaskIds } }
-      );
-    }
+    // Use $addToSet to atomically add task if not already present (prevents duplicates)
+    await LandlordCollection.updateAsync(
+      { _id: landlordDoc._id },
+      { $addToSet: { task_ids: taskId } }
+    );
+    console.log("Added task to landlord:", taskId);
   },
 };
+
 
 
 const landlordGetAllMethod = {
@@ -164,7 +164,7 @@ Meteor.methods({
   ...landlordInsertMethod,
   ...landlordGetMethod,
   ...landlordGetByLandlordIdMethod,
-  ...landlordUpdateTasksMethod,
+  ...landlordAddTaskMethod,
   ...landlordGetAllMethod,
   ...profileGetByLandlordIdMethod,
 });

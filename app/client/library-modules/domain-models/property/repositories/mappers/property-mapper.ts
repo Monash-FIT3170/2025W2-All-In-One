@@ -13,6 +13,7 @@ export function mapApiPropertyToProperty(property: ApiProperty): Property {
     suburb: property.suburb,
     province: property.province,
     postcode: property.postcode,
+    apartment_number: property.apartment_number,
     pricePerMonth: property.pricePerMonth,
     propertyStatus: property.propertyStatus,
     description: property.description,
@@ -21,6 +22,7 @@ export function mapApiPropertyToProperty(property: ApiProperty): Property {
     bedrooms: property.bedrooms,
     parking: property.parking,
     features: property.features,
+    featureIds: property.featureIds,
     type: property.type,
     area: property.area,
     agentId: property.agentId,
@@ -39,12 +41,13 @@ export async function mapFormSchemaToPropertyInsertData(form: FormSchemaType) {
     suburb: form.suburb,
     province: form.state, // adjust if you have a separate province field
     postcode: form.postal_code,
+    apartment_number: form.apartment_number,
     property_status_id: await getPropertyStatusId(PropertyStatus.VACANT), // fill as needed
     description: form.description,
-    summary_description: form.description.slice(0,60), // fill as needed
+    summary_description: form.summary_description,
     bathrooms: form.bathroom_number,
     bedrooms: form.bedroom_number,
-    parking: 0, // fill as needed
+    parking: form.parking_spaces,
     property_feature_ids: form.property_feature_ids,
     type: form.property_type,
     area: form.space,

@@ -16,6 +16,7 @@ import { getAgentByAgentId, getAgentById } from '/app/client/library-modules/dom
 import { getProfileDataById } from '/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository';
 import { getPropertyById, getPropertyByTenantId } from '/app/client/library-modules/domain-models/property/repositories/property-repository';
 import { getTenantById } from "/app/client/library-modules/domain-models/user/role-repositories/tenant-repository";
+import { PropertyWithListingData } from "/app/client/library-modules/use-cases/property-listing/models/PropertyWithListingData";
 
 interface TenantPropertyState {
   propertyId: string;
@@ -43,9 +44,11 @@ interface TenantPropertyState {
     markerLongitude: number;
   };
   inspectionBookingUiStateList: {
+    _id: string;
     date: string;
     startingTime: string;
     endingTime: string;
+    tenant_ids: string[];
   }[];
   listingImageUrls: string[];
   listingStatusText: string;
@@ -62,6 +65,9 @@ interface TenantPropertyState {
   agentProfile: ProfileData | null;
   isLoadingAgent: boolean;
   agentError: string | null;
+  isLoading: boolean;
+  propertiesWithListingData: PropertyWithListingData[];
+  error: string | null;
 }
 
 const initialState: TenantPropertyState = {
@@ -105,6 +111,9 @@ const initialState: TenantPropertyState = {
   agentProfile: null,
   isLoadingAgent: false,
   agentError: null,
+  isLoading: false,
+  propertiesWithListingData: [],
+  error: null
 };
 
 export const submitDraftListingAsync = createAsyncThunk(
@@ -112,6 +121,27 @@ export const submitDraftListingAsync = createAsyncThunk(
   async (propertyId: string) => {
     const submitDraftListing = await submitDraftListingUseCase(propertyId);
     return submitDraftListing;
+  }
+);
+
+export const fetchTenantPropertyWithListingData = createAsyncThunk(
+  "tenantProperties/fetchTenantProperties",
+  async (_: void, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const userId = state.currentUser.authUser?.userId;
+      if (!userId) {
+        return rejectWithValue("No authenticated user");
+      }
+
+      const tenant = await getTenantById(userId);
+      const property = await getPropertyByTenantId(tenant.tenantId);
+      const listings = await getPropertyWithListingDataUseCase(property.propertyId)
+  
+      return listings.image_urls;
+    } catch {
+      return rejectWithValue("Failed to fetch agent properties");
+    }
   }
 );
 
@@ -128,10 +158,6 @@ export const fetchAgentWithProfile = createAsyncThunk(
       if (!property.agentId) {
         throw new Error('No agent assigned to this property');
       }
-      // console.log('Property agent ID:', property.agentId);
-      // const user = await getUserAccountById(property.agentId);
-      // console.log('Found user account for agent:', user);
-
       // Debug log for agent ID
       console.log('Fetching agent with ID:', property.agentId);
 
@@ -193,9 +219,11 @@ export const tenantPropertySlice = createSlice({
       }
       state.inspectionBookingUiStateList = action.payload.propertyListingInspections.map(
         (inspection) => ({
-          date: getFormattedDateStringFromDate(inspection.start_time),
-          startingTime: getFormattedTimeStringFromDate(inspection.start_time),
-          endingTime: getFormattedTimeStringFromDate(inspection.end_time),
+          _id: inspection._id,
+          date: getFormattedDateStringFromDate(new Date(inspection.start_time)),
+          startingTime: getFormattedTimeStringFromDate(new Date(inspection.start_time)),
+          endingTime: getFormattedTimeStringFromDate(new Date(inspection.end_time)),
+          tenant_ids: inspection.tenant_ids
         })
       );
       state.listingImageUrls = action.payload.image_urls;
@@ -219,6 +247,27 @@ export const tenantPropertySlice = createSlice({
         state.isLoadingAgent = false;
         state.agentError = action.error.message || 'Failed to fetch agent details';
       });
+
+    builder
+      .addCase(fetchTenantPropertyWithListingData.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(
+        fetchTenantPropertyWithListingData.fulfilled,
+        (state, action) => {
+          state.isLoading = false;
+          state.listingImageUrls = action.payload;
+        }
+      )
+      .addCase(
+        fetchTenantPropertyWithListingData.rejected,
+        (state, action) => {
+          state.isLoading = false;
+          state.error =
+            (action.payload as string) || "Failed to fetch agent properties";
+        }
+      );
   },
 });
 
@@ -278,11 +327,22 @@ export const fetchPropertyAgent = createAsyncThunk(
 export const load = createAsyncThunk(
   "propertyListing/load",
   async (propertyId: string) => {
-    const propertyWithListingData = await getPropertyWithListingDataUseCase(
+    const result = await getPropertyWithListingDataUseCase(
       propertyId
     );
     const landlords: Landlord[] = await getAllLandlords();
-    return { ...propertyWithListingData, landlords };
+    
+    // Serialize Date objects in propertyListingInspections to avoid Redux serialization warnings
+    const serializedData = {
+      ...result,
+      propertyListingInspections: result.propertyListingInspections.map(inspection => ({
+        ...inspection,
+        start_time: inspection.start_time instanceof Date ? inspection.start_time.toISOString() : inspection.start_time,
+        end_time: inspection.end_time instanceof Date ? inspection.end_time.toISOString() : inspection.end_time,
+      })),
+    };
+    
+    return { ...serializedData, landlords };
   }
 );
 

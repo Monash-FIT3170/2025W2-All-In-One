@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Toast } from "/app/client/ui-modules/settings-page/components/Toast";
 import { Button } from "/app/client/ui-modules/theming-shadcn/Button";
 import {
   Form,
@@ -14,9 +13,10 @@ import {
   FormItem,
   FormLabel,
 } from "/app/client/ui-modules/settings-page/components/Form";
-import { useAppDispatch } from "/app/client/store";
+import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useNavigate } from "react-router";
 import { signoutUser } from "../../user-authentication/state/reducers/current-user-slice";
+import { NavigationPath } from "/app/client/navigation";
 
 const FormSchema = z.object({
   marketing_emails: z.boolean().default(false).optional(),
@@ -26,6 +26,7 @@ const FormSchema = z.object({
 export function SettingsAccountPreferences() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const profileData = useAppSelector((state) => state.currentUser.profileData);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -35,10 +36,7 @@ export function SettingsAccountPreferences() {
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    Toast({
-      title: "You submitted the following values:",
-      content: JSON.stringify(data, null, 2),
-    });
+    console.log("Account preferences updated:", data);
   }
 
   async function handleLogout() {
@@ -48,6 +46,10 @@ export function SettingsAccountPreferences() {
     } catch (error) {
       console.error("Logout failed:", error);
     }
+  }
+
+  function handleManageAccount() {
+    navigate(NavigationPath.Profile);
   }
 
   return (
@@ -64,11 +66,11 @@ export function SettingsAccountPreferences() {
                   <div className="space-y-0.5">
                     <FormLabel>Account Information</FormLabel>
                     <FormDescription>
-                      Shannon Wallis - shannonwallis@test.com
+                      {profileData ? `${profileData.firstName} ${profileData.lastName} - ${profileData.email}` : "Loading..."}
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Button>Manage Account</Button>
+                    <Button onClick={handleManageAccount}>Manage Account</Button>
                   </FormControl>
                 </FormItem>
               )}
@@ -85,7 +87,7 @@ export function SettingsAccountPreferences() {
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Button variant="destructive" onClick={handleLogout}>
+                    <Button variant="destructive" className="cursor-pointer" onClick={handleLogout}>
                       Sign Out
                     </Button>
                   </FormControl>

@@ -9,7 +9,6 @@ import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { getPropertyByAgentId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
 import { PropertyOption } from "../components/TaskFormSchema";
-import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
 interface AgentDashboardState {
   isLoading: boolean;
@@ -19,7 +18,6 @@ interface AgentDashboardState {
   monthlyRevenue: number;
   occupancyRate: number;
   tasks: Task[];
-  markers: { latitude: number; longitude: number }[];
   error: string | null;
   propertiesError: string | null;
   tasksCount: number;
@@ -33,7 +31,6 @@ const initialState: AgentDashboardState = {
   monthlyRevenue: 0,
   occupancyRate: 0,
   tasks: [],
-  markers: [],
   error: null,
   propertiesError: null,
   tasksCount: 0,
@@ -120,40 +117,6 @@ export const fetchAgentTasks = createAsyncThunk(
   }
 );
 
-export const fetchMarkersForDate = createAsyncThunk(
-  "agentDashboard/fetchMarkersForDate",
-  async (args: { tasks: Task[]; selectedDateISO?: string }) => {
-    const { tasks, selectedDateISO } = args;
-    const todayISO = new Date().toISOString().split("T")[0];
-
-    const tasksForSelectedDate = tasks.filter(
-      (task) => task.dueDate === (selectedDateISO || todayISO)
-    );
-
-    const markers = await Promise.all(
-      tasksForSelectedDate.map(async (task) => {
-        if (!task.propertyId) return null;
-        try {
-          const property = await getPropertyById(task.propertyId);
-          if (
-            property.locationLatitude != null &&
-            property.locationLongitude != null
-          ) {
-            return {
-              latitude: property.locationLatitude,
-              longitude: property.locationLongitude,
-            };
-          }
-        } catch (err) {
-          console.error(`Error fetching property ${task.propertyId}:`, err);
-        }
-        return null;
-      })
-    );
-
-    return markers.filter(Boolean) as { latitude: number; longitude: number }[];
-  }
-);
 
 export const agentDashboardSlice = createSlice({
   name: "agentDashboard",
@@ -201,17 +164,6 @@ export const agentDashboardSlice = createSlice({
       .addCase(fetchAgentTasks.rejected, (state) => {
         state.isLoading = false;
         state.error = "Failed to fetch agent tasks";
-      })
-
-      .addCase(fetchMarkersForDate.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(fetchMarkersForDate.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.markers = action.payload;
-      })
-      .addCase(fetchMarkersForDate.rejected, (state) => {
-        state.isLoading = false;
       });
   },
 });
@@ -225,7 +177,6 @@ export const selectProperties = (state: RootState) =>
   state.agentDashboard.properties;
 export const selectLoading = (state: RootState) =>
   state.agentDashboard.isLoading;
-export const selectMarkers = (state: RootState) => state.agentDashboard.markers;
 export default agentDashboardSlice.reducer;
 
 export const fetchPropertiesForAgent = (

@@ -82,10 +82,11 @@ export const submitForm = createAsyncThunk(
       (propertyFormData.inspection_times ?? []).map((t) => ({
         start_time: t.start_time,
         end_time: t.end_time,
+        tenant_ids: [],
       }))
     );
 
-    await insertPropertyListing(propertyId, imageUrls, ListingStatus.DRAFT, inspectionIds);
+    await insertPropertyListing(propertyId, imageUrls, ListingStatus.DRAFT, inspectionIds, propertyFormData.lease_term);
     return { propertyId };
   }
 );

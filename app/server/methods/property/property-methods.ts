@@ -161,6 +161,7 @@ async function mapPropertyDocumentToPropertyDTO(
     suburb: property.suburb,
     province: property.province,
     postcode: property.postcode,
+    apartment_number: property.apartment_number,
     pricePerMonth: propertyPriceDocument.price_per_month,
     propertyStatus: propertyStatusDocument.name,
     description: property.description,
@@ -169,6 +170,7 @@ async function mapPropertyDocumentToPropertyDTO(
     bedrooms: property.bedrooms,
     parking: property.parking,
     features: propertyFeaturesDocuments.map((doc) => doc.name),
+    featureIds: propertyFeaturesDocuments.map((doc) => doc._id),
     type: property.type,
     area: property.area,
     agentId: agentDocument ? agentDocument._id : "", // Always string
@@ -320,6 +322,7 @@ const updatePropertyData = {
   ): Promise<void> => {
     await PropertyCollection.updateAsync(property.propertyId, {
       $set: {
+        apartment_number: property.apartment_number,
         streetnumber: property.streetnumber,
         streetname: property.streetname,
         suburb: property.suburb,
@@ -370,7 +373,9 @@ const propertySearchMethod = {
             { suburb: { $regex: token, $options: "i" } },
             { postcode: { $regex: token, $options: "i" } },
             { streetname: { $regex: token, $options: "i" } },
+            { streetnumber: { $regex: token, $options: "i" } },
             { province: { $regex: token, $options: "i" } },
+            { apartment_number: { $regex: token, $options: "i" } },
           ],
         })),
       };

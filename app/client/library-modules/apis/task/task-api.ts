@@ -46,7 +46,9 @@ export async function apiCreateTaskForLandlord(taskData: {
   }
 }
 
-export async function apiUpdateTaskForAgent(taskData: {
+
+// Generic task update function (role-agnostic)
+export async function apiUpdateTask(taskData: {
   taskId: string;
   name?: string;
   description?: string;
@@ -54,26 +56,69 @@ export async function apiUpdateTaskForAgent(taskData: {
   priority?: TaskPriority;
 }): Promise<string> {
   try {
-    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_UPDATE_FOR_AGENT, taskData);
+    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_UPDATE, taskData);
     return result;
   } catch (error) {
-    console.error("Failed to update agent task:", error);
+    console.error("Failed to update task:", error);
     throw error;
   }
 }
 
-export async function apiUpdateTaskForLandlord(taskData: {
+
+export async function apiDeleteTaskForAgent(taskData: {
   taskId: string;
-  name?: string;
-  description?: string;
-  dueDate?: Date;
-  priority?: TaskPriority;
-}): Promise<string> {
+  agentId: string;
+}): Promise<boolean> {
   try {
-    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_UPDATE_FOR_LANDLORD, taskData);
+    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_DELETE_FOR_AGENT, taskData);
     return result;
   } catch (error) {
-    console.error("Failed to update landlord task:", error);
+    console.error("Failed to delete agent task:", error);
+    throw error;
+  }
+}
+
+export async function apiDeleteTaskForLandlord(taskData: {
+  taskId: string;
+  landlordId: string;
+}): Promise<boolean> {
+  try {
+    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_DELETE_FOR_LANDLORD, taskData);
+    return result;
+  } catch (error) {
+    console.error("Failed to delete landlord task:", error);
+    throw error;
+  }
+}
+
+export async function apiCreateTaskForTenant(taskData: {
+  name: string;
+  description: string;
+  dueDate: Date;
+  priority: TaskPriority;
+  userId: string;
+  propertyAddress?: string;
+  propertyId?: string;
+}): Promise<string> {
+  try {
+    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT_FOR_TENANT, taskData);
+    return result;
+  } catch (error) {
+    console.error("Failed to create tenant task:", error);
+    throw error;
+  }
+}
+
+
+export async function apiDeleteTaskForTenant(taskData: {
+  taskId: string;
+  tenantId: string;
+}): Promise<boolean> {
+  try {
+    const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_DELETE_FOR_TENANT, taskData);
+    return result;
+  } catch (error) {
+    console.error("Failed to delete tenant task:", error);
     throw error;
   }
 }

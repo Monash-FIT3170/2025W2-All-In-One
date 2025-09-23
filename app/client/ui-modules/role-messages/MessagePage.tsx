@@ -66,6 +66,13 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
     };
   }, [activeConversationId, dispatch]);
 
+  // Always reset to fresh state when navigating to messages page or when user changes
+  useEffect(() => {
+    // Reset active conversation whenever user navigates to messages page or logs in
+    // This ensures they always see the conversation selection screen and no message panel is open
+    dispatch(setActiveConversation(null));
+  }, [dispatch, authUser?.userId]);
+
   const handleSelectConversation = (conversationId: string) => {
     // Validate conversationId is not null/undefined
     if (!conversationId) {

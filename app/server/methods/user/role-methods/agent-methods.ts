@@ -68,12 +68,15 @@ const agentGetByAgentIDMethod = {
   },
 };
 
-// -- UPDATE AGENT TASKS --
-const agentUpdateTasksMethod = {
-  [MeteorMethodIdentifier.AGENT_UPDATE_TASKS]: async (
+// -- ADD TASK TO AGENT --
+// Single responsibility: Only adds a task to agent's task_ids array
+const agentAddTaskMethod = {
+  [MeteorMethodIdentifier.AGENT_ADD_TASK]: async (
     userId: string,
     taskId: string
   ): Promise<void> => {
+    console.log("AGENT_ADD_TASK called with:", { userId, taskId });
+    
     // Try resolve by userAccountId first, then fallback to agent _id
     let agentDoc = await AgentCollection.findOneAsync({ userAccountId: userId });
     if (!agentDoc) {
@@ -86,17 +89,15 @@ const agentUpdateTasksMethod = {
       );
     }
 
-    // Add the task ID to the agent's task_ids array if it doesn't already exist
-    const currentTaskIds = agentDoc.task_ids ?? [];
-    if (!currentTaskIds.includes(taskId)) {
-      const updatedTaskIds = [...currentTaskIds, taskId];
-      await AgentCollection.updateAsync(
-        { _id: agentDoc._id },
-        { $set: { task_ids: updatedTaskIds } }
-      );
-    }
+    // Use $addToSet to atomically add task if not already present (prevents duplicates)
+    await AgentCollection.updateAsync(
+      { _id: agentDoc._id },
+      { $addToSet: { task_ids: taskId } }
+    );
+    console.log("Added task to agent:", taskId);
   },
 };
+
 
 async function mapAgentDocumentToDTO(agent: AgentDocument): Promise<ApiAgent> {
   const taskIds = agent.task_ids ?? [];
@@ -156,7 +157,7 @@ const profileGetByAgentIdMethod = {
 Meteor.methods({
   ...agentInsertMethod,
   ...agentGetMethod,
-  ...agentUpdateTasksMethod,
+  ...agentAddTaskMethod,
   ...profileGetByAgentIdMethod,
   ...agentGetByAgentIDMethod,
 });

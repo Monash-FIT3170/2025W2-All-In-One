@@ -1,10 +1,12 @@
 import React from "react";
+import { useNavigate, useLocation } from "react-router";
 import {
   ThemedButton,
   ThemedButtonVariant,
 } from "/app/client/ui-modules/theming/components/ThemedButton";
 import { twMerge } from "tailwind-merge";
 import { Role } from "/app/shared/user-role-identifier";
+import { NavigationPath } from "/app/client/navigation";
 
 export function ApplyButton({
   onClick,
@@ -19,9 +21,13 @@ export function ApplyButton({
   userRole?: Role;
   hasApplied?: boolean;
 }): React.JSX.Element {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   // Determine button text based on user role and application status
   let buttonText = "Apply";
   let isDisabled = isLoading || hasApplied;
+  let buttonOnClick = onClick;
 
   if (userRole === Role.AGENT) {
     buttonText = "Agents cannot apply";
@@ -29,7 +35,13 @@ export function ApplyButton({
   } else if (userRole === Role.LANDLORD) {
     buttonText = "Landlords cannot apply";
     isDisabled = true;
-  } else if (hasApplied) {
+  }
+  else if (!userRole){
+    buttonText = "Sign In to Apply";
+    isDisabled = false;
+    buttonOnClick = () => navigate(NavigationPath.Signin, { state: { from: location.pathname + location.search } });
+  }
+  else if (hasApplied) {
     buttonText = "Already Applied";
     isDisabled = true;
   } else if (isLoading) {
@@ -38,11 +50,11 @@ export function ApplyButton({
 
   return (
     <ThemedButton
-      variant={ThemedButtonVariant.SECONDARY}
-      onClick={isDisabled ? () => {} : onClick}
+      variant={ThemedButtonVariant.PRIMARY}
+      onClick={isDisabled ? () => {} : buttonOnClick}
       className={twMerge(
         "w-[128px]",
-        isDisabled && hasApplied ? "opacity-50 cursor-not-allowed" : "",
+        isDisabled || hasApplied ? "opacity-50 cursor-not-allowed" : "",
         className
       )}
     >

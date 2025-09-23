@@ -6,6 +6,7 @@ export type PropertyWithListingData = {
   suburb: string;
   province: string;
   postcode: string;
+  apartment_number?: string;
   pricePerMonth: number;
   propertyStatus: string;
   description: string;
@@ -14,6 +15,7 @@ export type PropertyWithListingData = {
   bedrooms: number;
   parking: number;
   features: string[];
+  featureIds: string[];
   type: string;
   area?: number;
   agentId: string;
@@ -22,8 +24,11 @@ export type PropertyWithListingData = {
   locationLatitude: number;
   locationLongitude: number;
   listing_status: string;
+  lease_term: string;
   propertyListingInspections: {
+    _id: string;
     start_time: Date;
     end_time: Date;
+    tenant_ids: string[];
   }[];
 }

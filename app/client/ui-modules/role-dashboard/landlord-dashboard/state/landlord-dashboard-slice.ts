@@ -11,18 +11,12 @@ import {
 } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
-import {
-  PropertyOption,
-  TaskData,
-} from "../../agent-dashboard/components/TaskFormSchema";
-import { apiCreateTaskForLandlord } from "/app/client/library-modules/apis/task/task-api";
-import { createTaskForLandlordOnCalendar } from "../../../../library-modules/domain-models/task/repositories/task-repository";
+import { PropertyOption } from "../../agent-dashboard/components/TaskFormSchema";
 
 interface LandlordDashboardState {
   isLoading: boolean;
   properties: Property[];
   tasks: Task[];
-  markers: { latitude: number; longitude: number }[];
   dashboardData: {
     propertyCount: number;
     statusCounts: {
@@ -45,7 +39,6 @@ interface LandlordDashboardState {
 const initialState: LandlordDashboardState = {
   isLoading: false,
   tasks: [],
-  markers: [],
   properties: [],
   dashboardData: {
     propertyCount: 0,
@@ -136,6 +129,7 @@ export const fetchLandlordDetails = createAsyncThunk(
   }
 );
 
+
 export const landlordDashboardSlice = createSlice({
   name: "landlordDashboard",
   initialState,
@@ -199,12 +193,12 @@ export const { setLoading, setTasks, setProperties, setError } =
 export const selectLandlordDashboard = (state: RootState) =>
   state.landlordDashboard.dashboardData;
 export const selectTasks = (state: RootState) => state.landlordDashboard.tasks;
+export const selectPropertyDetails = (state: RootState) => state.landlordDashboard.properties;
 export const selectProperties = (state: RootState) =>
   state.landlordDashboard.properties;
 export const selectLoading = (state: RootState) =>
   state.landlordDashboard.isLoading;
 export default landlordDashboardSlice.reducer;
-export const selectMarkers = (state: RootState) => state.agentDashboard.markers;
 export const fetchPropertiesForLandlord = (
   agentId: string
 ): Promise<PropertyOption[]> => {
@@ -231,23 +225,6 @@ export const fetchPropertiesForLandlord = (
   });
 };
 
-export const createLandlordTask = createAsyncThunk(
-  "landlordDashboard/createLandlordTask",
-  async (taskData: TaskData, { getState, dispatch }) => {
-    const state = getState() as RootState;
-    const userId = state.currentUser.authUser?.userId;
-
-    if (!userId) throw new Error("No current user found");
-
-    // Call the repo with taskData + userId
-    const createdTaskId = await createTaskForLandlordOnCalendar(taskData, userId);
-
-    // Refresh all landlord details after creation
-    await dispatch(fetchLandlordTasks());
-
-    return createdTaskId;
-  }
-);
 
 export const fetchLandlordProperties = createAsyncThunk(
   "landlordDashboard/fetchLandlordProperties",

@@ -45,7 +45,9 @@ export const PropertyForm = forwardRef<PropertyFormRef, {
         <FormPropertyImages ref={formPropertyImagesRef} form={form} />
         <FormListingOptions form={form} />
         <div className="flex justify-end mt-5">
-          <Button type="submit">
+          <Button 
+            type="submit"
+          >
             {mode === PropertyFormMode.CREATE
               ? "Create Listing"
               : "Save Changes"}
@@ -72,12 +74,13 @@ export const formDefaultValues: z.infer<typeof formSchema> = {
   monthly_rent: 0,
   bedroom_number: 0,
   bathroom_number: 0,
+  parking_spaces: 0,
   space: 0,
   description: "",
+  summary_description: "",
   property_feature_ids: [],
   images: [],
   available_dates: new Date(),
   inspection_times: [],
   lease_term: "",
-  show_contact_boolean: false,
 };

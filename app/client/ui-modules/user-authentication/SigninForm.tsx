@@ -22,7 +22,7 @@ export const SigninForm = () => {
   // this is to be used to redirect to dashboard once a direct sign in is requested
   const authUser = useAppSelector((state) => state.currentUser.authUser);
 
-  const from = location.state?.from?.pathname;
+  const from = location.state?.from?.pathname || location.state?.from;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -81,7 +81,7 @@ export const SigninForm = () => {
 
       <button
         type="submit"
-        className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-black/90"
+        className="w-full bg-black text-white py-2 px-4 rounded-md cursor-pointer hover:bg-black/90"
         disabled={signinState.isLoading}
       >
         {signinState.isLoading ? "signing in..." : "sign in"}

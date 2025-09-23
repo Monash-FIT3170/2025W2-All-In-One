@@ -3,20 +3,35 @@ import { useAppDispatch, useAppSelector } from "../../../../store";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 import { UpcomingTasks } from "../../components/UpcomingTask";
-import { fetchTenantDetails, selectLoading, selectTasks } from "../state/reducers/tenant-dashboard-slice";
+import { CalendarTasksList } from "../../components/CalendarTasksList";
+import { AddTaskModal } from "../../agent-dashboard/components/AddTaskModal";
+import { PropertyOption, TaskData } from "../../agent-dashboard/components/TaskFormSchema";
+import { 
+  fetchTenantCalendarTasks, 
+  selectTenantCalendarLoading, 
+  selectTenantCalendarTasks,
+  deleteTenantCalendarTask,
+} from "../state/reducers/tenant-calendar-slice";
+import { apiCreateTaskForTenant } from "/app/client/library-modules/apis/task/task-api";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { getTodayISODate } from "/app/client/library-modules/utils/date-utils";
+import { Tenant } from "/app/client/library-modules/domain-models/user/Tenant";
 
 export function TenantCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch(); 
+  const currentTenant = useAppSelector(
+    (state) => state.currentUser.currentUser
+  ) as Tenant | undefined;
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
-  const tasks = useAppSelector(selectTasks); // Retrieve tasks from Redux store
-  const loading = useAppSelector(selectLoading);
+  const tasks = useAppSelector(selectTenantCalendarTasks); // Retrieve tasks from Redux store
+  const loading = useAppSelector(selectTenantCalendarLoading);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [properties] = useState<PropertyOption[]>([]); // Tenants don't manage properties, so empty array
   useEffect(() => { 
     if (currentUser?.userId) {
-      dispatch(fetchTenantDetails(currentUser.userId)); // Fetch tasks for the current user
+      dispatch(fetchTenantCalendarTasks(currentUser.userId)); // Fetch tasks for the current user
     }
     else {
       console.warn("No user ID found. Please log in to view the calendar.");
@@ -26,6 +41,55 @@ export function TenantCalendar(): React.JSX.Element {
     setSelectedDate(formatted);
     setSelectedDateISO(iso);
   };
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
+
+  const handleTaskSubmit = async (taskData: TaskData) => {
+    if (!currentUser?.userId) {
+      console.error("No current user found");
+      return;
+    }
+
+    try {
+      const apiData = {
+        name: taskData.name,
+        description: taskData.description,
+        dueDate: new Date(taskData.dueDate),
+        priority: taskData.priority,
+        userId: currentUser.userId,
+        propertyAddress: taskData.propertyAddress,
+        propertyId: taskData.propertyId || "",
+      };
+
+      const createdTaskId = await apiCreateTaskForTenant(apiData);
+      console.log("Task created successfully with ID:", createdTaskId);
+
+      setIsModalOpen(false);
+      // Refresh tasks to show the newly created task
+      dispatch(fetchTenantCalendarTasks(currentUser.userId));
+    } catch (error) {
+      console.error("Error creating task:", error);
+    }
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    if (!currentTenant?.tenantId) {
+      console.error("No current tenant found");
+      return;
+    }
+
+    try {
+      await dispatch(deleteTenantCalendarTask({
+        taskId,
+        tenantId: currentTenant.tenantId
+      }));
+      console.log("Task deleted successfully");
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -35,7 +99,7 @@ export function TenantCalendar(): React.JSX.Element {
     <div className="min-h-screen">
       <div className="flex">
         <div className="flex-1 p-6">
-          <h1 className="text-2xl font-bold mb-6">Agent Calendar</h1>
+          <h1 className="text-2xl font-bold mb-6">Tenant Calendar</h1>
           <div className="flex gap-6">
             {/* Left: Calendar */}
             <div className="flex-1">
@@ -51,43 +115,30 @@ export function TenantCalendar(): React.JSX.Element {
                     ? selectedDate
                     : new Date().toLocaleDateString()}
                 </h2>
-                <ul className="space-y-4 mt-2">
-                  {tasks
-                    .filter((task) => task.dueDate === (selectedDateISO || getTodayISODate()))
-                    .map((task, index) => (
-                      <li key={index} className="p-4 rounded shadow bg-white border border-gray-200">
-                        <p className="font-bold text-lg">{task.name}</p>
-                        <p className="text-sm text-gray-600 mb-2">{task.dueDate}</p>
-                        {task.description && (
-                          <p className="text-xs text-gray-500">{task.description}</p>
-                        )}
-                        <div className="mt-2">
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            task.status === TaskStatus.COMPLETED
-                              ? "bg-green-100 text-green-800"
-                              : task.status === TaskStatus.INPROGRESS
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-blue-100 text-blue-800"
-                          }`}>
-                            {task.status}
-                          </span>
-                        </div>
-                      </li>
-                    ))}
-                  {tasks.filter(task => task.dueDate === (selectedDateISO || new Date().toISOString().slice(0,10))).length === 0 && (
-                    <p className="text-gray-500 italic">No tasks for this date</p>
-                  )}
-                </ul>
+                <CalendarTasksList 
+                  tasks={tasks}
+                  selectedDateISO={selectedDateISO}
+                  showPropertyAddress={false}
+                  onDeleteTask={handleDeleteTask}
+                />
                 <br />
-                <Button>Add Task</Button>
+                <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
 
             {/* Right Section: Upcoming Tasks */}
-            <UpcomingTasks tasks={tasks} />
-            </div>
+            <UpcomingTasks tasks={tasks} showViewAllButton={false} />
           </div>
         </div>
       </div>
-)}
+
+      <AddTaskModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleTaskSubmit}
+        properties={properties} // Empty array for tenants
+      />
+    </div>
+  );
+}
 

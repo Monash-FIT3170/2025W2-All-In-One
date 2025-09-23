@@ -1,8 +1,9 @@
-import { apiGetListingForProperty, apiSubmitDraftListing, apiGetAllListedListings, apiInsertPropertyListing, apiUpdatePropertyListingImages, apiInsertPropertyListingInspections } from "../../../apis/property-listing/listing-api";
+import { apiGetListingForProperty, apiSubmitDraftListing, apiGetAllListedListings, apiInsertPropertyListing, apiUpdatePropertyListingImages, apiInsertPropertyListingInspections, addTenantToInspectionApi } from "../../../apis/property-listing/listing-api";
 import { Listing } from "/app/client/library-modules/domain-models/property-listing/Listing";
 import { mapApiListingToListing } from "./mappers/listing-mapper";
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
 import { ListingStatus } from "/app/shared/api-models/property-listing/ListingStatus";
+import { PropertyListingInspectionDocument } from "/app/server/database/property-listing/models/PropertyListingInspectionDocument";
 
 
 export async function getListingByPropertyId(id: string): Promise<Listing> {
@@ -26,13 +27,14 @@ export async function insertPropertyListing(
   propertyId: string,
   imageUrls: string[],
   status: ListingStatus,
-  inspectionIds: string[]
+  inspectionIds: string[],
+  leaseTerm: string
 ): Promise<string> {
-  return await apiInsertPropertyListing(propertyId, imageUrls, status, inspectionIds);
+  return await apiInsertPropertyListing(propertyId, imageUrls, status, inspectionIds, leaseTerm);
 }
 
 export async function insertPropertyListingInspections(
-  propertyListingInspections: { start_time: Date; end_time: Date }[]
+  propertyListingInspections: { start_time: Date; end_time: Date; tenant_ids: string[]; }[]
 ): Promise<string[]> {
   return apiInsertPropertyListingInspections(propertyListingInspections);
 }
@@ -42,4 +44,14 @@ export async function updatePropertyListingImages(
   imageUrls: string[]
 ): Promise<{ success: boolean; propertyId: string }> {
   return await apiUpdatePropertyListingImages(propertyId, imageUrls);
+}
+
+
+export class ListingRepository {
+  async addTenantToInspection(
+    inspectionId: string,
+    tenantId: string
+  ): Promise<PropertyListingInspectionDocument> {
+    return await addTenantToInspectionApi(inspectionId, tenantId);
+  }
 }

@@ -4,6 +4,7 @@ import { AgentDocument } from "./models/role-models/AgentDocument";
 import { TenantDocument } from "./models/role-models/TenantDocument";
 import { LandlordDocument } from "./models/role-models/LandlordDocument";
 import { ProfileDataDocument } from "./models/role-models/ProfileDataDocument";
+import { LoginHistoryDocument } from "./models/LoginHistoryDocument";
 
 export const UserAccountCollection: Mongo.Collection<UserAccountDocument> =
 	new Mongo.Collection("user_accounts");
@@ -15,3 +16,5 @@ export const LandlordCollection: Mongo.Collection<LandlordDocument> =
 	new Mongo.Collection("landlords");
 export const ProfileCollection: Mongo.Collection<ProfileDataDocument> =
 	new Mongo.Collection("profile_data");
+export const LoginHistoryCollection: Mongo.Collection<LoginHistoryDocument> =
+    new Mongo.Collection("login_history");

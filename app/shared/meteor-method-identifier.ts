@@ -1,8 +1,11 @@
 export enum MeteorMethodIdentifier {
-	TASK_INSERT_FOR_AGENT = "tasks.insertForAgent",
-	TASK_INSERT_FOR_LANDLORD = "tasks.insertForLandlord",
-	TASK_UPDATE_FOR_AGENT = "tasks.updateForAgent",
-	TASK_UPDATE_FOR_LANDLORD = "tasks.updateForLandlord",
+	TASK_INSERT_FOR_AGENT = "tasks.insertForAgent", // Creates a new task for an agent
+	TASK_INSERT_FOR_LANDLORD = "tasks.insertForLandlord", // Creates a new task for a landlord
+	TASK_INSERT_FOR_TENANT = "tasks.insertForTenant", // Creates a new task for a tenant
+	TASK_UPDATE = "tasks.update", // Updates an existing task (role-agnostic since only task data is modified)
+	TASK_DELETE_FOR_AGENT = "tasks.deleteForAgent", // Deletes a task for an agent and removes it from their task list
+	TASK_DELETE_FOR_LANDLORD = "tasks.deleteForLandlord", // Deletes a task for a landlord and removes it from their task list
+	TASK_DELETE_FOR_TENANT = "tasks.deleteForTenant", // Deletes a task for a tenant and removes it from their task list
 	TASK_GET_ALL = "tasks.getAll",
 	TASK_GET = "tasks.getOne",
 	TASK_GET_MULTIPLE = "tasks.getMultiple",
@@ -20,6 +23,7 @@ export enum MeteorMethodIdentifier {
 	LISTING_STATUS_GET_BY_NAME = "listings.getStatusByName", // Get listing status document by name
 	LISTING_GET_ALL_LISTED = "listings.getAllListed",
 	LISTING_UPDATE_IMAGES = "listings.updateImages", // Update images of a draft listing
+	LISTING_UPDATE_DATA = "listings.updateData", // Update listing data (lease term, inspection times)
 	INSERT_PROPERTY_LISTING = "listings.insertProperty",
 	INSERT_PROPERTY_LISTING_INSPECTION = "inspections.insert",
 	USER_REGISTER = "user.register",
@@ -28,13 +32,14 @@ export enum MeteorMethodIdentifier {
 	AGENT_INSERT = "agents.insert",
 	AGENT_GET = "agents.getOne",
 	AGENT_GET_BY_AGENT_ID = "agents.getByAgentId", // Get agent by agent ID (not user ID)
-	AGENT_UPDATE_TASKS = "agents.updateTasks", // Adds the id of the newly created task to the agent's task_ids
+	AGENT_ADD_TASK = "agents.addTask", // Adds a task to agent's task_ids array
 	TENANT_INSERT = "tenants.insert",
 	TENANT_GET = "tenants.getOne",
+	TENANT_ADD_TASK = "tenants.addTask", // Adds a task to tenant's task_ids array
 	LANDLORD_INSERT = "landlords.insert",
 	LANDLORD_GET = "landlords.getOne",
 	LANDLORD_GET_BY_LANDLORD_ID = "landlords.getByLandlordId", // Get landlord by landlord ID (not user ID)
-	LANDLORD_UPDATE_TASKS = "landlords.updateTasks", // Adds the id of the newly created task to the landlord's task_ids
+	LANDLORD_ADD_TASK = "landlords.addTask", // Adds a task to landlord's task_ids array
 	LANDLORD_GET_ALL = "landlords.getAll", // Get All Landlords
 	PROPERTY_STATUS_GET = "propertyStatus.getOne", // Find ID of property status by name
 	PROPERTY_GET_BY_TENANT_ID = "property.getByTenantId",
@@ -73,4 +78,9 @@ export enum MeteorMethodIdentifier {
 	LEASE_AGREEMENT_DELETE = "leaseAgreements.deleteOne",
 	LEASE_AGREEMENT_LIST_FOR_AGENT = "leaseAgreements.listForAgent",
 	LEASE_AGREEMENT_LIST_FOR_PROPERTY = "leaseAgreements.listForProperty",
+	SIGN_DOCUMENT = "leaseAgreements.signDocument", // Generic signing method that takes role into account
+	LOGIN_HISTORY_INSERT = "loginHistory.insert",
+	LOGIN_HISTORY_GET_FOR_USER = "loginHistory.getForUser",
+	VALIDATE_PASSWORD = "password.validate",
+	ADD_TENANT_TO_INSPECTION = "inspection.addTenant"
 }

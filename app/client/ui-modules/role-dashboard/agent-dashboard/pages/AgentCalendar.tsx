@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
-  selectTasks,
-  selectLoading,
-  fetchAgentTasks,
-  selectMarkers,
-} from "../state/agent-dashboard-slice";
+  selectCalendarTasks,
+  selectCalendarLoading,
+  fetchAgentCalendarTasks,
+  selectCalendarMarkers,
+  deleteCalendarTask,
+} from "../state/agent-calendar-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
 import { AddTaskModal } from "../components/AddTaskModal";
@@ -13,23 +14,25 @@ import { apiCreateTaskForAgent } from "/app/client/library-modules/apis/task/tas
 import { PropertyOption, TaskData } from "../components/TaskFormSchema";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { UpcomingTasks } from "../../components/UpcomingTask";
+import { CalendarTasksList } from "../../components/CalendarTasksList";
 import { TaskMap, TaskMapUiState } from "../components/TaskMap";
 import {
   getTodayISODate,
   getTodayAUDate,
 } from "/app/client/library-modules/utils/date-utils";
-import { fetchPropertiesForAgent } from "../state/agent-dashboard-slice";
+import { fetchPropertiesForAgentCalendar } from "../state/agent-calendar-slice";
 import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
-import { fetchMarkersForDate } from "../state/agent-dashboard-slice";
+import { fetchCalendarMarkersForDate } from "../state/agent-calendar-slice";
+import { LoadingSpinner } from "../../../common/LoadingSpinner";
 export function AgentCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const currentAgent = useAppSelector(
     (state) => state.currentUser.currentUser
   ) as Agent | undefined;
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
-  const tasks = useAppSelector(selectTasks);
-  const loading = useAppSelector(selectLoading);
-  const markers = useAppSelector(selectMarkers);
+  const tasks = useAppSelector(selectCalendarTasks);
+  const loading = useAppSelector(selectCalendarLoading);
+  const markers = useAppSelector(selectCalendarMarkers);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
@@ -44,15 +47,15 @@ export function AgentCalendar(): React.JSX.Element {
   // Fetch tasks for the current user
   useEffect(() => {
     if (currentUser?.userId) {
-      dispatch(fetchAgentTasks(currentUser.userId));
-      console.log("Fetching agent tasks");
+      dispatch(fetchAgentCalendarTasks(currentUser.userId));
+      console.log("Fetching agent calendar tasks");
     }
   }, [dispatch, currentUser?.userId]);
 
   // Fetch properties for the agent
   useEffect(() => {
     if (!currentAgent?.agentId) return;
-    fetchPropertiesForAgent(currentAgent.agentId)
+    fetchPropertiesForAgentCalendar(currentAgent.agentId)
       .then(setProperties)
       .catch((err) => console.error("Failed to fetch properties:", err));
   }, [currentAgent?.agentId]);
@@ -61,7 +64,7 @@ export function AgentCalendar(): React.JSX.Element {
 
   useEffect(() => {
     dispatch(
-      fetchMarkersForDate({
+      fetchCalendarMarkersForDate({
         tasks,
         selectedDateISO: selectedDateISO ?? undefined,
       })
@@ -98,13 +101,30 @@ export function AgentCalendar(): React.JSX.Element {
       console.log("Task created successfully with ID:", createdTaskId);
 
       setIsModalOpen(false);
-      dispatch(fetchAgentTasks(currentUser.userId));
+      dispatch(fetchAgentCalendarTasks(currentUser.userId));
     } catch (error) {
       console.error("Error creating task:", error);
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  const handleDeleteTask = async (taskId: string) => {
+    if (!currentAgent?.agentId) {
+      console.error("No current agent found");
+      return;
+    }
+
+    try {
+      await dispatch(deleteCalendarTask({
+        taskId,
+        agentId: currentAgent.agentId
+      }));
+      console.log("Task deleted successfully");
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+
+  if (loading) return <LoadingSpinner message="Loading your calendar..." />;
 
   return (
     <div className="min-h-screen">
@@ -123,59 +143,18 @@ export function AgentCalendar(): React.JSX.Element {
                 <h2 className="text-lg font-semibold">
                   {selectedDate ? selectedDate : getTodayAUDate()}
                 </h2>
-                <ul className="space-y-4 mt-2">
-                  {tasks
-                    .filter(
-                      (task) =>
-                        task.dueDate === (selectedDateISO || getTodayISODate())
-                    )
-                    .map((task, index) => (
-                      <li
-                        key={index}
-                        className="p-4 rounded shadow bg-white border border-gray-200"
-                      >
-                        <p className="font-bold text-lg">{task.name}</p>
-                        <p className="text-sm text-gray-600 mb-2">
-                          {task.dueDate}
-                        </p>
-                        {task.description && (
-                          <p className="text-xs text-gray-500">
-                            {task.description}
-                          </p>
-                        )}
-                        <p className="text-sm text-gray-700 mt-1">
-                          {task.propertyAddress}
-                        </p>
-                        <div className="mt-2">
-                          <span
-                            className={`text-xs px-2 py-1 rounded-full ${
-                              task.status === TaskStatus.COMPLETED
-                                ? "bg-green-100 text-green-800"
-                                : task.status === TaskStatus.INPROGRESS
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-blue-100 text-blue-800"
-                            }`}
-                          >
-                            {task.status}
-                          </span>
-                        </div>
-                      </li>
-                    ))}
-                  {tasks.filter(
-                    (task) =>
-                      task.dueDate === (selectedDateISO || getTodayISODate())
-                  ).length === 0 && (
-                    <p className="text-gray-500 italic">
-                      No tasks for this date
-                    </p>
-                  )}
-                </ul>
+                <CalendarTasksList 
+                  tasks={tasks}
+                  selectedDateISO={selectedDateISO}
+                  showPropertyAddress={true}
+                  onDeleteTask={handleDeleteTask}
+                />
                 <br />
                 <TaskMap mapUiState={mapUiState} className="mb-3" />
                 <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
-            <UpcomingTasks tasks={tasks} />
+            <UpcomingTasks tasks={tasks} showViewAllButton={false} />
           </div>
         </div>
       </div>
