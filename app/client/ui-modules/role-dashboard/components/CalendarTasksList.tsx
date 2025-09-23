@@ -9,16 +9,24 @@ interface CalendarTasksListProps {
   selectedDateISO: string | null;
   showPropertyAddress?: boolean; // true for Agent/Landlord, false for Tenant
   onDeleteTask?: (taskId: string) => void; // Callback for delete functionality
+  onUpdateTaskStatus?: (taskId: string, status: TaskStatus) => void; // Callback for status update functionality
 }
 
 export function CalendarTasksList({
   tasks,
   selectedDateISO,
   showPropertyAddress = true,
-  onDeleteTask
+  onDeleteTask,
+  onUpdateTaskStatus
 }: CalendarTasksListProps): React.JSX.Element {
   const targetDate = selectedDateISO || getTodayISODate();
   const filteredTasks = tasks.filter((task) => task.dueDate === targetDate);
+
+  const handleStatusChange = (taskId: string, newStatus: string) => {
+    if (onUpdateTaskStatus && Object.values(TaskStatus).includes(newStatus as TaskStatus)) {
+      onUpdateTaskStatus(taskId, newStatus as TaskStatus);
+    }
+  };
 
   return (
     <ul className="space-y-4 mt-2">
@@ -44,17 +52,35 @@ export function CalendarTasksList({
                 </p>
               )}
               <div className="mt-2">
-                <span
-                  className={`text-xs px-2 py-1 rounded-full ${
-                    task.status === TaskStatus.COMPLETED
-                      ? "bg-green-100 text-green-800"
-                      : task.status === TaskStatus.INPROGRESS
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-blue-100 text-blue-800"
-                  }`}
-                >
-                  {task.status}
-                </span>
+                {onUpdateTaskStatus ? (
+                  <select
+                    value={task.status}
+                    onChange={(e) => handleStatusChange(task.taskId, e.target.value)}
+                    className={`text-xs px-2 py-1 rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-offset-1 cursor-pointer ${
+                      task.status === TaskStatus.COMPLETED
+                        ? "bg-green-100 text-green-800 focus:ring-green-500"
+                        : task.status === TaskStatus.INPROGRESS
+                          ? "bg-yellow-100 text-yellow-800 focus:ring-yellow-500"
+                          : "bg-blue-100 text-blue-800 focus:ring-blue-500"
+                    }`}
+                  >
+                    <option value={TaskStatus.NOTSTARTED}>{TaskStatus.NOTSTARTED}</option>
+                    <option value={TaskStatus.INPROGRESS}>{TaskStatus.INPROGRESS}</option>
+                    <option value={TaskStatus.COMPLETED}>{TaskStatus.COMPLETED}</option>
+                  </select>
+                ) : (
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full ${
+                      task.status === TaskStatus.COMPLETED
+                        ? "bg-green-100 text-green-800"
+                        : task.status === TaskStatus.INPROGRESS
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-blue-100 text-blue-800"
+                    }`}
+                  >
+                    {task.status}
+                  </span>
+                )}
               </div>
             </div>
             {onDeleteTask && (
