@@ -3,7 +3,8 @@ import { RootState } from "../../../../../store";
 import { getTenantById } from "/app/client/library-modules/domain-models/user/role-repositories/tenant-repository";
 import { getTaskById } from "/app/client/library-modules/domain-models/task/repositories/task-repository";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
-import { apiDeleteTaskForTenant } from "/app/client/library-modules/apis/task/task-api";
+import { apiDeleteTaskForTenant, apiUpdateTask } from "/app/client/library-modules/apis/task/task-api";
+import { TaskStatus } from "/app/shared/task-status-identifier";
 
 interface TenantCalendarState {
   tasks: Task[];
@@ -73,6 +74,23 @@ export const deleteTenantCalendarTask = createAsyncThunk(
   }
 );
 
+export const updateTenantCalendarTaskStatus = createAsyncThunk(
+  "tenantCalendar/updateTenantCalendarTaskStatus",
+  async (args: { taskId: string; status: TaskStatus }, { getState }) => {
+    try {
+      await apiUpdateTask({
+        taskId: args.taskId,
+        status: args.status
+      });
+      
+      return { taskId: args.taskId, status: args.status }; // Return updated data for state update
+    } catch (error) {
+      console.error("Error updating tenant task status:", error);
+      throw error;
+    }
+  }
+);
+
 export const tenantCalendarSlice = createSlice({
   name: "tenantCalendar",
   initialState,
@@ -100,6 +118,20 @@ export const tenantCalendarSlice = createSlice({
       })
       .addCase(deleteTenantCalendarTask.rejected, (state, action) => {
         state.error = action.error.message || "Failed to delete task";
+      })
+      .addCase(updateTenantCalendarTaskStatus.pending, (state) => {
+        // Keep UI responsive during update
+      })
+      .addCase(updateTenantCalendarTaskStatus.fulfilled, (state, action) => {
+        // Update the task status in state
+        const { taskId, status } = action.payload;
+        const taskIndex = state.tasks.findIndex(task => task.taskId === taskId);
+        if (taskIndex !== -1) {
+          state.tasks[taskIndex].status = status;
+        }
+      })
+      .addCase(updateTenantCalendarTaskStatus.rejected, (state, action) => {
+        state.error = action.error.message || "Failed to update task status";
       });
   },
 });

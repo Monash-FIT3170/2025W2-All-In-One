@@ -7,7 +7,8 @@ import { getTaskById } from "/app/client/library-modules/domain-models/task/repo
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { PropertyOption } from "../components/TaskFormSchema";
 import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
-import { apiDeleteTaskForAgent } from "/app/client/library-modules/apis/task/task-api";
+import { apiDeleteTaskForAgent, apiUpdateTask } from "/app/client/library-modules/apis/task/task-api";
+import { TaskStatus } from "/app/shared/task-status-identifier";
 
 interface AgentCalendarState {
   tasks: Task[];
@@ -102,6 +103,23 @@ export const deleteCalendarTask = createAsyncThunk(
   }
 );
 
+export const updateAgentCalendarTaskStatus = createAsyncThunk(
+  "agentCalendar/updateAgentCalendarTaskStatus",
+  async (args: { taskId: string; status: TaskStatus }, { getState }) => {
+    try {
+      await apiUpdateTask({
+        taskId: args.taskId,
+        status: args.status
+      });
+      
+      return { taskId: args.taskId, status: args.status }; // Return updated data for state update
+    } catch (error) {
+      console.error("Error updating agent task status:", error);
+      throw error;
+    }
+  }
+);
+
 export const agentCalendarSlice = createSlice({
   name: "agentCalendar",
   initialState,
@@ -138,6 +156,20 @@ export const agentCalendarSlice = createSlice({
       })
       .addCase(deleteCalendarTask.rejected, (state, action) => {
         state.error = action.error.message || "Failed to delete task";
+      })
+      .addCase(updateAgentCalendarTaskStatus.pending, (state) => {
+        // Keep UI responsive during update
+      })
+      .addCase(updateAgentCalendarTaskStatus.fulfilled, (state, action) => {
+        // Update the task status in state
+        const { taskId, status } = action.payload;
+        const taskIndex = state.tasks.findIndex(task => task.taskId === taskId);
+        if (taskIndex !== -1) {
+          state.tasks[taskIndex].status = status;
+        }
+      })
+      .addCase(updateAgentCalendarTaskStatus.rejected, (state, action) => {
+        state.error = action.error.message || "Failed to update task status";
       });
   },
 });
