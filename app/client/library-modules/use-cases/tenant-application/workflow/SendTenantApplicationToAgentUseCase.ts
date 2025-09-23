@@ -5,8 +5,8 @@ import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
 import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
 import { calculateDueDate } from "/app/client/library-modules/utils/date-utils";
-import { notifyRejectedApplicantsUseCase } from "./NotifyRejectedApplicantsUseCase";
-
+import { notifyRejectedApplicantsUseCase } from "../NotifyRejectedApplicantsUseCase";
+import { notifyChosenTenantUseCase } from "../NotifyChosenTenantUseCase";
 /*WILL SEPARATE THESE USE CASES INTO SEPARATE FILES LATER*/
 
 export async function sendApprovedApplicationsToAgentUseCase(
@@ -128,6 +128,15 @@ export async function sendApprovedApplicationsToAgentUseCase(
     if (!existingTaskId) {
         throw new Error('No linked task ID found for final approved applications');
       }
+
+    // Notify the chosen tenant
+    if (chosenApplication.tenantUserId) {
+      await notifyChosenTenantUseCase(
+        propertyId,
+        chosenApplication.tenantUserId,
+        chosenApplication.applicantName
+      );
+    }
     // Update task for agent
     const taskResult = await updateTaskForAgent({
       taskId: existingTaskId,
