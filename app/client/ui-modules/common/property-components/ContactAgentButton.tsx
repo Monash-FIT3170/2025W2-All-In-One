@@ -47,7 +47,6 @@ export function ContactAgentButton({
       if (existingConversation) {
         // Use existing conversation
         conversationId = existingConversation.conversationId;
-        console.log("Using existing conversation:", conversationId);
       } else {
         // Create new conversation
         const newConversationData = {
@@ -60,23 +59,20 @@ export function ContactAgentButton({
           }
         };
 
-        console.log("Creating new conversation with data:", newConversationData);
         try {
           conversationId = await apiInsertConversation(newConversationData);
-          console.log("Created new conversation:", conversationId);
         } catch (insertError) {
           console.error("Failed to create conversation:", insertError);
           throw insertError;
         }
 
         // Refresh conversations to include the new one
-        dispatch(fetchConversations());
+        await dispatch(fetchConversations()).unwrap();
       }
 
       // Navigate to messages page with conversationId in state
-      console.log("Navigating to messages with conversationId:", conversationId);
       navigate(NavigationPath.TenantMessages, {
-        state: { conversationId }
+        state: { conversationId, agentId, shouldAutoSelect: true }
       });
     } catch (error) {
       console.error("Error handling contact agent:", error);

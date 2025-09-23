@@ -54,14 +54,61 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
 
   // Auto-select conversation from navigation state
   useEffect(() => {
-    const state = location.state as { conversationId?: string } | null;
-    if (state?.conversationId && conversations.length > 0 && !activeConversationId) {
+    const state = location.state as { conversationId?: string; agentId?: string; shouldAutoSelect?: boolean } | null;
+    if (state?.conversationId && state.shouldAutoSelect && conversations.length > 0) {
       const conversation = conversations.find(c => c.id === state.conversationId);
       if (conversation) {
-        console.log("Auto-selecting conversation from navigation state:", state.conversationId);
         dispatch(setActiveConversation(state.conversationId));
         dispatch(resetUnreadCount(state.conversationId));
         dispatch(addActiveUser(state.conversationId));
+      } else {
+        // If conversation not found, try to refresh conversations in case it was just created
+        if (!conversationsLoading) {
+          dispatch(fetchConversations());
+        }
+      }
+    }
+  }, [conversations, location.state, dispatch, conversationsLoading]);
+
+  // Additional effect to ensure conversation selection works even if activeConversationId is already set
+  useEffect(() => {
+    const state = location.state as { conversationId?: string; agentId?: string; shouldAutoSelect?: boolean } | null;
+    if (state?.conversationId && state.shouldAutoSelect && conversations.length > 0) {
+      const conversation = conversations.find(c => c.id === state.conversationId);
+      if (conversation && activeConversationId !== state.conversationId) {
+        dispatch(setActiveConversation(state.conversationId));
+        dispatch(resetUnreadCount(state.conversationId));
+        dispatch(addActiveUser(state.conversationId));
+      }
+    }
+  }, [conversations, activeConversationId, location.state, dispatch]);
+
+  // Retry mechanism for conversation selection with timeout
+  useEffect(() => {
+    const state = location.state as { conversationId?: string; agentId?: string; shouldAutoSelect?: boolean } | null;
+    if (state?.conversationId && state.shouldAutoSelect) {
+      const conversationId = state.conversationId;
+      const trySelectConversation = () => {
+        const conversation = conversations.find(c => c.id === conversationId);
+        if (conversation && activeConversationId !== conversationId) {
+          dispatch(setActiveConversation(conversationId));
+          dispatch(resetUnreadCount(conversationId));
+          dispatch(addActiveUser(conversationId));
+          return true;
+        }
+        return false;
+      };
+
+      // Try immediately
+      if (!trySelectConversation()) {
+        // If not found, try again after a short delay
+        const timeoutId = setTimeout(() => {
+          if (!trySelectConversation()) {
+            // Conversation still not found after retry
+          }
+        }, 1000);
+
+        return () => clearTimeout(timeoutId);
       }
     }
   }, [conversations, activeConversationId, location.state, dispatch]);
