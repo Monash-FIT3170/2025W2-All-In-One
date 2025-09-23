@@ -119,6 +119,7 @@ export function PropertyListingPage({
       <>
         <ListingPageContent
           propertyId={state.propertyId}
+          agentId={state.agentId}
           streetNumber={state.streetNumber}
           street={state.street}
           suburb={state.suburb}
@@ -214,6 +215,7 @@ export function PropertyListingPage({
 
 function ListingPageContent({
   propertyId,
+  agentId,
   streetNumber,
   street,
   suburb,
@@ -252,6 +254,7 @@ function ListingPageContent({
   tenantId,
 }: {
   propertyId: string;
+  agentId: string;
   streetNumber: string;
   street: string;
   suburb: string;
@@ -417,6 +420,7 @@ function ListingPageContent({
       />
       <ListingHero
         propertyId={propertyId}
+        agentId={agentId}
         streetNumber={streetNumber}
         street={street}
         suburb={suburb}
@@ -559,6 +563,7 @@ function TopBar({
 
 function ListingHero({
   propertyId,
+  agentId,
   className = "",
   streetNumber,
   street,
@@ -583,6 +588,7 @@ function ListingHero({
   hasApplied,
 }: {
   propertyId: string;
+  agentId: string;
   className?: string;
   streetNumber: string;
   street: string;
@@ -648,7 +654,7 @@ function ListingHero({
           )}
 
           {userRole === Role.TENANT && (
-            <ContactAgentButton propertyId={propertyId} />
+            <ContactAgentButton propertyId={propertyId} agentId={agentId} />
           )}
         </div>
       </div>
@@ -715,7 +721,6 @@ function BottomBar({
   onReviewTenant: () => void;
   className?: string;
 }): React.JSX.Element {
-  ListingPageContent;
   return (
     <div
       className={twMerge("flex justify-between items-center gap-2", className)}

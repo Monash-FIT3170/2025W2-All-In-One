@@ -6,20 +6,83 @@ import {
 import { twMerge } from "tailwind-merge";
 import { useNavigate } from "react-router";
 import { NavigationPath } from "/app/client/navigation";
+import { useAppDispatch, useAppSelector } from "/app/client/store";
+import { fetchConversations } from "/app/client/ui-modules/role-messages/state/reducers/messages-slice";
+import { apiGetConversationsForTenant, apiInsertConversation } from "/app/client/library-modules/apis/messaging/messaging-api";
+import { Role } from "/app/shared/user-role-identifier";
 
 export function ContactAgentButton({
   propertyId,
+  agentId,
   className="",
 }: {
   propertyId: string;
+  agentId: string;
   className?: string;
 }): React.JSX.Element {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const currentUser = useAppSelector((state) => state.currentUser.currentUser);
+  const authUser = useAppSelector((state) => state.currentUser.authUser);
 
-  const handleClick = () => {
-    navigate(NavigationPath.TenantMessages, {
-      state: { propertyId }
-    });
+  const handleClick = async () => {
+    if (!currentUser || !authUser || authUser.role !== Role.TENANT) {
+      console.error("User not authenticated or not a tenant");
+      return;
+    }
+
+    const tenantId = (currentUser as any).tenantId;
+
+    try {
+      // Get existing conversations for this tenant
+      const existingConversations = await apiGetConversationsForTenant(tenantId);
+
+      // Check if tenant already has a conversation with this agent
+      const existingConversation = existingConversations.find(
+        conv => conv.agentId === agentId
+      );
+
+      let conversationId: string;
+
+      if (existingConversation) {
+        // Use existing conversation
+        conversationId = existingConversation.conversationId;
+        console.log("Using existing conversation:", conversationId);
+      } else {
+        // Create new conversation
+        const newConversationData = {
+          agentId: agentId,
+          tenantId: tenantId,
+          propertyId: propertyId,
+          unreadCounts: {
+            [agentId]: 0,
+            [tenantId]: 0
+          }
+        };
+
+        console.log("Creating new conversation with data:", newConversationData);
+        try {
+          conversationId = await apiInsertConversation(newConversationData);
+          console.log("Created new conversation:", conversationId);
+        } catch (insertError) {
+          console.error("Failed to create conversation:", insertError);
+          throw insertError;
+        }
+
+        // Refresh conversations to include the new one
+        dispatch(fetchConversations());
+      }
+
+      // Navigate to messages page with conversationId in state
+      console.log("Navigating to messages with conversationId:", conversationId);
+      navigate(NavigationPath.TenantMessages, {
+        state: { conversationId }
+      });
+    } catch (error) {
+      console.error("Error handling contact agent:", error);
+      // Fallback to just navigating to messages
+      navigate(NavigationPath.TenantMessages);
+    }
   };
   return (
     <ThemedButton
