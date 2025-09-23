@@ -122,9 +122,10 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
         updatedAt: conv.updatedAt ? (conv.updatedAt instanceof Date ? conv.updatedAt.toISOString() : conv.updatedAt) : new Date().toISOString()
       }));
       
-      dispatch(setConversationsFromSubscription({ 
-        conversations: apiConversations, 
-        currentUserId 
+      dispatch(setConversationsFromSubscription({
+        conversations: apiConversations,
+        currentUserId,
+        dispatch
       }));
     }
   }, [conversations, conversationsReady, dispatch, currentUserId]);
