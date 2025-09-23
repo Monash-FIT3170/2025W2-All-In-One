@@ -12,9 +12,10 @@ interface ChatWindowProps {
   messageText: string;
   onChangeMessage: (value: string) => void;
   onSend: () => void;
+  placeholderMessage?: string;
 }
 
-export function ChatWindow({ header, messages, messageText, onChangeMessage, onSend }: ChatWindowProps) {
+export function ChatWindow({ header, messages, messageText, onChangeMessage, onSend, placeholderMessage }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -94,7 +95,7 @@ export function ChatWindow({ header, messages, messageText, onChangeMessage, onS
         </>
       ) : (
         <div className="flex-1 flex items-center justify-center text-gray-500">
-          <p>Select a conversation to start messaging</p>
+          <p>{placeholderMessage || "Select a conversation to start messaging"}</p>
         </div>
       )}
     </div>

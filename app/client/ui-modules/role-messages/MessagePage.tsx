@@ -212,6 +212,7 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
           messageText={messageText}
           onChangeMessage={handleChangeMessage}
           onSend={handleSend}
+          placeholderMessage={conversations.length === 0 ? "No conversations yet" : undefined}
         />
       </div>
     </div>
