@@ -1,5 +1,5 @@
 import React from "react";
-import { CardWidget } from "../../role-dashboard/components/CardWidget";
+import { CardWidget } from "../../common/CardWidget";
 
 export function PropertyCardBlank() {
   return (
@@ -9,7 +9,7 @@ export function PropertyCardBlank() {
         value=""
         className="w-full overflow-hidden h-full flex flex-col text-center"
       >
-        {/* Image Placeholer */}
+        {/* Image */}
         <div className="relative">
           <div className="h-48 w-full bg-gray-300 animate-pulse" />
           {/* Status Pill */}

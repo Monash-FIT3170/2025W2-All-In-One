@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router";
 import { Button } from "../../../theming-shadcn/Button";
-import { CardWidget } from "../../components/CardWidget";
+import { CardWidget } from "../../../common/CardWidget";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { NavigationPath } from "/app/client/navigation";
