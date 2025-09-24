@@ -5,14 +5,26 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import "../themes/calendar"; // Import your CSS file for custom styles
 
+
+type Priority = "low" | "medium" | "high";
+export type DateBadge = { total: number; counts: Partial<Record<Priority, number>> };
+export type DateBadgesMap = Record<string, DateBadge>;
+
+
 type Props = {
   onDateSelect: (formatted: string, iso: string) => void;
   selectedDateISO: string | null;
+  dateBadges?: DateBadgesMap
 };
+
+const fmtISO = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
 
 export function Calendar({
   onDateSelect,
   selectedDateISO,
+  dateBadges
 }: Props): React.JSX.Element {
   const getSuffix = (day: number) => {
     if (day > 3 && day < 21) return "th";
@@ -27,6 +39,7 @@ export function Calendar({
         return "th";
     }
   };
+
 
   const handleDateClick = (info: any) => {
     const clickedDate = info.dateStr; // This should be in YYYY-MM-DD format
@@ -65,6 +78,49 @@ export function Calendar({
         args.el.classList.add("selected-day");
       }
     }
+  
+    // new code
+  if (!dateStr) return; // guard weird cells
+  const iso = fmtISO(args.date)
+
+  const badge = dateBadges?.[iso];
+  const frame: HTMLElement =
+    args.el.querySelector(".fc-daygrid-day-frame") ?? args.el;
+
+  // remove old badges so we don't duplicate on rerenders
+  frame.querySelector(".fc-badges")?.remove();
+
+  if (!badge?.total) return;
+
+  // build dots
+  const container = document.createElement("div");
+  container.className = "absolute bottom-1 left-0 w-full flex gap-1 px-1";
+
+  const high = badge.counts.high ?? 0;
+  const med  = badge.counts.medium ?? 0;
+  const dots = Math.min(badge.total, 3);
+
+  for (let i = 0; i < dots; i++) {
+  const dot = document.createElement("div");
+  dot.className =
+    "flex-1 h-2 rounded-full " +
+    (i < high
+      ? "bg-red-500"
+      : i < high + med
+      ? "bg-yellow-400"
+      : "bg-green-500");
+  container.appendChild(dot);
+  }
+
+  if (badge.total > 3) {
+    const more = document.createElement("div");
+    more.className = "absolute bottom-2 right-1 text-[10px] text-gray-600";
+    more.textContent = `+${badge.total - 3}`;
+    container.appendChild(more);
+  }
+
+  frame.appendChild(container);
+      
   };
 
   return (

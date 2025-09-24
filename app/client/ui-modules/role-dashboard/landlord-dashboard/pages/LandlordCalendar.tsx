@@ -33,8 +33,8 @@ export function LandlordCalendar(): React.JSX.Element {
   const loading = useAppSelector(selectLandlordCalendarLoading);
   const markers = useAppSelector(selectLandlordCalendarMarkers);
 
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(getTodayAUDate());
+  const [selectedDateISO, setSelectedDateISO] = useState<string | null>(getTodayISODate());
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [properties, setProperties] = useState<PropertyOption[]>([]);
   const [mapUiState, setMapUiState] = useState<TaskMapUiState>({ markers: [] });
@@ -79,6 +79,31 @@ export function LandlordCalendar(): React.JSX.Element {
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+
+  // 
+  const toISODateOnly = (d: string | Date) => {
+    const dt = typeof d === "string" ? new Date(d) : d;
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, "0");
+    const day = String(dt.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  type Priority = "low" | "medium" | "high";
+
+  const dateBadges = React.useMemo(() => {
+    const map: Record<string, { total: number; counts: Partial<Record<Priority, number>> }> = {};
+    for (const t of tasks as any[]) {
+      if (!t?.dueDate) continue;
+      const iso = toISODateOnly(t.dueDate);
+      const p: Priority = (t.priority as Priority) ?? "medium";
+      map[iso] ??= { total: 0, counts: {} };
+      map[iso].total += 1;
+      map[iso].counts[p] = (map[iso].counts[p] ?? 0) + 1;
+    }
+    return map;
+  }, [tasks]);
+
 
   const handleTaskSubmit = async (taskData: TaskData) => {
     if (!currentUser?.userId) {
@@ -139,6 +164,7 @@ export function LandlordCalendar(): React.JSX.Element {
               <Calendar
                 selectedDateISO={selectedDateISO}
                 onDateSelect={handleDateSelection}
+                dateBadges={dateBadges}
               />
 
               <div className="mt-4">
