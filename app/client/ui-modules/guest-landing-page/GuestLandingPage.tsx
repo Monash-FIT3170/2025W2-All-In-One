@@ -68,7 +68,15 @@ export function GuestLandingPage() {
             </Button>
           </div>
           <div className="py-10 text-center">
-            {error || listedProperties.length === 0 ? (
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-items-center px-4">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <PropertyCardBlank key={i} />
+                ))}
+              </div>
+            ) : error ? (
+              <div>{error}</div>
+            ) : !listedProperties || listedProperties.length === 0 ? (
               <div>
                 No properties found at the moment. Please check back later!
               </div>
@@ -78,16 +86,11 @@ export function GuestLandingPage() {
                   Featured Rental Properties
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-items-center px-4">
-                  {isLoading
-                    ? Array.from({ length: 6 }).map((_, i) => (
-                        <PropertyCardBlank key={i} />
-                      ))
-                    : listedProperties
-                        .slice(0, visibleCount)
-                        .map((prop) => (
-                          <PropertyCard key={prop.propertyId} {...prop} />
-                        ))}
+                  {listedProperties.slice(0, visibleCount).map((prop) => (
+                    <PropertyCard key={prop.propertyId} {...prop} />
+                  ))}
                 </div>
+
                 {listedProperties.length > visibleCount && (
                   <div className="mt-6">
                     <Button onClick={handleViewMore}>View More</Button>
