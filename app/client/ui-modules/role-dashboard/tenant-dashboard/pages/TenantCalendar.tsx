@@ -85,15 +85,22 @@ export function TenantCalendar(): React.JSX.Element {
 
   type Priority = "low" | "medium" | "high";
 
+  // maps badges of tasks for each date
   const dateBadges = React.useMemo(() => {
     const map: Record<string, { total: number; counts: Partial<Record<Priority, number>> }> = {};
     for (const t of tasks as any[]) {
       if (!t?.dueDate) continue;
+      
       const iso = toISODateOnly(t.dueDate);
+      
       const p: Priority = (t.priority as Priority) ?? "medium";
+      
       map[iso] ??= { total: 0, counts: {} };
+      
       map[iso].total += 1;
+      
       map[iso].counts[p] = (map[iso].counts[p] ?? 0) + 1;
+    
     }
     return map;
   }, [tasks]);

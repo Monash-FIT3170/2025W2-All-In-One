@@ -79,8 +79,10 @@ export function Calendar({
       }
     }
   
-    // new code
-  if (!dateStr) return; // guard weird cells
+  /////// If date is empty, bails out
+  if (!dateStr) return;
+
+  // converts it to format
   const iso = fmtISO(args.date)
 
   const badge = dateBadges?.[iso];
@@ -92,7 +94,7 @@ export function Calendar({
 
   if (!badge?.total) return;
 
-  // build dots
+  // building the pills
   const container = document.createElement("div");
   container.className = "absolute bottom-1 left-0 w-full flex gap-1 px-1";
 
