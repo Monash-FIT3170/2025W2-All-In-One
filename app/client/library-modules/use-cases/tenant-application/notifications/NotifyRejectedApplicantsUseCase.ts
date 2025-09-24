@@ -1,6 +1,5 @@
 import { getTenantApplicationsByPropertyId } from "/app/client/library-modules/domain-models/tenant-application/repositories/tenant-application-repository";
-import { apiInsertConversation, apiInsertMessage } from "/app/client/library-modules/apis/messaging/messaging-api";
-import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
+import { apiInsertMessage } from "/app/client/library-modules/apis/messaging/messaging-api";
 import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
 import { createAgentTenantConversation } from "/app/client/ui-modules/role-messages/state/helpers/conversation-helpers";
 import { getProfileDataById } from "/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository";
