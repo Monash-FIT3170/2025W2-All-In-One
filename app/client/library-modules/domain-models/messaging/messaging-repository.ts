@@ -138,9 +138,19 @@ export function convertApiConversationsToAgentView(
 export function convertApiConversationsToTenantView(
   apiConversations: ApiConversation[],
   tenantId: string,
-  agentProfile?: ApiProfileData
+  agentProfiles?: Map<string, ApiProfileData> | ApiProfileData
 ): Conversation[] {
   return apiConversations.map(apiConversation => {
+    let agentProfile: ApiProfileData | undefined;
+
+    if (agentProfiles instanceof Map) {
+      // Multiple agent profiles
+      agentProfile = apiConversation.agentId ? agentProfiles.get(apiConversation.agentId) : undefined;
+    } else {
+      // Single agent profile (backward compatibility)
+      agentProfile = agentProfiles;
+    }
+
     const name = getDisplayName(agentProfile, "Agent", apiConversation.agentId);
     return convertApiConversationToDomain(apiConversation, tenantId, name, "Agent");
   });

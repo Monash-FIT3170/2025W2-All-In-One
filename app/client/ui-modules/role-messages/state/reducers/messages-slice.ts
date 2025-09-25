@@ -254,6 +254,43 @@ export const removeActiveUser = createAsyncThunk(
 );
 
 /**
+ * Updates conversation metadata (names, avatars) for conversations that need profile data
+ * Called when new conversations appear via real-time subscriptions
+ */
+export const updateConversationMetadata = createAsyncThunk(
+  "messages/updateConversationMetadata",
+  async (_, { getState, dispatch }) => {
+    try {
+      const state = getState() as { messages: MessagesState; currentUser: { currentUser: Agent | Tenant | Landlord | null; authUser: { role: Role } | null } };
+      const currentUser = state.currentUser.currentUser;
+      const authUser = state.currentUser.authUser;
+      const conversations = state.messages.conversations;
+
+      // Validate user authentication
+      if (!currentUser || !authUser) {
+        return;
+      }
+
+      // Find conversations that need metadata updates (have generic names like "User C8Hd")
+      const conversationsNeedingUpdate = conversations.filter(conv =>
+        conv.name.startsWith('User ') && conv.name.length <= 10 // Generic names are short
+      );
+
+      if (conversationsNeedingUpdate.length === 0) {
+        return;
+      }
+
+      // For all roles, dispatch fetchConversations to get proper metadata
+      // This ensures profile data is fetched and conversation names are updated
+      dispatch(fetchConversations());
+
+    } catch (error) {
+      console.error("Error updating conversation metadata:", error);
+    }
+  }
+);
+
+/**
  * Redux Slice Definition
  * Contains reducers for synchronous state updates and real-time subscription handling
  */
@@ -328,12 +365,12 @@ export const messagesSlice = createSlice({
      * Updates conversations from real-time subscription data
      * Converts API format to UI format and preserves existing conversation metadata
      */
-    setConversationsFromSubscription(state, action: PayloadAction<{ conversations: ApiConversation[]; currentUserId: string }>) {
-      
+    setConversationsFromSubscription(state, action: PayloadAction<{ conversations: ApiConversation[]; currentUserId: string; dispatch?: any }>) {
+
       // Helper function to generate user avatars from names
       const getAvatarInitials = (name: string) => {
         const parts = name.split(' ');
-        return parts.length > 1 
+        return parts.length > 1
           ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
           : `${parts[0][0]}${parts[0][1] || ''}`.toUpperCase();
       };
@@ -342,13 +379,13 @@ export const messagesSlice = createSlice({
       const uiConversations: Conversation[] = action.payload.conversations.map(doc => {
         // Try to preserve existing conversation data (name, role) if available
         const existingConversation = state.conversations.find(c => c.id === doc.conversationId);
-        
+
         // Calculate unread count for current user
         let unreadCount = 0;
         if (doc.unreadCounts && action.payload.currentUserId) {
           unreadCount = doc.unreadCounts[action.payload.currentUserId] || 0;
         }
-        
+
         // Determine timestamp - only show timestamp if there's an actual message
         let timestamp = '';
         if (doc.lastMessage?.timestamp && doc.lastMessage?.text && doc.lastMessage.text.trim() !== '') {
@@ -356,7 +393,7 @@ export const messagesSlice = createSlice({
         } else {
           timestamp = '';
         }
-        
+
         return {
           id: doc.conversationId,
           name: existingConversation?.name || `User ${doc.tenantId?.slice(-4) || doc.agentId?.slice(-4) || 'Unknown'}`,
@@ -367,8 +404,22 @@ export const messagesSlice = createSlice({
           unreadCount,
         };
       });
-      
+
       state.conversations = uiConversations;
+
+      // Check if any conversations have generic names and need metadata updates
+      const hasGenericNames = uiConversations.some(conv =>
+        conv.name.startsWith('User ') && conv.name.length <= 10
+      );
+
+      // If we have conversations with generic names and a dispatch function, update metadata
+      if (hasGenericNames && action.payload.dispatch) {
+        console.log("Detected conversations with generic names, updating metadata");
+        // Use setTimeout to avoid dispatching during reducer execution
+        setTimeout(() => {
+          action.payload.dispatch(updateConversationMetadata());
+        }, 100);
+      }
     },
 
     /**
