@@ -8,20 +8,20 @@ import { Role } from "/app/shared/user-role-identifier";
 import {
   updateTenantApplicationStatus
 } from "/app/client/library-modules/domain-models/tenant-application/repositories/tenant-application-repository";
-import { LoadTenantApplicationsUseCase } from "/app/client/library-modules/use-cases/tenant-application/LoadTenantApplicationsUseCase";
+import { LoadTenantApplicationsUseCase } from "../../../../library-modules/use-cases/tenant-application/LoadTenantApplicationsUseCase";
 
 import {
   sendAcceptedApplicationsToLandlordUseCase,
   sendBackgroundPassedToLandlordUseCase
-} from "../../../../library-modules/use-cases/tenant-application/SendTenantApplicationToLandlordUseCase";
-import { createTenantApplicationUseCase } from "/app/client/library-modules/use-cases/tenant-application/CreateTenantApplicationUseCase";
+} from "../../../../library-modules/use-cases/tenant-application/workflow/SendTenantApplicationToLandlordUseCase";
+import { createTenantApplicationUseCase } from "../../../../library-modules/use-cases/tenant-application/CreateTenantApplicationUseCase";
 import {
   sendApprovedApplicationsToAgentUseCase,
   sendFinalApprovedApplicationToAgentUseCase
-} from "/app/client/library-modules/use-cases/tenant-application/SendTenantApplicationToAgentUseCase";
-import { agentAcceptApplication, agentRejectApplication, landLordApproveApplication, landLordRejectApplication } from "../../../../library-modules/use-cases/tenant-application/AcceptOrRejectTenantApplicationUseCase.ts";
+} from "../../../../library-modules/use-cases/tenant-application/workflow/SendTenantApplicationToAgentUseCase";
+import { agentAcceptApplication, agentRejectApplication, landLordApproveApplication, landLordRejectApplication } from "../../../../library-modules/use-cases/tenant-application/decision-making/AcceptOrRejectTenantApplicationUseCase.ts";
 import { AppDispatch } from "/app/client/store";
-import { ResetTenantApplicationDecisionUseCase } from "/app/client/library-modules/use-cases/tenant-application/ResetTenantApplicationDecisionUseCase";
+import { ResetTenantApplicationDecisionUseCase } from "../../../../library-modules/use-cases/tenant-application/decision-making/ResetTenantApplicationDecisionUseCase";
 
 const initialState: TenantSelectionUiState = {
   applicationsByProperty: {},

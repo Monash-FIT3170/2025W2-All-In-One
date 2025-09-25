@@ -1,4 +1,4 @@
-import { updateTenantApplicationStatus } from '../../domain-models/tenant-application/repositories/tenant-application-repository';
+import { updateTenantApplicationStatus } from '../../../domain-models/tenant-application/repositories/tenant-application-repository';
 import { TenantApplicationStatus } from '/app/shared/api-models/tenant-application/TenantApplicationStatus';
 
 export class ResetTenantApplicationDecisionUseCase {

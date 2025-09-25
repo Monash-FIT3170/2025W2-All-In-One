@@ -16,7 +16,6 @@ export class LoadPropertyWithTenantApplicationsUseCase {
   private shouldLoadTenantApplications(listingStatus: ListingStatus): boolean {
     return [
       ListingStatus.LISTED,
-      ListingStatus.TENANT_SELECTION,
       ListingStatus.TENANT_APPROVAL
     ].includes(listingStatus);
   }
