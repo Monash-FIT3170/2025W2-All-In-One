@@ -69,18 +69,25 @@ const landlordGetByLandlordIdMethod = {
 // Single responsibility: Only adds a task to landlord's task_ids array
 const landlordAddTaskMethod = {
   [MeteorMethodIdentifier.LANDLORD_ADD_TASK]: async (
-    userId: string,
+    identifier: string, // can be either userId or landlordId
     taskId: string
   ): Promise<void> => {
-    console.log("LANDLORD_ADD_TASK called with:", { userId, taskId });
-    
-    const landlordDoc = await LandlordCollection.findOneAsync({
-      userAccountId: userId,
+    console.log("LANDLORD_ADD_TASK called with:", { identifier, taskId });
+
+    let landlordDoc = await LandlordCollection.findOneAsync({
+      userAccountId: identifier,
     });
 
     if (!landlordDoc) {
+      // If not found by userAccountId, try by _id (landlordId)
+      landlordDoc = await LandlordCollection.findOneAsync({
+        _id: identifier,
+      });
+    }
+
+    if (!landlordDoc) {
       throw meteorWrappedInvalidDataError(
-        new InvalidDataError(`Landlord with user ID ${userId} not found.`)
+        new InvalidDataError(`Landlord with user ID ${identifier} not found.`)
       );
     }
 

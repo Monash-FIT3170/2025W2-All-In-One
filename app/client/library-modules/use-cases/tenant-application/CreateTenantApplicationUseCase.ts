@@ -2,7 +2,7 @@ import { insertTenantApplication } from "/app/client/library-modules/domain-mode
 import { getPropertyById } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
 import { Role } from "/app/shared/user-role-identifier";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
-import { CreateTenantApplicationRequest, CreateTenantApplicationResponse } from "./models/TenantApplicationsData";
+import { CreateTenantApplicationRequest, CreateTenantApplicationResponse } from "./models/TenantApplicationData";
 import { Agent } from "../../domain-models/user/Agent";
 import { Tenant } from "../../domain-models/user/Tenant";
 import { Landlord } from "../../domain-models/user/Landlord";
