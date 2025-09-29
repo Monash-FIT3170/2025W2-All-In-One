@@ -300,38 +300,30 @@ export const selectConversation = createAsyncThunk(
  * Updates conversation metadata (names, avatars) for conversations that need profile data
  * Called when new conversations appear via real-time subscriptions
  */
-export const updateConversationMetadata = createAsyncThunk(
-  "messages/updateConversationMetadata",
-  async (_, { getState, dispatch }) => {
-    try {
-      const state = getState() as { messages: MessagesState; currentUser: { currentUser: Agent | Tenant | Landlord | null; authUser: { role: Role } | null } };
-      const currentUser = state.currentUser.currentUser;
-      const authUser = state.currentUser.authUser;
-      const conversations = state.messages.conversations;
+export const updateConversationMetadata = () => (dispatch: any, getState: any) => {
+  const state = getState() as { messages: MessagesState; currentUser: { currentUser: Agent | Tenant | Landlord | null; authUser: { role: Role } | null } };
+  const currentUser = state.currentUser.currentUser;
+  const authUser = state.currentUser.authUser;
+  const conversations = state.messages.conversations;
 
-      // Validate user authentication
-      if (!currentUser || !authUser) {
-        return;
-      }
-
-      // Find conversations that need metadata updates (have generic names like "User C8Hd")
-      const conversationsNeedingUpdate = conversations.filter(conv =>
-        conv.name.startsWith('User ') && conv.name.length <= 10 // Generic names are short
-      );
-
-      if (conversationsNeedingUpdate.length === 0) {
-        return;
-      }
-
-      // For all roles, dispatch fetchConversations to get proper metadata
-      // This ensures profile data is fetched and conversation names are updated
-      dispatch(fetchConversations());
-
-    } catch (error) {
-      console.error("Error updating conversation metadata:", error);
-    }
+  // Validate user authentication
+  if (!currentUser || !authUser) {
+    return;
   }
-);
+
+  // Find conversations that need metadata updates (have generic names like "User C8Hd")
+  const conversationsNeedingUpdate = conversations.filter(conv =>
+    conv.name.startsWith('User ') && conv.name.length <= 10 // Generic names are short
+  );
+
+  if (conversationsNeedingUpdate.length === 0) {
+    return;
+  }
+
+  // For all roles, dispatch fetchConversations to get proper metadata
+  // This ensures profile data is fetched and conversation names are updated
+  dispatch(fetchConversations());
+};
 
 /**
  * Redux Slice Definition
