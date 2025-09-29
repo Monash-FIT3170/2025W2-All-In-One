@@ -400,7 +400,7 @@ export const messagesSlice = createSlice({
      * Updates conversations from real-time subscription data
      * Converts API format to UI format and preserves existing conversation metadata
      */
-    setConversationsFromSubscription(state, action: PayloadAction<{ conversations: ApiConversation[]; currentUserId: string; dispatch?: any }>) {
+    setConversationsFromSubscription(state, action: PayloadAction<{ conversations: ApiConversation[]; currentUserId: string }>) {
 
       // Helper function to generate user avatars from names
       const getAvatarInitials = (name: string) => {
@@ -441,20 +441,6 @@ export const messagesSlice = createSlice({
       });
 
       state.conversations = uiConversations;
-
-      // Check if any conversations have generic names and need metadata updates
-      const hasGenericNames = uiConversations.some(conv =>
-        conv.name.startsWith('User ') && conv.name.length <= 10
-      );
-
-      // If we have conversations with generic names and a dispatch function, update metadata
-      if (hasGenericNames && action.payload.dispatch) {
-        console.log("Detected conversations with generic names, updating metadata");
-        // Use setTimeout to avoid dispatching during reducer execution
-        setTimeout(() => {
-          action.payload.dispatch(updateConversationMetadata());
-        }, 100);
-      }
     },
 
     /**
