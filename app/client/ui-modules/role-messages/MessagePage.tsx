@@ -18,6 +18,7 @@ import {
   selectConversation,
 } from "./state/reducers/messages-slice";
 import { useMessagingSubscriptions } from "./hooks/useMessagingSubscriptions";
+import { useContactAgentHandler } from "./hooks/useContactAgentHandler";
 import { useLocation } from "react-router";
 
 type UserRole = 'agent' | 'landlord' | 'tenant';
@@ -44,6 +45,9 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
   // Use real-time subscriptions for live messaging
   const { conversationsReady, messagesReady } = useMessagingSubscriptions(activeConversationId);
 
+  // Handle conversation creation from navigation state
+  useContactAgentHandler({ role });
+
   // Initial fetch for conversations (fallback for when subscriptions aren't ready)
   useEffect(() => {
     if (authUser && !conversationsReady) {
@@ -67,45 +71,6 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
     }
   }, [conversations, location.state, dispatch, conversationsLoading]);
 
-  // Additional effect to ensure conversation selection works even if activeConversationId is already set
-  useEffect(() => {
-    const state = location.state as { conversationId?: string; agentId?: string; shouldAutoSelect?: boolean } | null;
-    if (state?.conversationId && state.shouldAutoSelect && conversations.length > 0) {
-      const conversation = conversations.find(c => c.id === state.conversationId);
-      if (conversation && activeConversationId !== state.conversationId) {
-        dispatch(selectConversation(state.conversationId));
-      }
-    }
-  }, [conversations, activeConversationId, location.state, dispatch]);
-
-  // Retry mechanism for conversation selection with timeout
-  useEffect(() => {
-    const state = location.state as { conversationId?: string; agentId?: string; shouldAutoSelect?: boolean } | null;
-    if (state?.conversationId && state.shouldAutoSelect) {
-      const conversationId = state.conversationId;
-      const trySelectConversation = () => {
-        const conversation = conversations.find(c => c.id === conversationId);
-        if (conversation && activeConversationId !== conversationId) {
-          dispatch(selectConversation(conversationId));
-          return true;
-        }
-        return false;
-      };
-
-      // Try immediately
-      if (!trySelectConversation()) {
-        // If not found, try again after a short delay
-        const timeoutId = setTimeout(() => {
-          if (!trySelectConversation()) {
-            // Conversation still not found after retry
-          }
-        }, 1000);
-
-        return () => clearTimeout(timeoutId);
-      }
-    }
-  }, [conversations, activeConversationId, location.state, dispatch]);
-
   // Initial fetch for messages (fallback for when subscriptions aren't ready)
   useEffect(() => {
     if (activeConversationId && !messagesReady) {
@@ -123,10 +88,10 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
   }, [activeConversationId, dispatch]);
 
   // Always reset to fresh state when navigating to messages page or when user changes
-  // But don't reset if we have a conversationId in navigation state
+  // But don't reset if we have conversation creation state or existing conversationId
   useEffect(() => {
-    const state = location.state as { conversationId?: string } | null;
-    if (!state?.conversationId) {
+    const state = location.state as { conversationId?: string; agentId?: string; propertyId?: string } | null;
+    if (!state?.conversationId && !state?.agentId && !state?.propertyId) {
       // Reset active conversation whenever user navigates to messages page or logs in
       // This ensures they always see the conversation selection screen and no message panel is open
       dispatch(setActiveConversation(null));
