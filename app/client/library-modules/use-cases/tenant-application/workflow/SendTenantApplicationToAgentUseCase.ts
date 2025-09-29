@@ -5,7 +5,8 @@ import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
 import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
 import { calculateDueDate } from "/app/client/library-modules/utils/date-utils";
-
+import { notifyRejectedApplicantsUseCase } from "../notifications/NotifyRejectedApplicantsUseCase";
+import { notifyChosenTenantUseCase } from "../notifications/NotifyChosenTenantUseCase";
 /*WILL SEPARATE THESE USE CASES INTO SEPARATE FILES LATER*/
 
 export async function sendApprovedApplicationsToAgentUseCase(
@@ -84,23 +85,22 @@ export async function sendApprovedApplicationsToAgentUseCase(
 
     const chosenApplication = finalApprovedApplications[0];
 
-    // Update property's tenantId with the chosen tenant's user ID
-    if (chosenApplication.tenantUserId) {
-      console.log('=== PROPERTY TENANT ID UPDATE ===');
-      console.log('Property ID:', propertyId);
-      console.log('Current Tenant ID:', chosenApplication.tenantUserId);
-      console.log('Application Status:', chosenApplication.status);
+    // Update property with chosen tenant
+    await updatePropertyWithChosenTenant(propertyId, chosenApplication);
 
-      await updatePropertyTenantId(propertyId, chosenApplication.tenantUserId);
 
-      const updatedProperty = await getPropertyById(propertyId);
-      console.log('Updated Property Details:', updatedProperty);
-      console.log('New Tenant ID in Property:', updatedProperty.tenantId);
-      console.log('=== END PROPERTY UPDATE ===');
-    } else {
-      console.log('No tenantUserId found in chosen application');
-    }
+    // Get agent ID for messaging of rejected applicants
+    const property = await getPropertyById(propertyId);
+    const agentId = property.agentId;
+    const propertyAddress = `${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`;
 
+    // Notify all other applicants that they were not selected
+    await notifyRejectedApplicants(propertyId, chosenApplication.id, agentId, propertyAddress);
+
+    // Notify chosen tenant
+    await notifyChosenTenant(propertyId, chosenApplication);
+
+    // Update task for agent
     const updatedTaskName = `Process Final Tenant Selection`;
     const updatedTaskDescription = `Process final tenant selection for ${chosenApplication.applicantName} at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`;
     const updatedDueDate = calculateDueDate(3);
@@ -110,6 +110,7 @@ export async function sendApprovedApplicationsToAgentUseCase(
     if (!existingTaskId) {
         throw new Error('No linked task ID found for final approved applications');
       }
+
     // Update task for agent
     const taskResult = await updateTaskForAgent({
       taskId: existingTaskId,
@@ -136,6 +137,69 @@ export async function sendApprovedApplicationsToAgentUseCase(
       taskId: taskResult
     };
   }
+
+/**
+ * Updates property with the chosen tenant
+ */
+async function updatePropertyWithChosenTenant(
+  propertyId: string,
+  chosenApplication: TenantApplication
+): Promise<void> {
+  if (chosenApplication.tenantUserId) {
+    console.log('=== PROPERTY TENANT ID UPDATE ===');
+    console.log('Property ID:', propertyId);
+    console.log('Current Tenant ID:', chosenApplication.tenantUserId);
+    console.log('Application Status:', chosenApplication.status);
+
+    await updatePropertyTenantId(propertyId, chosenApplication.tenantUserId);
+
+    const updatedProperty = await getPropertyById(propertyId);
+    console.log('Updated Property Details:', updatedProperty);
+    console.log('New Tenant ID in Property:', updatedProperty.tenantId);
+    console.log('=== END PROPERTY UPDATE ===');
+  } else {
+    console.log('No tenantUserId found in chosen application');
+  }
+}
+
+/**
+ * Notifies rejected applicants
+ */
+async function notifyRejectedApplicants(
+  propertyId: string,
+  chosenApplicationId: string,
+  agentId: string,
+  propertyAddress: string
+): Promise<void> {
+  console.log('=== NOTIFYING REJECTED APPLICANTS ===');
+  const notificationResult = await notifyRejectedApplicantsUseCase(
+    propertyId,
+    chosenApplicationId,
+    agentId,
+    propertyAddress
+  );
+  console.log('Notification result:', notificationResult);
+}
+
+/**
+ * Notifies the chosen tenant
+ */
+async function notifyChosenTenant(
+  propertyId: string,
+  chosenApplication: TenantApplication
+): Promise<void> {
+  console.log('=== NOTIFYING CHOSEN TENANT ===');
+  if (chosenApplication.tenantUserId) {
+    await notifyChosenTenantUseCase(
+      propertyId,
+      chosenApplication.tenantUserId,
+      chosenApplication.applicantName
+    );
+  }
+  console.log('=== END NOTIFICATION ===');
+}
+
+
 function validateTaskInputs(propertyId: string, propertyLandlordId: string): void {
   if (!propertyId) {
     throw new Error('Property ID is required to send applications to agent');
