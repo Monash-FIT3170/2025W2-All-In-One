@@ -254,6 +254,49 @@ export const removeActiveUser = createAsyncThunk(
 );
 
 /**
+ * Selects a conversation by setting it as active, resetting unread count, and adding user to active users
+ * This combines the common operations performed when a user selects/opens a conversation
+ */
+export const selectConversation = createAsyncThunk(
+  "messages/selectConversation",
+  async (conversationId: string, { dispatch, getState, rejectWithValue }) => {
+    try {
+      // Validate conversation ID using helper function
+      validateConversationId(conversationId);
+
+      const state = getState() as { currentUser: { currentUser: Agent | Tenant | Landlord | null; authUser: { role: Role } | null } };
+      const currentUser = state.currentUser.currentUser;
+      const authUser = state.currentUser.authUser;
+
+      // Validate user authentication and get user context
+      const userContext = validateAndGetUserContext(currentUser, authUser);
+
+      // First, set the active conversation (synchronous UI update)
+      dispatch(setActiveConversation(conversationId));
+
+      // Then perform the async operations in parallel for better performance
+      const [resetResult, addResult] = await Promise.allSettled([
+        resetUnreadCountRepo(conversationId, userContext.userId),
+        apiAddActiveUser(conversationId, userContext.userId)
+      ]);
+
+      // Handle results - log errors but don't fail the entire operation
+      if (resetResult.status === 'rejected') {
+        console.error("Error resetting unread count:", resetResult.reason);
+      }
+      if (addResult.status === 'rejected') {
+        console.error("Error adding active user:", addResult.reason);
+      }
+
+      return { conversationId, userId: userContext.userId };
+    } catch (error) {
+      console.error("Error selecting conversation:", error);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to select conversation");
+    }
+  }
+);
+
+/**
  * Updates conversation metadata (names, avatars) for conversations that need profile data
  * Called when new conversations appear via real-time subscriptions
  */

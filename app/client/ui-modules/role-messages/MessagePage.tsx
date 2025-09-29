@@ -14,9 +14,8 @@ import {
   sendMessage,
   setActiveConversation,
   setMessageText,
-  resetUnreadCount,
-  addActiveUser,
   removeActiveUser,
+  selectConversation,
 } from "./state/reducers/messages-slice";
 import { useMessagingSubscriptions } from "./hooks/useMessagingSubscriptions";
 import { useLocation } from "react-router";
@@ -58,9 +57,7 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
     if (state?.conversationId && state.shouldAutoSelect && conversations.length > 0) {
       const conversation = conversations.find(c => c.id === state.conversationId);
       if (conversation) {
-        dispatch(setActiveConversation(state.conversationId));
-        dispatch(resetUnreadCount(state.conversationId));
-        dispatch(addActiveUser(state.conversationId));
+        dispatch(selectConversation(state.conversationId));
       } else {
         // If conversation not found, try to refresh conversations in case it was just created
         if (!conversationsLoading) {
@@ -76,9 +73,7 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
     if (state?.conversationId && state.shouldAutoSelect && conversations.length > 0) {
       const conversation = conversations.find(c => c.id === state.conversationId);
       if (conversation && activeConversationId !== state.conversationId) {
-        dispatch(setActiveConversation(state.conversationId));
-        dispatch(resetUnreadCount(state.conversationId));
-        dispatch(addActiveUser(state.conversationId));
+        dispatch(selectConversation(state.conversationId));
       }
     }
   }, [conversations, activeConversationId, location.state, dispatch]);
@@ -91,9 +86,7 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
       const trySelectConversation = () => {
         const conversation = conversations.find(c => c.id === conversationId);
         if (conversation && activeConversationId !== conversationId) {
-          dispatch(setActiveConversation(conversationId));
-          dispatch(resetUnreadCount(conversationId));
-          dispatch(addActiveUser(conversationId));
+          dispatch(selectConversation(conversationId));
           return true;
         }
         return false;
@@ -152,12 +145,8 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
       dispatch(removeActiveUser(activeConversationId));
     }
 
-    dispatch(setActiveConversation(conversationId));
-    // Reset unread count when opening a conversation
-    dispatch(resetUnreadCount(conversationId));
-
-    // Add current user to new conversation's active users
-    dispatch(addActiveUser(conversationId));
+    // Select the new conversation (sets active, resets unread count, adds to active users)
+    dispatch(selectConversation(conversationId));
   };
 
   const handleChangeMessage = (value: string) => {
