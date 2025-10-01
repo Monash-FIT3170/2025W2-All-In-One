@@ -4,14 +4,36 @@ import { PropertyWithListingDataAndNames } from "../state/landlord-properties-sl
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { NavigationPath } from "/app/client/navigation";
 import { StatusBadge } from "../../components/StatusBadge";
+import { ReviewTenantButton } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantButton";
+import { useTenantApplicationReview } from '/app/client/ui-modules/tenant-selection/hooks/useTenantApplicationReview';
+import { TenantSelectionModal } from "/app/client/ui-modules/tenant-selection/TenantSelectionModal";
+import { Role } from "/app/shared/user-role-identifier";
+import { useAppSelector } from "/app/client/store";
 
 export function LandlordPropertyDetail(): React.JSX.Element {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("Financial");
+  const authUser = useAppSelector((state) => state.currentUser.authUser);
 
   // Get property from router state (passed from PropertyCard)
   const passedProperty = location.state?.property as PropertyWithListingDataAndNames;
+
+  // Use the tenant application review hook
+  const {
+    isModalOpen,
+    setIsModalOpen,
+    tenantApplications,
+    landlordApprovedApplicantCount,
+    finalApprovedApplicantCount,
+    shouldShowSendToAgentButton,
+    shouldShowSendFinalApprovedToAgentButton,
+    handleAccept,
+    handleReject,
+    handleReset,
+    handleSendToAgent,
+    handleSendFinalApprovedToAgent,
+  } = useTenantApplicationReview(passedProperty?.propertyId || "", authUser?.role || Role.LANDLORD);
 
   const handleBackToProperties = () => {
     navigate(NavigationPath.LandlordProperties);
@@ -170,8 +192,8 @@ export function LandlordPropertyDetail(): React.JSX.Element {
                 </div>
               </div>
 
-              {/* Tenant Selection - Only show for vacant properties */}
-              {isVacant && (
+              {/* Tenant Selection */}
+              {tenantApplications && tenantApplications.length > 0 && (
                 <div className="bg-white border border-gray-200 rounded-lg p-4">
                   <div className="flex items-center mb-3">
                     <svg className="h-4 w-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,20 +203,15 @@ export function LandlordPropertyDetail(): React.JSX.Element {
                   </div>
 
                   <div className="text-center py-3">
-                    <div className="mb-3">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-600">
-                        Property is currently vacant
-                      </span>
-                    </div>
-
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
                       <p className="text-xs text-blue-800 font-medium mb-1">Action Required</p>
                       <p className="text-xs text-blue-700">You have potential tenants waiting for your review</p>
                     </div>
 
-                    <button className="w-full bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm">
-                      Review Potential Tenants
-                    </button>
+                    <ReviewTenantButton
+                      onClick={() => setIsModalOpen(true)}
+                      className="w-full"
+                    />
                   </div>
                 </div>
               )}
@@ -256,6 +273,25 @@ export function LandlordPropertyDetail(): React.JSX.Element {
           </div>
         </div>
       </div>
+
+      {/* Tenant Selection Modal */}
+      {authUser?.role === Role.LANDLORD && (
+        <TenantSelectionModal
+          role={Role.LANDLORD}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onReject={handleReject}
+          onAccept={handleAccept}
+          onReset={handleReset}
+          onSendToAgent={handleSendToAgent}
+          onSendFinalApprovedToAgent={handleSendFinalApprovedToAgent}
+          shouldShowSendToAgentButton={shouldShowSendToAgentButton}
+          shouldShowSendFinalApprovedToAgentButton={shouldShowSendFinalApprovedToAgentButton}
+          landlordApprovedApplicantCount={landlordApprovedApplicantCount}
+          finalApprovedApplicantCount={finalApprovedApplicantCount}
+          tenantApplications={tenantApplications}
+        />
+      )}
     </div>
   );
-} 
+}
