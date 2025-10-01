@@ -9,16 +9,18 @@ import { NavigationPath } from "/app/client/navigation";
 
 export function ContactAgentButton({
   propertyId,
+  agentId,
   className="",
 }: {
   propertyId: string;
+  agentId: string;
   className?: string;
 }): React.JSX.Element {
   const navigate = useNavigate();
 
   const handleClick = () => {
     navigate(NavigationPath.TenantMessages, {
-      state: { propertyId }
+      state: { agentId, propertyId }
     });
   };
   return (

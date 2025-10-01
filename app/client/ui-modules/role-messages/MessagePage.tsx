@@ -14,11 +14,12 @@ import {
   sendMessage,
   setActiveConversation,
   setMessageText,
-  resetUnreadCount,
-  addActiveUser,
   removeActiveUser,
+  selectConversation,
 } from "./state/reducers/messages-slice";
 import { useMessagingSubscriptions } from "./hooks/useMessagingSubscriptions";
+import { useContactAgentHandler } from "./hooks/useContactAgentHandler";
+import { useLocation } from "react-router";
 
 type UserRole = 'agent' | 'landlord' | 'tenant';
 
@@ -28,7 +29,8 @@ interface MessagesPageProps {
 
 export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
   const dispatch = useAppDispatch();
-  
+  const location = useLocation();
+
   // Selectors
   const conversations = useAppSelector(selectConversationsForRole(role));
   const activeConversationId = useAppSelector(selectActiveConversationId);
@@ -43,12 +45,31 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
   // Use real-time subscriptions for live messaging
   const { conversationsReady, messagesReady } = useMessagingSubscriptions(activeConversationId);
 
+  // Handle conversation creation from navigation state
+  useContactAgentHandler({ role });
+
   // Initial fetch for conversations (fallback for when subscriptions aren't ready)
   useEffect(() => {
     if (authUser && !conversationsReady) {
       dispatch(fetchConversations());
     }
   }, [dispatch, authUser, conversationsReady]);
+
+  // Auto-select conversation from navigation state
+  useEffect(() => {
+    const state = location.state as { conversationId?: string; agentId?: string; shouldAutoSelect?: boolean } | null;
+    if (state?.conversationId && state.shouldAutoSelect && conversations.length > 0) {
+      const conversation = conversations.find(c => c.id === state.conversationId);
+      if (conversation) {
+        dispatch(selectConversation(state.conversationId));
+      } else {
+        // If conversation not found, try to refresh conversations in case it was just created
+        if (!conversationsLoading) {
+          dispatch(fetchConversations());
+        }
+      }
+    }
+  }, [conversations, location.state, dispatch, conversationsLoading]);
 
   // Initial fetch for messages (fallback for when subscriptions aren't ready)
   useEffect(() => {
@@ -67,11 +88,15 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
   }, [activeConversationId, dispatch]);
 
   // Always reset to fresh state when navigating to messages page or when user changes
+  // But don't reset if we have conversation creation state or existing conversationId
   useEffect(() => {
-    // Reset active conversation whenever user navigates to messages page or logs in
-    // This ensures they always see the conversation selection screen and no message panel is open
-    dispatch(setActiveConversation(null));
-  }, [dispatch, authUser?.userId]);
+    const state = location.state as { conversationId?: string; agentId?: string; propertyId?: string } | null;
+    if (!state?.conversationId && !state?.agentId && !state?.propertyId) {
+      // Reset active conversation whenever user navigates to messages page or logs in
+      // This ensures they always see the conversation selection screen and no message panel is open
+      dispatch(setActiveConversation(null));
+    }
+  }, [dispatch, authUser?.userId, location.state]);
 
   const handleSelectConversation = (conversationId: string) => {
     // Validate conversationId is not null/undefined
@@ -85,12 +110,8 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
       dispatch(removeActiveUser(activeConversationId));
     }
 
-    dispatch(setActiveConversation(conversationId));
-    // Reset unread count when opening a conversation
-    dispatch(resetUnreadCount(conversationId));
-
-    // Add current user to new conversation's active users
-    dispatch(addActiveUser(conversationId));
+    // Select the new conversation (sets active, resets unread count, adds to active users)
+    dispatch(selectConversation(conversationId));
   };
 
   const handleChangeMessage = (value: string) => {
@@ -145,6 +166,7 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
           messageText={messageText}
           onChangeMessage={handleChangeMessage}
           onSend={handleSend}
+          placeholderMessage={conversations.length === 0 ? "No conversations yet" : undefined}
         />
       </div>
     </div>
