@@ -288,7 +288,7 @@ function ListingPageContent({
 }): React.JSX.Element {
   const dispatch = useAppDispatch();
 
-  // Use the tenant application review hook
+  // Uses the tenant application review hook
   const {
     isModalOpen: isReviewTenantModalOpen,
     setIsModalOpen: setIsReviewTenantModalOpen,

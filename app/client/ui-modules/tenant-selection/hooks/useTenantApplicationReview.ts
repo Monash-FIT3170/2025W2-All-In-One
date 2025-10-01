@@ -17,6 +17,7 @@ import {
   selectHasAcceptedApplicationsForProperty,
   selectHasBackgroundPassedApplicationsForProperty,
   selectBackgroundPassedApplicantCountForProperty,
+  selectHasTenantChosenForProperty,
 } from '../state/reducers/tenant-selection-slice';
 import { TenantApplicationStatus } from '/app/shared/api-models/tenant-application/TenantApplicationStatus';
 import { Role } from '/app/shared/user-role-identifier';
@@ -25,14 +26,14 @@ export function useTenantApplicationReview(propertyId: string, userRole: Role) {
   const dispatch = useAppDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Load tenant applications when propertyId changes
+  // load tenant applications when propertyId changes
   useEffect(() => {
     if (propertyId) {
       dispatch(loadTenantApplicationsForPropertyAsync(propertyId));
     }
   }, [dispatch, propertyId]);
 
-  // Selectors
+  // selectors
   const tenantApplications = useAppSelector((state) =>
     selectFilteredApplications(state, propertyId)
   );
@@ -51,7 +52,6 @@ export function useTenantApplicationReview(propertyId: string, userRole: Role) {
     selectFinalApprovedApplicantCountForProperty(state, propertyId)
   );
 
-  // Additional selectors for agent functionality
   const acceptedApplicantCount = useAppSelector((state) =>
     selectAcceptedApplicantCountForProperty(state, propertyId)
   );
@@ -65,16 +65,20 @@ export function useTenantApplicationReview(propertyId: string, userRole: Role) {
     selectBackgroundPassedApplicantCountForProperty(state, propertyId)
   );
 
-  // Computed values
+  const hasTenantChosen = useAppSelector((state) =>
+    selectHasTenantChosenForProperty(state, propertyId)
+  );
+
+  // conditions for send buttons
   const shouldShowSendToAgentButton =
-    hasLandlordApprovedApplications && userRole === Role.LANDLORD;
+    hasLandlordApprovedApplications && userRole === Role.LANDLORD && !hasTenantChosen;
   const shouldShowSendFinalApprovedToAgentButton =
-    hasFinalApprovedApplications && userRole === Role.LANDLORD;
+    hasFinalApprovedApplications && userRole === Role.LANDLORD && !hasTenantChosen;
   const shouldShowSendToLandlordButton =
     (hasAcceptedApplications || hasBackgroundPassedApplications) &&
-    userRole === Role.AGENT;
+    userRole === Role.AGENT && !hasTenantChosen;
 
-  // Handlers
+  // handlers
   const handleAccept = async (applicationId: string) => {
     try {
       await dispatch(

@@ -624,6 +624,11 @@ export const selectHasFinalApprovedApplicationForProperty = (state: RootState, p
   return applications.some((app: DomainTenantApplication) => app.status === TenantApplicationStatus.FINAL_APPROVED);
 };
 
+export const selectHasTenantChosenForProperty = (state: RootState, propertyId: string) => {
+  const applications = selectApplicationsForProperty(state, propertyId);
+  return applications.some((app: DomainTenantApplication) => app.status === TenantApplicationStatus.TENANT_CHOSEN);
+};
+
 export const selectFilteredApplications = (state: RootState, propertyId: string) => {
   const applications = selectApplicationsForProperty(state, propertyId);
   const { activeFilter } = state.tenantSelection;
