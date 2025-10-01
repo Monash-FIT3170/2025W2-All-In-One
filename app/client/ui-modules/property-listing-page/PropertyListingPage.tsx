@@ -25,6 +25,7 @@ import { twMerge } from "tailwind-merge";
 import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listing-page/components/SubmitDraftListingButton";
 import { ReviewTenantButton } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantButton";
 import { TenantSelectionModal } from "/app/client/ui-modules/tenant-selection/TenantSelectionModal";
+import { useTenantApplicationReview } from '/app/client/ui-modules/tenant-selection/hooks/useTenantApplicationReview';
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useSelector } from "react-redux";
 import {
@@ -33,9 +34,9 @@ import {
   selectPropertyListingUiState,
   submitDraftListingAsync,
 } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
-import { 
-  load as loadPropertyForm, 
-  selectPropertyFormUiState 
+import {
+  load as loadPropertyForm,
+  selectPropertyFormUiState
 } from "/app/client/ui-modules/property-form-agent/state/reducers/property-form-slice";
 
 import { PropertyListingPageUiState } from "/app/client/ui-modules/property-listing-page/state/PropertyListingUiState";
@@ -100,13 +101,6 @@ export function PropertyListingPage({
     console.log(`Loading property with ID: ${propertyId}`);
     dispatch(load(propertyId));
   }, []);
-
-  // Load tenant applications when property loads
-  useEffect(() => {
-    if (propertyId && authUser) {
-      dispatch(loadTenantApplicationsForPropertyAsync(propertyId));
-    }
-  }, [propertyId, authUser]);
 
   if (state.shouldShowLoadingState) {
     return (
@@ -289,21 +283,32 @@ function ListingPageContent({
   className?: string;
   tenantId?: string;
 }): React.JSX.Element {
-  const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
   const dispatch = useAppDispatch();
 
-  const tenantApplications = useAppSelector((state) =>
-    selectFilteredApplications(state, propertyId)
-  );
+  // Use the tenant application review hook
+  const {
+    isModalOpen: isReviewTenantModalOpen,
+    setIsModalOpen: setIsReviewTenantModalOpen,
+    tenantApplications,
+    landlordApprovedApplicantCount,
+    finalApprovedApplicantCount,
+    acceptedApplicantCount,
+    backgroundPassedApplicantCount,
+    hasAcceptedApplications,
+    hasBackgroundPassedApplications,
+    shouldShowSendToAgentButton,
+    shouldShowSendFinalApprovedToAgentButton,
+    shouldShowSendToLandlordButton,
+    handleAccept,
+    handleReject,
+    handleReset,
+    handleSendToAgent,
+    handleSendToLandlord,
+    handleSendFinalApprovedToAgent,
+  } = useTenantApplicationReview(propertyId, authUser?.role || Role.AGENT);
+
   const isCreatingApplication = useAppSelector(
     (state) => state.tenantSelection.isLoading
-  );
-
-  const acceptedApplicantCount = useAppSelector((state) =>
-    selectAcceptedApplicantCountForProperty(state, propertyId)
-  );
-  const hasAcceptedApplications = useAppSelector((state) =>
-    selectHasAcceptedApplicationsForProperty(state, propertyId)
   );
 
   // Get current user's name for checking if they've already applied
@@ -313,97 +318,6 @@ function ListingPageContent({
   const hasCurrentUserApplied = useAppSelector((state) =>
     selectHasCurrentUserApplied(state, propertyId, currentUserName)
   );
-
-  // Step 2 selectors for landlord approved applications
-  const hasLandlordApprovedApplications = useAppSelector((state) =>
-    selectHasLandlordApprovedApplicationsForProperty(state, propertyId)
-  );
-  const landlordApprovedApplicantCount = useAppSelector((state) =>
-    selectLandlordApprovedApplicantCountForProperty(state, propertyId)
-  );
-
-  const hasBackgroundPassedApplications = useAppSelector((state) =>
-    selectHasBackgroundPassedApplicationsForProperty(state, propertyId)
-  );
-  const backgroundPassedApplicantCount = useAppSelector((state) =>
-    selectBackgroundPassedApplicantCountForProperty(state, propertyId)
-  );
-
-  const shouldShowSendToLandlordButton =
-    (hasAcceptedApplications || hasBackgroundPassedApplications) &&
-    authUser?.role === Role.AGENT;
-  const shouldShowSendToAgentButton =
-    hasLandlordApprovedApplications && authUser?.role === Role.LANDLORD;
-
-  const hasFinalApprovedApplications = useAppSelector((state) =>
-    selectHasFinalApprovedApplicationForProperty(state, propertyId)
-  );
-  const finalApprovedApplicantCount = useAppSelector((state) =>
-    selectFinalApprovedApplicantCountForProperty(state, propertyId)
-  );
-  const shouldShowSendFinalApprovedToAgentButton =
-    hasFinalApprovedApplications && authUser?.role === Role.LANDLORD;
-
-  const handleAccept = async (applicationId: string) => {
-    try {
-      await dispatch(
-        intentAcceptApplicationAsync({ propertyId, applicationId })
-      ).unwrap();
-    } catch (error) {
-      console.error("Failed to accept application:", error);
-    }
-  };
-
-  const handleReject = async (applicationId: string) => {
-    try {
-      await dispatch(
-        intentRejectApplicationAsync({ propertyId, applicationId })
-      ).unwrap();
-    } catch (error) {
-      console.error("Failed to reject application:", error);
-    }
-  };
-  const handleReset = async (applicationId: string, currentStatus: TenantApplicationStatus) => {
-    try {
-      const result = await dispatch(intentResetApplicationDecisionAsync({
-        applicationId: [applicationId],
-        currentStatus: currentStatus
-      })).unwrap();
-      console.log(`Application ${applicationId} reset successfully`);
-    } catch (error) {
-      console.error("Failed to reset application:", error);
-    }
-  };
-
-  const handleSendToLandlord = async () => {
-    try {
-      await dispatch(intentSendApplicationToLandlordAsync()).unwrap();
-      console.log("Successfully sent applications to landlord");
-    } catch (error) {
-      console.error("Failed to send applications to landlord:", error);
-    }
-  };
-
-  const handleSendToAgent = async () => {
-    try {
-      await dispatch(intentSendApplicationToAgentAsync()).unwrap();
-      console.log("Successfully sent applications to agent");
-    } catch (error) {
-      console.error("Failed to send applications to agent:", error);
-    }
-  };
-
-  const handleSendFinalApprovedToAgent = async () => {
-    try {
-      await dispatch(sendFinalApprovedApplicationToAgentAsync()).unwrap();
-      console.log("Successfully sent final approved application to agent");
-    } catch (error) {
-      console.error(
-        "Failed to send final approved application to agent:",
-        error
-      );
-    }
-  };
 
   return (
     <div className={twMerge("p-5", className)}>
