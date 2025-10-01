@@ -110,45 +110,34 @@ export async function handleAgentConversations(agent: Agent): Promise<Conversati
 
 /**
  * Handles conversation fetching for Tenant users
+ * Tenants can now contact any agent, not just their assigned property agent
  */
 export async function handleTenantConversations(tenant: Tenant): Promise<Conversation[]> {
   const tenantId = tenant.tenantId;
 
-  // Step 1: Get existing conversations for this tenant
+  // Get existing conversations for this tenant
   const existingConversations: ApiConversation[] = await apiGetConversationsForTenant(tenantId);
 
-  // Step 2: If conversation exists, use it
-  if (existingConversations.length > 0) {
-    // Fetch agent profile for the conversation
-    const conversation = existingConversations[0]; // Tenant only has one agent
-    const agentProfile = conversation.agentId ? await fetchAgentProfile(conversation.agentId) : null;
+  // Fetch agent profiles for all conversations
+  const uniqueAgentIds = [...new Set(existingConversations.map(c => c.agentId).filter((id): id is string => Boolean(id)))];
+  const agentProfiles = new Map<string, any>();
 
-    // Convert to UI format
-    return convertApiConversationsToTenantView(
-      existingConversations,
-      tenantId,
-      agentProfile
-    );
-  }
+  await Promise.all(
+    uniqueAgentIds.map(async (agentId) => {
+      try {
+        const profile = await fetchAgentProfile(agentId);
+        agentProfiles.set(agentId, profile);
+      } catch (error) {
+        console.error(`Failed to fetch profile for agent ${agentId}:`, error);
+      }
+    })
+  );
 
-  // Step 3: No conversation exists, find the agent from tenant's property
-  const tenantProperty = await apiGetPropertyByTenantId(tenantId);
-
-  if (!tenantProperty || !tenantProperty.agentId) {
-    throw new Error("No property or agent found for this tenant");
-  }
-
-  // Step 4: Create new conversation with the agent (AGENT ↔ TENANT ONLY)
-  const newConversation = await createTenantAgentConversation(tenantId, tenantProperty);
-
-  // Step 5: Fetch agent profile
-  const agentProfile = await fetchAgentProfile(tenantProperty.agentId);
-
-  // Step 6: Convert to UI format
+  // Convert to UI format - show all existing conversations
   return convertApiConversationsToTenantView(
-    [newConversation],
+    existingConversations,
     tenantId,
-    agentProfile
+    agentProfiles
   );
 }
 

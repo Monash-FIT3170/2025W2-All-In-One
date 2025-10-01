@@ -2,7 +2,7 @@ import { updateTenantApplicationStatus, updateTenantApplicationLinkedTaskId } fr
 import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
 import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
-import { createTaskForLandlord, updateTaskForLandlord } from "../../domain-models/task/repositories/task-repository";
+import { createTaskForLandlord, updateTaskForLandlord } from "../../../domain-models/task/repositories/task-repository";
 import { calculateDueDate } from "/app/client/library-modules/utils/date-utils";
 import { apiGetLandlordByLandlordId } from "/app/client/library-modules/apis/user/user-role-api";
 
