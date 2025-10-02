@@ -154,6 +154,7 @@ export function PropertyListingPage({
           authUser={authUser}
           profileData={profileData}
           tenantId={currentUser?.userAccountId}
+          isGuest={!authUser}
           onBack={() => {
             const from = searchParams.get("from") as EntryPoint | null;
             if (from && from in BACK_ROUTES) {
@@ -252,6 +253,7 @@ function ListingPageContent({
   bookedPropertyListingInspections,
   className = "",
   tenantId,
+  isGuest,
 }: {
   propertyId: string;
   agentId: string;
@@ -291,6 +293,7 @@ function ListingPageContent({
   bookedPropertyListingInspections?: number[];
   className?: string;
   tenantId?: string;
+  isGuest: boolean;
 }): React.JSX.Element {
   const [isReviewTenantModalOpen, setIsReviewTenantModalOpen] = useState(false);
   const dispatch = useAppDispatch();
@@ -413,7 +416,7 @@ function ListingPageContent({
       <TopBar
         listingStatusText={listingStatusText}
         listingStatusPillVariant={listingStatusPillVariant}
-        shouldDisplayListingStatus={shouldDisplayListingStatus}
+        shouldDisplayListingStatus={shouldDisplayListingStatus && !isGuest}
         shouldDisplayEditListingButton={shouldDisplayEditListingButton}
         onBack={onBack}
         className="mb-3"
