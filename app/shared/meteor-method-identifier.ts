@@ -82,4 +82,5 @@ export enum MeteorMethodIdentifier {
 	LOGIN_HISTORY_INSERT = "loginHistory.insert",
 	LOGIN_HISTORY_GET_FOR_USER = "loginHistory.getForUser",
 	VALIDATE_PASSWORD = "password.validate",
+	ADD_TENANT_TO_INSPECTION = "inspection.addTenant"
 }

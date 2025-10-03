@@ -12,6 +12,7 @@ import { UserAccount } from "/app/client/library-modules/domain-models/user/User
 export function UpcomingTasks(props: {
   tasks: Task[];
   currentUser?: UserAccount | null;
+  showViewAllButton?: boolean; // Default is true
 }): React.JSX.Element {
   const navigate = useNavigate();
 
@@ -63,11 +64,13 @@ export function UpcomingTasks(props: {
           <div className="text-center text-gray-500">No upcoming tasks</div>
         )}
       </div>
-      <div className="mt-4">
-        <ViewAllButton onClick={handleViewAllTasks}>
-          View All Tasks
-        </ViewAllButton>
-      </div>
+      {(props.showViewAllButton ?? true) && (
+        <div className="mt-4">
+          <ViewAllButton onClick={handleViewAllTasks}>
+            View All Tasks
+          </ViewAllButton>
+        </div>
+      )}
     </CardWidget>
   );
 }

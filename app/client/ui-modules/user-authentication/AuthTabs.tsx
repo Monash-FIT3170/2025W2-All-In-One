@@ -44,7 +44,7 @@ export const AuthTabs = ({ initialTab }: AuthTabsProps) => {
     ) {
       const newTab: AuthTabType = value;
       setTab(newTab);
-      navigate(newTab);
+      navigate(newTab, { state: location.state });
     }
   };
 

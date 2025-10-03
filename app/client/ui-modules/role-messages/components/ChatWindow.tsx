@@ -12,9 +12,10 @@ interface ChatWindowProps {
   messageText: string;
   onChangeMessage: (value: string) => void;
   onSend: () => void;
+  placeholderMessage?: string;
 }
 
-export function ChatWindow({ header, messages, messageText, onChangeMessage, onSend }: ChatWindowProps) {
+export function ChatWindow({ header, messages, messageText, onChangeMessage, onSend, placeholderMessage }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -55,13 +56,10 @@ export function ChatWindow({ header, messages, messageText, onChangeMessage, onS
                       }`}
                     >
                       <p className="text-sm break-words whitespace-pre-wrap mb-1">{m.text}</p>
-                      <div className={`flex items-center gap-2 text-xs ${m.isOutgoing ? "text-gray-300" : "text-gray-500"}`}>
+                      <div className={`flex items-center justify-between text-xs ${m.isOutgoing ? "text-gray-300" : "text-gray-500"}`}>
                         <span>{formatChatMessageTimestamp(m.timestamp)}</span>
                         {m.isOutgoing && (
-                          <>
-                            <span>•</span>
-                            <span>{m.isRead ? "Read" : "Delivered"}</span>
-                          </>
+                          <span className="ml-2">{m.isRead ? "Read" : "Delivered"}</span>
                         )}
                       </div>
                     </div>
@@ -97,7 +95,7 @@ export function ChatWindow({ header, messages, messageText, onChangeMessage, onS
         </>
       ) : (
         <div className="flex-1 flex items-center justify-center text-gray-500">
-          <p>Select a conversation to start messaging</p>
+          <p>{placeholderMessage || "Select a conversation to start messaging"}</p>
         </div>
       )}
     </div>

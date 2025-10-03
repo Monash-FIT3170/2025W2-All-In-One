@@ -2,6 +2,7 @@ import React, { use, useEffect } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { EyeIcon } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
+import { useLocation, useNavigate } from "react-router";
 import {
   updateField,
   clearForm,
@@ -20,6 +21,10 @@ export const SignupForm = () => {
   const dispatch = useAppDispatch();
   const formState = useAppSelector(selectSignupFormUIState);
   const redirectToDashboard = useRedirectToDashboard();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const from = location.state?.from?.pathname || location.state?.from;
 
   useEffect(() => {
     dispatch(clearForm());
@@ -30,7 +35,12 @@ export const SignupForm = () => {
     const result = await dispatch(registerUser());
 
     if (registerUser.fulfilled.match(result)) {
-      redirectToDashboard(formState.accountType);
+      if (from) {
+        // navigate to the original request
+        navigate(from, { replace: true });
+      } else {
+        redirectToDashboard(formState.accountType);
+      }
     }
   };
 

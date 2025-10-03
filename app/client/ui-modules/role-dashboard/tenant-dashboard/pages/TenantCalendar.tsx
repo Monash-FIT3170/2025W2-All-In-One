@@ -15,7 +15,7 @@ import {
 } from "../state/reducers/tenant-calendar-slice";
 import { apiCreateTaskForTenant } from "/app/client/library-modules/apis/task/task-api";
 import { TaskStatus } from "/app/shared/task-status-identifier";
-import { getTodayISODate } from "/app/client/library-modules/utils/date-utils";
+import { getTodayAUDate, getTodayISODate } from "/app/client/library-modules/utils/date-utils";
 import { Tenant } from "/app/client/library-modules/domain-models/user/Tenant";
 
 export function TenantCalendar(): React.JSX.Element {
@@ -26,8 +26,8 @@ export function TenantCalendar(): React.JSX.Element {
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
   const tasks = useAppSelector(selectTenantCalendarTasks); // Retrieve tasks from Redux store
   const loading = useAppSelector(selectTenantCalendarLoading);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(getTodayAUDate());
+  const [selectedDateISO, setSelectedDateISO] = useState<string | null>(getTodayISODate());
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [properties] = useState<PropertyOption[]>([]); // Tenants don't manage properties, so empty array
   useEffect(() => { 
@@ -74,6 +74,38 @@ export function TenantCalendar(): React.JSX.Element {
     }
   };
 
+
+  
+  const toISODateOnly = (d: string | Date) => {
+    const dt = typeof d === "string" ? new Date(d) : d;
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, "0");
+    const day = String(dt.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  type Priority = "low" | "medium" | "high";
+
+  // maps badges of tasks for each date
+  const dateBadges = React.useMemo(() => {
+    const map: Record<string, { total: number; counts: Partial<Record<Priority, number>> }> = {};
+    for (const t of tasks as any[]) {
+      if (!t?.dueDate) continue;
+      
+      const iso = toISODateOnly(t.dueDate);
+      
+      const p: Priority = (t.priority as Priority) ?? "medium";
+      
+      map[iso] ??= { total: 0, counts: {} };
+      
+      map[iso].total += 1;
+      
+      map[iso].counts[p] = (map[iso].counts[p] ?? 0) + 1;
+    
+    }
+    return map;
+  }, [tasks]);
+
   const handleDeleteTask = async (taskId: string) => {
     if (!currentTenant?.tenantId) {
       console.error("No current tenant found");
@@ -119,6 +151,7 @@ export function TenantCalendar(): React.JSX.Element {
               <Calendar
                 selectedDateISO={selectedDateISO}
                 onDateSelect={handleDateSelection}
+                dateBadges={dateBadges}
               />
 
               {/* Below Calendar */}
@@ -141,7 +174,7 @@ export function TenantCalendar(): React.JSX.Element {
             </div>
 
             {/* Right Section: Upcoming Tasks */}
-            <UpcomingTasks tasks={tasks} />
+            <UpcomingTasks tasks={tasks} showViewAllButton={false} />
           </div>
         </div>
       </div>

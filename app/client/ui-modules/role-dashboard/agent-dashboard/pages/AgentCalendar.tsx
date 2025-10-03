@@ -35,8 +35,8 @@ export function AgentCalendar(): React.JSX.Element {
   const loading = useAppSelector(selectCalendarLoading);
   const markers = useAppSelector(selectCalendarMarkers);
 
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(getTodayAUDate());
+  const [selectedDateISO, setSelectedDateISO] = useState<string | null>(getTodayISODate());
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [properties, setProperties] = useState<PropertyOption[]>([]);
   const [mapUiState, setMapUiState] = useState<TaskMapUiState>({ markers: [] });
@@ -77,6 +77,40 @@ export function AgentCalendar(): React.JSX.Element {
     setSelectedDate(formatted);
     setSelectedDateISO(iso);
   };
+
+
+// normalises date/iso string to YYYY-MM-DD
+  const toISODateOnly = (d: string | Date) => {
+    const dt = typeof d === "string" ? new Date(d) : d;
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, "0");
+    const day = String(dt.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  // priorities for tasks
+  type Priority = "low" | "medium" | "high";
+
+  // maps badges of tasks for each date
+  const dateBadges = React.useMemo(() => {
+    const map: Record<string, { total: number; counts: Partial<Record<Priority, number>> }> = {};
+    for (const t of tasks as any[]) {
+      if (!t?.dueDate) continue;
+      
+      const iso = toISODateOnly(t.dueDate);
+      
+      const p: Priority = (t.priority as Priority) ?? "medium";
+      
+      map[iso] ??= { total: 0, counts: {} };
+      
+      map[iso].total += 1;
+      
+      map[iso].counts[p] = (map[iso].counts[p] ?? 0) + 1;
+    
+    }
+    return map;
+  }, [tasks]);
+
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -150,6 +184,7 @@ export function AgentCalendar(): React.JSX.Element {
               <Calendar
                 selectedDateISO={selectedDateISO}
                 onDateSelect={handleDateSelection}
+                dateBadges={dateBadges}
               />
 
               <div className="mt-4">
@@ -168,7 +203,7 @@ export function AgentCalendar(): React.JSX.Element {
                 <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
-            <UpcomingTasks tasks={tasks} />
+            <UpcomingTasks tasks={tasks} showViewAllButton={false} />
           </div>
         </div>
       </div>
