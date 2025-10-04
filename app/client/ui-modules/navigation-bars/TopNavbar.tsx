@@ -12,7 +12,10 @@ import { NotificationBellDropdown } from "../theming/components/NotificationBell
 import { selectTasks as selectAgentTasks } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
 import { selectTasks as selectTenantTasks } from "../role-dashboard/tenant-dashboard/state/reducers/tenant-dashboard-slice";
 import { selectTasks as selectLandlordTasks } from "../role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
-import { selectAllConversations, fetchConversations } from "../role-messages/state/reducers/messages-slice";
+import {
+  selectAllConversations,
+  fetchConversations,
+} from "../role-messages/state/reducers/messages-slice";
 import { Role } from "/app/shared/user-role-identifier";
 import { NavigationPath } from "../../navigation";
 
@@ -41,9 +44,19 @@ export function TopNavbar({
     }
   }, [authUser?.userId, authUser?.role, dispatch]);
 
-  const upcomingTasks = authUser?.role === Role.AGENT ? agentTasks : authUser?.role === Role.TENANT ? tenantTasks : authUser?.role === Role.LANDLORD ? landlordTasks : [];
+  const upcomingTasks =
+    authUser?.role === Role.AGENT
+      ? agentTasks
+      : authUser?.role === Role.TENANT
+        ? tenantTasks
+        : authUser?.role === Role.LANDLORD
+          ? landlordTasks
+          : [];
 
-  const totalUnreadMessages = conversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
+  const totalUnreadMessages = conversations.reduce(
+    (sum, conv) => sum + conv.unreadCount,
+    0
+  );
 
   const handleSignout = async () => {
     try {
@@ -57,7 +70,8 @@ export function TopNavbar({
   const handleGoHome = () => navigate(NavigationPath.Home);
   const handleGoProfile = () => navigate(NavigationPath.Profile);
 
-  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] =
+    useState(false);
 
   const toggleNotificationDropdown = () => {
     setIsNotificationDropdownOpen((prev) => !prev);
@@ -108,17 +122,28 @@ export function TopNavbar({
                   title={authUser.role || "User"}
                 />
               </div>
-              <Button variant="outline" className="cursor-pointer" onClick={handleSignout}>
+              <Button
+                variant="outline"
+                onClick={handleSignout}
+                className="cursor-pointer hover:bg-red-300 hover:border-red-400 transition-colors duration-200"
+              >
                 Sign out
               </Button>
             </>
           ) : (
             <div className="flex gap-4">
               <Link to="/signin">
-                <Button>Sign in</Button>
+                <Button className="hover:bg-gray-500 transition-colors duration-200">
+                  Sign in
+                </Button>
               </Link>
               <Link to="/signup">
-                <Button variant="outline">Sign up</Button>
+                <Button
+                  variant="outline"
+                  className="hover:bg-gray-200 transition-colors duration-200"
+                >
+                  Sign up
+                </Button>
               </Link>
             </div>
           )}
