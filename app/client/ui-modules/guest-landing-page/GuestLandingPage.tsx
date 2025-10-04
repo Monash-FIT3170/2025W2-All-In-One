@@ -60,6 +60,7 @@ export function GuestLandingPage() {
             />
 
             <Button
+              className="bg-neutral-900 text-white hover:bg-gray-500"
               onClick={() => {
                 handleSearch(searchQuery, navigate);
               }}
@@ -93,7 +94,12 @@ export function GuestLandingPage() {
 
                 {listedProperties.length > visibleCount && (
                   <div className="mt-6">
-                    <Button onClick={handleViewMore}>View More</Button>
+                    <Button
+                      className="h-11 px-6 rounded-xl hover:bg-gray-500 transition-colors duration-200"
+                      onClick={handleViewMore}
+                    >
+                      View More
+                    </Button>
                   </div>
                 )}
               </>
