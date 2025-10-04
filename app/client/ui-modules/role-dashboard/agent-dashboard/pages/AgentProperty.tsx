@@ -52,7 +52,9 @@ const STATUS_COLOURS: Record<string, string> = {
           {/* Header Row with Title and Action Button */}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Agent Properties</h2>
-            <Button size="sm" variant="default" onClick={() => navigate("/propertyform")} >+ List a Property</Button>
+            <Button onClick={() => navigate("/propertyform")} 
+                className="px-4 py-2 rounded-md bg-black hover:bg-gray-500 transition-colors duration-200 shadow-sm"
+                >+ List a Property</Button>
           </div>
 
           {/* Search Bar + Filter Bar Row */}
