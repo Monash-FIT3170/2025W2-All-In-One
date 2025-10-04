@@ -5,6 +5,7 @@ import { CardWidget } from "../../../common/CardWidget";
 import { Property } from "/app/client/library-modules/domain-models/property/Property";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { NavigationPath } from "/app/client/navigation";
+import { ViewAllButton } from "../../components/ViewAllButton";
 
 interface PropertyOverviewProps {
   properties: Property[];
@@ -84,15 +85,10 @@ export function MyProperties({
           </table>
         </div>
       </div>
-
       <div className="mt-4">
-        <Button
-          variant="ghost"
-          className="w-full py-3 border-transparent rounded-lg text-center hover:bg-gray-50 transition-colors"
-          onClick={handleViewAllProperties}
-        >
+        <ViewAllButton onClick={handleViewAllProperties}>
           View All Properties
-        </Button>
+        </ViewAllButton>
       </div>
     </CardWidget>
   );
