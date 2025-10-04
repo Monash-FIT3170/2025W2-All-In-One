@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "../theming-shadcn/Button";
 import { PropertyCard } from "../guest-landing-page/components/PropertyCard";
+import { PropertyCardBlank } from "../guest-landing-page/components/PropertyCardBlank";
 import { Input } from "../theming-shadcn/Input";
 import { useLocation, useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
@@ -87,35 +88,23 @@ export function GuestSearchResultsPage() {
         </div>
       </div>
 
-      {/* results */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <p className="mb-4 text-[15px] font-medium">
-          {isLoading
-            ? "Loading properties…"
-            : `${properties.length} properties found for "${
-                decodedUrlQuery || "—"
-              }"`}
-        </p>
-      </div>
-
       {/* property cards */}
       <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-16">
-        {!isLoading && properties.length === 0 && (
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center px-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <PropertyCardBlank key={i} />
+            ))}
+          </div>
+        ) : properties.length === 0 ? (
           <div className="text-center text-neutral-700">
             No results found for "{decodedUrlQuery}".
           </div>
-        )}
-
-        {!isLoading && properties.length > 0 && (
+        ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center px-4">
               {shown.map((prop) => (
-                <div
-                  key={prop.propertyId}
-                  className="bg-white border border-neutral-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition"
-                >
-                  <PropertyCard {...prop} />
-                </div>
+                <PropertyCard key={prop.propertyId} {...prop} />
               ))}
             </div>
 
