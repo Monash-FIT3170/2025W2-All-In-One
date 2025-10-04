@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Progress } from "../../components/ProgressBar";
-import { CardWidget } from "../../components/CardWidget";
+import { CardWidget } from "../../../common/CardWidget";
 
 interface AgentDashBoardProps {
   propertyCount: number;
@@ -19,10 +19,7 @@ export function AgentDashboardCards({
 }: AgentDashBoardProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-      <CardWidget
-        title="Total Properties"
-        value={propertyCount.toString()}
-      />
+      <CardWidget title="Total Properties" value={propertyCount.toString()} />
       <CardWidget title="Occupancy Rate" value={`${occupancyRate.toFixed(2)}%`}>
         <Progress value={occupancyRate} className="mt-2" />
       </CardWidget>

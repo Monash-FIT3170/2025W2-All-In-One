@@ -16,8 +16,8 @@ export function ViewAllButton({
 }: ViewAllButtonProps): React.JSX.Element {
   return (
     <Button
-      variant="ghost"
-      className={`w-full py-3 border-transparent rounded-lg text-center hover:bg-gray-50 transition-colors ${className}`}
+      variant="default"
+      className={`w-full py-3 border-transparent rounded-lg text-center bg-slate-800 hover:bg-gray-500 transition-colors duration-200 ${className}`}
       onClick={onClick}
       disabled={disabled}
     >

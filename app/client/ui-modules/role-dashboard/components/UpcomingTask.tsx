@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router";
-import { CardWidget } from "./CardWidget";
+import { CardWidget } from "../../common/CardWidget";
 import { ViewAllButton } from "./ViewAllButton";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { parse, format, isTomorrow, compareAsc } from "date-fns";

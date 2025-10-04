@@ -1,5 +1,5 @@
 import React from "react";
-import { CardWidget } from "../../components/CardWidget";
+import { CardWidget } from "../../../common/CardWidget";
 import { Progress } from "../../components/ProgressBar";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { TaskStatus } from "/app/shared/task-status-identifier";
@@ -24,26 +24,28 @@ function DashboardCards({ rentAmount, tasks = [] }: DashboardCardsProps) {
   const leaseMonthsRemaining = useAppSelector(selectLeaseMonthsRemaining);
 
   // Calculate pending tasks (not completed)
-  const pendingTasks = tasks.filter(t => t.status !== TaskStatus.COMPLETED);
+  const pendingTasks = tasks.filter((t) => t.status !== TaskStatus.COMPLETED);
   const pendingTasksCount = pendingTasks.length;
 
   // Calculate tasks due this week
   const start = startOfWeek(new Date(), { weekStartsOn: 0 }); // Sunday
   const end = endOfWeek(new Date(), { weekStartsOn: 0 });
 
-  const tasksDueThisWeek = pendingTasks.filter(t => {
+  const tasksDueThisWeek = pendingTasks.filter((t) => {
     const due = parseISO(t.dueDate); // YYYY-MM-DD
     return isWithinInterval(due, { start, end });
   }).length;
 
   // Determine lease display values based on enum
-  const leaseValue = leaseStatusKind === LeaseStatusKind.NotAvailable 
-    ? "N/A" 
-    : `${leaseMonthsRemaining} months`;
-  
-  const leaseSubtitle = leaseStatusKind === LeaseStatusKind.NotAvailable
-    ? "Not available yet"
-    : "Remaining on current lease";
+  const leaseValue =
+    leaseStatusKind === LeaseStatusKind.NotAvailable
+      ? "N/A"
+      : `${leaseMonthsRemaining} months`;
+
+  const leaseSubtitle =
+    leaseStatusKind === LeaseStatusKind.NotAvailable
+      ? "Not available yet"
+      : "Remaining on current lease";
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">

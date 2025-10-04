@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CardWidget } from "../../components/CardWidget";
+import { CardWidget } from "../../../common/CardWidget";
 import { Progress } from "../../components/ProgressBar";
 
 interface LandlordDashBoardProps {
