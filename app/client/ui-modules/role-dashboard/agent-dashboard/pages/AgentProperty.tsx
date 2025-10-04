@@ -15,6 +15,7 @@ import { PropertyCard } from "/app/client/ui-modules/role-dashboard/components/P
 import { useNavigate } from "react-router";
 import { PropertyWithListingDataAndNames } from "../../landlord-dashboard/state/landlord-properties-slice";
 import { NavigationPath } from "/app/client/navigation";
+import { List } from "lucide-react";
 
 export function AgentProperty(): React.JSX.Element {
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
@@ -31,6 +32,14 @@ export function AgentProperty(): React.JSX.Element {
     PropertyStatus.OCCUPIED,
     ListingStatus.CLOSED,   
   ];
+
+const STATUS_COLOURS: Record<string, string> = {
+    ALL: "bg-gray-200 text-slate-800 hover:bg-gray-500",
+    [ListingStatus.DRAFT]: "bg-orange-100 hover:bg-gray-200",
+    [PropertyStatus.VACANT]: "bg-red-100 hover:bg-gray-200",
+    [PropertyStatus.OCCUPIED]: "bg-blue-100 hover:bg-gray-200",
+    [ListingStatus.CLOSED]: "bg-green-100 hover:bg-gray-200"
+}
   useEffect(() => {
     dispatch(fetchAgentPropertiesWithListingData());
   }, [currentUser?.userId, dispatch]);
@@ -71,8 +80,8 @@ export function AgentProperty(): React.JSX.Element {
                     className={
                       `inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ` +
                       (selected
-                        ? "bg-white text-black border-gray-400 shadow-sm"
-                        : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200")
+                        ? "ring-2 ring-offset-1"
+                        : STATUS_COLOURS[status])
                     }
                   >
                     {status}
