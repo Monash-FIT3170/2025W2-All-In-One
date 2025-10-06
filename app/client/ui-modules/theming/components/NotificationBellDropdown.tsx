@@ -6,8 +6,17 @@ import { Conversation } from '/app/client/library-modules/domain-models/messagin
 import { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { NavigationPath } from '../../../navigation';
-import { useAppSelector } from '/app/client/store';
+import { useAppSelector, useAppDispatch } from '/app/client/store';
 import { Role } from '/app/shared/user-role-identifier';
+import {
+  selectNotificationTasks,
+  selectNotificationConversations,
+  selectUnreadMessageCount,
+  selectNotificationLoading,
+  fetchNotificationTasks,
+  updateNotificationConversations
+} from '../state/notification-slice';
+import { useNotificationSubscriptions } from '../hooks/useNotificationSubscriptions';
 
 interface NotificationDropdownProps {
   open: boolean;
@@ -19,7 +28,29 @@ interface NotificationDropdownProps {
 export function NotificationBellDropdown({ open, onClose, tasks, conversations }: NotificationDropdownProps) {
   const popupRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const authUser = useAppSelector((state) => state.currentUser.authUser);
+
+  // Get data from Redux notification slice
+  const reduxTasks = useAppSelector(selectNotificationTasks);
+  const reduxConversations = useAppSelector(selectNotificationConversations);
+  const unreadMessageCount = useAppSelector(selectUnreadMessageCount);
+  const isLoading = useAppSelector(selectNotificationLoading);
+
+  // Use Redux data if available, otherwise fall back to props
+  const displayTasks = reduxTasks.length > 0 ? reduxTasks : tasks;
+  const displayConversations = reduxConversations.length > 0 ? reduxConversations : conversations;
+
+  // Use notification subscriptions for real-time updates
+  useNotificationSubscriptions({ enabled: true });
+
+  // Fetch notification data when dropdown opens
+  useEffect(() => {
+    if (open && authUser) {
+      dispatch(fetchNotificationTasks());
+      dispatch(updateNotificationConversations());
+    }
+  }, [open, authUser, dispatch]);
 
   useEffect(() => {
     if (!open) return;
@@ -79,7 +110,7 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
     onClose(); // Close the dropdown after navigation
   };
 
-  const transformedTasks = tasks
+  const transformedTasks = displayTasks
     .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks
     .sort((a, b) => {
       const dateA = parse(a.dueDate, "dd/MM/yyyy", new Date());
@@ -132,8 +163,8 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
         )}
         {/* New Messages Section */}
         {(() => {
-          const newMessageConversations = conversations.filter(conv => conv.unreadCount > 0);
-          const totalUnreadCount = newMessageConversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
+          const newMessageConversations = displayConversations.filter(conv => conv.unreadCount > 0);
+          const totalUnreadCount = unreadMessageCount > 0 ? unreadMessageCount : newMessageConversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
           const sortedConversations = newMessageConversations.sort((a, b) => {
             if (!a.timestamp && !b.timestamp) return 0;
             if (!a.timestamp) return 1;
@@ -142,7 +173,7 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
           });
           const latestConversation = sortedConversations[0];
 
-          return newMessageConversations.length > 0 ? (
+          return newMessageConversations.length > 0 || totalUnreadCount > 0 ? (
             <div
               className="px-4 py-3 border-t border-gray-100 hover:bg-gray-50 transition cursor-pointer"
               onClick={handleMessagesClick}
