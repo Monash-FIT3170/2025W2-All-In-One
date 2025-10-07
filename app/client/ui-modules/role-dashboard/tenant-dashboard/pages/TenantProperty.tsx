@@ -62,6 +62,17 @@ export function TenantProperty({
         />
       </>
     );
+  } else if (!state.hasProperty) {
+    return (
+      <div className={twMerge("p-5 text-center", className)}>
+        <h2 className="text-2xl font-semibold mb-4">You do not have a property.</h2>
+        {state.fetchError ? (
+          <p className="text-red-600 mb-4">Error: {state.fetchError}</p>
+        ) : (
+          <p className="text-gray-600 mb-4">You don't have a property assigned to you yet.</p>
+        )}
+      </div>
+    );
   } else {
     return (
       <>
