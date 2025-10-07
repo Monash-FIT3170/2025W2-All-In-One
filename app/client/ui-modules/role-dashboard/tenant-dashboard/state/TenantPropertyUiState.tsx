@@ -38,4 +38,6 @@ export type TenantPropertyUiState = {
   landlords: Landlord[];
   isSubmittingDraft: boolean;
   currentPropertyId?: string;
+  hasProperty: boolean;
+  fetchError: string | null;
 };
