@@ -20,11 +20,12 @@ import {
   submitDraftListingAsync,
 } from "/app/client/ui-modules/role-dashboard/tenant-dashboard/state/reducers/tenant-property-slice";
 import { TenantPropertyUiState } from "../state/TenantPropertyUiState";
-import { useSearchParams } from "react-router";
+import { useSearchParams, useNavigate } from "react-router";
 import { SubHeading } from "../../../theming/components/SubHeading";
 import { PropertyMap, PropertyMapUiState } from "../../../common/property-components/PropertyMap";
 import { fetchAgentWithProfile } from '../state/reducers/tenant-property-slice';
 import { AgentDetails } from '../components/AgentDetails';
+import { NavigationPath } from "/app/client/navigation";
 
 export function TenantProperty({
   className = "",
@@ -34,6 +35,7 @@ export function TenantProperty({
   const [searchParams] = useSearchParams();
   const propertyId = searchParams.get("propertyId");
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
   const state: TenantPropertyUiState = useSelector(
     selectTenantPropertyUiState
@@ -65,12 +67,17 @@ export function TenantProperty({
   } else if (!state.hasProperty) {
     return (
       <div className={twMerge("p-5 text-center", className)}>
-        <h2 className="text-2xl font-semibold mb-4">You do not have a property.</h2>
         {state.fetchError ? (
           <p className="text-red-600 mb-4">Error: {state.fetchError}</p>
         ) : (
-          <p className="text-gray-600 mb-4">You don't have a property assigned to you yet.</p>
+          <h2 className="text-2xl font-semibold mb-4">You don't have a property assigned to you yet.</h2>
         )}
+        <button
+          onClick={() => navigate(NavigationPath.Home)}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
+        >
+          Explore Available Properties
+        </button>
       </div>
     );
   } else {
