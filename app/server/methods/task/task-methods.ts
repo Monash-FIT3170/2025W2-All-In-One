@@ -15,6 +15,8 @@ type TaskUpdateData = {
   dueDate?: Date;
   priority?: TaskPriority;
   taskStatus?: TaskStatus;
+  taskPropertyAddress?: string;
+  taskPropertyId?: string;
 };
 /**
  * Retrieves a task by its ID and returns it as an `ApiTask` DTO.
@@ -330,6 +332,8 @@ const taskUpdateMethod = {
     dueDate?: Date;
     priority?: TaskPriority;
     status?: TaskStatus;
+    propertyAddress?: string;
+    propertyId?: string;
   }): Promise<string> => {
     console.log("taskUpdateMethod called with:", taskData);
 
@@ -356,6 +360,12 @@ const taskUpdateMethod = {
     }
     if (taskData.status !== undefined) {
       updateData.taskStatus = taskData.status;
+    }
+    if (taskData.propertyAddress !== undefined) {
+      updateData.taskPropertyAddress = taskData.propertyAddress;
+    }
+    if (taskData.propertyId !== undefined) {
+      updateData.taskPropertyId = taskData.propertyId;
     }
 
     try {
