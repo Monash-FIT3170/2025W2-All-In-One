@@ -12,7 +12,6 @@ import {
   selectNotificationTasks,
   selectNotificationConversations,
   selectUnreadMessageCount,
-  selectNotificationLoading,
   fetchNotificationTasks,
   updateNotificationConversations
 } from '../state/notification-slice';
@@ -35,22 +34,10 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
   const reduxTasks = useAppSelector(selectNotificationTasks);
   const reduxConversations = useAppSelector(selectNotificationConversations);
   const unreadMessageCount = useAppSelector(selectUnreadMessageCount);
-  const isLoading = useAppSelector(selectNotificationLoading);
 
   // Use Redux data if available, otherwise fall back to props
   const displayTasks = reduxTasks.length > 0 ? reduxTasks : (tasks || []);
   const displayConversations = reduxConversations.length > 0 ? reduxConversations : (conversations || []);
-
-  // Debug logging
-  console.log("NotificationBellDropdown Debug:", {
-    reduxTasksCount: reduxTasks.length,
-    reduxConversationsCount: reduxConversations.length,
-    displayTasksCount: displayTasks.length,
-    displayConversationsCount: displayConversations.length,
-    isLoading,
-    authUser: authUser?.role,
-    reduxTasks: reduxTasks
-  });
 
   // Use notification subscriptions for real-time updates
   useNotificationSubscriptions({ enabled: true });
@@ -58,7 +45,6 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
   // Fetch notification data when dropdown opens
   useEffect(() => {
     if (open && authUser) {
-      console.log("Notification dropdown opened, fetching tasks...");
       dispatch(fetchNotificationTasks());
       dispatch(updateNotificationConversations());
     }
@@ -81,13 +67,6 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
   }, [open, onClose]);
 
   if (!open) return null;
-
-  const formatTaskDate = (date: Date): string => {
-    if (!date || isNaN(date.getTime())) {
-      return 'Invalid Date';
-    }
-    return format(date, 'MMM d, h:mm a');
-  };
 
   const getStatusStyle = (status: string) => {
     switch (status) {
@@ -125,9 +104,7 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
   const transformedTasks = displayTasks
     .filter((task) => {
       // Only show upcoming tasks: Not Started and In Progress
-      const isUpcoming = task.status === TaskStatus.NOTSTARTED || task.status === TaskStatus.INPROGRESS;
-      console.log(`Task "${task.name}": status="${task.status}", isUpcoming=${isUpcoming}`);
-      return isUpcoming;
+      return task.status === TaskStatus.NOTSTARTED || task.status === TaskStatus.INPROGRESS;
     })
     .sort((a, b) => {
       // Handle different date formats more robustly

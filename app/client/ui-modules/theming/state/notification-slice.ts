@@ -53,12 +53,6 @@ export const fetchNotificationTasks = createAsyncThunk(
 
       if (authUser.role === Role.AGENT && 'agentId' in currentUser) {
         try {
-          console.log("Fetching agent tasks for notifications");
-          console.log("Current user data:", {
-            agentId: currentUser.agentId,
-            userAccountId: currentUser.userAccountId
-          });
-
           // Use the same approach as the agent dashboard but call it properly
           const { getAgentById } = await import("/app/client/library-modules/domain-models/user/role-repositories/agent-repository");
 
@@ -66,25 +60,17 @@ export const fetchNotificationTasks = createAsyncThunk(
           let agentData;
           try {
             agentData = await getAgentById(currentUser.userAccountId);
-            console.log("Successfully fetched agent by userAccountId:", agentData);
           } catch (error) {
-            console.log("Failed to fetch by userAccountId, trying agentId:", error);
             agentData = await getAgentById(currentUser.agentId);
-            console.log("Successfully fetched agent by agentId:", agentData);
           }
 
           if (agentData.tasks && agentData.tasks.length > 0) {
             const { getTaskById } = await import("/app/client/library-modules/domain-models/task/repositories/task-repository");
             const taskPromises = agentData.tasks.slice(0, 5).map((taskId: string) => getTaskById(taskId));
             const taskResults = await Promise.all(taskPromises);
-            console.log("Task results:", taskResults);
             tasks = taskResults.filter(task => task && task.status !== TaskStatus.COMPLETED);
-            console.log("Filtered tasks:", tasks);
-          } else {
-            console.log("No tasks found for agent");
           }
         } catch (error) {
-          console.error("Error fetching agent tasks for notifications:", error);
           tasks = [];
         }
       } else if (authUser.role === Role.TENANT && 'tenantId' in currentUser) {
@@ -98,7 +84,6 @@ export const fetchNotificationTasks = createAsyncThunk(
             tasks = taskResults.filter(task => task && task.status !== TaskStatus.COMPLETED);
           }
         } catch (error) {
-          console.error("Error fetching tenant tasks for notifications:", error);
           tasks = [];
         }
       } else if (authUser.role === Role.LANDLORD && 'landlordId' in currentUser) {
@@ -112,14 +97,12 @@ export const fetchNotificationTasks = createAsyncThunk(
             tasks = taskResults.filter(task => task && task.status !== TaskStatus.COMPLETED);
           }
         } catch (error) {
-          console.error("Error fetching landlord tasks for notifications:", error);
           tasks = [];
         }
       }
 
       return tasks;
     } catch (error) {
-      console.error("Error fetching notification tasks:", error);
       return rejectWithValue(error instanceof Error ? error.message : "Failed to fetch tasks");
     }
   }
@@ -169,7 +152,6 @@ export const updateNotificationConversations = createAsyncThunk(
 
       return { conversations, unreadMessageCount };
     } catch (error) {
-      console.error("Error updating notification conversations:", error);
       return rejectWithValue(error instanceof Error ? error.message : "Failed to update conversations");
     }
   }

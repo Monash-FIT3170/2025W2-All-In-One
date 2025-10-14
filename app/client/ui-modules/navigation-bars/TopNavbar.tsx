@@ -9,20 +9,11 @@ import { useAppSelector, useAppDispatch } from "/app/client/store";
 import { ProfileFooter } from "../navigation-bars/side-nav-bars/components/ProfileFooter";
 import { signoutUser } from "../user-authentication/state/reducers/current-user-slice";
 import { NotificationBellDropdown } from "../theming/components/NotificationBellDropdown";
-import { selectTasks as selectAgentTasks } from "../role-dashboard/agent-dashboard/state/agent-dashboard-slice";
-import { selectTasks as selectTenantTasks } from "../role-dashboard/tenant-dashboard/state/reducers/tenant-dashboard-slice";
-import { selectTasks as selectLandlordTasks } from "../role-dashboard/landlord-dashboard/state/landlord-dashboard-slice";
-import {
-  selectAllConversations,
-  fetchConversations,
-} from "../role-messages/state/reducers/messages-slice";
+
 import {
   fetchNotificationTasks,
   updateNotificationConversations,
-  selectNotificationTasks,
-  selectNotificationConversations,
 } from "../theming/state/notification-slice";
-import { Role } from "/app/shared/user-role-identifier";
 import { NavigationPath } from "../../navigation";
 
 interface TopNavbarProps {
@@ -38,33 +29,13 @@ export function TopNavbar({
   const profileData = useAppSelector((state) => state.currentUser.profileData);
   const authUser = useAppSelector((state) => state.currentUser.authUser);
 
-  const agentTasks = useAppSelector(selectAgentTasks);
-  const tenantTasks = useAppSelector(selectTenantTasks);
-  const landlordTasks = useAppSelector(selectLandlordTasks);
-  const conversations = useAppSelector(selectAllConversations);
-
   // Load conversations and notification data globally when user is authenticated
   React.useEffect(() => {
     if (authUser?.userId && authUser?.role) {
-      dispatch(fetchConversations());
       dispatch(fetchNotificationTasks());
       dispatch(updateNotificationConversations());
     }
   }, [authUser?.userId, authUser?.role, dispatch]);
-
-  const upcomingTasks =
-    authUser?.role === Role.AGENT
-      ? agentTasks
-      : authUser?.role === Role.TENANT
-        ? tenantTasks
-        : authUser?.role === Role.LANDLORD
-          ? landlordTasks
-          : [];
-
-  const totalUnreadMessages = conversations.reduce(
-    (sum, conv) => sum + conv.unreadCount,
-    0
-  );
 
   const handleSignout = async () => {
     try {
@@ -80,10 +51,6 @@ export function TopNavbar({
 
   const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] =
     useState(false);
-
-  const toggleNotificationDropdown = () => {
-    setIsNotificationDropdownOpen((prev) => !prev);
-  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-2">
@@ -112,7 +79,7 @@ export function TopNavbar({
               <BellIcon
                 hasNotifications={true}
                 className="text-gray-600 cursor-pointer"
-                onClick={toggleNotificationDropdown}
+                onClick={() => setIsNotificationDropdownOpen((prev) => !prev)}
               />
               <div className="relative">
                 {/* Notification Board */}
