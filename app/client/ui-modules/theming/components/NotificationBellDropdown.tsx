@@ -21,8 +21,8 @@ import { useNotificationSubscriptions } from '../hooks/useNotificationSubscripti
 interface NotificationDropdownProps {
   open: boolean;
   onClose: () => void;
-  tasks: Task[];
-  conversations: Conversation[];
+  tasks?: Task[]; // Made optional since we'll use Redux state
+  conversations?: Conversation[]; // Made optional since we'll use Redux state
 }
 
 export function NotificationBellDropdown({ open, onClose, tasks, conversations }: NotificationDropdownProps) {
@@ -38,8 +38,19 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
   const isLoading = useAppSelector(selectNotificationLoading);
 
   // Use Redux data if available, otherwise fall back to props
-  const displayTasks = reduxTasks.length > 0 ? reduxTasks : tasks;
-  const displayConversations = reduxConversations.length > 0 ? reduxConversations : conversations;
+  const displayTasks = reduxTasks.length > 0 ? reduxTasks : (tasks || []);
+  const displayConversations = reduxConversations.length > 0 ? reduxConversations : (conversations || []);
+
+  // Debug logging
+  console.log("NotificationBellDropdown Debug:", {
+    reduxTasksCount: reduxTasks.length,
+    reduxConversationsCount: reduxConversations.length,
+    displayTasksCount: displayTasks.length,
+    displayConversationsCount: displayConversations.length,
+    isLoading,
+    authUser: authUser?.role,
+    reduxTasks: reduxTasks
+  });
 
   // Use notification subscriptions for real-time updates
   useNotificationSubscriptions({ enabled: true });
@@ -47,6 +58,7 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
   // Fetch notification data when dropdown opens
   useEffect(() => {
     if (open && authUser) {
+      console.log("Notification dropdown opened, fetching tasks...");
       dispatch(fetchNotificationTasks());
       dispatch(updateNotificationConversations());
     }
@@ -111,11 +123,33 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
   };
 
   const transformedTasks = displayTasks
-    .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks
+    .filter((task) => {
+      // Only show upcoming tasks: Not Started and In Progress
+      const isUpcoming = task.status === TaskStatus.NOTSTARTED || task.status === TaskStatus.INPROGRESS;
+      console.log(`Task "${task.name}": status="${task.status}", isUpcoming=${isUpcoming}`);
+      return isUpcoming;
+    })
     .sort((a, b) => {
-      const dateA = parse(a.dueDate, "dd/MM/yyyy", new Date());
-      const dateB = parse(b.dueDate, "dd/MM/yyyy", new Date());
-      return compareAsc(dateB, dateA); // Descending orderc
+      // Handle different date formats more robustly
+      const parseDate = (dateStr: string) => {
+        // Try parsing as dd/MM/yyyy first
+        let date = parse(dateStr, "dd/MM/yyyy", new Date());
+        if (isNaN(date.getTime())) {
+          // If that fails, try parsing as ISO string or other formats
+          date = new Date(dateStr);
+        }
+        return date;
+      };
+
+      const dateA = parseDate(a.dueDate);
+      const dateB = parseDate(b.dueDate);
+
+      // Handle invalid dates
+      if (isNaN(dateA.getTime()) && isNaN(dateB.getTime())) return 0;
+      if (isNaN(dateA.getTime())) return 1;
+      if (isNaN(dateB.getTime())) return -1;
+
+      return compareAsc(dateB, dateA); // Descending order
     });
 
   return (

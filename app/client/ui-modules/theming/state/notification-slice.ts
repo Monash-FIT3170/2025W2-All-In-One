@@ -10,6 +10,7 @@ import { RootState } from "../../../store";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { Conversation } from "/app/client/library-modules/domain-models/messaging/Conversation";
 import { Role } from "/app/shared/user-role-identifier";
+import { TaskStatus } from "/app/shared/task-status-identifier";
 import { Agent } from "/app/client/library-modules/domain-models/user/Agent";
 import { Tenant } from "/app/client/library-modules/domain-models/user/Tenant";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
@@ -47,9 +48,74 @@ export const fetchNotificationTasks = createAsyncThunk(
         return rejectWithValue("User not authenticated");
       }
 
-      // For now, return empty tasks array since we need to implement proper task fetching
-      // This will be enhanced in the next iteration
+      // Fetch tasks using existing dashboard task fetching logic
       let tasks: Task[] = [];
+
+      if (authUser.role === Role.AGENT && 'agentId' in currentUser) {
+        try {
+          console.log("Fetching agent tasks for notifications");
+          console.log("Current user data:", {
+            agentId: currentUser.agentId,
+            userAccountId: currentUser.userAccountId
+          });
+
+          // Use the same approach as the agent dashboard but call it properly
+          const { getAgentById } = await import("/app/client/library-modules/domain-models/user/role-repositories/agent-repository");
+
+          // Try fetching by userAccountId first, then by agentId if that fails
+          let agentData;
+          try {
+            agentData = await getAgentById(currentUser.userAccountId);
+            console.log("Successfully fetched agent by userAccountId:", agentData);
+          } catch (error) {
+            console.log("Failed to fetch by userAccountId, trying agentId:", error);
+            agentData = await getAgentById(currentUser.agentId);
+            console.log("Successfully fetched agent by agentId:", agentData);
+          }
+
+          if (agentData.tasks && agentData.tasks.length > 0) {
+            const { getTaskById } = await import("/app/client/library-modules/domain-models/task/repositories/task-repository");
+            const taskPromises = agentData.tasks.slice(0, 5).map((taskId: string) => getTaskById(taskId));
+            const taskResults = await Promise.all(taskPromises);
+            console.log("Task results:", taskResults);
+            tasks = taskResults.filter(task => task && task.status !== TaskStatus.COMPLETED);
+            console.log("Filtered tasks:", tasks);
+          } else {
+            console.log("No tasks found for agent");
+          }
+        } catch (error) {
+          console.error("Error fetching agent tasks for notifications:", error);
+          tasks = [];
+        }
+      } else if (authUser.role === Role.TENANT && 'tenantId' in currentUser) {
+        try {
+          const { getTenantById } = await import("/app/client/library-modules/domain-models/user/role-repositories/tenant-repository");
+          const tenantData = await getTenantById(currentUser.tenantId);
+          if (tenantData.tasks && tenantData.tasks.length > 0) {
+            const { getTaskById } = await import("/app/client/library-modules/domain-models/task/repositories/task-repository");
+            const taskPromises = tenantData.tasks.slice(0, 5).map((taskId: string) => getTaskById(taskId));
+            const taskResults = await Promise.all(taskPromises);
+            tasks = taskResults.filter(task => task && task.status !== TaskStatus.COMPLETED);
+          }
+        } catch (error) {
+          console.error("Error fetching tenant tasks for notifications:", error);
+          tasks = [];
+        }
+      } else if (authUser.role === Role.LANDLORD && 'landlordId' in currentUser) {
+        try {
+          const { getLandlordById } = await import("/app/client/library-modules/domain-models/user/role-repositories/landlord-repository");
+          const landlordData = await getLandlordById(currentUser.landlordId);
+          if (landlordData.tasks && landlordData.tasks.length > 0) {
+            const { getTaskById } = await import("/app/client/library-modules/domain-models/task/repositories/task-repository");
+            const taskPromises = landlordData.tasks.slice(0, 5).map((taskId: string) => getTaskById(taskId));
+            const taskResults = await Promise.all(taskPromises);
+            tasks = taskResults.filter(task => task && task.status !== TaskStatus.COMPLETED);
+          }
+        } catch (error) {
+          console.error("Error fetching landlord tasks for notifications:", error);
+          tasks = [];
+        }
+      }
 
       return tasks;
     } catch (error) {

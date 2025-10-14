@@ -16,6 +16,12 @@ import {
   selectAllConversations,
   fetchConversations,
 } from "../role-messages/state/reducers/messages-slice";
+import {
+  fetchNotificationTasks,
+  updateNotificationConversations,
+  selectNotificationTasks,
+  selectNotificationConversations,
+} from "../theming/state/notification-slice";
 import { Role } from "/app/shared/user-role-identifier";
 import { NavigationPath } from "../../navigation";
 
@@ -37,10 +43,12 @@ export function TopNavbar({
   const landlordTasks = useAppSelector(selectLandlordTasks);
   const conversations = useAppSelector(selectAllConversations);
 
-  // Load conversations globally when user is authenticated (like tasks)
+  // Load conversations and notification data globally when user is authenticated
   React.useEffect(() => {
     if (authUser?.userId && authUser?.role) {
       dispatch(fetchConversations());
+      dispatch(fetchNotificationTasks());
+      dispatch(updateNotificationConversations());
     }
   }, [authUser?.userId, authUser?.role, dispatch]);
 
@@ -111,8 +119,6 @@ export function TopNavbar({
                 <NotificationBellDropdown
                   open={isNotificationDropdownOpen}
                   onClose={() => setIsNotificationDropdownOpen(false)}
-                  tasks={upcomingTasks}
-                  conversations={conversations}
                 />
               </div>
               <div className="cursor-pointer" onClick={handleGoProfile}>
