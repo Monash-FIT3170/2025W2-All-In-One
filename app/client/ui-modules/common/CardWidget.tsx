@@ -20,7 +20,9 @@ export function CardWidget({
   rightElement,
 }: CardWidgetProps): React.JSX.Element {
   return (
-    <div className={`bg-white rounded-lg p-6 shadow-md border border-gray-200 ${className}`}>
+    <div
+      className={`bg-white rounded-lg p-6 shadow-md border border-gray-200 ${className}`}
+    >
       <div className="flex justify-between items-start">
         <div>
           <h3 className="text-xl font-semibold text-gray-900">{title}</h3>

@@ -1,5 +1,5 @@
 import React from "react";
-import { CardWidget } from "../../role-dashboard/components/CardWidget";
+import { CardWidget } from "../../common/CardWidget";
 import {
   selectIsEditing,
   selectProfileData,

@@ -6,20 +6,24 @@ import { UpcomingTasks } from "../../components/UpcomingTask";
 import { MyProperties } from "../components/MyProperties";
 import {
   selectTasks,
-  selectProperties,
   fetchLandlordDetails,
   selectLandlordDashboard,
 } from "../state/landlord-dashboard-slice";
+import {
+  selectLandlordProperties,
+  fetchLandlordProperties
+} from "../state/landlord-properties-slice";
 
 export function LandlordDashboard(): React.JSX.Element {
   const dispatch = useAppDispatch();
-  const properties = useAppSelector(selectProperties);
+  const properties = useAppSelector(selectLandlordProperties);
   const tasks = useAppSelector(selectTasks);
   const dashboardData = useAppSelector(selectLandlordDashboard);
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchLandlordDetails());
+      dispatch(fetchLandlordProperties(currentUser.userId));
     } else {
       console.warn("No user ID found. Please log in to view the dashboard.");
     }

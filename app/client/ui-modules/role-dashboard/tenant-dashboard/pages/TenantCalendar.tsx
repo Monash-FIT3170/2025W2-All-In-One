@@ -11,6 +11,7 @@ import {
   selectTenantCalendarLoading, 
   selectTenantCalendarTasks,
   deleteTenantCalendarTask,
+  updateTenantCalendarTaskStatus,
 } from "../state/reducers/tenant-calendar-slice";
 import { apiCreateTaskForTenant } from "/app/client/library-modules/apis/task/task-api";
 import { TaskStatus } from "/app/shared/task-status-identifier";
@@ -122,6 +123,18 @@ export function TenantCalendar(): React.JSX.Element {
     }
   };
 
+  const handleTaskStatusUpdate = async (taskId: string, status: TaskStatus) => {
+    try {
+      await dispatch(updateTenantCalendarTaskStatus({
+        taskId,
+        status
+      }));
+      console.log(`Task ${taskId} status updated to ${status}`);
+    } catch (error) {
+      console.error("Failed to update task status:", error);
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -153,6 +166,7 @@ export function TenantCalendar(): React.JSX.Element {
                   selectedDateISO={selectedDateISO}
                   showPropertyAddress={false}
                   onDeleteTask={handleDeleteTask}
+                  onUpdateTaskStatus={handleTaskStatusUpdate}
                 />
                 <br />
                 <Button onClick={handleOpenModal}>Add Task</Button>

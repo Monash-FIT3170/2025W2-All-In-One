@@ -1,13 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router";
 import { Button } from "../../../theming-shadcn/Button";
-import { CardWidget } from "../../components/CardWidget";
-import { Property } from "/app/client/library-modules/domain-models/property/Property";
+import { CardWidget } from "../../../common/CardWidget";
+import { PropertyWithListingDataAndNames } from "../state/landlord-properties-slice";
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { NavigationPath } from "/app/client/navigation";
+import { ViewAllButton } from "../../components/ViewAllButton";
 
 interface PropertyOverviewProps {
-  properties: Property[];
+  properties: PropertyWithListingDataAndNames[];
 }
 
 export function MyProperties({
@@ -17,6 +18,13 @@ export function MyProperties({
 
   const handleViewAllProperties = () => {
     navigate(NavigationPath.LandlordProperties);
+  };
+
+  const handlePropertyClick = (property: PropertyWithListingDataAndNames) => {
+    const url = `${NavigationPath.LandlordPropertyDetail}?propertyId=${property.propertyId}`;
+    navigate(url, {
+      state: { property }
+    });
   };
   return (
     <CardWidget
@@ -60,7 +68,11 @@ export function MyProperties({
             </thead>
             <tbody className="divide-y divide-gray-200">
               {properties.map((property, index) => (
-                <tr key={index} className="transition-colors hover:bg-gray-50">
+                <tr 
+                  key={index} 
+                  className="transition-colors hover:bg-gray-50 cursor-pointer"
+                  onClick={() => handlePropertyClick(property)}
+                >
                   <td className="px-6 py-4 text-sm">{`${property.streetnumber} ${property.streetname}`}</td>
                   <td className="px-6 py-4">
                     <span
@@ -84,15 +96,10 @@ export function MyProperties({
           </table>
         </div>
       </div>
-
       <div className="mt-4">
-        <Button
-          variant="ghost"
-          className="w-full py-3 border-transparent rounded-lg text-center hover:bg-gray-50 transition-colors"
-          onClick={handleViewAllProperties}
-        >
+        <ViewAllButton onClick={handleViewAllProperties}>
           View All Properties
-        </Button>
+        </ViewAllButton>
       </div>
     </CardWidget>
   );
