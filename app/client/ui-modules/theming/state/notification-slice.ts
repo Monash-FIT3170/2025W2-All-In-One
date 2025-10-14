@@ -76,7 +76,14 @@ export const fetchNotificationTasks = createAsyncThunk(
       } else if (authUser.role === Role.TENANT && 'tenantId' in currentUser) {
         try {
           const { getTenantById } = await import("/app/client/library-modules/domain-models/user/role-repositories/tenant-repository");
-          const tenantData = await getTenantById(currentUser.tenantId);
+
+          // Try fetching by userAccountId first, then by tenantId if that fails
+          let tenantData;
+          try {
+            tenantData = await getTenantById(currentUser.userAccountId);
+          } catch (error) {
+            tenantData = await getTenantById(currentUser.tenantId);
+          }
           if (tenantData.tasks && tenantData.tasks.length > 0) {
             const { getTaskById } = await import("/app/client/library-modules/domain-models/task/repositories/task-repository");
             const taskPromises = tenantData.tasks.slice(0, 5).map((taskId: string) => getTaskById(taskId));
@@ -89,7 +96,14 @@ export const fetchNotificationTasks = createAsyncThunk(
       } else if (authUser.role === Role.LANDLORD && 'landlordId' in currentUser) {
         try {
           const { getLandlordById } = await import("/app/client/library-modules/domain-models/user/role-repositories/landlord-repository");
-          const landlordData = await getLandlordById(currentUser.landlordId);
+
+          // Try fetching by userAccountId first, then by landlordId if that fails
+          let landlordData;
+          try {
+            landlordData = await getLandlordById(currentUser.userAccountId);
+          } catch (error) {
+            landlordData = await getLandlordById(currentUser.landlordId);
+          }
           if (landlordData.tasks && landlordData.tasks.length > 0) {
             const { getTaskById } = await import("/app/client/library-modules/domain-models/task/repositories/task-repository");
             const taskPromises = landlordData.tasks.slice(0, 5).map((taskId: string) => getTaskById(taskId));
