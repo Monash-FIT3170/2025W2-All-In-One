@@ -101,6 +101,28 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
     onClose(); // Close the dropdown after navigation
   };
 
+  const handleTaskClick = (task: Task) => {
+    if (!authUser?.role) return;
+
+    let calendarPath: string;
+    switch (authUser.role) {
+      case Role.AGENT:
+        calendarPath = NavigationPath.AgentCalendar;
+        break;
+      case Role.LANDLORD:
+        calendarPath = NavigationPath.LandlordCalendar;
+        break;
+      case Role.TENANT:
+        calendarPath = NavigationPath.TenantCalendar;
+        break;
+      default:
+        return; // Don't navigate if role is unknown
+    }
+
+    navigate(calendarPath);
+    onClose(); // Close the dropdown after navigation
+  };
+
   const transformedTasks = displayTasks
     .filter((task) => {
       // Only show upcoming tasks: Not Started and In Progress
@@ -148,7 +170,8 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
           transformedTasks.map((task) => (
             <div
               key={task.taskId}
-              className="px-4 py-3 border-b last:border-b-0 border-gray-100 hover:bg-gray-50 transition"
+              className="px-4 py-3 border-b last:border-b-0 border-gray-100 hover:bg-gray-50 transition cursor-pointer"
+              onClick={() => handleTaskClick(task)}
             >
               <div className="flex justify-between items-start mb-1">
                 <div className="font-medium text-base text-gray-900">{task.name}</div>
@@ -160,7 +183,7 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
                   {task.status}
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
+              <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
                 <span>Due: {task.dueDate}</span>
                 {task.priority && (
                   <>
@@ -168,6 +191,9 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
                     <span>Priority: {task.priority}</span>
                   </>
                 )}
+              </div>
+              <div className="text-xs text-blue-600 font-medium">
+                Click to view in calendar
               </div>
             </div>
           ))
@@ -209,7 +235,7 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
                   </>
                 )}
               </div>
-              <div className="text-sm text-gray-900 font-normal">
+              <div className="text-sm text-blue-600 font-medium">
                 Click here to view messages
               </div>
             </div>
