@@ -68,6 +68,8 @@ interface TenantPropertyState {
   isLoading: boolean;
   propertiesWithListingData: PropertyWithListingData[];
   error: string | null;
+  hasProperty: boolean;
+  fetchError: string | null;
 }
 
 const initialState: TenantPropertyState = {
@@ -113,7 +115,9 @@ const initialState: TenantPropertyState = {
   agentError: null,
   isLoading: false,
   propertiesWithListingData: [],
-  error: null
+  error: null,
+  hasProperty: false,
+  fetchError: null
 };
 
 export const submitDraftListingAsync = createAsyncThunk(
@@ -230,7 +234,28 @@ export const tenantPropertySlice = createSlice({
 
       state.shouldShowLoadingState = false;
       state.landlords = action.payload.landlords;
+      state.hasProperty = true;
+      state.fetchError = null;
       })
+
+    builder.addCase(fetchTenantProperty.pending, (state) => {
+      state.shouldShowLoadingState = true;
+      state.fetchError = null;
+    });
+    builder.addCase(fetchTenantProperty.fulfilled, (state, action) => {
+      if (action.payload.property) {
+        state.hasProperty = true;
+        state.currentPropertyId = action.payload.property.propertyId;
+      } else {
+        state.hasProperty = false;
+        state.shouldShowLoadingState = false;
+      }
+    });
+    builder.addCase(fetchTenantProperty.rejected, (state, action) => {
+      state.shouldShowLoadingState = false;
+      state.hasProperty = false;
+      state.fetchError = action.error.message || 'Failed to fetch tenant property';
+    });
 
     builder
       .addCase(fetchAgentWithProfile.pending, (state) => {

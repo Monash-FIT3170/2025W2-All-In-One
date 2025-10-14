@@ -6,6 +6,7 @@ import {
   fetchLandlordCalendarTasks,
   selectLandlordCalendarMarkers,
   deleteLandlordCalendarTask,
+  updateLandlordCalendarTaskStatus,
 } from "../../landlord-dashboard/state/landlord-calendar-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
@@ -157,6 +158,18 @@ export function LandlordCalendar(): React.JSX.Element {
     }
   };
 
+  const handleTaskStatusUpdate = async (taskId: string, status: TaskStatus) => {
+    try {
+      await dispatch(updateLandlordCalendarTaskStatus({
+        taskId,
+        status
+      }));
+      console.log(`Task ${taskId} status updated to ${status}`);
+    } catch (error) {
+      console.error("Failed to update task status:", error);
+    }
+  };
+
 
   if (loading) return <div>Loading...</div>;
 
@@ -183,6 +196,7 @@ export function LandlordCalendar(): React.JSX.Element {
                   selectedDateISO={selectedDateISO}
                   showPropertyAddress={true}
                   onDeleteTask={handleDeleteTask}
+                  onUpdateTaskStatus={handleTaskStatusUpdate}
                 />
                 <br />
                 <TaskMap mapUiState={mapUiState} />
