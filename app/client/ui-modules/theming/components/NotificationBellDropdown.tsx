@@ -1,13 +1,13 @@
 import React from 'react';
 import { TaskStatus } from '/app/shared/task-status-identifier';
-import { parse, format, compareAsc } from "date-fns";
+import { compareAsc } from "date-fns";
 import { Task } from '/app/client/library-modules/domain-models/task/Task';
 import { Conversation } from '/app/client/library-modules/domain-models/messaging/Conversation';
 import { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { NavigationPath } from '../../../navigation';
 import { useAppSelector, useAppDispatch } from '/app/client/store';
-import { Role } from '/app/shared/user-role-identifier';
+import { parseDateRobust } from '../../../library-modules/utils/date-utils';
+import { useRoleBasedNavigation } from '../../user-authentication/hooks/useRoleBasedNavigation';
 import {
   selectNotificationTasks,
   selectNotificationConversations,
@@ -29,6 +29,7 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const authUser = useAppSelector((state) => state.currentUser.authUser);
+  const { getCalendarPath, getMessagesPath } = useRoleBasedNavigation();
 
   // Get data from Redux notification slice
   const reduxTasks = useAppSelector(selectNotificationTasks);
@@ -80,45 +81,13 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
   };
 
   const handleMessagesClick = () => {
-    if (!authUser?.role) return;
-
-    let messagesPath: string;
-    switch (authUser.role) {
-      case Role.AGENT:
-        messagesPath = NavigationPath.AgentMessages;
-        break;
-      case Role.LANDLORD:
-        messagesPath = NavigationPath.LandlordMessages;
-        break;
-      case Role.TENANT:
-        messagesPath = NavigationPath.TenantMessages;
-        break;
-      default:
-        return; // Don't navigate if role is unknown
-    }
-
+    const messagesPath = getMessagesPath();
     navigate(messagesPath);
     onClose(); // Close the dropdown after navigation
   };
 
   const handleTaskClick = (task: Task) => {
-    if (!authUser?.role) return;
-
-    let calendarPath: string;
-    switch (authUser.role) {
-      case Role.AGENT:
-        calendarPath = NavigationPath.AgentCalendar;
-        break;
-      case Role.LANDLORD:
-        calendarPath = NavigationPath.LandlordCalendar;
-        break;
-      case Role.TENANT:
-        calendarPath = NavigationPath.TenantCalendar;
-        break;
-      default:
-        return; // Don't navigate if role is unknown
-    }
-
+    const calendarPath = getCalendarPath();
     navigate(calendarPath);
     onClose(); // Close the dropdown after navigation
   };
@@ -129,19 +98,8 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
       return task.status === TaskStatus.NOTSTARTED || task.status === TaskStatus.INPROGRESS;
     })
     .sort((a, b) => {
-      // Handle different date formats more robustly
-      const parseDate = (dateStr: string) => {
-        // Try parsing as dd/MM/yyyy first
-        let date = parse(dateStr, "dd/MM/yyyy", new Date());
-        if (isNaN(date.getTime())) {
-          // If that fails, try parsing as ISO string or other formats
-          date = new Date(dateStr);
-        }
-        return date;
-      };
-
-      const dateA = parseDate(a.dueDate);
-      const dateB = parseDate(b.dueDate);
+      const dateA = parseDateRobust(a.dueDate);
+      const dateB = parseDateRobust(b.dueDate);
 
       // Handle invalid dates
       if (isNaN(dateA.getTime()) && isNaN(dateB.getTime())) return 0;
