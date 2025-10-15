@@ -25,14 +25,17 @@ export function ContactInfoCard({ profile, isEditing, onChange }: Props) {
     key: keyof Props["profile"];
     type?: string;
   }[] = [
-    { label: "Email Address", key: "email", type: "string" },
-    { label: "Phone Number", key: "phone", type: "string" },
+    { label: "Email Address *", key: "email", type: "string" },
+    { label: "Phone Number *", key: "phone", type: "string" },
     { label: "Emergency Contact", key: "emergencyContact", type: "string" },
   ];
 
   return (
     <CardWidget
       title="Contact Information"
+      className={
+        isEditing ? "ring-2 ring-blue-500 bg-blue-50" : ""
+      }
       value=""
       subtitle="How we can reach you"
     >

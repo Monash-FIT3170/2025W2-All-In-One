@@ -90,8 +90,8 @@ export function ProfilePage(): React.JSX.Element {
     return (
         <div className="min-h-screen">
             <div className="flex">
-                <div className="max-w-screen-xl mx-auto px-6 sm:px-8">
-                    <div className="flex justify-between items-center">
+                <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
                         <div className="flex items-start gap-4">
                             <EditableAvatar
                                 editing={isEditing}
@@ -133,6 +133,11 @@ export function ProfilePage(): React.JSX.Element {
                                     since {formateDateToMonthYear(userSignUp)}
                                 </p>
                                 <div className="flex gap-2 flex-wrap">
+                                    {isEditing && (
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            * Indicates a mandatory field
+                                        </p>
+                                    )}
                                     <span className="text-xs bg-white text-black px-2 py-1 rounded-full border border-gray-400">
                                         Verified{" "}
                                         {capitalize_first_letter(
@@ -143,20 +148,20 @@ export function ProfilePage(): React.JSX.Element {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex gap-2 mt-1">
+                        <div className="flex gap-2 self-end md:self-auto">
                             {isEditing ? (
                                 <>
                                     <Button
                                         onClick={() =>
                                             dispatch(setEditing(false))
                                         }
-                                        className="w-32 mt-1 hover:bg-gray-300 cursor-pointer transition"
+                                        className="w-28 mt-1 hover:bg-gray-300 cursor-pointer transition"
                                     >
                                         Cancel Edit
                                     </Button>
                                     <Button
                                         onClick={handleSave}
-                                        className="w-32 mt-1 hover:bg-gray-300 cursor-pointer transition"
+                                        className="w-28 mt-1 hover:bg-gray-300 cursor-pointer transition"
                                     >
                                         Save Profile
                                     </Button>
@@ -164,7 +169,7 @@ export function ProfilePage(): React.JSX.Element {
                             ) : (
                                 <Button
                                     onClick={() => dispatch(setEditing(true))}
-                                    className="w-32 mt-1 hover:bg-gray-300 cursor-pointer transition"
+                                    className="w-28 mt-1 hover:bg-gray-300 cursor-pointer transition"
                                 >
                                     Edit Profile
                                 </Button>
@@ -172,7 +177,7 @@ export function ProfilePage(): React.JSX.Element {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-6 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         {cards.map(({ Component, key }) => (
                             <Component
                                 key={key}

@@ -16,6 +16,9 @@ export function EditableField({
   onChange,
   type = "text",
 }: EditableFieldProps) {
+  const maxDate =
+    type === "date" ? new Date().toISOString().split("T")[0] : undefined;
+
   return (
     <div className="grid w-full items-start gap-0.5 min-w-0">
       <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -23,6 +26,7 @@ export function EditableField({
       </label>
 
       <Input
+        max={maxDate}
         value={value ?? ""}
         type={type}
         onChange={(e) => onChange(e.target.value)}

@@ -26,15 +26,18 @@ export function PersonalInfoCard({ profile, isEditing, onChange }: Props) {
     key: keyof Props["profile"];
     type?: string;
   }[] = [
-    { label: "First Name", key: "firstName", type: "string" },
-    { label: "Last Name", key: "lastName", type: "string" },
-    { label: "Date of Birth", key: "dob", type: "date" },
+    { label: "First Name *", key: "firstName", type: "string" },
+    { label: "Last Name *", key: "lastName", type: "string" },
+    { label: "Date of Birth *", key: "dob", type: "date" },
     { label: "Occupation", key: "occupation", type: "string" },
   ];
 
   return (
     <CardWidget
       title="Personal Information"
+      className={
+        isEditing ? "ring-2 ring-blue-500 bg-blue-50" : ""
+      }
       value=""
       subtitle="your basic personal information"
     >

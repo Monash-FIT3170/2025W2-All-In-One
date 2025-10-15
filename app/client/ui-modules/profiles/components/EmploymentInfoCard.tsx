@@ -32,6 +32,9 @@ export function EmploymentInfoCard({ profile, isEditing, onChange }: Props) {
   return (
     <CardWidget
       title="Employment Information"
+      className={
+        isEditing ? "ring-2 ring-blue-500 bg-blue-50" : ""
+      }
       value=""
       subtitle="Your current employment details"
     >
