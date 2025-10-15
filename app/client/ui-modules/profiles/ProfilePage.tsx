@@ -134,7 +134,7 @@ export function ProfilePage(): React.JSX.Element {
                                 </p>
                                 <div className="flex gap-2 flex-wrap">
                                     {isEditing && (
-                                        <p className="text-xs text-gray-500 mt-1">
+                                        <p className="text-sm font-medium text-gray-700 italic mt-1">
                                             * Indicates a mandatory field
                                         </p>
                                     )}
