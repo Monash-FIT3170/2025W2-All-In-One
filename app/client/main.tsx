@@ -40,8 +40,7 @@ import {
 } from "./ui-modules/user-authentication/components/RouteGuards";
 import { NavigationPath } from "./navigation";
 import { GuestSearchResultsPage } from "./ui-modules/search/SearchResultPage";
-import { AboutPage } from 
-
+import { AboutPage } from "./ui-modules/about-page/AboutPage";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -92,6 +91,7 @@ function AppRoot(): React.JSX.Element {
             path={NavigationPath.PropertyListing}
             element={<PropertyListingPage />}
           />
+          <Route path={NavigationPath.AboutPage} element={<AboutPage />} />
 
           {/* Search routes */}
           <Route
