@@ -22,6 +22,7 @@ import { uploadFileHandler } from "../../library-modules/apis/azure/blob-api";
 import { Role } from "/app/shared/user-role-identifier";
 import { setCurrentProfileData } from "../user-authentication/state/reducers/current-user-slice";
 import { CheckCircle, XCircle } from "lucide-react";
+import { apiUpdateAccountEmail } from "../../library-modules/apis/user/user-account-api";
 
 export function ProfilePage(): React.JSX.Element {
     const dispatch = useAppDispatch();
@@ -116,7 +117,20 @@ export function ProfilePage(): React.JSX.Element {
             return;
         }
 
-        if (currentUser?.profileDataId) {
+        if (currentUser?.profileDataId && authUser?.userId) {
+            // If email changed, update Meteor account email
+            if (localProfile.email !== profile.email) {
+                try {
+                    await apiUpdateAccountEmail(authUser.userId, localProfile.email);
+                } catch (err) {
+                    setNotification({
+                        message: "Failed to update account email. " + (err instanceof Error ? err.message : ""),
+                        type: "error",
+                    });
+                    return;
+                }
+            }
+
             const updated = await dispatch(
                 saveProfileData({
                     id: currentUser.profileDataId,

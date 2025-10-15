@@ -4,6 +4,7 @@ import { InvalidDataError } from "../../errors/InvalidDataError";
 import { meteorWrappedInvalidDataError } from "../../utils/error-utils";
 import { ApiProfileData } from "/app/shared/api-models/user/api-roles/ApiProfileData";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
+import { Meteor } from "meteor/meteor";
 
 const profileDataInsertMethod = {
     [MeteorMethodIdentifier.PROFILE_INSERT]: async (
@@ -132,4 +133,20 @@ Meteor.methods({
     ...updateProfileDataMethod,
     ...getProfileDataMethod,
     ...profileDataInsertMethod,
+    [MeteorMethodIdentifier.ACCOUNT_EMAIL_UPDATE]: async function (
+        userId: string,
+        newEmail: string
+    ) {
+        if (!userId || !newEmail)
+            throw new Meteor.Error("invalid-arguments", "User ID and new email required");
+        // Only allow user to update their own email or admin
+        if (this.userId !== userId && !Meteor.user()?.isAdmin) {
+            throw new Meteor.Error("not-authorized", "Not authorized to update email");
+        }
+        // Update the email in Meteor accounts
+        await Meteor.users.updateAsync(
+            { _id: userId },
+            { $set: { "emails.0.address": newEmail } }
+        );
+    },
 });
