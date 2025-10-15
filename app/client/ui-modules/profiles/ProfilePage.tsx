@@ -281,23 +281,32 @@ export function ProfilePage(): React.JSX.Element {
                     )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        {cards.map(({ Component, key }) => (
-                            <Component
-                                key={key}
-                                profile={isEditing ? localProfile : profile}
-                                isEditing={isEditing}
-                                onChange={(field, value) => {
-                                    setLocalProfile((prev) => ({
-                                        ...prev,
-                                        [field]: value,
-                                    }));
-                                    if (errors[field]) {
-                                        setErrors((prev) => ({ ...prev, [field]: "" }));
-                                    }
-                                }}
-                                errors={errors}
-                            />
-                        ))}
+                        {cards.map(({ Component, key }, index) => {
+                            const isLastAndOdd =
+                                cards.length % 2 !== 0 &&
+                                index === cards.length - 1;
+                            const cardElement = (
+                                <Component
+                                    key={key}
+                                    profile={isEditing ? localProfile : profile}
+                                    isEditing={isEditing}
+                                    onChange={(field, value) => {
+                                        setLocalProfile((prev) => ({
+                                            ...prev,
+                                            [field]: value,
+                                        }));
+                                        if (errors[field]) {
+                                            setErrors((prev) => ({ ...prev, [field]: "" }));
+                                        }
+                                    }}
+                                    errors={errors}
+                                />
+                            );
+
+                            return isLastAndOdd ? (
+                                <div key={`${key}-wrapper`} className="md:col-span-2 flex justify-center">{cardElement}</div>
+                            ) : cardElement;
+                        })}
                     </div>
                 </div>
             </div>

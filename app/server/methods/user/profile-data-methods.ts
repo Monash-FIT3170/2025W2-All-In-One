@@ -140,7 +140,7 @@ Meteor.methods({
         if (!userId || !newEmail)
             throw new Meteor.Error("invalid-arguments", "User ID and new email required");
         // Only allow user to update their own email or admin
-        if (this.userId !== userId && !Meteor.user()?.isAdmin) {
+        if (this.userId !== userId) {
             throw new Meteor.Error("not-authorized", "Not authorized to update email");
         }
         // Update the email in Meteor accounts
