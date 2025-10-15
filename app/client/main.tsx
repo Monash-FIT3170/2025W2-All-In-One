@@ -51,8 +51,11 @@ function initialiseReactRoot(): void {
   root.render(
     <React.StrictMode>
       <Provider store={store}>
-        <AppRoot />
+        <BrowserRouter>
+          <AppRoot />
+          </BrowserRouter>
       </Provider>
+
     </React.StrictMode>
   );
 }
@@ -70,7 +73,6 @@ function AppRoot(): React.JSX.Element {
 
   return (
     <DefaultTheme>
-      <BrowserRouter>
         <TopNavbar onSideBarOpened={setIsSidebarOpen} />
         <RoleSideNavBar
           isOpen={isSidebarOpen}
@@ -302,7 +304,6 @@ function AppRoot(): React.JSX.Element {
           />
         </Routes>
         <BottomNavbar />
-      </BrowserRouter>
     </DefaultTheme>
   );
 }
