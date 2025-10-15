@@ -63,6 +63,9 @@ export function useNotificationSubscriptions({ enabled = true }: UseNotification
       // Calculate and update total unread count
       const totalUnreadCount = notificationConversations.reduce((sum, conv) => sum + (conv.unreadCount || 0), 0);
       dispatch(setUnreadMessageCount(totalUnreadCount));
+
+      // Refresh tasks to ensure completed tasks are removed from notifications
+      dispatch(fetchNotificationTasks());
     }
   }, [conversations, conversationsReady, enabled, dispatch, currentUser, authUser]);
 

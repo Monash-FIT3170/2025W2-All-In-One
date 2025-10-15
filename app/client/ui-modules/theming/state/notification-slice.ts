@@ -229,6 +229,8 @@ export const notificationSlice = createSlice({
         state.isLoading = false;
         state.tasks = action.payload;
         state.lastUpdated = new Date().toISOString();
+        // Update red dot visibility after tasks are updated
+        // This ensures completed tasks are immediately removed from notifications
       })
       .addCase(fetchNotificationTasks.rejected, (state, action) => {
         state.isLoading = false;
