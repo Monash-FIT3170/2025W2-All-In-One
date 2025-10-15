@@ -13,6 +13,8 @@ import { NotificationBellDropdown } from "../theming/components/NotificationBell
 import {
   fetchNotificationTasks,
   updateNotificationConversations,
+  selectNotificationTasks,
+  selectUnreadMessageCount,
 } from "../theming/state/notification-slice";
 import { NavigationPath } from "../../navigation";
 
@@ -28,6 +30,8 @@ export function TopNavbar({
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const profileData = useAppSelector((state) => state.currentUser.profileData);
   const authUser = useAppSelector((state) => state.currentUser.authUser);
+  const notificationTasks = useAppSelector(selectNotificationTasks);
+  const unreadMessageCount = useAppSelector(selectUnreadMessageCount);
 
   // Load conversations and notification data globally when user is authenticated
   React.useEffect(() => {
@@ -77,7 +81,7 @@ export function TopNavbar({
           {currentUser && profileData && authUser ? (
             <>
               <BellIcon
-                hasNotifications={true}
+                hasNotifications={notificationTasks.length > 0 || unreadMessageCount > 0}
                 className="text-gray-600 cursor-pointer"
                 onClick={() => setIsNotificationDropdownOpen((prev) => !prev)}
               />
