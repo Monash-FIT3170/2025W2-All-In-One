@@ -45,7 +45,7 @@ export function PersonalInfoCard({
         isEditing ? "ring-2 ring-blue-500 bg-blue-50" : ""
       }
       value=""
-      subtitle="your basic personal information"
+      subtitle="Your basic personal information"
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {fields.map(({ label, key, type }) => (
