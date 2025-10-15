@@ -32,6 +32,7 @@ export function ProfilePage(): React.JSX.Element {
     );
 
     const [localProfile, setLocalProfile] = React.useState(profile);
+    const [errors, setErrors] = React.useState<Record<string, string>>({});
 
     const currentUser = useAppSelector(
         (state) => state.currentUser.currentUser
@@ -64,8 +65,38 @@ export function ProfilePage(): React.JSX.Element {
         }
     }, [isEditing]);
 
+    const validateProfile = () => {
+        const newErrors: Record<string, string> = {};
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        // Simple phone regex: allows optional +, digits, spaces, hyphens, and parentheses.
+        const phoneRegex = /^\+?[0-9\s-()]{7,20}$/;
+
+        if (!localProfile.firstName)
+            newErrors.firstName = "First name is required.";
+        if (!localProfile.lastName)
+            newErrors.lastName = "Last name is required.";
+        if (!localProfile.dob) newErrors.dob = "Date of birth is required.";
+        if (!localProfile.email) {
+            newErrors.email = "Email is required.";
+        } else if (!emailRegex.test(localProfile.email)) {
+            newErrors.email = "Please enter a valid email address.";
+        }
+        if (!localProfile.phone) {
+            newErrors.phone = "Phone number is required.";
+        } else if (!phoneRegex.test(localProfile.phone)) {
+            newErrors.phone = "Please enter a valid phone number.";
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     // in handle save, we can add validation for fields and cancel it if fields incorrect
     const handleSave = async () => {
+        if (!validateProfile()) {
+            alert("Please correctly fill in all mandatory fields.");
+            return;
+        }
+
         if (currentUser?.profileDataId) {
             const updated = await dispatch(
                 saveProfileData({
@@ -74,6 +105,8 @@ export function ProfilePage(): React.JSX.Element {
                 })
             ).unwrap();
             dispatch(setCurrentProfileData(updated));
+            dispatch(setEditing(false));
+            setErrors({});
         }
     };
 
@@ -133,11 +166,6 @@ export function ProfilePage(): React.JSX.Element {
                                     since {formateDateToMonthYear(userSignUp)}
                                 </p>
                                 <div className="flex gap-2 flex-wrap">
-                                    {isEditing && (
-                                        <p className="text-sm font-medium text-gray-700 italic mt-1">
-                                            * Indicates a mandatory field
-                                        </p>
-                                    )}
                                     <span className="text-xs bg-white text-black px-2 py-1 rounded-full border border-gray-400">
                                         Verified{" "}
                                         {capitalize_first_letter(
@@ -148,31 +176,40 @@ export function ProfilePage(): React.JSX.Element {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex gap-2 self-end md:self-auto">
-                            {isEditing ? (
-                                <>
+                        <div className="flex flex-col items-end">
+                            <div className="flex gap-2 self-end md:self-auto">
+                                {isEditing ? (
+                                    <>
+                                        <Button
+                                            onClick={() =>
+                                                dispatch(setEditing(false))
+                                            }
+                                            className="w-28 mt-1 hover:bg-gray-300 cursor-pointer transition"
+                                        >
+                                            Cancel Edit
+                                        </Button>
+                                        <Button
+                                            onClick={handleSave}
+                                            className="w-28 mt-1 hover:bg-gray-300 cursor-pointer transition"
+                                        >
+                                            Save Profile
+                                        </Button>
+                                    </>
+                                ) : (
                                     <Button
                                         onClick={() =>
-                                            dispatch(setEditing(false))
+                                            dispatch(setEditing(true))
                                         }
                                         className="w-28 mt-1 hover:bg-gray-300 cursor-pointer transition"
                                     >
-                                        Cancel Edit
+                                        Edit Profile
                                     </Button>
-                                    <Button
-                                        onClick={handleSave}
-                                        className="w-28 mt-1 hover:bg-gray-300 cursor-pointer transition"
-                                    >
-                                        Save Profile
-                                    </Button>
-                                </>
-                            ) : (
-                                <Button
-                                    onClick={() => dispatch(setEditing(true))}
-                                    className="w-28 mt-1 hover:bg-gray-300 cursor-pointer transition"
-                                >
-                                    Edit Profile
-                                </Button>
+                                )}
+                            </div>
+                            {isEditing && (
+                                <p className="text-sm font-medium text-gray-700 italic mt-2">
+                                    * Indicates a mandatory field
+                                </p>
                             )}
                         </div>
                     </div>
@@ -183,12 +220,16 @@ export function ProfilePage(): React.JSX.Element {
                                 key={key}
                                 profile={isEditing ? localProfile : profile}
                                 isEditing={isEditing}
-                                onChange={(field, value) =>
+                                onChange={(field, value) => {
                                     setLocalProfile((prev) => ({
                                         ...prev,
                                         [field]: value,
-                                    }))
-                                }
+                                    }));
+                                    if (errors[field]) {
+                                        setErrors((prev) => ({ ...prev, [field]: "" }));
+                                    }
+                                }}
+                                errors={errors}
                             />
                         ))}
                     </div>

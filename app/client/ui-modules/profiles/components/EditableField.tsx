@@ -7,6 +7,7 @@ interface EditableFieldProps {
   editing: boolean;
   onChange: (value: string) => void;
   type?: string;
+  error?: string;
 }
 
 export function EditableField({
@@ -15,6 +16,7 @@ export function EditableField({
   editing,
   onChange,
   type = "text",
+  error,
 }: EditableFieldProps) {
   const maxDate =
     type === "date" ? new Date().toISOString().split("T")[0] : undefined;
@@ -31,8 +33,11 @@ export function EditableField({
         type={type}
         onChange={(e) => onChange(e.target.value)}
         readOnly={!editing}
-        className="w-full h-10 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className={`w-full h-10 px-3 py-2 text-sm border rounded-md bg-white text-black focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+          error ? "border-red-500" : "border-gray-300"
+        }`}
       />
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
     </div>
   );
 }

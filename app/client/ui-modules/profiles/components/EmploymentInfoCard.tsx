@@ -17,9 +17,15 @@ interface Props {
 
   isEditing: boolean;
   onChange: (field: keyof Props["profile"], value: string) => void;
+  errors: Record<string, string>;
 }
 
-export function EmploymentInfoCard({ profile, isEditing, onChange }: Props) {
+export function EmploymentInfoCard({
+  profile,
+  isEditing,
+  onChange,
+  errors,
+}: Props) {
   const fields: {
     label: string;
     key: keyof Props["profile"];
@@ -47,6 +53,7 @@ export function EmploymentInfoCard({ profile, isEditing, onChange }: Props) {
             editing={isEditing}
             onChange={(val) => onChange(key, val)}
             type={type}
+            error={errors[key]}
           />
         ))}
       </div>
