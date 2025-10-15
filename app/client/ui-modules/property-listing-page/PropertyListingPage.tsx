@@ -782,7 +782,8 @@ function ListingModalEditor({
     description: state.propertyDescription,
     summary_description: state.summaryDescription,
     images: [], // Placeholder, as we don't have image files in the current state
-    available_dates: new Date(),
+    startlease_date: new Date(),
+    endlease_date: new Date(),
     lease_term: state.leaseTerm,
     suburb: state.suburb,
     monthly_rent: state.monthlyRent,
