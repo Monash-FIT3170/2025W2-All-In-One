@@ -6,6 +6,7 @@ import {
   ListingSummary,
 } from "./components/ListingSummary";
 import { PropertyDescription } from "/app/client/ui-modules/common/property-components/PropertyDescription";
+import { ListingDates } from "./components/ListingDates";
 import { LeftCircularArrowIcon } from "/app/client/ui-modules/theming/icons/LeftCircularArrowIcon";
 import { RightCircularArrowIcon } from "/app/client/ui-modules/theming/icons/RightCircularArrowIcon";
 import { ImageCarousel } from "../theming/components/ImageCarousel";
@@ -130,6 +131,9 @@ export function PropertyListingPage({
           propertyStatusText={state.propertyStatusText}
           propertyStatusPillVariant={state.propertyStatusPillVariant}
           propertyDescription={state.propertyDescription}
+          startLeaseDate={state.startLeaseDate}
+          endLeaseDate={state.endLeaseDate}
+          leaseTerm={state.leaseTerm}
           propertyFeatures={state.propertyFeatures}
           propertyType={state.propertyType}
           propertyLandArea={state.propertyLandArea}
@@ -227,6 +231,9 @@ function ListingPageContent({
   propertyStatusText,
   propertyStatusPillVariant,
   propertyDescription,
+  startLeaseDate,
+  endLeaseDate,
+  leaseTerm,
   propertyFeatures,
   propertyType,
   propertyLandArea,
@@ -267,6 +274,9 @@ function ListingPageContent({
   propertyStatusText: string;
   propertyStatusPillVariant: PropertyStatusPillVariant;
   propertyDescription: string;
+  startLeaseDate: Date;
+  endLeaseDate: Date;
+  leaseTerm: string;
   propertyFeatures: string[];
   propertyType: string;
   propertyLandArea: string;
@@ -449,6 +459,9 @@ function ListingPageContent({
       />
       <ListingDetails
         propertyDescription={propertyDescription}
+        startLeaseDate={startLeaseDate}
+        endLeaseDate={endLeaseDate}
+        leaseTerm={leaseTerm}
         mapUiState={mapUiState}
         inspectionBookingUiStateList={inspectionBookingUiStateList}
         onBook={(inspectionId: string) => {
@@ -667,6 +680,9 @@ function ListingHero({
 
 function ListingDetails({
   propertyDescription,
+  startLeaseDate,
+  endLeaseDate,
+  leaseTerm,
   mapUiState,
   inspectionBookingUiStateList,
   onBook,
@@ -677,6 +693,9 @@ function ListingDetails({
   tenantId,
 }: {
   propertyDescription: string;
+  startLeaseDate: Date;
+  endLeaseDate: Date;
+  leaseTerm: string;
   mapUiState: PropertyMapUiState;
   inspectionBookingUiStateList: InspectionBookingListUiState[];
   onBook: (inspectionId: string) => void;
@@ -691,6 +710,12 @@ function ListingDetails({
       <div className="flex-1 flex flex-col">
         <PropertyDescription
           description={propertyDescription}
+          className="mb-4"
+        />
+        <ListingDates
+          startLeaseDate={startLeaseDate}
+          endLeaseDate={endLeaseDate}
+          leaseTerm={leaseTerm}
           className="mb-4"
         />
         <PropertyInspections
