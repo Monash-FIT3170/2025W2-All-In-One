@@ -1,25 +1,55 @@
 import React from 'react';
 import { TaskStatus } from '/app/shared/task-status-identifier';
-import { parse, format, compareAsc } from "date-fns";
+import { compareAsc } from "date-fns";
 import { Task } from '/app/client/library-modules/domain-models/task/Task';
 import { Conversation } from '/app/client/library-modules/domain-models/messaging/Conversation';
 import { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { NavigationPath } from '../../../navigation';
-import { useAppSelector } from '/app/client/store';
-import { Role } from '/app/shared/user-role-identifier';
+import { useAppSelector, useAppDispatch } from '/app/client/store';
+import { parseDateRobust } from '../../../library-modules/utils/date-utils';
+import { useRoleBasedNavigation } from '../../user-authentication/hooks/useRoleBasedNavigation';
+import {
+  selectNotificationTasks,
+  selectNotificationConversations,
+  selectUnreadMessageCount,
+  fetchNotificationTasks,
+  updateNotificationConversations
+} from '../state/notification-slice';
+import { useNotificationSubscriptions } from '../hooks/useNotificationSubscriptions';
 
 interface NotificationDropdownProps {
   open: boolean;
   onClose: () => void;
-  tasks: Task[];
-  conversations: Conversation[];
+  tasks?: Task[]; // Made optional since we'll use Redux state
+  conversations?: Conversation[]; // Made optional since we'll use Redux state
 }
 
 export function NotificationBellDropdown({ open, onClose, tasks, conversations }: NotificationDropdownProps) {
   const popupRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const authUser = useAppSelector((state) => state.currentUser.authUser);
+  const { getCalendarPath, getMessagesPath } = useRoleBasedNavigation();
+
+  // Get data from Redux notification slice
+  const reduxTasks = useAppSelector(selectNotificationTasks);
+  const reduxConversations = useAppSelector(selectNotificationConversations);
+  const unreadMessageCount = useAppSelector(selectUnreadMessageCount);
+
+  // Use Redux data if available, otherwise fall back to props
+  const displayTasks = reduxTasks.length > 0 ? reduxTasks : (tasks || []);
+  const displayConversations = reduxConversations.length > 0 ? reduxConversations : (conversations || []);
+
+  // Use notification subscriptions for real-time updates
+  useNotificationSubscriptions({ enabled: true });
+
+  // Fetch notification data when dropdown opens
+  useEffect(() => {
+    if (open && authUser) {
+      dispatch(fetchNotificationTasks());
+      dispatch(updateNotificationConversations());
+    }
+  }, [open, authUser, dispatch]);
 
   useEffect(() => {
     if (!open) return;
@@ -39,13 +69,6 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
 
   if (!open) return null;
 
-  const formatTaskDate = (date: Date): string => {
-    if (!date || isNaN(date.getTime())) {
-      return 'Invalid Date';
-    }
-    return format(date, 'MMM d, h:mm a');
-  };
-
   const getStatusStyle = (status: string) => {
     switch (status) {
       case TaskStatus.NOTSTARTED:
@@ -58,33 +81,32 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
   };
 
   const handleMessagesClick = () => {
-    if (!authUser?.role) return;
-
-    let messagesPath: string;
-    switch (authUser.role) {
-      case Role.AGENT:
-        messagesPath = NavigationPath.AgentMessages;
-        break;
-      case Role.LANDLORD:
-        messagesPath = NavigationPath.LandlordMessages;
-        break;
-      case Role.TENANT:
-        messagesPath = NavigationPath.TenantMessages;
-        break;
-      default:
-        return; // Don't navigate if role is unknown
-    }
-
+    const messagesPath = getMessagesPath();
     navigate(messagesPath);
     onClose(); // Close the dropdown after navigation
   };
 
-  const transformedTasks = tasks
-    .filter((task) => task.status !== TaskStatus.COMPLETED) // Filter out completed tasks
+  const handleTaskClick = (task: Task) => {
+    const calendarPath = getCalendarPath();
+    navigate(calendarPath);
+    onClose(); // Close the dropdown after navigation
+  };
+
+  const transformedTasks = displayTasks
+    .filter((task) => {
+      // Only show upcoming tasks: Not Started and In Progress
+      return task.status === TaskStatus.NOTSTARTED || task.status === TaskStatus.INPROGRESS;
+    })
     .sort((a, b) => {
-      const dateA = parse(a.dueDate, "dd/MM/yyyy", new Date());
-      const dateB = parse(b.dueDate, "dd/MM/yyyy", new Date());
-      return compareAsc(dateB, dateA); // Descending orderc
+      const dateA = parseDateRobust(a.dueDate);
+      const dateB = parseDateRobust(b.dueDate);
+
+      // Handle invalid dates
+      if (isNaN(dateA.getTime()) && isNaN(dateB.getTime())) return 0;
+      if (isNaN(dateA.getTime())) return 1;
+      if (isNaN(dateB.getTime())) return -1;
+
+      return compareAsc(dateB, dateA); // Descending order
     });
 
   return (
@@ -106,7 +128,8 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
           transformedTasks.map((task) => (
             <div
               key={task.taskId}
-              className="px-4 py-3 border-b last:border-b-0 border-gray-100 hover:bg-gray-50 transition"
+              className="px-4 py-3 border-b last:border-b-0 border-gray-100 hover:bg-gray-50 transition cursor-pointer"
+              onClick={() => handleTaskClick(task)}
             >
               <div className="flex justify-between items-start mb-1">
                 <div className="font-medium text-base text-gray-900">{task.name}</div>
@@ -118,7 +141,7 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
                   {task.status}
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
+              <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
                 <span>Due: {task.dueDate}</span>
                 {task.priority && (
                   <>
@@ -127,13 +150,16 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
                   </>
                 )}
               </div>
+              <div className="text-xs text-blue-600 font-medium">
+                Click to view in calendar
+              </div>
             </div>
           ))
         )}
         {/* New Messages Section */}
         {(() => {
-          const newMessageConversations = conversations.filter(conv => conv.unreadCount > 0);
-          const totalUnreadCount = newMessageConversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
+          const newMessageConversations = displayConversations.filter(conv => conv.unreadCount > 0);
+          const totalUnreadCount = unreadMessageCount > 0 ? unreadMessageCount : newMessageConversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
           const sortedConversations = newMessageConversations.sort((a, b) => {
             if (!a.timestamp && !b.timestamp) return 0;
             if (!a.timestamp) return 1;
@@ -142,7 +168,7 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
           });
           const latestConversation = sortedConversations[0];
 
-          return newMessageConversations.length > 0 ? (
+          return newMessageConversations.length > 0 || totalUnreadCount > 0 ? (
             <div
               className="px-4 py-3 border-t border-gray-100 hover:bg-gray-50 transition cursor-pointer"
               onClick={handleMessagesClick}
@@ -167,7 +193,7 @@ export function NotificationBellDropdown({ open, onClose, tasks, conversations }
                   </>
                 )}
               </div>
-              <div className="text-sm text-gray-900 font-normal">
+              <div className="text-sm text-blue-600 font-medium">
                 Click here to view messages
               </div>
             </div>
