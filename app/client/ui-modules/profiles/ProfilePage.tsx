@@ -21,6 +21,7 @@ import { current } from "@reduxjs/toolkit";
 import { uploadFileHandler } from "../../library-modules/apis/azure/blob-api";
 import { Role } from "/app/shared/user-role-identifier";
 import { setCurrentProfileData } from "../user-authentication/state/reducers/current-user-slice";
+import { CheckCircle, XCircle } from "lucide-react";
 
 export function ProfilePage(): React.JSX.Element {
     const dispatch = useAppDispatch();
@@ -33,6 +34,10 @@ export function ProfilePage(): React.JSX.Element {
 
     const [localProfile, setLocalProfile] = React.useState(profile);
     const [errors, setErrors] = React.useState<Record<string, string>>({});
+    const [notification, setNotification] = React.useState<{
+        message: string;
+        type: "error" | "success";
+    } | null>(null);
 
     const currentUser = useAppSelector(
         (state) => state.currentUser.currentUser
@@ -65,6 +70,16 @@ export function ProfilePage(): React.JSX.Element {
         }
     }, [isEditing]);
 
+    React.useEffect(() => {
+        if (notification) {
+            const timer = setTimeout(() => {
+                setNotification(null);
+            }, 300000); // Auto-dismiss after 5 minutes
+
+            return () => clearTimeout(timer);
+        }
+    }, [notification]);
+
     const validateProfile = () => {
         const newErrors: Record<string, string> = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -92,8 +107,12 @@ export function ProfilePage(): React.JSX.Element {
 
     // in handle save, we can add validation for fields and cancel it if fields incorrect
     const handleSave = async () => {
+        setNotification(null); // Clear previous notifications
         if (!validateProfile()) {
-            alert("Please correctly fill in all mandatory fields.");
+            setNotification({
+                message: "Please fill in all mandatory fields correctly.",
+                type: "error",
+            });
             return;
         }
 
@@ -107,6 +126,10 @@ export function ProfilePage(): React.JSX.Element {
             dispatch(setCurrentProfileData(updated));
             dispatch(setEditing(false));
             setErrors({});
+            setNotification({
+                message: "Profile saved successfully!",
+                type: "success",
+            });
         }
     };
 
@@ -213,6 +236,35 @@ export function ProfilePage(): React.JSX.Element {
                             )}
                         </div>
                     </div>
+
+                    {notification && (
+                        <div
+                            className={`p-4 mb-6 rounded-md border ${
+                                notification.type === "error"
+                                    ? "bg-red-50 border-red-200 text-red-700"
+                                    : "bg-green-50 border-green-200 text-green-700"
+                            }`}
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                    {notification.type === "success" ? (
+                                        <CheckCircle className="h-5 w-5 mr-3" />
+                                    ) : (
+                                        <XCircle className="h-5 w-5 mr-3" />
+                                    )}
+                                    <p className="text-sm font-medium">
+                                        {notification.message}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => setNotification(null)}
+                                    className="opacity-70 hover:opacity-100"
+                                >
+                                    <XCircle className="h-5 w-5" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         {cards.map(({ Component, key }) => (
