@@ -40,6 +40,8 @@ import {
 } from "./ui-modules/user-authentication/components/RouteGuards";
 import { NavigationPath } from "./navigation";
 import { GuestSearchResultsPage } from "./ui-modules/search/SearchResultPage";
+import { AboutPage } from 
+
 
 Meteor.startup(initialiseReactRoot);
 
