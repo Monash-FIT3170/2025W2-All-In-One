@@ -100,7 +100,7 @@ export default function FormBasicInformation({
               <FormItem className="py-2">
                 <FormLabel>Street Number</FormLabel>
                 <FormControl>
-                  <Input placeholder="123" type="number" {...field} />
+                  <Input placeholder="123" type="number" min={0} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -187,7 +187,7 @@ export default function FormBasicInformation({
               <FormItem className="py-2">
                 <FormLabel>Postal Code</FormLabel>
                 <FormControl>
-                  <Input placeholder="3000" type="number" {...field} />
+                  <Input placeholder="3000" min={0} type="number" {...field} />
                 </FormControl>
 
                 <FormMessage />
