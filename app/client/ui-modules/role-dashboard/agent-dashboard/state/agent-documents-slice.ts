@@ -24,6 +24,9 @@ export interface AgentDocumentState {
 	uploadProgress: number;
 	error: string | null;
 	selectedPropertyId: string | null;
+
+	search: string;
+		
 }
 
 // Initial state
@@ -34,6 +37,8 @@ const initialState: AgentDocumentState = {
 	uploadProgress: 0,
 	error: null,
 	selectedPropertyId: null,
+
+	search: "",
 };
 
 // Async thunks
@@ -165,6 +170,10 @@ export const agentDocumentsSlice = createSlice({
 		clearUploadProgress: (state) => {
 			state.uploadProgress = 0;
 		},
+		setAgentDocSearch: (state, action: PayloadAction<string>) => {
+			state.search = action.payload;
+		},
+
 	},
 	extraReducers: (builder) => {
 		// Fetch documents
@@ -225,6 +234,7 @@ export const {
 	setUploadProgress,
 	clearError,
 	clearUploadProgress,
+	setAgentDocSearch
 } = agentDocumentsSlice.actions;
 
 // Selectors
@@ -257,6 +267,8 @@ export const selectDocumentsByProperty = (
 	propertyId: string
 ) =>
 	state.agentDocuments.documents.filter((doc) => doc.propertyId === propertyId);
+
+	
 
 // Reducer
 export default agentDocumentsSlice.reducer;

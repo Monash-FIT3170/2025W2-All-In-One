@@ -4,6 +4,7 @@ import {
 	apiGetLeaseAgreementsForProperty,
 	apiInsertLeaseAgreement,
 	apiDeleteLeaseAgreement,
+	apiSearchDocument,
 } from "../../../apis/user-documents/lease-agreement-api";
 import { LeaseAgreementDocument } from "../LeaseAgreement";
 import { mapApiLeaseAgreementToLeaseAgreement } from "./mappers/lease-agreement-mapper";
@@ -53,4 +54,12 @@ export async function deleteLeaseAgreement(
 	id: string
 ): Promise<void> {
 	await apiDeleteLeaseAgreement(id);
+}
+
+
+export async function searchLeaseAgreement(
+	agentId: string,
+	query: string
+): Promise<void> {
+	await apiSearchDocument(agentId, query);
 }
