@@ -24,9 +24,9 @@ function getAvatarInitials(name: string): string {
 
 // Helper function to generate display name from profile
 function getDisplayName(profile: ApiProfileData | undefined, roleType: string, id: string): string {
-  return profile 
+  return profile
     ? `${profile.firstName} ${profile.lastName}`.trim()
-    : `${roleType} ${id.slice(-4)}`;
+    : roleType;
 }
 
 // Convert API conversation to domain model
@@ -36,7 +36,7 @@ function convertApiConversationToDomain(
   displayName?: string,
   displayRole?: string
 ): Conversation {
-  const name = displayName || `User ${apiConversation.agentId?.slice(-4) || 'Unknown'}`;
+  const name = displayName || (apiConversation.tenantId ? 'Tenant' : apiConversation.agentId ? 'Agent' : apiConversation.landlordId ? 'Landlord' : 'User');
   const role = displayRole || "User";
   
   // Calculate timestamp - only show if there's an actual message
