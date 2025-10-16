@@ -221,7 +221,7 @@ export default function FormBasicInformation({
               <FormItem className="py-2">
                 <FormLabel>Monthly Rent</FormLabel>
                 <FormControl>
-                  <Input placeholder="0" type="number" {...field} />
+                  <Input placeholder="0" type="number" min={0} {...field} />
                 </FormControl>
 
                 <FormMessage />
