@@ -80,9 +80,7 @@ export function MyProperties({
                         ? "bg-red-50 text-red-800"
                         : status === PropertyStatus.VACANT
                           ? "bg-green-50 text-green-800"
-                          : status === PropertyStatus.UNDER_MAINTENANCE
-                            ? "bg-yellow-50 text-yellow-800"
-                            : "bg-blue-50 text-blue-800"
+                          : "bg-blue-50 text-blue-800"
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
@@ -128,23 +126,13 @@ export function MyProperties({
                   <td className="px-6 py-4">
                     <span
                       className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        property.propertyStatus === PropertyStatus.CLOSED
-                          ? "bg-gray-100 text-gray-800"
-                          : property.propertyStatus === PropertyStatus.DRAFT
-                            ? "bg-purple-100 text-purple-800"
+                          property.propertyStatus ===
+                            PropertyStatus.VACANT
+                            ? "bg-green-100 text-green-800"
                             : property.propertyStatus ===
-                                PropertyStatus.LISTED
-                              ? "bg-blue-100 text-blue-800"
-                              : property.propertyStatus ===
-                                  PropertyStatus.UNDER_MAINTENANCE
-                                ? "bg-yellow-100 text-yellow-800"
-                                : property.propertyStatus ===
-                                    PropertyStatus.VACANT
-                                  ? "bg-green-100 text-green-800"
-                                  : property.propertyStatus ===
-                                      PropertyStatus.OCCUPIED
-                                    ? "bg-red-100 text-red-800"
-                                    : "bg-grey-100 text-grey-800"
+                                PropertyStatus.OCCUPIED
+                              ? "bg-red-100 text-red-800"
+                              : "bg-grey-100 text-grey-800"
                       }`}
                     >
                       {property.propertyStatus}
