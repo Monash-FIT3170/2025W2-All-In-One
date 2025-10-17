@@ -74,6 +74,7 @@ import { addBookedPropertyListingInspection } from "./state/reducers/property-li
 import { Role } from "/app/shared/user-role-identifier";
 import { CurrentUserState } from "../user-authentication/state/CurrentUserState";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
+import { LoadingSpinner } from "../common/LoadingSpinner";
 
 export function PropertyListingPage({
   className = "",
@@ -525,7 +526,7 @@ function ListingPageContentLoadingSkeleton({
 }: {
   className?: string;
 }): React.JSX.Element {
-  return <p className={className}>Loading...</p>;
+  return <p>{LoadingSpinner({ message: "Loading property...", size: "md", className })}</p>;
 }
 
 function TopBar({

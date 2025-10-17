@@ -26,6 +26,7 @@ import { PropertyMap, PropertyMapUiState } from "../../../common/property-compon
 import { fetchAgentWithProfile } from '../state/reducers/tenant-property-slice';
 import { AgentDetails } from '../components/AgentDetails';
 import { NavigationPath } from "/app/client/navigation";
+import { LoadingSpinner } from "../../../common/LoadingSpinner";
 
 export function TenantProperty({
   className = "",
@@ -239,7 +240,7 @@ function PropertyPageContentLoadingSkeleton({
 }: {
   className?: string;
 }): React.JSX.Element {
-  return <p className={className}>Loading...</p>;
+  return <LoadingSpinner message="Loading your property..." size="md" className={className} />;
 }
 
 function PropertyHero({

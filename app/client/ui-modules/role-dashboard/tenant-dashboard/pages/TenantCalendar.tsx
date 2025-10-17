@@ -136,7 +136,7 @@ export function TenantCalendar(): React.JSX.Element {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner message="Loading your calendar..." size="md" />;
   }
 
 

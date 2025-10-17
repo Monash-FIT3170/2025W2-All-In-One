@@ -13,9 +13,6 @@ import {
 } from "/app/client/library-modules/utils/date-utils";
 
 import { PropertyListingInspectionDocument } from "/app/server/database/property-listing/models/PropertyListingInspectionDocument";
-import { AddTenantToInspectionUseCase } from "/app/client/library-modules/use-cases/property-listing/AddTenantToInspectionUseCase";
-import { ListingRepository } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { apiPropertyInsertPrice } from "/app/client/library-modules/apis/property-price/price-api";
 import { addTenantToInspectionApi } from "/app/client/library-modules/apis/property-listing/listing-api";
 
