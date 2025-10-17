@@ -28,9 +28,11 @@ export async function insertPropertyListing(
   imageUrls: string[],
   status: ListingStatus,
   inspectionIds: string[],
+  startLeaseDate: Date,
+  endLeaseDate: Date,
   leaseTerm: string
 ): Promise<string> {
-  return await apiInsertPropertyListing(propertyId, imageUrls, status, inspectionIds, leaseTerm);
+  return await apiInsertPropertyListing(propertyId, imageUrls, status, inspectionIds, startLeaseDate, endLeaseDate, leaseTerm);
 }
 
 export async function insertPropertyListingInspections(

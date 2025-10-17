@@ -162,6 +162,8 @@ async function mapListingDocumentToListingDTO(
     property_id: listing.property_id,
     image_urls: listing.image_urls,
     listing_status: listingStatusDocument.name,
+    startlease_date: listing.startlease_date,
+    endlease_date: listing.endlease_date,
     lease_term: listing.lease_term,
     propertyListingInspections: propertyListingInspections.map(
       (inspection) => ({
@@ -402,6 +404,8 @@ const updatePropertyListingData = {
 
       // Update the listing document
       const updateFields: Partial<ListingDocument> = {
+        startlease_date: updateData.startLeaseDate,
+        endlease_date: updateData.endLeaseDate,
         lease_term: updateData.leaseTerm,
         inspection_ids: inspectionIds,
       };

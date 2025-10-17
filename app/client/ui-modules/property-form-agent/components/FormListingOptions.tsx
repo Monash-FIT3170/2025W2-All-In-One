@@ -43,10 +43,49 @@ export default function FormListingOptions({
       />
       <FormField
         control={form.control}
-        name="available_dates"
+        name="startlease_date"
         render={({ field }) => (
           <FormItem className="flex flex-col py-2">
             <FormLabel>Available from</FormLabel>
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant={"outline"}
+                    className={`w-[240px] pl-3 text-left font-normal border-[--divider-color] ${!field.value ? "text-muted-foreground" : ""}`}
+                  >
+                    {field.value ? (
+                      format(field.value, "PPP")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-auto p-0 border-(--divider-color) bg-white z-[10000]"
+                align="start"
+              >
+                <Calendar
+                  mode="single"
+                  selected={field.value}
+                  onSelect={field.onChange}
+                />
+              </PopoverContent>
+            </Popover>
+
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+            <FormField
+        control={form.control}
+        name="endlease_date"
+        render={({ field }) => (
+          <FormItem className="flex flex-col py-2">
+            <FormLabel>Available Until</FormLabel>
             <Popover>
               <PopoverTrigger asChild>
                 <FormControl>

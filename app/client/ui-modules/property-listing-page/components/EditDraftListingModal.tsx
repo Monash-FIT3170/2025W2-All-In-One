@@ -93,6 +93,8 @@ export default function EditDraftListingModal(
     // Update listing-specific data (lease term and inspection times)
     const listingUpdateData = {
       propertyId: props.propertyId,
+      startLeaseDate: values.startlease_date,
+      endLeaseDate: values.endlease_date,
       leaseTerm: values.lease_term,
       inspectionTimes: values.inspection_times.map(inspection => ({
         start_time: new Date(inspection.start_time),

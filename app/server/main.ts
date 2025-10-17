@@ -595,6 +595,8 @@ async function seedListedProperties(
 				listing_status_id: listedStatusId, // "Listed"
 				image_urls: randomImageUrls,
 				inspection_ids: getRandomInspectionIds(),
+        startlease_date: new Date(),
+        endlease_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
         lease_term: "12_months",
 			});
 
@@ -700,6 +702,8 @@ async function seedDraftProperties(
 			listing_status_id: draftStatusId, // Draft status
 			image_urls: draftImageUrls,
 			inspection_ids: [], // No inspections scheduled yet
+      startlease_date: new Date(), // No lease start date for draft
+      endlease_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // 1 year lease end date for draft
 			lease_term: "12_months", // 12 month lease term (string)
 		});
 

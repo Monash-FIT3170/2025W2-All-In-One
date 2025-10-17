@@ -30,7 +30,7 @@ export function PropertyInspections({
   className = "",
 }: {
   bookingUiStateList: InspectionBookingListUiState[];
-  onBook: (inspectionId: string) => void; // <-- FIXED
+  onBook: (inspectionId: string) => void; 
   userRole?: Role;
   tenantId?: string;
   className?: string;

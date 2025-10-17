@@ -14,31 +14,24 @@ import { Geocode } from "./models/Geocode";
  * @returns latitude and longitude of the address
  */
 export async function getGeocode(address: string, fallback?: Geocode): Promise<Geocode> {
+  const tempFallback: Geocode = { latitude: -33.8688, longitude: 151.2093 }; // fallback value
+
   try {
     const geocodeResults = await apiGeocodeAddress(address);
 
     if (geocodeResults.length === 0) {
-      if (!fallback) {
-        throw new ExternalApiError(`No geocode results (length = 0) found for the address (${address}).`);
-      } else {
-        console.warn(`No geocode results found for the address (${address}), using fallback: ${fallback}`);
-        return fallback;
-      }
+      console.warn(`No geocode results found for the address (${address}), using fallback.`);
+      return fallback || tempFallback;
     }
 
     const geocode: Geocode = mapApiGeocodeResultsToGeocode(geocodeResults)[0];
-
     return geocode;
   } catch (error) {
-    if (!fallback) {
-      throw new ExternalApiError(`Geocoding failed for address "${address}". No fallback defined. Error=(${error})`);
-    }
-
     console.warn(`Geocoding failed for address "${address}". Using fallback. Error=(${error})`);
-
-    return fallback;
+    return fallback || tempFallback;
   }
 }
+
 
 function mapApiGeocodeResultsToGeocode(results: ApiGeocodeResult[]): Geocode[] {
   return results.map((result) => {

@@ -20,7 +20,8 @@ export const formSchema = z.object({
   summary_description: z.string().min(1, { message: "Please fill out field" }),
   property_feature_ids: z.array(z.string()),
   images: z.array(z.instanceof(File)).optional(),
-  available_dates: z.coerce.date(),
+  startlease_date: z.coerce.date(),
+  endlease_date: z.coerce.date(),
   inspection_times: z.array(
     z.object({
       start_time: z.coerce.date(),
