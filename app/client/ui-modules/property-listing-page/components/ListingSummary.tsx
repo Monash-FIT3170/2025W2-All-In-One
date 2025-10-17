@@ -106,7 +106,7 @@ function StatusPill({
   const bgColorClass = (() => {
     switch (variant) {
       case PropertyStatusPillVariant.VACANT:
-        return "bg-(--status-green-color)";
+        return "bg-green-100 text-green-800"
     }
   })();
 
