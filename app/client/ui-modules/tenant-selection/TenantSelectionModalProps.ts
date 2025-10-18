@@ -9,6 +9,7 @@ type BaseTenantSelectionModalProps = {
   onReject: (applicationId: string) => void;
   onAccept: (applicationId: string) => void;
   onReset: (applicationId: string, currentStatus: TenantApplicationStatus) => void;
+  propertyId?: string;
 };
 
 export type AgentTenantSelectionModalProps = BaseTenantSelectionModalProps & {

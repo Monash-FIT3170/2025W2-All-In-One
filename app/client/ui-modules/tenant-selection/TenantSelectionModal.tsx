@@ -12,6 +12,7 @@ import {
   selectActiveFilter,
 } from './state/reducers/tenant-selection-slice';
 import { TenantApplicationStatus } from '/app/shared/api-models/tenant-application/TenantApplicationStatus';
+import { useTenantApplicationSubscriptions } from './hooks/useTenantApplicationSubscriptions';
 
 export const TenantSelectionModal = (
   props: TenantSelectionModalProps
@@ -23,11 +24,24 @@ export const TenantSelectionModal = (
     onAccept,
     onReset,
     tenantApplications = [],
+    propertyId,
   } = props;
   const dispatch = useAppDispatch();
   const activeFilter = useAppSelector(selectActiveFilter);
   const isLoading = useAppSelector((state) => state.tenantSelection.isLoading);
   const error = useAppSelector((state) => state.tenantSelection.error);
+
+  // Use real-time subscriptions for tenant applications
+  const {
+    applications: realTimeApplications,
+  } = useTenantApplicationSubscriptions({
+    enabled: isOpen, // Only subscribe when modal is open
+    propertyId: propertyId,
+    statusUpdatesOnly: false
+  });
+
+  // Use real-time data if available, otherwise fall back to props
+  const finalTenantApplications = realTimeApplications.length > 0 ? realTimeApplications : tenantApplications;
 
   const handleReject = (applicationId: string) => {
     onReject(applicationId);
@@ -91,7 +105,7 @@ export const TenantSelectionModal = (
         )}
 
         <ModalContent
-          tenantApplications={tenantApplications}
+          tenantApplications={finalTenantApplications}
           onReject={handleReject}
           onAccept={handleAccept}
           onReset={handleReset}

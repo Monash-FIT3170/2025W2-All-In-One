@@ -7,6 +7,7 @@ import { TenantApplication } from "/app/client/library-modules/domain-models/ten
 import { calculateDueDate } from "/app/client/library-modules/utils/date-utils";
 import { notifyRejectedApplicantsUseCase } from "../notifications/NotifyRejectedApplicantsUseCase";
 import { notifyChosenTenantUseCase } from "../notifications/NotifyChosenTenantUseCase";
+import { getAgentByAgentId } from "/app/client/library-modules/domain-models/user/role-repositories/agent-repository";
 /*WILL SEPARATE THESE USE CASES INTO SEPARATE FILES LATER*/
 
 export async function sendApprovedApplicationsToAgentUseCase(
@@ -31,7 +32,8 @@ export async function sendApprovedApplicationsToAgentUseCase(
 
     // Get property to find agent ID
     const property = await getPropertyById(propertyId);
-    const agentId = property.agentId;
+    const agent = await getAgentByAgentId(property.agentId);
+    const agentUserId = agent.userAccountId;
 
     // Create task for agent
     const taskResult = await createTaskForAgent({
@@ -41,7 +43,7 @@ export async function sendApprovedApplicationsToAgentUseCase(
       priority: TaskPriority.MEDIUM,
       propertyAddress: `${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`,
       propertyId: propertyId,
-      userId: agentId,
+      userId: agentUserId,
     });
 
     // Update all approved applications to BACKGROUND_CHECK_PENDING status
