@@ -360,6 +360,13 @@ export const tenantSelectionSlice = createSlice({
     setCurrentStep: (state, action) => {
       state.currentStep = action.payload;
     },
+    setApplicationsFromSubscription: (state, action) => {
+      const { propertyId, applications } = action.payload;
+      if (!state.applicationsByProperty[propertyId]) {
+        state.applicationsByProperty[propertyId] = [];
+      }
+      state.applicationsByProperty[propertyId] = applications;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -592,6 +599,7 @@ export const {
   setFilter,
   clearError,
   setCurrentStep,
+  setApplicationsFromSubscription
 } = tenantSelectionSlice.actions;
 
 export const selectTenantSelectionState = (state: RootState) => state.tenantSelection;

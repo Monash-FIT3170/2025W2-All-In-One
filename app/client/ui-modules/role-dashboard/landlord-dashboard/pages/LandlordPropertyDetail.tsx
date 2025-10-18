@@ -6,6 +6,7 @@ import { NavigationPath } from "/app/client/navigation";
 import { StatusBadge } from "../../components/StatusBadge";
 import { ReviewTenantButton } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantButton";
 import { useTenantApplicationReview } from '/app/client/ui-modules/tenant-selection/hooks/useTenantApplicationReview';
+import { useTenantApplicationSubscriptions } from '/app/client/ui-modules/tenant-selection/hooks/useTenantApplicationSubscriptions';
 import { TenantSelectionModal } from "/app/client/ui-modules/tenant-selection/TenantSelectionModal";
 import { Role } from "/app/shared/user-role-identifier";
 import { useAppSelector } from "/app/client/store";
@@ -34,6 +35,19 @@ export function LandlordPropertyDetail(): React.JSX.Element {
     handleSendToAgent,
     handleSendFinalApprovedToAgent,
   } = useTenantApplicationReview(passedProperty?.propertyId || "", authUser?.role || Role.LANDLORD);
+
+  // Use real-time subscriptions for tenant applications
+  const {
+    applications: realTimeApplications,
+    applicationsReady
+  } = useTenantApplicationSubscriptions({
+    enabled: true, // Always enabled for landlord to see updates
+    propertyId: passedProperty?.propertyId,
+    statusUpdatesOnly: false
+  });
+
+  // Use real-time data if available, otherwise fall back to Redux data
+  const finalTenantApplications = realTimeApplications.length > 0 ? realTimeApplications : tenantApplications;
 
   const handleBackToProperties = () => {
     navigate(NavigationPath.LandlordProperties);
@@ -193,7 +207,7 @@ export function LandlordPropertyDetail(): React.JSX.Element {
               </div>
 
               {/* Tenant Selection */}
-              {tenantApplications && tenantApplications.length > 0 && (
+              {finalTenantApplications && finalTenantApplications.length > 0 && (
                 <div className="bg-white border border-gray-200 rounded-lg p-4">
                   <div className="flex items-center mb-3">
                     <svg className="h-4 w-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,7 +303,8 @@ export function LandlordPropertyDetail(): React.JSX.Element {
           shouldShowSendFinalApprovedToAgentButton={shouldShowSendFinalApprovedToAgentButton}
           landlordApprovedApplicantCount={landlordApprovedApplicantCount}
           finalApprovedApplicantCount={finalApprovedApplicantCount}
-          tenantApplications={tenantApplications}
+          tenantApplications={finalTenantApplications}
+          propertyId={passedProperty?.propertyId}
         />
       )}
     </div>
