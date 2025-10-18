@@ -8,6 +8,7 @@ import { TenantApplication } from '/app/client/library-modules/domain-models/ten
 import { TenantApplicationDocument } from '/app/server/database/tenant/models/TenantApplicationDocument';
 import { TenantApplicationStatus } from '/app/shared/api-models/tenant-application/TenantApplicationStatus';
 import { setApplicationsFromSubscription } from '../state/reducers/tenant-selection-slice';
+import { mapTenantApplicationDocumentToTenantApplication } from '/app/client/library-modules/domain-models/tenant-application/repositories/mappers/tenant-application-mapper';
 // Client-side collection for tenant applications
 // auto sync via Meteor's pub/sub system
 const TenantApplicationCollection: Mongo.Collection<TenantApplicationDocument> = new Mongo.Collection("tenantApplications");
@@ -86,21 +87,7 @@ export function useTenantApplicationSubscriptions({
     }, [applicationsReady, userRole, roleId, propertyId]);
 
     // Transform applications to domain model
-    const transformedApplications: TenantApplication[] = applications.map(appDoc => ({
-      id: appDoc._id,
-      applicationId: appDoc._id,
-      propertyId: appDoc.propertyId,
-      applicantName: appDoc.applicantName,
-      status: appDoc.status as TenantApplicationStatus,
-      step: appDoc.step,
-      createdAt: appDoc.createdAt.toISOString(),
-      updatedAt: appDoc.updatedAt.toISOString(),
-      agentId: appDoc.agentId,
-      landlordId: appDoc.landlordId,
-      tenantUserId: appDoc.tenantUserId,
-      taskId: appDoc.taskId,
-      linkedTaskId: appDoc.linkedTaskId,
-    }));
+    const transformedApplications: TenantApplication[] = applications.map(mapTenantApplicationDocumentToTenantApplication);
 
   // Track previous applications to prevent infinite loops
   const prevApplicationsRef = useRef<TenantApplication[]>([]);
