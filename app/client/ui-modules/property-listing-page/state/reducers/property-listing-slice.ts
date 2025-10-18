@@ -18,6 +18,7 @@ import { ListingRepository } from "/app/client/library-modules/domain-models/pro
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { apiPropertyInsertPrice } from "/app/client/library-modules/apis/property-price/price-api";
 import { addTenantToInspectionApi } from "/app/client/library-modules/apis/property-listing/listing-api";
+import { deleteDraftListingUseCase } from "/app/client/library-modules/use-cases/property-listing/DeleteDraftListingUseCase";
 
 const initialState: PropertyListingPageUiState = {
   agentId: "",
@@ -71,6 +72,15 @@ export const submitDraftListingAsync = createAsyncThunk(
     return submitDraftListing;
   }
 );
+
+export const deleteDraftListingAsync = createAsyncThunk(
+  "propertyListing/deleteDraftListing",
+  async (propertyId: string) => {
+    const deleteDraftListing = await deleteDraftListingUseCase(propertyId);
+    return deleteDraftListing;
+  }
+);
+
 
 export const insertPropertyPriceAsync = createAsyncThunk(
   "propertyListing/insertPropertyPrice",

@@ -57,7 +57,7 @@ const submitDraftListing = {
       }
 
       // Find the "Listed" listing status ID
-      const listedStatus = await ListingStatusCollection.findOneAsync({
+      const  listedStatus = await ListingStatusCollection.findOneAsync({
         name: ListingStatus.LISTED,
       });
 
@@ -92,6 +92,73 @@ const submitDraftListing = {
     }
   },
 };
+
+const deleteDraftListing = {
+  [MeteorMethodIdentifier.LISTING_DELETE_DRAFT]: async function (
+    propertyId: string
+  ): Promise<{ success: boolean; propertyId: string }> {
+    // 0) Arg validation
+    if (!propertyId || typeof propertyId !== "string") {
+      throw new Meteor.Error("invalid-args", "propertyId is required");
+    }
+
+    // 1) Load the exact listing we’re deleting
+    const listing = await getListingDocumentAssociatedWithProperty(propertyId);
+    if (!listing) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`No listing found for property with Id ${propertyId}`)
+      );
+    }
+
+    // 2) Enforce DRAFT status correctly
+    const draftStatusDoc = await getListingStatusDocumentByName(ListingStatus.DRAFT);
+    if (!draftStatusDoc) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError("DRAFT status not found in database")
+      );
+    }
+
+    if (listing.listing_status_id !== draftStatusDoc._id) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(
+          `Only draft listings can be deleted. Listing for property ${propertyId} is not in DRAFT.`
+        )
+      );
+    }
+
+    // 3) Delete associated inspections safely (only if there are any)
+    const inspIds = Array.isArray(listing.inspection_ids) ? listing.inspection_ids : [];
+    if (inspIds.length > 0) {
+      await PropertyListingInspectionCollection.removeAsync({ _id: { $in: inspIds } });
+    }
+
+    // 4) Delete the listing by _id (precise; avoids mass delete)
+    const removedCount = await ListingCollection.removeAsync({ _id: listing._id });
+    if (removedCount !== 1) {
+      throw meteorWrappedInvalidDataError(
+        new InvalidDataError(`Failed to delete listing for property ${propertyId}`)
+      );
+    }
+
+    // Delete associated property
+    const property = await PropertyCollection.findOneAsync({
+      _id: propertyId,
+    });
+
+    if (property) {
+      const propertyRemovedCount = await PropertyCollection.removeAsync({ _id: propertyId });
+      if (propertyRemovedCount !== 1) {
+        throw meteorWrappedInvalidDataError(
+          new InvalidDataError(`Failed to delete property with Id ${propertyId}`)
+        );
+      }
+    }
+
+
+    return { success: true, propertyId };
+  },
+};
+
 
 const getAllListedListings = {
   [MeteorMethodIdentifier.LISTING_GET_ALL_LISTED]: async (
@@ -426,6 +493,7 @@ Meteor.methods({
   ...insertDraftListingDocumentForProperty,
   ...getListingStatusIdByName,
   ...submitDraftListing,
+  ...deleteDraftListing,
   ...getAllListedListings,
   ...updatePropertyListingImages,
   ...updatePropertyListingData,

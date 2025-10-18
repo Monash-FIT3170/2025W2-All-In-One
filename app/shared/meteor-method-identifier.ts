@@ -51,6 +51,7 @@ export enum MeteorMethodIdentifier {
 	PROFILE_EDIT = "profileData.edit",
 	PROFILE_INSERT = "profileData.insert",
 	LISTING_SUBMIT_DRAFT = "listing.submitDraft",
+	LISTING_DELETE_DRAFT = "listing.deleteDraftListing",
 	PROPERTY_FEATURES_GET_ALL = "propertyFeatures.getAll",
 	TENANT_APPLICATION_GET_BY_PROPERTY_ID = "tenantApplication.getByPropertyId",
 	TENANT_APPLICATION_GET_BY_LANDLORD_ID = "tenantApplications.getByLandlordId",

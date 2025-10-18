@@ -60,6 +60,13 @@ export async function apiSubmitDraftListing(propertyId: string): Promise<void> {
   );
 }
 
+export async function apiDeleteDraftListing(propertyId: string): Promise<void> {
+  await Meteor.callAsync(
+    MeteorMethodIdentifier.LISTING_DELETE_DRAFT,
+    propertyId
+  );
+}
+
 export async function apiUpdatePropertyListingImages(
   propertyId: string,
   imageUrls: string[]
