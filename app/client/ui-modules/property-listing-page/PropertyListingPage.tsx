@@ -26,6 +26,7 @@ import { SubmitDraftListingButton } from "/app/client/ui-modules/property-listin
 import { ReviewTenantButton } from "/app/client/ui-modules/property-listing-page/components/ReviewTenantButton";
 import { TenantSelectionModal } from "/app/client/ui-modules/tenant-selection/TenantSelectionModal";
 import { useTenantApplicationReview } from '/app/client/ui-modules/tenant-selection/hooks/useTenantApplicationReview';
+import { useTenantApplicationSubscriptions } from '/app/client/ui-modules/tenant-selection/hooks/useTenantApplicationSubscriptions';
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useSelector } from "react-redux";
 import {
@@ -52,24 +53,8 @@ import {
 import { NavigationPath } from "../../navigation";
 import { BACK_ROUTES, EntryPoint } from "../../navigation";
 import {
-  selectAcceptedApplicantCountForProperty,
-  selectHasAcceptedApplicationsForProperty,
-  selectFilteredApplications,
   selectHasCurrentUserApplied,
   createTenantApplicationAsync,
-  loadTenantApplicationsForPropertyAsync,
-  selectLandlordApprovedApplicantCountForProperty,
-  selectHasLandlordApprovedApplicationsForProperty,
-  intentSendApplicationToAgentAsync,
-  intentSendApplicationToLandlordAsync,
-  selectHasBackgroundPassedApplicationsForProperty,
-  selectBackgroundPassedApplicantCountForProperty,
-  intentAcceptApplicationAsync,
-  intentRejectApplicationAsync,
-  selectHasFinalApprovedApplicationForProperty,
-  selectFinalApprovedApplicantCountForProperty,
-  sendFinalApprovedApplicationToAgentAsync,
-  intentResetApplicationDecisionAsync,
 } from "/app/client/ui-modules/tenant-selection/state/reducers/tenant-selection-slice";
 import { addBookedPropertyListingInspection } from "./state/reducers/property-listing-slice";
 import { Role } from "/app/shared/user-role-identifier";
@@ -313,6 +298,19 @@ function ListingPageContent({
     handleSendFinalApprovedToAgent,
   } = useTenantApplicationReview(propertyId, authUser?.role || Role.AGENT);
 
+  // Use real-time subscriptions for tenant applications
+  const {
+    applications: realTimeApplications,
+    applicationsReady
+  } = useTenantApplicationSubscriptions({
+    enabled: true, // Always enabled for agent to see updates
+    propertyId: propertyId,
+    statusUpdatesOnly: false
+  });
+
+  // Use real-time data if available, otherwise fall back to Redux data
+  const finalTenantApplications = realTimeApplications.length > 0 ? realTimeApplications : tenantApplications;
+
   const isCreatingApplication = useAppSelector(
     (state) => state.tenantSelection.isLoading
   );
@@ -408,7 +406,8 @@ function ListingPageContent({
           acceptedApplicantCount={acceptedApplicantCount}
           backgroundPassedApplicantCount={backgroundPassedApplicantCount}
           hasAcceptedApplications={hasAcceptedApplications}
-          tenantApplications={tenantApplications}
+          tenantApplications={finalTenantApplications}
+          propertyId={propertyId}
         />
       )}
       {authUser?.role === Role.LANDLORD && (
@@ -422,12 +421,11 @@ function ListingPageContent({
           onSendToAgent={handleSendToAgent}
           onSendFinalApprovedToAgent={handleSendFinalApprovedToAgent}
           shouldShowSendToAgentButton={shouldShowSendToAgentButton}
-          shouldShowSendFinalApprovedToAgentButton={
-            shouldShowSendFinalApprovedToAgentButton
-          }
+          shouldShowSendFinalApprovedToAgentButton={shouldShowSendFinalApprovedToAgentButton}
           landlordApprovedApplicantCount={landlordApprovedApplicantCount}
           finalApprovedApplicantCount={finalApprovedApplicantCount}
-          tenantApplications={tenantApplications}
+          tenantApplications={finalTenantApplications}
+          propertyId={propertyId}
         />
       )}
     </div>
