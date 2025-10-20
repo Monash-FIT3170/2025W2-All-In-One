@@ -105,11 +105,13 @@ export async function apiInsertPropertyListingInspections(
 
 export const addTenantToInspectionApi = async (
   inspectionId: string,
-  tenantId: string
+  tenantId: string,
+  propertyId: string
 ): Promise<PropertyListingInspectionDocument> => {
   return await Meteor.callAsync(
     MeteorMethodIdentifier.ADD_TENANT_TO_INSPECTION,
     inspectionId,
-    tenantId
+    tenantId,
+    propertyId
   );
 };

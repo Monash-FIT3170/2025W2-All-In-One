@@ -323,10 +323,10 @@ export const bookPropertyInspectionAsync = createAsyncThunk(
     propertyId: string;
   }): Promise<PropertyListingInspectionDocument> => {
     console.log("got to the bookPropertyInspectionAsync");
-    console.log("inspectionId:", inspectionId, "tenantId:", tenantId);
     const updatedInspection: PropertyListingInspectionDocument = await addTenantToInspectionApi(
       inspectionId,
-      tenantId
+      tenantId,
+      propertyId
     );
     return updatedInspection;
   }

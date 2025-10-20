@@ -331,23 +331,13 @@ const addTenantToInspectionMethod = {
     tenantId: string,
     propertyId: string
   ): Promise<PropertyListingInspectionDocument> => {
-    console.log(
-      "ADD_TENANT_TO_INSPECTION method called",
-      inspectionId,
-      tenantId
-    );
     const inspection = await PropertyListingInspectionCollection.findOneAsync({
       _id: inspectionId,
     });
     if (!inspection)
       throw new Meteor.Error("not-found", "Inspection not found");
-    console.log(
-      "Tenant ID attempting to be added to the inspection 1" + tenantId
-    );
+
     if (!inspection.tenant_ids.includes(tenantId)) {
-      console.log(
-        "Tenant ID attempting to be added to the inspection 2" + tenantId
-      );
       await PropertyListingInspectionCollection.updateAsync(
         { _id: inspectionId },
         { $push: { tenant_ids: tenantId } }
@@ -357,17 +347,31 @@ const addTenantToInspectionMethod = {
       _id: propertyId,
     });
 
+    // Build property address from available fields
+    let propertyAddress = 'Property address not available';
+    if (property) {
+      const addressParts = [];
+      if (property.streetnumber) addressParts.push(property.streetnumber.toString());
+      if (property.streetname) addressParts.push(property.streetname);
+      if (property.suburb) addressParts.push(property.suburb);
+      if (property.province) addressParts.push(property.province);
+      if (property.postcode) addressParts.push(property.postcode);
+
+      if (addressParts.length > 0) {
+        propertyAddress = addressParts.join(' ');
+      }
+    }
+
     // Create task for tenant
     const taskData = {
       name: "Attend open inspection",
       description: "View the property at the scheduled time",
       dueDate: inspection.starttime,
       priority: TaskPriority.MEDIUM,
-      propertyAddress: `${property?.streetname} ${property?.streetnumber}, ${property?.suburb}, ${property?.province} ${property?.postcode}`,
+      propertyAddress: propertyAddress,
       propertyId: propertyId,
       userId: tenantId,
       };
-    console.log("Creating task for tenant:", taskData);
     await Meteor.callAsync(MeteorMethodIdentifier.TASK_INSERT_FOR_TENANT, taskData);
     // return the updated doc so client thunk has fresh state
     const updated = await PropertyListingInspectionCollection.findOneAsync({
@@ -458,6 +462,7 @@ const updatePropertyListingData = {
           (inspection) => ({
             starttime: inspection.start_time,
             endtime: inspection.end_time,
+            tenant_ids: [],
           })
         );
 
