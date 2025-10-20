@@ -6,6 +6,8 @@ import { PropertyWithListingDataAndNames } from "../state/landlord-properties-sl
 import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { NavigationPath } from "/app/client/navigation";
 import { ViewAllButton } from "../../components/ViewAllButton";
+import { useState } from "react";
+import { Popover, PopoverTrigger, PopoverContent } from "../../../theming-shadcn/Popover";
 
 interface PropertyOverviewProps {
   properties: PropertyWithListingDataAndNames[];
@@ -15,6 +17,11 @@ export function MyProperties({
   properties,
 }: PropertyOverviewProps): React.JSX.Element {
   const navigate = useNavigate();
+  const [filterStatus, setFilterStatus] = useState<PropertyStatus | null>(null);
+
+  const filteredProperties = filterStatus
+    ? properties.filter((property) => property.propertyStatus === filterStatus)
+    : properties;
 
   const handleViewAllProperties = () => {
     navigate(NavigationPath.LandlordProperties);
@@ -32,22 +39,57 @@ export function MyProperties({
       value=""
       subtitle="Overview of your investment properties"
       rightElement={
-        <button className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50">
-          <span>Filter</span>
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50">
+              <span>Filter {filterStatus && `(${filterStatus})`}</span>
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="end" sideOffset={8} className="w-48 p-1">
+            <div className="space-y-1">
+              <button
+                onClick={() => setFilterStatus(null)}
+                className={`w-full text-left px-3 py-2 text-sm rounded ${
+                  !filterStatus
+                    ? "bg-blue-50 text-blue-800"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                All Statuses
+              </button>
+              {Object.values(PropertyStatus).map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setFilterStatus(status)}
+                  className={`w-full text-left px-3 py-2 text-sm rounded ${
+                    filterStatus === status
+                      ? status === PropertyStatus.OCCUPIED
+                        ? "bg-red-50 text-red-800"
+                        : status === PropertyStatus.VACANT
+                          ? "bg-green-50 text-green-800"
+                          : "bg-blue-50 text-blue-800"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
       }
     >
       <div className="mt-2">
@@ -67,21 +109,30 @@ export function MyProperties({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {properties.map((property, index) => (
-                <tr 
-                  key={index} 
-                  className="transition-colors hover:bg-gray-50 cursor-pointer"
+              {filteredProperties.map((property, index) => (
+                <tr
+                  key={index}
+                  className="transition-colors hover:bg-gray-50"
                   onClick={() => handlePropertyClick(property)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) =>
+                    e.key === "Enter" &&
+                    handlePropertyClick(property)
+                  }
+                  aria-label={`View property details for property at ${property.streetnumber} ${property.streetname}`}
                 >
                   <td className="px-6 py-4 text-sm">{`${property.streetnumber} ${property.streetname}`}</td>
                   <td className="px-6 py-4">
                     <span
                       className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        property.propertyStatus === PropertyStatus.OCCUPIED
-                          ? "bg-red-100 text-red-800"
-                          : property.propertyStatus === PropertyStatus.VACANT
+                          property.propertyStatus ===
+                            PropertyStatus.VACANT
                             ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
+                            : property.propertyStatus ===
+                                PropertyStatus.OCCUPIED
+                              ? "bg-red-100 text-red-800"
+                              : "bg-grey-100 text-grey-800"
                       }`}
                     >
                       {property.propertyStatus}
