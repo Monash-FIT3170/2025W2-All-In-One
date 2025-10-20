@@ -60,6 +60,9 @@ import { addBookedPropertyListingInspection } from "./state/reducers/property-li
 import { Role } from "/app/shared/user-role-identifier";
 import { CurrentUserState } from "../user-authentication/state/CurrentUserState";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
+import DeleteDraftListingButton from "./components/DeleteDraftListingButton";
+import { DeleteDraftListingModal } from "./components/DeleteDraftListingModal";
+import { deleteDraftListingAsync } from "./state/reducers/property-listing-slice";
 
 export function PropertyListingPage({
   className = "",
@@ -662,13 +665,25 @@ function ListingModalEditor({
   className?: string;
 }): React.JSX.Element {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = React.useState(false);
   const toggleModal = () => setIsModalOpen(!isModalOpen);
+  const toggleConfirmationModal = () => setIsConfirmationModalOpen(!isConfirmationModalOpen);
   const state: PropertyListingPageUiState = useSelector(
     selectPropertyListingUiState
   );
   const propertyFormState = useAppSelector(selectPropertyFormUiState);
   const authUser = useAppSelector((state) => state.currentUser.authUser);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const handleDelete = async () => {
+    try {
+      await dispatch(deleteDraftListingAsync(state.propertyId)).unwrap();
+      navigate(NavigationPath.AgentProperties); 
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
 
   // Load property form data if landlords are not available
   React.useEffect(() => {
@@ -707,6 +722,13 @@ function ListingModalEditor({
 
   return (
     <>
+    <DeleteDraftListingButton onClick={toggleConfirmationModal} />
+      <DeleteDraftListingModal
+        isOpen={isConfirmationModalOpen}
+        toggle={toggleConfirmationModal}
+        propertyId={state.propertyId}
+        onClick={handleDelete}
+      />
       <EditDraftListingButton onClick={toggleModal} />
       <EditDraftListingModal
         isOpen={isModalOpen}
