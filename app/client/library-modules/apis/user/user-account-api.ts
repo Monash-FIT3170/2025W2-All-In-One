@@ -29,3 +29,7 @@ export async function apiGetLoginHistory(
     { userId, page, pageSize }
   );
 }
+
+export async function apiUpdateAccountEmail(userId: string, newEmail: string): Promise<void> {
+  await Meteor.callAsync(MeteorMethodIdentifier.ACCOUNT_EMAIL_UPDATE, userId, newEmail);
+}

@@ -18,25 +18,34 @@ interface Props {
 
   isEditing: boolean;
   onChange: (field: keyof Props["profile"], value: string) => void;
+  errors: Record<string, string>;
 }
 
-export function PersonalInfoCard({ profile, isEditing, onChange }: Props) {
+export function PersonalInfoCard({
+  profile,
+  isEditing,
+  onChange,
+  errors,
+}: Props) {
   const fields: {
     label: string;
     key: keyof Props["profile"];
     type?: string;
   }[] = [
-    { label: "First Name", key: "firstName", type: "string" },
-    { label: "Last Name", key: "lastName", type: "string" },
-    { label: "Date of Birth", key: "dob", type: "date" },
+    { label: "First Name *", key: "firstName", type: "string" },
+    { label: "Last Name *", key: "lastName", type: "string" },
+    { label: "Date of Birth *", key: "dob", type: "date" },
     { label: "Occupation", key: "occupation", type: "string" },
   ];
 
   return (
     <CardWidget
       title="Personal Information"
+      className={
+        isEditing ? "ring-2 ring-blue-500 bg-blue-50" : ""
+      }
       value=""
-      subtitle="your basic personal information"
+      subtitle="Your basic personal information"
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {fields.map(({ label, key, type }) => (
@@ -47,6 +56,7 @@ export function PersonalInfoCard({ profile, isEditing, onChange }: Props) {
             editing={isEditing}
             onChange={(val) => onChange(key, val)}
             type={type}
+            error={errors[key]}
           />
         ))}
       </div>

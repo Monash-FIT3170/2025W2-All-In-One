@@ -265,6 +265,9 @@ function getPropertyStatusPillVariant(
   if (lowerStatus === "vacant") {
     return PropertyStatusPillVariant.VACANT;
   }
+  if (lowerStatus === "occupied") {
+    return PropertyStatusPillVariant.OCCUPIED;
+  }
   return PropertyStatusPillVariant.VACANT;
 }
 
