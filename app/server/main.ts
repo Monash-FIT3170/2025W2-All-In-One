@@ -4,6 +4,7 @@ import "./methods/task/task-methods";
 import "./methods/property/property-methods";
 import "./methods/messaging/messaging-methods";
 import "./publications/messaging-publications";
+import "./publications/tenant-application-publications";
 import "./methods/property-listing/listing-methods";
 import "./methods/user-documents/lease-agreement-methods";
 import "./methods/tenant-application/tenant-application-method";
@@ -589,7 +590,6 @@ async function seedListedProperties(
           .sort(() => Math.random() - 0.5) // shuffle
           .slice(0, 2); // pick first 2
       }
-      
 			await ListingCollection.insertAsync({
 				property_id: property._id,
 				listing_status_id: listedStatusId, // "Listed"
