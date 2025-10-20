@@ -604,28 +604,28 @@ async function seedListedProperties(
 
   await PropertyListingInspectionCollection.insertAsync({
     _id: "1",
-    starttime: new Date("2025-04-12T10:00:00Z"),
-    endtime: new Date("2025-04-13T11:00:00Z"),
+    starttime: new Date("2025-10-25T10:00:00Z"),
+    endtime: new Date("2025-10-25T11:00:00Z"),
     tenant_ids: [""],
   });
   await PropertyListingInspectionCollection.insertAsync({
     _id: "2",
-    starttime: new Date("2025-04-14T10:00:00Z"),
-    endtime: new Date("2025-04-15T11:00:00Z"),
+    starttime: new Date("2025-10-26T10:00:00Z"),
+    endtime: new Date("2025-10-26T11:00:00Z"),
     tenant_ids: [""],
   });
 
   await PropertyListingInspectionCollection.insertAsync({
     _id: "3",
-    starttime: new Date("2025-04-16T10:00:00Z"),
-    endtime: new Date("2025-04-17T11:00:00Z"),
+    starttime: new Date("2025-10-27T10:00:00Z"),
+    endtime: new Date("2025-10-27T11:00:00Z"),
     tenant_ids: [""],
   });
 
   await PropertyListingInspectionCollection.insertAsync({
     _id: "4",
-    starttime: new Date("2026-04-16T10:00:00Z"),
-    endtime: new Date("2026-04-17T11:00:00Z"),
+    starttime: new Date("2025-11-01T10:00:00Z"),
+    endtime: new Date("2025-11-01T11:00:00Z"),
     tenant_ids: [""],
   });
 
