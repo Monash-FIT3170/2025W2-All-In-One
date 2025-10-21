@@ -65,8 +65,7 @@ export async function apiSearchDocument(
   query: string
 ): Promise<ApiLeaseAgreement[]> {
   return await Meteor.callAsync(
-    MeteorMethodIdentifier.LEASE_AGREEMENT_SEARCH, 
-    agentId, 
-    query
+    MeteorMethodIdentifier.LEASE_AGREEMENT_SEARCH,
+    { agentId, q: query }
   );
 }
