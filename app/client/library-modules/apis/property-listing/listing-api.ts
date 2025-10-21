@@ -30,12 +30,16 @@ export async function apiInsertPropertyListing(
   imageUrls: string[],
   status: ListingStatus,
   inspectionIds: string[],
-  leaseTerm: string,
+  startLeaseDate: Date,
+  endLeaseDate: Date,
+  leaseTerm: string
 ) {
   const data: ApiInsertListingPayload = {
     property_id: propertyId,
     image_urls: imageUrls,
     inspection_ids: inspectionIds,
+    startlease_date: startLeaseDate,
+    endlease_date: endLeaseDate,
     lease_term: leaseTerm,
   };
   const insertedListing: string = await Meteor.callAsync(
