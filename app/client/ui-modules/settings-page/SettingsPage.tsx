@@ -38,10 +38,12 @@ function SettingsPageBase({
   }
 
   return (
-    <div className="p-5 space-y-6">
-      <SettingsAccountPreferences />
-      <SettingsSecurityPreferences />
-      <SettingsAccountDeactivation/>
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-1 p-5 space-y-6">
+        <SettingsAccountPreferences />
+        <SettingsSecurityPreferences />
+        <SettingsAccountDeactivation/>
+      </div>
     </div>
   );
 }
