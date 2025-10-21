@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 
 export enum PropertyStatusPillVariant {
   VACANT,
+  OCCUPIED,
 }
 
 export function ListingSummary({
@@ -107,6 +108,8 @@ function StatusPill({
     switch (variant) {
       case PropertyStatusPillVariant.VACANT:
         return "bg-green-100 text-green-800"
+      case PropertyStatusPillVariant.OCCUPIED:
+        return "bg-red-100 text-red-800"
     }
   })();
 

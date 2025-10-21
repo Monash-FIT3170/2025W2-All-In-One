@@ -360,6 +360,13 @@ export const tenantSelectionSlice = createSlice({
     setCurrentStep: (state, action) => {
       state.currentStep = action.payload;
     },
+    setApplicationsFromSubscription: (state, action) => {
+      const { propertyId, applications } = action.payload;
+      if (!state.applicationsByProperty[propertyId]) {
+        state.applicationsByProperty[propertyId] = [];
+      }
+      state.applicationsByProperty[propertyId] = applications;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -592,6 +599,7 @@ export const {
   setFilter,
   clearError,
   setCurrentStep,
+  setApplicationsFromSubscription
 } = tenantSelectionSlice.actions;
 
 export const selectTenantSelectionState = (state: RootState) => state.tenantSelection;
@@ -622,6 +630,11 @@ export const selectHasBackgroundPassedApplicationsForProperty = (state: RootStat
 export const selectHasFinalApprovedApplicationForProperty = (state: RootState, propertyId: string) => {
   const applications = selectApplicationsForProperty(state, propertyId);
   return applications.some((app: DomainTenantApplication) => app.status === TenantApplicationStatus.FINAL_APPROVED);
+};
+
+export const selectHasTenantChosenForProperty = (state: RootState, propertyId: string) => {
+  const applications = selectApplicationsForProperty(state, propertyId);
+  return applications.some((app: DomainTenantApplication) => app.status === TenantApplicationStatus.TENANT_CHOSEN);
 };
 
 export const selectFilteredApplications = (state: RootState, propertyId: string) => {

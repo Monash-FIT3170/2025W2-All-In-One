@@ -1,4 +1,4 @@
-import { apiGetListingForProperty, apiSubmitDraftListing, apiGetAllListedListings, apiInsertPropertyListing, apiUpdatePropertyListingImages, apiInsertPropertyListingInspections, addTenantToInspectionApi } from "../../../apis/property-listing/listing-api";
+import { apiGetListingForProperty, apiSubmitDraftListing, apiGetAllListedListings, apiInsertPropertyListing, apiUpdatePropertyListingImages, apiInsertPropertyListingInspections, addTenantToInspectionApi, apiDeleteDraftListing } from "../../../apis/property-listing/listing-api";
 import { Listing } from "/app/client/library-modules/domain-models/property-listing/Listing";
 import { mapApiListingToListing } from "./mappers/listing-mapper";
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
@@ -17,6 +17,10 @@ export async function submitDraftListing(propertyId: string): Promise<void> {
   await apiSubmitDraftListing(propertyId);
 }
 
+export async function deleteDraftListing(propertyId: string): Promise<void> {
+  await apiDeleteDraftListing(propertyId);
+}
+
 
 export async function getAllListedListings(skip = 0, limit = 3): Promise<{ apiListing: ApiListing }[]> {
   const apiListings = await apiGetAllListedListings(skip, limit);
@@ -28,9 +32,11 @@ export async function insertPropertyListing(
   imageUrls: string[],
   status: ListingStatus,
   inspectionIds: string[],
+  startLeaseDate: Date,
+  endLeaseDate: Date,
   leaseTerm: string
 ): Promise<string> {
-  return await apiInsertPropertyListing(propertyId, imageUrls, status, inspectionIds, leaseTerm);
+  return await apiInsertPropertyListing(propertyId, imageUrls, status, inspectionIds, startLeaseDate, endLeaseDate, leaseTerm);
 }
 
 export async function insertPropertyListingInspections(
