@@ -62,11 +62,9 @@ Meteor.startup(async () => {
   await removeTenantApplicationsData();
 
   await removeAllCollections();
-  // await tempSeedPropertyStatusData();
   await permSeedListingStatusData();
   await tempSeedUserAndRoleData();
   await permSeedPropertyFeaturesData();
-  // await tempSeedPropertyData();
   await tempSeedTaskData();
   await tempSeedProfileData();
   await tempSeedUserAndRoleData();
@@ -75,6 +73,9 @@ Meteor.startup(async () => {
   await seedListedProperties(globalAgent, globalLandlord, globalTenant);
 	await seedDraftProperties(globalAgent, globalLandlord);
   await seedLeaseAgreements(globalAgent);
+  await closeExpiredListings();
+
+  Meteor.setInterval(closeExpiredListings, 24 * 60 * 60 * 1000);
 });
 
 async function tempSeedUserAndRoleData(): Promise<void> {
@@ -703,7 +704,7 @@ async function seedDraftProperties(
 			image_urls: draftImageUrls,
 			inspection_ids: [], // No inspections scheduled yet
       startlease_date: new Date(), // No lease start date for draft
-      endlease_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // 1 year lease end date for draft
+      endlease_date: new Date(new Date().setFullYear(new Date().getFullYear() - 1)), // 1 year lease end date for draft
 			lease_term: "12_months", // 12 month lease term (string)
 		});
 
@@ -939,5 +940,31 @@ async function permSeedPropertyFeaturesData(): Promise<void> {
       await PropertyFeatureCollection.insertAsync(feature);
       console.log(`[Seed] Inserted feature: ${feature.name}`);
     }
+  }
+}
+
+async function closeExpiredListings(): Promise<void> {
+  try {
+    const now = new Date();
+
+    const expiredListings = await ListingCollection.find({
+      endlease_date: { $lt: now },
+      listing_status_id: { $ne: "3" } // "3" = closed
+    }).fetchAsync();
+
+    if (expiredListings.length === 0) {
+      console.log("[AutoClose] No expired listings found.");
+      return;
+    }
+
+    for (const listing of expiredListings) {
+      await ListingCollection.updateAsync(
+        { _id: listing._id },
+        { $set: { listing_status_id: "3" } }
+      );
+      console.log(`[AutoClose] Listing ${listing._id} marked as closed.`);
+    }
+  } catch (err) {
+    console.error("[AutoClose] Failed to close expired listings:", err);
   }
 }
