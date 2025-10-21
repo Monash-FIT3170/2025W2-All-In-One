@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useSelector } from "react-redux";
 import {
   fetchTenantProperty,
-  load, 
+  load,
   selectTenantPropertyUiState,
   submitDraftListingAsync,
 } from "/app/client/ui-modules/role-dashboard/tenant-dashboard/state/reducers/tenant-property-slice";
@@ -26,6 +26,7 @@ import { PropertyMap, PropertyMapUiState } from "../../../common/property-compon
 import { fetchAgentWithProfile } from '../state/reducers/tenant-property-slice';
 import { AgentDetails } from '../components/AgentDetails';
 import { NavigationPath } from "/app/client/navigation";
+import { LoadingSpinner } from "../../../common/LoadingSpinner";
 
 export function TenantProperty({
   className = "",
@@ -239,7 +240,11 @@ function PropertyPageContentLoadingSkeleton({
 }: {
   className?: string;
 }): React.JSX.Element {
-  return <p className={className}>Loading...</p>;
+  return (
+    <div className={className}>
+      <LoadingSpinner message="Loading your property details..." size="md" />
+    </div>
+  );
 }
 
 function PropertyHero({
