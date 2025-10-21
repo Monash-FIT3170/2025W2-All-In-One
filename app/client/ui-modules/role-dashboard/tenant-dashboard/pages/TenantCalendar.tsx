@@ -188,11 +188,14 @@ export function TenantCalendar(): React.JSX.Element {
 
               {/* Below Calendar */}
               <div className="mt-4">
-                <h2 className="text-lg font-semibold">
-                  {selectedDate
-                    ? selectedDate
-                    : new Date().toLocaleDateString()}
-                </h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold">
+                    {selectedDate
+                      ? selectedDate
+                      : new Date().toLocaleDateString()}
+                  </h2>
+                  <Button onClick={handleOpenModal}>Add Task</Button>
+                </div>
                 <CalendarTasksList 
                   tasks={tasks}
                   selectedDateISO={selectedDateISO}
@@ -201,8 +204,6 @@ export function TenantCalendar(): React.JSX.Element {
                   onUpdateTaskStatus={handleTaskStatusUpdate}
                   onEditTask={handleEditTask}
                 />
-                <br />
-                <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
 
