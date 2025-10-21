@@ -6,7 +6,7 @@ import { NavBarLink } from "./side-nav-bars/components/NavBarLink";
 
 export function BottomNavbar(): React.JSX.Element {
   return (
-    <footer className="bg-[#111827] text-white py-4 mt-8">
+    <footer className="bg-[#111827] text-white py-4 mt-auto">
       <div className="flex justify-between items-center px-6">
         <Link to="/">
           <div className="flex items-center gap-2">

@@ -168,7 +168,14 @@ export function TenantCalendar(): React.JSX.Element {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full border-b-2 border-blue-600 h-16 w-16 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading calendar...</p>
+        </div>
+      </div>
+    );
   }
 
 
@@ -224,4 +231,3 @@ export function TenantCalendar(): React.JSX.Element {
     </div>
   );
 }
-
