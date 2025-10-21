@@ -60,6 +60,7 @@ export async function deleteLeaseAgreement(
 export async function searchLeaseAgreement(
 	agentId: string,
 	query: string
-): Promise<void> {
-	await apiSearchDocument(agentId, query);
+): Promise<LeaseAgreementDocument[]> {
+	const apiLeases = await apiSearchDocument(agentId, query);
+	return (apiLeases ?? []).map(mapApiLeaseAgreementToLeaseAgreement);
 }

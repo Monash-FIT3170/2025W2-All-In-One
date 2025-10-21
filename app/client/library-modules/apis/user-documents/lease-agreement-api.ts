@@ -63,7 +63,7 @@ export async function apiSignDocument(
 export async function apiSearchDocument(
   agentId: string,
   query: string
-): Promise<ApiLeaseAgreement> {
+): Promise<ApiLeaseAgreement[]> {
   return await Meteor.callAsync(
     MeteorMethodIdentifier.LEASE_AGREEMENT_SEARCH, 
     agentId, 

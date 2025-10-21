@@ -4,11 +4,15 @@ import {
 	getLeaseAgreementsForAgent,
 	insertLeaseAgreement,
 	deleteLeaseAgreement,
+	searchLeaseAgreement,
 } from "../../../../library-modules/domain-models/user-documents/repositories/lease-agreement-repository";
 import { uploadFilesHandler } from "../../../../library-modules/apis/azure/blob-api";
 import { BlobNamePrefix } from "/app/shared/azure/blob-models";
 import { LeaseAgreementDocument } from "../../../../library-modules/domain-models/user-documents/LeaseAgreement";
 import { getPropertyByAgentId } from "../../../../library-modules/domain-models/property/repositories/property-repository";
+import { getTenantById } from "/app/client/library-modules/domain-models/user/role-repositories/tenant-repository";
+import { getUserAccountById } from "/app/client/library-modules/domain-models/user/user-account-repositories/user-account-repository";
+import { getProfileDataById } from "/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository";
 
 // Types
 export interface AgentDocument extends LeaseAgreementDocument {
@@ -42,41 +46,75 @@ const initialState: AgentDocumentState = {
 };
 
 // Async thunks
-export const fetchAgentDocuments = createAsyncThunk(
-	"agentDocuments/fetchDocuments",
-	async (agentId: string) => {
-		try {
-			const [documents, properties] = await Promise.all([
-				getLeaseAgreementsForAgent(agentId),
-				getPropertyByAgentId(agentId),
-			]);
+export const fetchAgentDocuments = createAsyncThunk<
+  AgentDocument[],                                  // return type
+  { agentId: string; query?: string }               // arg type
+>(
+  "agentDocuments/fetchDocuments",
+  async ({ agentId, query }) => {
+    try {
+      // 1) Fetch docs (all vs search) — both must return LeaseAgreementDocument[]
+      const documents: LeaseAgreementDocument[] = await (
+        query && query.trim()
+          ? searchLeaseAgreement(agentId, query.trim())
+          : getLeaseAgreementsForAgent(agentId)
+      );
 
-			// Create a map of propertyId to property details for quick lookup
-			const propertyMap = new Map(
-				properties.map((prop) => [prop.propertyId, prop])
-			);
+      // 2) Fetch properties and index by propertyId (no Map)
+      const properties = await getPropertyByAgentId(agentId);
+      const propertyIndex: Record<string, typeof properties[number]> = {};
+      properties.forEach(p => {
+        propertyIndex[p.propertyId] = p;
+      });
 
-			// Map documents with property details and tenant names
-			const enrichedDocuments = documents.map((doc) => {
-				const property = propertyMap.get(doc.propertyId);
-				const propertyAddress = property
-					? `${property.streetnumber} ${property.streetname}, ${property.suburb}`
-					: "Property address unavailable";
+      // 3) Collect unique tenant IDs (no Set) + fetch tenants in parallel
+      const tenantIds = documents
+        .map(d => d.tenantId)
+        .filter((id, idx, arr): id is string =>
+          typeof id === "string" && id.length > 0 && arr.indexOf(id) === idx
+        );
 
-				return {
-					...doc,
-					propertyAddress,
-					tenantName: doc.tenantName || "No tenant assigned",
-				};
-			});
+      const tenantResults = await Promise.all(
+        tenantIds.map(async (id) => {
+          try {
+            return await getProfileDataById(id);   // your existing single-id method
+          } catch {
+            return null;                      // tolerate failures
+          }
+        })
+      );
 
-			return enrichedDocuments;
-		} catch (error) {
-			throw new Error(
-				error instanceof Error ? error.message : "Failed to fetch documents"
-			);
-		}
-	}
+      // Build tenant index (id -> fullName) — no Map
+      const tenantIndex: Record<string, string> = {};
+      tenantResults.forEach(t => {
+        if (t && t.profileDataId) tenantIndex[t.profileDataId] = t.firstName + " " + t.lastName;
+      });
+
+      // 4) Enrich documents
+      const enriched: AgentDocument[] = documents.map((doc) => {
+        const prop = propertyIndex[doc.propertyId];
+        const propertyAddress = prop
+          ? `${prop.streetnumber} ${prop.streetname}, ${prop.suburb}`
+          : "Property address unavailable";
+
+        const tenantName = doc.tenantId
+          ? (tenantIndex[doc.tenantId] ?? "Tenant not found")
+          : "No tenant assigned";
+
+        return {
+          ...doc,
+          propertyAddress,
+          tenantName, // derived, not persisted
+        };
+      });
+
+      return enriched;
+    } catch (error) {
+      throw new Error(
+        error instanceof Error ? error.message : "Failed to fetch documents"
+      );
+    }
+  }
 );
 
 export const uploadAgentDocument = createAsyncThunk(
