@@ -77,10 +77,9 @@ export function AgentDocumentList({
                     </h4>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex items-center gap-1 text-xs text-gray-600">
-                      
-												<span>
-													{document.tenantName || "No tenant assigned"}
-												</span>
+                        {/*<span>
+                          {document.tenantName || "No tenant assigned"}
+                        </span>*/}
                       </div>
                     </div>
                   </div>

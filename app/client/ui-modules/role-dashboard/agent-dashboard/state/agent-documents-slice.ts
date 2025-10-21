@@ -67,46 +67,39 @@ export const fetchAgentDocuments = createAsyncThunk<
         propertyIndex[p.propertyId] = p;
       });
 
-      // 3) Collect unique tenant IDs (no Set) + fetch tenants in parallel
-      const tenantIds = documents
-        .map(d => d.tenantId)
-        .filter((id, idx, arr): id is string =>
-          typeof id === "string" && id.length > 0 && arr.indexOf(id) === idx
-        );
 
-      const tenantResults = await Promise.all(
-        tenantIds.map(async (id) => {
-          try {
-            return await getProfileDataById(id);   // your existing single-id method
-          } catch {
-            return null;                      // tolerate failures
-          }
-        })
-      );
 
-      // Build tenant index (id -> fullName) — no Map
-      const tenantIndex: Record<string, string> = {};
-      tenantResults.forEach(t => {
-        if (t && t.profileDataId) tenantIndex[t.profileDataId] = t.firstName + " " + t.lastName;
-      });
+			// gets all the profile data by id in parallel
+      const tenantProfiles = await Promise.all(
+				documents.map(async (doc) => {
+				if (!doc.tenantId) return null;
+				try {
+					return await getProfileDataById(doc.tenantId);
+				} catch {
+				return null;
+    }
+  })
+);
+   
 
       // 4) Enrich documents
-      const enriched: AgentDocument[] = documents.map((doc) => {
-        const prop = propertyIndex[doc.propertyId];
-        const propertyAddress = prop
-          ? `${prop.streetnumber} ${prop.streetname}, ${prop.suburb}`
-          : "Property address unavailable";
+      const enriched: AgentDocument[] = documents.map((doc, i) => {
+  			const tenant = tenantProfiles[i];
+  			const tenantName = tenant
+    			? `${tenant.firstName ?? ""} ${tenant.lastName ?? ""}`.trim()
+    			: "No tenant assigned";
 
-        const tenantName = doc.tenantId
-          ? (tenantIndex[doc.tenantId] ?? "Tenant not found")
-          : "No tenant assigned";
+				const property = propertyIndex[doc.propertyId];
+				const propertyAddress = property
+					? `${property.streetnumber} ${property.streetname}, ${property.suburb}`
+					: "Property address unavailable";
 
-        return {
-          ...doc,
-          propertyAddress,
-          tenantName, // derived, not persisted
-        };
-      });
+  return {
+    ...doc,
+    propertyAddress,
+    tenantName,
+  };
+});
 
       return enriched;
     } catch (error) {
