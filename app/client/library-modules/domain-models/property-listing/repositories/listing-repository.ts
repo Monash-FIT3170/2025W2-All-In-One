@@ -1,4 +1,4 @@
-import { apiGetListingForProperty, apiSubmitDraftListing, apiGetAllListedListings, apiInsertPropertyListing, apiUpdatePropertyListingImages, apiInsertPropertyListingInspections, addTenantToInspectionApi } from "../../../apis/property-listing/listing-api";
+import { apiGetListingForProperty, apiSubmitDraftListing, apiGetAllListedListings, apiInsertPropertyListing, apiUpdatePropertyListingImages, apiInsertPropertyListingInspections, addTenantToInspectionApi, apiDeleteDraftListing } from "../../../apis/property-listing/listing-api";
 import { Listing } from "/app/client/library-modules/domain-models/property-listing/Listing";
 import { mapApiListingToListing } from "./mappers/listing-mapper";
 import { ApiListing } from "/app/shared/api-models/property-listing/ApiListing";
@@ -15,6 +15,10 @@ export async function getListingByPropertyId(id: string): Promise<Listing> {
 
 export async function submitDraftListing(propertyId: string): Promise<void> {
   await apiSubmitDraftListing(propertyId);
+}
+
+export async function deleteDraftListing(propertyId: string): Promise<void> {
+  await apiDeleteDraftListing(propertyId);
 }
 
 

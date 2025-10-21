@@ -75,18 +75,6 @@ export function PropertyCard(props: PropertyWithListingData) {
             alt={`Property at ${address}`}
             className="h-48 w-full object-cover"
           />
-          {/* Status pill */}
-          {propertyStatus && (
-            <span
-              className={`absolute top-2 right-2 px-3 py-1 rounded-full text-xs font-semibold shadow-md
-                                ${propertyStatus === "VACANT" ? "bg-green-600 text-white" : ""}
-                                ${propertyStatus === "OCCUPIED" ? "bg-red-500 text-white" : ""}
-                            `}
-              style={{ zIndex: 2 }}
-            >
-              {propertyStatus}
-            </span>
-          )}
         </div>
         <div className="p-4 flex-grow">
           <h2 className="text-lg font-semibold truncate" title={address}>

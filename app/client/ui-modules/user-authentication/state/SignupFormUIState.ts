@@ -11,3 +11,15 @@ export type SignupFormUIState = {
   message: string;
   isLoading: boolean;
 };
+
+export const initialState: SignupFormUIState = {
+  accountType: Role.TENANT,
+  passwordVisible: false,
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  agentCode: "",
+  message: "",
+  isLoading: false
+};

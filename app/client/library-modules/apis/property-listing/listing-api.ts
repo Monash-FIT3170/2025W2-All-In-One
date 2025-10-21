@@ -64,6 +64,13 @@ export async function apiSubmitDraftListing(propertyId: string): Promise<void> {
   );
 }
 
+export async function apiDeleteDraftListing(propertyId: string): Promise<void> {
+  await Meteor.callAsync(
+    MeteorMethodIdentifier.LISTING_DELETE_DRAFT,
+    propertyId
+  );
+}
+
 export async function apiUpdatePropertyListingImages(
   propertyId: string,
   imageUrls: string[]
@@ -102,11 +109,13 @@ export async function apiInsertPropertyListingInspections(
 
 export const addTenantToInspectionApi = async (
   inspectionId: string,
-  tenantId: string
+  tenantId: string,
+  propertyId: string
 ): Promise<PropertyListingInspectionDocument> => {
   return await Meteor.callAsync(
     MeteorMethodIdentifier.ADD_TENANT_TO_INSPECTION,
     inspectionId,
-    tenantId
+    tenantId,
+    propertyId
   );
 };

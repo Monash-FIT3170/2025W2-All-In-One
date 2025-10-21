@@ -1,12 +1,15 @@
 import { updateTenantApplicationStatus, updateTenantApplicationLinkedTaskId } from "/app/client/library-modules/domain-models/tenant-application/repositories/tenant-application-repository";
 import { createTaskForAgent, updateTaskForAgent } from "/app/client/library-modules/domain-models/task/repositories/task-repository";
 import { getPropertyById, updatePropertyTenantId } from "/app/client/library-modules/domain-models/property/repositories/property-repository";
+import { apiUpdatePropertyData, apiGetPropertyStatusId } from "/app/client/library-modules/apis/property/property-api";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
+import { PropertyStatus } from "/app/shared/api-models/property/PropertyStatus";
 import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
 import { calculateDueDate } from "/app/client/library-modules/utils/date-utils";
 import { notifyRejectedApplicantsUseCase } from "../notifications/NotifyRejectedApplicantsUseCase";
 import { notifyChosenTenantUseCase } from "../notifications/NotifyChosenTenantUseCase";
+import { getAgentByAgentId } from "/app/client/library-modules/domain-models/user/role-repositories/agent-repository";
 /*WILL SEPARATE THESE USE CASES INTO SEPARATE FILES LATER*/
 
 export async function sendApprovedApplicationsToAgentUseCase(
@@ -31,7 +34,8 @@ export async function sendApprovedApplicationsToAgentUseCase(
 
     // Get property to find agent ID
     const property = await getPropertyById(propertyId);
-    const agentId = property.agentId;
+    const agent = await getAgentByAgentId(property.agentId);
+    const agentUserId = agent.userAccountId;
 
     // Create task for agent
     const taskResult = await createTaskForAgent({
@@ -41,7 +45,7 @@ export async function sendApprovedApplicationsToAgentUseCase(
       priority: TaskPriority.MEDIUM,
       propertyAddress: `${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`,
       propertyId: propertyId,
-      userId: agentId,
+      userId: agentUserId,
     });
 
     // Update all approved applications to BACKGROUND_CHECK_PENDING status
@@ -139,23 +143,33 @@ export async function sendApprovedApplicationsToAgentUseCase(
   }
 
 /**
- * Updates property with the chosen tenant
+ * Updates property with the chosen tenant and sets status to occupied
  */
 async function updatePropertyWithChosenTenant(
   propertyId: string,
   chosenApplication: TenantApplication
 ): Promise<void> {
   if (chosenApplication.tenantUserId) {
-    console.log('=== PROPERTY TENANT ID UPDATE ===');
+    console.log('=== PROPERTY TENANT ID AND STATUS UPDATE ===');
     console.log('Property ID:', propertyId);
     console.log('Current Tenant ID:', chosenApplication.tenantUserId);
     console.log('Application Status:', chosenApplication.status);
 
+    // Update tenant ID
     await updatePropertyTenantId(propertyId, chosenApplication.tenantUserId);
+
+    // Update property status to OCCUPIED
+    const occupiedStatusId = await apiGetPropertyStatusId(PropertyStatus.OCCUPIED);
+
+    await apiUpdatePropertyData({
+      propertyId: propertyId,
+      property_status_id: occupiedStatusId
+    } as any);
 
     const updatedProperty = await getPropertyById(propertyId);
     console.log('Updated Property Details:', updatedProperty);
     console.log('New Tenant ID in Property:', updatedProperty.tenantId);
+    console.log('New Property Status:', updatedProperty.propertyStatus);
     console.log('=== END PROPERTY UPDATE ===');
   } else {
     console.log('No tenantUserId found in chosen application');
@@ -225,4 +239,3 @@ function ensureSingleFinalApprovedApplication(applications: TenantApplication[])
       throw new Error('Only one applicant can be chosen for final approval');
     }
   }
-

@@ -4,6 +4,7 @@ import "./methods/task/task-methods";
 import "./methods/property/property-methods";
 import "./methods/messaging/messaging-methods";
 import "./publications/messaging-publications";
+import "./publications/tenant-application-publications";
 import "./methods/property-listing/listing-methods";
 import "./methods/user-documents/lease-agreement-methods";
 import "./methods/tenant-application/tenant-application-method";
@@ -589,7 +590,6 @@ async function seedListedProperties(
           .sort(() => Math.random() - 0.5) // shuffle
           .slice(0, 2); // pick first 2
       }
-      
 			await ListingCollection.insertAsync({
 				property_id: property._id,
 				listing_status_id: listedStatusId, // "Listed"
@@ -606,28 +606,28 @@ async function seedListedProperties(
 
   await PropertyListingInspectionCollection.insertAsync({
     _id: "1",
-    starttime: new Date("2025-04-12T10:00:00Z"),
-    endtime: new Date("2025-04-13T11:00:00Z"),
+    starttime: new Date("2025-10-25T10:00:00Z"),
+    endtime: new Date("2025-10-25T11:00:00Z"),
     tenant_ids: [""],
   });
   await PropertyListingInspectionCollection.insertAsync({
     _id: "2",
-    starttime: new Date("2025-04-14T10:00:00Z"),
-    endtime: new Date("2025-04-15T11:00:00Z"),
+    starttime: new Date("2025-10-26T10:00:00Z"),
+    endtime: new Date("2025-10-26T11:00:00Z"),
     tenant_ids: [""],
   });
 
   await PropertyListingInspectionCollection.insertAsync({
     _id: "3",
-    starttime: new Date("2025-04-16T10:00:00Z"),
-    endtime: new Date("2025-04-17T11:00:00Z"),
+    starttime: new Date("2025-10-27T10:00:00Z"),
+    endtime: new Date("2025-10-27T11:00:00Z"),
     tenant_ids: [""],
   });
 
   await PropertyListingInspectionCollection.insertAsync({
     _id: "4",
-    starttime: new Date("2026-04-16T10:00:00Z"),
-    endtime: new Date("2026-04-17T11:00:00Z"),
+    starttime: new Date("2025-11-01T10:00:00Z"),
+    endtime: new Date("2025-11-01T11:00:00Z"),
     tenant_ids: [""],
   });
 
