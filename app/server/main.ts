@@ -203,6 +203,8 @@ async function tempSeedProfileData(): Promise<void> {
     const statuses = [
       { _id: "1", name: PropertyStatus.VACANT },
       { _id: "2", name: PropertyStatus.OCCUPIED },
+      { _id: "3", name: PropertyStatus.UNDER_MAINTENANCE },
+      { _id: "4", name: PropertyStatus.CLOSED },
     ];
 
     // Add new status if it doesn't exist
@@ -958,11 +960,29 @@ async function closeExpiredListings(): Promise<void> {
     }
 
     for (const listing of expiredListings) {
+      // 1️⃣ Close the listing
       await ListingCollection.updateAsync(
         { _id: listing._id },
         { $set: { listing_status_id: "3" } }
       );
       console.log(`[AutoClose] Listing ${listing._id} marked as closed.`);
+
+      // 2️⃣ Close the related property as well
+      if (listing.property_id) {
+        const propertyResult = await PropertyCollection.updateAsync(
+          { _id: listing.property_id },
+          { $set: { property_status_id: "4" } }
+        );
+        if (propertyResult) {
+          console.log(
+            `[AutoClose] Property ${listing.property_id} marked as closed.`
+          );
+        } else {
+          console.warn(
+            `[AutoClose] Property ${listing.property_id} not found for listing ${listing._id}.`
+          );
+        }
+      }
     }
   } catch (err) {
     console.error("[AutoClose] Failed to close expired listings:", err);
