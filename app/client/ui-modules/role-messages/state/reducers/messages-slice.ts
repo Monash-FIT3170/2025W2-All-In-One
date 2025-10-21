@@ -431,7 +431,7 @@ export const messagesSlice = createSlice({
 
         return {
           id: doc.conversationId,
-          name: existingConversation?.name || `User ${doc.tenantId?.slice(-4) || doc.agentId?.slice(-4) || 'Unknown'}`,
+          name: existingConversation?.name || (doc.tenantId ? 'Tenant' : doc.agentId ? 'Agent' : doc.landlordId ? 'Landlord' : 'User'),
           role: existingConversation?.role || (doc.tenantId ? "Tenant" : doc.agentId ? "Agent" : "User"),
           avatar: existingConversation?.avatar || getAvatarInitials(existingConversation?.name || 'User'),
           lastMessage: doc.lastMessage?.text || "No messages yet",

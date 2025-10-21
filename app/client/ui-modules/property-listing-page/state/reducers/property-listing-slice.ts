@@ -18,6 +18,7 @@ import { ListingRepository } from "/app/client/library-modules/domain-models/pro
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { apiPropertyInsertPrice } from "/app/client/library-modules/apis/property-price/price-api";
 import { addTenantToInspectionApi } from "/app/client/library-modules/apis/property-listing/listing-api";
+import { deleteDraftListingUseCase } from "/app/client/library-modules/use-cases/property-listing/DeleteDraftListingUseCase";
 
 const initialState: PropertyListingPageUiState = {
   agentId: "",
@@ -53,6 +54,8 @@ const initialState: PropertyListingPageUiState = {
   listingImageUrls: [],
   listingStatusText: "",
   listingStatusPillVariant: ListingStatusPillVariant.DRAFT,
+  startLeaseDate: new Date(),
+  endLeaseDate: new Date(),
   leaseTerm: "12_months",
   shouldDisplayListingStatus: true,
   shouldDisplaySubmitDraftButton: true,
@@ -71,6 +74,15 @@ export const submitDraftListingAsync = createAsyncThunk(
     return submitDraftListing;
   }
 );
+
+export const deleteDraftListingAsync = createAsyncThunk(
+  "propertyListing/deleteDraftListing",
+  async (propertyId: string) => {
+    const deleteDraftListing = await deleteDraftListingUseCase(propertyId);
+    return deleteDraftListing;
+  }
+);
+
 
 export const insertPropertyPriceAsync = createAsyncThunk(
   "propertyListing/insertPropertyPrice",
@@ -157,6 +169,8 @@ export const propertyListingSlice = createSlice({
       state.listingStatusPillVariant = getListingStatusPillVariant(
         action.payload.listing_status
       );
+      state.startLeaseDate = action.payload.startlease_date;
+      state.endLeaseDate = action.payload.endlease_date;
       state.leaseTerm = action.payload.lease_term;
 
       // Set button visibility based on listing status
@@ -255,6 +269,9 @@ function getPropertyStatusPillVariant(
   if (lowerStatus === "vacant") {
     return PropertyStatusPillVariant.VACANT;
   }
+  if (lowerStatus === "occupied") {
+    return PropertyStatusPillVariant.OCCUPIED;
+  }
   return PropertyStatusPillVariant.VACANT;
 }
 
@@ -310,10 +327,10 @@ export const bookPropertyInspectionAsync = createAsyncThunk(
     propertyId: string;
   }): Promise<PropertyListingInspectionDocument> => {
     console.log("got to the bookPropertyInspectionAsync");
-    console.log("inspectionId:", inspectionId, "tenantId:", tenantId);
     const updatedInspection: PropertyListingInspectionDocument = await addTenantToInspectionApi(
       inspectionId,
-      tenantId
+      tenantId,
+      propertyId
     );
     return updatedInspection;
   }

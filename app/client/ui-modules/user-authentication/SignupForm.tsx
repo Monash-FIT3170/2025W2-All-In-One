@@ -1,6 +1,6 @@
 import React, { use, useEffect } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
-import { EyeIcon } from "lucide-react";
+import { EyeIcon, EyeClosedIcon} from "lucide-react";
 import { useAppDispatch, useAppSelector } from "/app/client/store";
 import { useLocation, useNavigate } from "react-router";
 import {
@@ -147,7 +147,11 @@ export const SignupForm = () => {
             )
           }
         >
-          <EyeIcon className="w-5 h-5" />
+          {formState.passwordVisible ? (
+            <EyeIcon className="w-5 h-5" />
+          ) : (
+            <EyeClosedIcon className="w-5 h-5" />
+          )}
         </button>
         <p className="text-xs text-gray-500 mt-1">
           Password must be at least 8 characters long

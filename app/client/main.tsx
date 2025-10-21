@@ -40,6 +40,8 @@ import {
 } from "./ui-modules/user-authentication/components/RouteGuards";
 import { NavigationPath } from "./navigation";
 import { GuestSearchResultsPage } from "./ui-modules/search/SearchResultPage";
+import { AboutPage } from "./ui-modules/about-page/AboutPage";
+import { PrivacyPolicyPage } from "./ui-modules/privacy-policy-page/PrivacyPolicy";
 
 Meteor.startup(initialiseReactRoot);
 
@@ -50,8 +52,11 @@ function initialiseReactRoot(): void {
   root.render(
     <React.StrictMode>
       <Provider store={store}>
-        <AppRoot />
+        <BrowserRouter>
+          <AppRoot />
+          </BrowserRouter>
       </Provider>
+
     </React.StrictMode>
   );
 }
@@ -69,7 +74,6 @@ function AppRoot(): React.JSX.Element {
 
   return (
     <DefaultTheme>
-      <BrowserRouter>
         <TopNavbar onSideBarOpened={setIsSidebarOpen} />
         <RoleSideNavBar
           isOpen={isSidebarOpen}
@@ -90,7 +94,8 @@ function AppRoot(): React.JSX.Element {
             path={NavigationPath.PropertyListing}
             element={<PropertyListingPage />}
           />
-
+          <Route path={NavigationPath.AboutPage} element={<AboutPage />} />
+          <Route path={NavigationPath.PrivacyPolicyPage} element={<PrivacyPolicyPage />} />
           {/* Search routes */}
           <Route
             path={NavigationPath.Search}
@@ -300,7 +305,6 @@ function AppRoot(): React.JSX.Element {
           />
         </Routes>
         <BottomNavbar />
-      </BrowserRouter>
     </DefaultTheme>
   );
 }
