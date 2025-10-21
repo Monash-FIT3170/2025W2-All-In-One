@@ -8,9 +8,9 @@ interface CalendarTasksListProps {
   tasks: Task[];
   selectedDateISO: string | null;
   showPropertyAddress?: boolean; // true for Agent/Landlord, false for Tenant
-  onDeleteTask?: (taskId: string) => void; // Callback for delete functionality
+  onDeleteTask?: (taskId: string) => void; // Callback for delete functionalit
   onUpdateTaskStatus?: (taskId: string, status: TaskStatus) => void; // Callback for status update functionality
-  onEditTask?: (task: Task) => void; // Callback for edit functionality
+  onEditTask?: (task: Task) => void; // Callback for edit functionalit
 }
 
 export function CalendarTasksList({
