@@ -43,6 +43,28 @@ export const TenantSelectionModal = (
   const finalTenantApplications =
     realTimeApplications.length > 0 ? realTimeApplications : tenantApplications;
 
+  const filteredTenantApplications = finalTenantApplications.filter((app) => {
+    switch (activeFilter) {
+      case FilterType.ACCEPTED:
+        return [
+          TenantApplicationStatus.ACCEPTED,
+          TenantApplicationStatus.LANDLORD_APPROVED,
+          TenantApplicationStatus.FINAL_APPROVED,
+          TenantApplicationStatus.BACKGROUND_CHECK_PASSED,
+        ].includes(app.status);
+
+      case FilterType.REJECTED:
+        return [
+          TenantApplicationStatus.REJECTED,
+          TenantApplicationStatus.LANDLORD_REJECTED,
+          TenantApplicationStatus.FINAL_REJECTED,
+          TenantApplicationStatus.BACKGROUND_CHECK_FAILED,
+        ].includes(app.status);
+      default: //all
+        return true;
+    }
+  });
+
   const handleReject = (applicationId: string) => {
     onReject(applicationId);
   };
@@ -86,12 +108,11 @@ export const TenantSelectionModal = (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-[2px] flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-6 max-h-[90vh] overflow-hidden">
         <ModalHeader onClose={onClose} />
-
         <FilterTabs
           activeFilter={activeFilter}
           onFilterChange={handleFilterChange}
+          userRole={props.role}
         />
-
         {/* Error Display */}
         {error && (
           <div className="px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded mx-4 mb-2">
@@ -107,7 +128,7 @@ export const TenantSelectionModal = (
         )}
 
         <ModalContent
-          tenantApplications={finalTenantApplications}
+          tenantApplications={filteredTenantApplications}
           onReject={handleReject}
           onAccept={handleAccept}
           onReset={handleReset}
