@@ -1,18 +1,19 @@
-import React from 'react';
-import { TenantSelectionModalProps } from './TenantSelectionModalProps';
-import { Role } from '/app/shared/user-role-identifier';
-import { FilterType } from './enums/FilterType';
-import { ModalHeader } from './components/ModalHeader';
-import { FilterTabs } from './components/FilterTabs';
-import { ModalContent } from './components/ModalContent';
-import { ModalDone } from './components/ModalDone';
-import { useAppDispatch, useAppSelector } from '/app/client/store';
+import React from "react";
+import { TenantSelectionModalProps } from "./TenantSelectionModalProps";
+import { Role } from "/app/shared/user-role-identifier";
+import { FilterType } from "./enums/FilterType";
+import { ModalHeader } from "./components/ModalHeader";
+import { FilterTabs } from "./components/FilterTabs";
+import { ModalContent } from "./components/ModalContent";
+import { ModalDone } from "./components/ModalDone";
+import { useAppDispatch, useAppSelector } from "/app/client/store";
 import {
   setFilter,
   selectActiveFilter,
-} from './state/reducers/tenant-selection-slice';
-import { TenantApplicationStatus } from '/app/shared/api-models/tenant-application/TenantApplicationStatus';
-import { useTenantApplicationSubscriptions } from './hooks/useTenantApplicationSubscriptions';
+} from "./state/reducers/tenant-selection-slice";
+import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
+import { useTenantApplicationSubscriptions } from "./hooks/useTenantApplicationSubscriptions";
+import { useEffect } from "react";
 
 export const TenantSelectionModal = (
   props: TenantSelectionModalProps
@@ -32,16 +33,57 @@ export const TenantSelectionModal = (
   const error = useAppSelector((state) => state.tenantSelection.error);
 
   // Use real-time subscriptions for tenant applications
-  const {
-    applications: realTimeApplications,
-  } = useTenantApplicationSubscriptions({
-    enabled: isOpen, // Only subscribe when modal is open
-    propertyId: propertyId,
-    statusUpdatesOnly: false
-  });
+  const { applications: realTimeApplications } =
+    useTenantApplicationSubscriptions({
+      enabled: isOpen, // Only subscribe when modal is open
+      propertyId: propertyId,
+      statusUpdatesOnly: false,
+    });
 
   // Use real-time data if available, otherwise fall back to props
-  const finalTenantApplications = realTimeApplications.length > 0 ? realTimeApplications : tenantApplications;
+  const finalTenantApplications =
+    realTimeApplications.length > 0 ? realTimeApplications : tenantApplications;
+
+  const filteredTenantApplications = finalTenantApplications.filter((app) => {
+    switch (activeFilter) {
+      case FilterType.ACCEPTED:
+        return [
+          TenantApplicationStatus.ACCEPTED,
+          TenantApplicationStatus.LANDLORD_APPROVED,
+          TenantApplicationStatus.FINAL_APPROVED,
+          TenantApplicationStatus.BACKGROUND_CHECK_PASSED,
+        ].includes(app.status);
+
+      case FilterType.REJECTED:
+        return [
+          TenantApplicationStatus.REJECTED,
+          TenantApplicationStatus.LANDLORD_REJECTED,
+          TenantApplicationStatus.FINAL_REJECTED,
+          TenantApplicationStatus.BACKGROUND_CHECK_FAILED,
+        ].includes(app.status);
+
+      case FilterType.REVIEW_REQUIRED:
+        if (props.role === Role.AGENT) {
+          return [
+            TenantApplicationStatus.UNDETERMINED,
+            TenantApplicationStatus.BACKGROUND_CHECK_PENDING,
+          ].includes(app.status);
+        } else if (props.role === Role.LANDLORD) {
+          return [
+            TenantApplicationStatus.LANDLORD_REVIEW,
+            TenantApplicationStatus.FINAL_REVIEW,
+          ].includes(app.status);
+        }
+      default: //all
+        return true;
+    }
+  });
+
+  useEffect(() => {
+    if (isOpen) {
+      dispatch(setFilter(FilterType.ALL));
+    }
+  }, [isOpen, dispatch]);
 
   const handleReject = (applicationId: string) => {
     onReject(applicationId);
@@ -51,12 +93,15 @@ export const TenantSelectionModal = (
     onAccept(applicationId);
   };
 
-  const handleReset = async (applicationId: string, currentStatus: TenantApplicationStatus) => {
+  const handleReset = async (
+    applicationId: string,
+    currentStatus: TenantApplicationStatus
+  ) => {
     onReset(applicationId, currentStatus);
   };
 
   const handleSendToLandlord = () => {
-    if (props.role === Role.AGENT) {;
+    if (props.role === Role.AGENT) {
       props.onSendToLandlord();
     }
   };
@@ -77,19 +122,22 @@ export const TenantSelectionModal = (
     dispatch(setFilter(filter));
   };
 
-
   if (!isOpen) return <></>;
 
   return (
-    <div className="fixed inset-0 bg-opacity-100 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg max-w-md w-full mx-4 max-h-screen overflow-hidden shadow-xl">
-        <ModalHeader onClose={onClose} />
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-[2px] flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-6 max-h-[90vh] overflow-hidden">
+        <div className="px-6 pt-4">
+          <ModalHeader onClose={onClose} />
 
-        <FilterTabs
-          activeFilter={activeFilter}
-          onFilterChange={handleFilterChange}
-        />
-
+          <div className="flex justify-end mt-2">
+            <FilterTabs
+              activeFilter={activeFilter}
+              onFilterChange={handleFilterChange}
+              userRole={props.role}
+            />
+          </div>
+        </div>
         {/* Error Display */}
         {error && (
           <div className="px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded mx-4 mb-2">
@@ -105,14 +153,14 @@ export const TenantSelectionModal = (
         )}
 
         <ModalContent
-          tenantApplications={finalTenantApplications}
+          tenantApplications={filteredTenantApplications}
           onReject={handleReject}
           onAccept={handleAccept}
           onReset={handleReset}
           userRole={props.role}
         />
 
-         {/* Agent-only button */}
+        {/* Agent-only button */}
         {props.role === Role.AGENT && props.shouldShowSendToLandlordButton && (
           <div className="p-4 border-t">
             <button
@@ -120,7 +168,12 @@ export const TenantSelectionModal = (
               disabled={isLoading}
               className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              Send {props.hasAcceptedApplications ? props.acceptedApplicantCount : props.backgroundPassedApplicantCount} {props.hasAcceptedApplications ? 'Accepted' : 'Background Passed'} Applicant(s) to Landlord
+              Send{" "}
+              {props.hasAcceptedApplications
+                ? props.acceptedApplicantCount
+                : props.backgroundPassedApplicantCount}{" "}
+              {props.hasAcceptedApplications ? "Accepted" : "Background Passed"}{" "}
+              Applicant(s) to Landlord
             </button>
           </div>
         )}
@@ -133,26 +186,29 @@ export const TenantSelectionModal = (
               disabled={isLoading}
               className="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              Send {props.landlordApprovedApplicantCount} Approved Applicant(s) to Agent for Background Check
+              Send {props.landlordApprovedApplicantCount} Approved Applicant(s)
+              to Agent for Background Check
             </button>
           </div>
         )}
 
         {/* Landlord final approved button */}
-        {props.role === Role.LANDLORD && props.shouldShowSendFinalApprovedToAgentButton && (
-          <div className="p-4 border-t">
-            <button
-              onClick={handleSendFinalApprovedToAgent}
-              disabled={isLoading}
-              className="w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              Send {props.finalApprovedApplicantCount} Final Approved Applicant to Agent
-            </button>
-          </div>
-        )}
+        {props.role === Role.LANDLORD &&
+          props.shouldShowSendFinalApprovedToAgentButton && (
+            <div className="p-4 border-t">
+              <button
+                onClick={handleSendFinalApprovedToAgent}
+                disabled={isLoading}
+                className="w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                Send {props.finalApprovedApplicantCount} Final Approved
+                Applicant to Agent
+              </button>
+            </div>
+          )}
 
         <ModalDone onClose={onClose} />
       </div>
     </div>
   );
-}
+};
