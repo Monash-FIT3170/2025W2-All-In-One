@@ -61,12 +61,30 @@ export function FilterTabs({
     );
   };
 
+  const getActiveButtonColour = (filter: FilterType) => {
+    switch (filter) {
+      case FilterType.ACCEPTED:
+        return "bg-green-100 text-green-800";
+      case FilterType.REJECTED:
+        return "bg-red-100 text-red-800";
+      case FilterType.REVIEW_REQUIRED:
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
   return (
     <div className="px-4 pt-4">
       <div className="flex items-center justify-between mb-4">
         <Popover>
           <PopoverTrigger asChild>
-            <button className="flex bg-gray-100 rounded-lg p-1 hover:bg-gray-50">
+            <button
+              className={twMerge(
+                "flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200",
+                getActiveButtonColour(activeFilter)
+              )}
+            >
               <span>
                 Filter{" "}
                 {activeFilter !== FilterType.ALL
