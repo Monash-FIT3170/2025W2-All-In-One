@@ -5,7 +5,6 @@ import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { TaskStatus } from "/app/shared/task-status-identifier";
 import { useAppSelector } from "../../../../store";
 import {
-  selectMessagesCount,
   selectLeaseStatusKind,
   selectLeaseMonthsRemaining,
   LeaseStatusKind,
@@ -19,9 +18,9 @@ interface DashboardCardsProps {
 
 function DashboardCards({ rentAmount, tasks = [] }: DashboardCardsProps) {
   // Get state values from Redux
-  const messagesCount = useAppSelector(selectMessagesCount);
   const leaseStatusKind = useAppSelector(selectLeaseStatusKind);
   const leaseMonthsRemaining = useAppSelector(selectLeaseMonthsRemaining);
+  const leaseTerm = useAppSelector((state) => state.tenantProperty.leaseTerm);
 
   // Calculate pending tasks (not completed)
   const pendingTasks = tasks.filter((t) => t.status !== TaskStatus.COMPLETED);
@@ -55,6 +54,26 @@ function DashboardCards({ rentAmount, tasks = [] }: DashboardCardsProps) {
 
   const leaseInfo = getLeaseDisplayInfo();
 
+  // Format lease term for display
+  const getLeasePeriodDisplay = () => {
+    // If lease status is not available, don't show lease term
+    if (leaseStatusKind === LeaseStatusKind.NotAvailable) {
+      return "N/A";
+    }
+    
+    // Only show lease term if tenant has active lease
+    switch (leaseTerm) {
+      case "month_to_month":
+        return "Month to month";
+      case "6_months":
+        return "6 months";
+      case "12_months":
+        return "12 months";
+      default:
+        return leaseTerm ? leaseTerm.replace(/_/g, " ") : "N/A";
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
       <CardWidget
@@ -82,11 +101,9 @@ function DashboardCards({ rentAmount, tasks = [] }: DashboardCardsProps) {
       />
 
       <CardWidget
-        title="Messages"
-        value={messagesCount.toString()}
-        subtitle={
-          messagesCount === 0 ? "No new messages" : `${messagesCount} unread`
-        }
+        title="Lease Period"
+        value={getLeasePeriodDisplay()}
+        subtitle={leaseStatusKind === LeaseStatusKind.NotAvailable ? "No lease information" : "Current lease term"}
       />
     </div>
   );

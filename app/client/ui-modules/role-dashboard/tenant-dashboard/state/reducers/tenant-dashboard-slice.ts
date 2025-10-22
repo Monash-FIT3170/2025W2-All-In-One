@@ -20,7 +20,6 @@ interface TenantDashboardState {
   error: string | null;
   property: Property | null;
   leaseAgreements: LeaseAgreementDocument[];
-  messagesCount: number;
   leaseStatusKind: LeaseStatusKind;
   leaseMonthsRemaining: number | null;
 }
@@ -31,7 +30,6 @@ const initialState: TenantDashboardState = {
   error: null,
   property: null,
   leaseAgreements: [],
-  messagesCount: 0, // Default value for messages
   leaseStatusKind: LeaseStatusKind.NotAvailable, // Default enum value
   leaseMonthsRemaining: null, // Default value for months
 };
@@ -120,9 +118,6 @@ export const tenantDashboardSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
-    setMessagesCount: (state, action: PayloadAction<number>) => {
-      state.messagesCount = action.payload;
-    },
     setLeaseStatus: (state, action: PayloadAction<{ kind: LeaseStatusKind; monthsRemaining?: number }>) => {
       state.leaseStatusKind = action.payload.kind;
       state.leaseMonthsRemaining = action.payload.monthsRemaining ?? null;
@@ -148,14 +143,13 @@ export const tenantDashboardSlice = createSlice({
   },
 });
 
-export const { setLoading, setTasks, setError, setMessagesCount, setLeaseStatus } = tenantDashboardSlice.actions;
+export const { setLoading, setTasks, setError, setLeaseStatus } = tenantDashboardSlice.actions;
 
 export const selectTenantDashboard = (state: RootState) => state.tenantDashboard;
 export const selectTasks = (state: RootState) => state.tenantDashboard.tasks;
 export const selectLoading = (state: RootState) => state.tenantDashboard.isLoading;
 export const selectPropertyDetails = (state: RootState) => state.tenantDashboard.property;
 export const selectLeaseAgreements = (state: RootState) => state.tenantDashboard.leaseAgreements;
-export const selectMessagesCount = (state: RootState) => state.tenantDashboard.messagesCount;
 export const selectLeaseStatusKind = (state: RootState) => state.tenantDashboard.leaseStatusKind;
 export const selectLeaseMonthsRemaining = (state: RootState) => state.tenantDashboard.leaseMonthsRemaining;
 export default tenantDashboardSlice.reducer;
