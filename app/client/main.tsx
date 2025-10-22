@@ -41,6 +41,7 @@ import {
 import { NavigationPath } from "./navigation";
 import { GuestSearchResultsPage } from "./ui-modules/search/SearchResultPage";
 import { AboutPage } from "./ui-modules/about-page/AboutPage";
+import { TermsPage } from "./ui-modules/terms-page/TermsPage";
 import { PrivacyPolicyPage } from "./ui-modules/privacy-policy-page/PrivacyPolicy";
 
 Meteor.startup(initialiseReactRoot);
@@ -98,7 +99,8 @@ function AppRoot(): React.JSX.Element {
             />
             <Route path={NavigationPath.AboutPage} element={<AboutPage />} />
             <Route path={NavigationPath.PrivacyPolicyPage} element={<PrivacyPolicyPage />} />
-            {/* Search routes */}
+            <Route path={NavigationPath.TermsPage} element={<TermsPage />} />
+          {/* Search routes */}
             <Route
               path={NavigationPath.Search}
               element={<GuestSearchResultsPage />}
