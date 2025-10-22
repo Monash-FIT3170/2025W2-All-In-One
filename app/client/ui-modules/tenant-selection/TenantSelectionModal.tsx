@@ -13,6 +13,7 @@ import {
 } from "./state/reducers/tenant-selection-slice";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
 import { useTenantApplicationSubscriptions } from "./hooks/useTenantApplicationSubscriptions";
+import { useEffect } from "react";
 
 export const TenantSelectionModal = (
   props: TenantSelectionModalProps
@@ -77,6 +78,12 @@ export const TenantSelectionModal = (
         return true;
     }
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      dispatch(setFilter(FilterType.ALL));
+    }
+  }, [isOpen, dispatch]);
 
   const handleReject = (applicationId: string) => {
     onReject(applicationId);
