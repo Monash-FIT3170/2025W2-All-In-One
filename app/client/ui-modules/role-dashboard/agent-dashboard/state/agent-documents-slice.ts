@@ -53,14 +53,15 @@ export const fetchAgentDocuments = createAsyncThunk<
   "agentDocuments/fetchDocuments",
   async ({ agentId, query }) => {
     try {
-      // 1) Fetch docs (all vs search) — both must return LeaseAgreementDocument[]
+      
+			// FETCHES DOCS  BASED ON IF SEARCH IS PRESENT OR NOT
       const documents: LeaseAgreementDocument[] = await (
         query && query.trim()
           ? searchLeaseAgreement(agentId, query.trim())
           : getLeaseAgreementsForAgent(agentId)
       );
 
-      // 2) Fetch properties and index by propertyId (no Map)
+      // 2) Fetch properties 
       const properties = await getPropertyByAgentId(agentId);
       const propertyIndex: Record<string, typeof properties[number]> = {};
       properties.forEach(p => {
@@ -234,7 +235,7 @@ export const agentDocumentsSlice = createSlice({
 				state.uploadProgress = 100;
 				const newDoc: AgentDocument = {
 					...action.payload,
-					tenantId: undefined, // Keep this for compatibility
+					tenantId: undefined,
 					propertyAddress:
 						(action.payload as any).propertyAddress ||
 						"Property address unavailable",

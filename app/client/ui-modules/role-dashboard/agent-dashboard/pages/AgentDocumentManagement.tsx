@@ -28,7 +28,7 @@ function AgentDocumentManagement() {
    useEffect(() => {
     if (!currentUser || !("agentId" in currentUser)) return;
     const agentId = currentUser.agentId;
-
+    // if no search fetch all else the search
     if (debouncedSearchTerm === "") {
       dispatch(fetchAgentDocuments({ agentId })); // fetch all
     } else {
@@ -82,7 +82,7 @@ function AgentDocumentManagement() {
     );
   }
 
-  const clearSearch = () => setSearchTerm("");
+
 
   return (
     <div className="min-h-screen bg-gray-50">
