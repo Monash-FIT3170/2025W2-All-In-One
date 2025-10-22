@@ -120,12 +120,17 @@ export const TenantSelectionModal = (
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-[2px] flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-6 max-h-[90vh] overflow-hidden">
-        <ModalHeader onClose={onClose} />
-        <FilterTabs
-          activeFilter={activeFilter}
-          onFilterChange={handleFilterChange}
-          userRole={props.role}
-        />
+        <div className="px-6 pt-4">
+          <ModalHeader onClose={onClose} />
+
+          <div className="flex justify-end mt-2">
+            <FilterTabs
+              activeFilter={activeFilter}
+              onFilterChange={handleFilterChange}
+              userRole={props.role}
+            />
+          </div>
+        </div>
         {/* Error Display */}
         {error && (
           <div className="px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded mx-4 mb-2">
