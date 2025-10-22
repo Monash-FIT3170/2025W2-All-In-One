@@ -13,9 +13,6 @@ import {
 } from "/app/client/library-modules/utils/date-utils";
 
 import { PropertyListingInspectionDocument } from "/app/server/database/property-listing/models/PropertyListingInspectionDocument";
-import { AddTenantToInspectionUseCase } from "/app/client/library-modules/use-cases/property-listing/AddTenantToInspectionUseCase";
-import { ListingRepository } from "/app/client/library-modules/domain-models/property-listing/repositories/listing-repository";
-import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { apiPropertyInsertPrice } from "/app/client/library-modules/apis/property-price/price-api";
 import { addTenantToInspectionApi } from "/app/client/library-modules/apis/property-listing/listing-api";
 import { deleteDraftListingUseCase } from "/app/client/library-modules/use-cases/property-listing/DeleteDraftListingUseCase";
@@ -54,6 +51,8 @@ const initialState: PropertyListingPageUiState = {
   listingImageUrls: [],
   listingStatusText: "",
   listingStatusPillVariant: ListingStatusPillVariant.DRAFT,
+  startLeaseDate: new Date(),
+  endLeaseDate: new Date(),
   leaseTerm: "12_months",
   shouldDisplayListingStatus: true,
   shouldDisplaySubmitDraftButton: true,
@@ -167,6 +166,8 @@ export const propertyListingSlice = createSlice({
       state.listingStatusPillVariant = getListingStatusPillVariant(
         action.payload.listing_status
       );
+      state.startLeaseDate = action.payload.startlease_date;
+      state.endLeaseDate = action.payload.endlease_date;
       state.leaseTerm = action.payload.lease_term;
 
       // Set button visibility based on listing status

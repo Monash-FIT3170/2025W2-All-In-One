@@ -59,3 +59,13 @@ export async function apiSignDocument(
     role
   );
 }
+
+export async function apiSearchDocument(
+  agentId: string,
+  query: string
+): Promise<ApiLeaseAgreement[]> {
+  return await Meteor.callAsync(
+    MeteorMethodIdentifier.LEASE_AGREEMENT_SEARCH,
+    { agentId, q: query }
+  );
+}

@@ -13,7 +13,7 @@ export function mapApiLeaseAgreementToLeaseAgreement(
 		uploadedDate: new Date(leaseAgreement.uploadedDate),
 		validUntil: new Date(leaseAgreement.validUntil),
 		documentUrl: leaseAgreement.documentUrl,
-		tenantName: leaseAgreement.tenantName,
+		tenantId: leaseAgreement.tenantId,
 		tenantSigned: leaseAgreement.tenantSigned,
 		landlordSigned: leaseAgreement.landlordSigned,
 		agentSigned: leaseAgreement.agentSigned,

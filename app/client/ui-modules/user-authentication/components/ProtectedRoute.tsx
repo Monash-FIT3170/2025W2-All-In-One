@@ -31,7 +31,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // If still loading user data, show loading or wait
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full border-b-2 border-blue-600 h-16 w-16 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   // If not authenticated, return null (navigation will happen in useEffect)

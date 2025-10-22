@@ -92,8 +92,8 @@ function ImageCarouselLoadingSkeleton({
   className?: string;
 }): React.JSX.Element {
   return (
-    <div className={twMerge("h-[445px] w-[724px] bg-[#EEEEEE]", className)}>
-      Loading...
+    <div className={twMerge("h-[445px] w-[724px] bg-[#EEEEEE] flex items-center justify-center", className)}>
+      <div className="animate-spin rounded-full border-b-2 border-blue-600 h-16 w-16"></div>
     </div>
   );
 }

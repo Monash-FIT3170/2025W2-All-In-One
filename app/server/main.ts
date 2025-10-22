@@ -8,6 +8,7 @@ import "./publications/tenant-application-publications";
 import "./methods/property-listing/listing-methods";
 import "./methods/user-documents/lease-agreement-methods";
 import "./methods/tenant-application/tenant-application-method";
+import { closeExpiredListings } from './utils/close-expired-listings';
 
 import {
   PropertyCollection,
@@ -62,11 +63,9 @@ Meteor.startup(async () => {
   await removeTenantApplicationsData();
 
   await removeAllCollections();
-  // await tempSeedPropertyStatusData();
   await permSeedListingStatusData();
   await tempSeedUserAndRoleData();
   await permSeedPropertyFeaturesData();
-  // await tempSeedPropertyData();
   await tempSeedTaskData();
   await tempSeedProfileData();
   await tempSeedUserAndRoleData();
@@ -75,6 +74,9 @@ Meteor.startup(async () => {
   await seedListedProperties(globalAgent, globalLandlord, globalTenant);
 	await seedDraftProperties(globalAgent, globalLandlord);
   await seedLeaseAgreements(globalAgent);
+  await closeExpiredListings();
+
+  Meteor.setInterval(closeExpiredListings, 24 * 60 * 60 * 1000);
 });
 
 async function tempSeedUserAndRoleData(): Promise<void> {
@@ -202,6 +204,8 @@ async function tempSeedProfileData(): Promise<void> {
     const statuses = [
       { _id: "1", name: PropertyStatus.VACANT },
       { _id: "2", name: PropertyStatus.OCCUPIED },
+      { _id: "3", name: PropertyStatus.UNDER_MAINTENANCE },
+      { _id: "4", name: PropertyStatus.CLOSED },
     ];
 
     // Add new status if it doesn't exist
@@ -595,6 +599,8 @@ async function seedListedProperties(
 				listing_status_id: listedStatusId, // "Listed"
 				image_urls: randomImageUrls,
 				inspection_ids: getRandomInspectionIds(),
+        startlease_date: new Date(),
+        endlease_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
         lease_term: "12_months",
 			});
 
@@ -700,6 +706,8 @@ async function seedDraftProperties(
 			listing_status_id: draftStatusId, // Draft status
 			image_urls: draftImageUrls,
 			inspection_ids: [], // No inspections scheduled yet
+      startlease_date: new Date(), // No lease start date for draft
+      endlease_date: new Date(new Date().setFullYear(new Date().getFullYear() - 1)), // 1 year lease end date for draft
 			lease_term: "12_months", // 12 month lease term (string)
 		});
 

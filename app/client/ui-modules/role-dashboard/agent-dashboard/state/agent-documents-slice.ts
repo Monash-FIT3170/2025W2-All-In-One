@@ -4,11 +4,15 @@ import {
 	getLeaseAgreementsForAgent,
 	insertLeaseAgreement,
 	deleteLeaseAgreement,
+	searchLeaseAgreement,
 } from "../../../../library-modules/domain-models/user-documents/repositories/lease-agreement-repository";
 import { uploadFilesHandler } from "../../../../library-modules/apis/azure/blob-api";
 import { BlobNamePrefix } from "/app/shared/azure/blob-models";
 import { LeaseAgreementDocument } from "../../../../library-modules/domain-models/user-documents/LeaseAgreement";
 import { getPropertyByAgentId } from "../../../../library-modules/domain-models/property/repositories/property-repository";
+import { getTenantById } from "/app/client/library-modules/domain-models/user/role-repositories/tenant-repository";
+import { getUserAccountById } from "/app/client/library-modules/domain-models/user/user-account-repositories/user-account-repository";
+import { getProfileDataById } from "/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository";
 
 // Types
 export interface AgentDocument extends LeaseAgreementDocument {
@@ -24,6 +28,9 @@ export interface AgentDocumentState {
 	uploadProgress: number;
 	error: string | null;
 	selectedPropertyId: string | null;
+
+	search: string;
+		
 }
 
 // Initial state
@@ -34,44 +41,74 @@ const initialState: AgentDocumentState = {
 	uploadProgress: 0,
 	error: null,
 	selectedPropertyId: null,
+
+	search: "",
 };
 
 // Async thunks
-export const fetchAgentDocuments = createAsyncThunk(
-	"agentDocuments/fetchDocuments",
-	async (agentId: string) => {
-		try {
-			const [documents, properties] = await Promise.all([
-				getLeaseAgreementsForAgent(agentId),
-				getPropertyByAgentId(agentId),
-			]);
+export const fetchAgentDocuments = createAsyncThunk<
+  AgentDocument[],                                  // return type
+  { agentId: string; query?: string }               // arg type
+>(
+  "agentDocuments/fetchDocuments",
+  async ({ agentId, query }) => {
+    try {
+      
+			// FETCHES DOCS  BASED ON IF SEARCH IS PRESENT OR NOT
+      const documents: LeaseAgreementDocument[] = await (
+        query && query.trim()
+          ? searchLeaseAgreement(agentId, query.trim())
+          : getLeaseAgreementsForAgent(agentId)
+      );
 
-			// Create a map of propertyId to property details for quick lookup
-			const propertyMap = new Map(
-				properties.map((prop) => [prop.propertyId, prop])
-			);
+      // 2) Fetch properties 
+      const properties = await getPropertyByAgentId(agentId);
+      const propertyIndex: Record<string, typeof properties[number]> = {};
+      properties.forEach(p => {
+        propertyIndex[p.propertyId] = p;
+      });
 
-			// Map documents with property details and tenant names
-			const enrichedDocuments = documents.map((doc) => {
-				const property = propertyMap.get(doc.propertyId);
+
+
+			// gets all the profile data by id in parallel
+      const tenantProfiles = await Promise.all(
+				documents.map(async (doc) => {
+				if (!doc.tenantId) return null;
+				try {
+					return await getProfileDataById(doc.tenantId);
+				} catch {
+				return null;
+    }
+  })
+);
+   
+
+      // 4) Enrich documents
+      const enriched: AgentDocument[] = documents.map((doc, i) => {
+  			const tenant = tenantProfiles[i];
+  			const tenantName = tenant
+    			? `${tenant.firstName ?? ""} ${tenant.lastName ?? ""}`.trim()
+    			: "No tenant assigned";
+
+				const property = propertyIndex[doc.propertyId];
 				const propertyAddress = property
 					? `${property.streetnumber} ${property.streetname}, ${property.suburb}`
 					: "Property address unavailable";
 
-				return {
-					...doc,
-					propertyAddress,
-					tenantName: doc.tenantName || "No tenant assigned",
-				};
-			});
+  return {
+    ...doc,
+    propertyAddress,
+    tenantName,
+  };
+});
 
-			return enrichedDocuments;
-		} catch (error) {
-			throw new Error(
-				error instanceof Error ? error.message : "Failed to fetch documents"
-			);
-		}
-	}
+      return enriched;
+    } catch (error) {
+      throw new Error(
+        error instanceof Error ? error.message : "Failed to fetch documents"
+      );
+    }
+  }
 );
 
 export const uploadAgentDocument = createAsyncThunk(
@@ -165,6 +202,10 @@ export const agentDocumentsSlice = createSlice({
 		clearUploadProgress: (state) => {
 			state.uploadProgress = 0;
 		},
+		setAgentDocSearch: (state, action: PayloadAction<string>) => {
+			state.search = action.payload;
+		},
+
 	},
 	extraReducers: (builder) => {
 		// Fetch documents
@@ -194,7 +235,7 @@ export const agentDocumentsSlice = createSlice({
 				state.uploadProgress = 100;
 				const newDoc: AgentDocument = {
 					...action.payload,
-					tenantId: undefined, // Keep this for compatibility
+					tenantId: undefined,
 					propertyAddress:
 						(action.payload as any).propertyAddress ||
 						"Property address unavailable",
@@ -225,6 +266,7 @@ export const {
 	setUploadProgress,
 	clearError,
 	clearUploadProgress,
+	setAgentDocSearch
 } = agentDocumentsSlice.actions;
 
 // Selectors
@@ -257,6 +299,8 @@ export const selectDocumentsByProperty = (
 	propertyId: string
 ) =>
 	state.agentDocuments.documents.filter((doc) => doc.propertyId === propertyId);
+
+	
 
 // Reducer
 export default agentDocumentsSlice.reducer;

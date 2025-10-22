@@ -6,6 +6,8 @@ import { LeaseAgreementDocument } from "/app/server/database/user-documents/Leas
 import { InvalidDataError } from "/app/server/errors/InvalidDataError";
 import { meteorWrappedInvalidDataError } from "/app/server/utils/error-utils";
 import { ApiLeaseAgreement } from "/app/shared/api-models/user-documents/ApiLeaseAgreement";
+import { getTenantIdByPropertyId, propertySearchMethod } from "../property/property-methods";
+
 
 // Insert (returns DTO, not just id)
 const leaseAgreementInsertMethod = {
@@ -24,9 +26,13 @@ const leaseAgreementInsertMethod = {
       );
     }
 
+    // will grab it from property if there isnt any inserted
+    const tenantId = await getTenantIdByPropertyId(data.propertyId);
+
     const toInsert: Omit<LeaseAgreementDocument, "_id"> = {
       ...data,
       uploadedDate: new Date(),
+      tenantId: tenantId
     };
 
     try {
@@ -149,6 +155,52 @@ const leaseAgreementSignMethod = {
 
 
 
+
+const documentSearchMethod = { [MeteorMethodIdentifier.LEASE_AGREEMENT_SEARCH]: async (params: {agentId: string; q: string}): Promise<ApiLeaseAgreement[]> =>{
+
+  check(params, {agentId: String, q: String})
+
+  const {agentId, q} = params;
+
+  const cleanedQ = q.trim();
+
+  if (!cleanedQ) return [];
+
+  ///  ngl ths seems so dodgy idk any other ideas atm tho
+  const matchingProperties = await propertySearchMethod[MeteorMethodIdentifier.PROPERTY_SEARCH](q);
+
+  const propertyIds = matchingProperties.map(p => p.propertyId)
+
+
+  // regex for the document title
+  const rx = new RegExp(cleanedQ.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+
+  const docs = await LeaseAgreementCollection.find(
+      {
+        agentId,
+        $or: [
+          { title: rx },
+          { propertyId: { $in: propertyIds } }
+        ]
+      },
+      { sort: { uploadedDate: -1 } }
+    ).fetchAsync();
+
+    // 4️⃣ Map to DTOs
+    return docs.map(mapLeaseAgreementDocumentToDTO);
+  }
+
+
+}
+
+
+
+
+
+
+
+
+
 export const mapLeaseAgreementDocumentToDTO = (
   doc: LeaseAgreementDocument
 ): ApiLeaseAgreement => ({
@@ -159,7 +211,7 @@ export const mapLeaseAgreementDocumentToDTO = (
   uploadedDate: doc.uploadedDate,
   documentUrl: doc.documentUrl,
   validUntil: doc.validUntil,
-  tenantName: doc.tenantName,
+  tenantId: doc.tenantId,
   tenantSigned: doc.tenantSigned,
   landlordSigned: doc.landlordSigned,
   agentSigned: doc.agentSigned,
@@ -172,4 +224,5 @@ Meteor.methods({
   ...leaseAgreementsForPropertyMethod,
   ...leaseAgreementsForAgentMethod,
   ...leaseAgreementSignMethod,
+  ...documentSearchMethod
 });
