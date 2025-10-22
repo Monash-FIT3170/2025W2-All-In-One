@@ -136,7 +136,10 @@ export function MessagesPage({ role }: MessagesPageProps): React.JSX.Element {
     return (
       <div className="bg-gray-50 flex justify-center p-2 pt-3">
         <div className="w-full max-w-[1720px] h-[calc(100vh-8rem)] bg-white rounded-xl shadow-lg flex items-center justify-center">
-          <div className="text-gray-500">Loading conversations...</div>
+          <div className="text-center">
+            <div className="animate-spin rounded-full border-b-2 border-blue-600 h-16 w-16 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading conversations...</p>
+          </div>
         </div>
       </div>
     );

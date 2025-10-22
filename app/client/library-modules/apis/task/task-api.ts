@@ -56,6 +56,8 @@ export async function apiUpdateTask(taskData: {
   dueDate?: Date;
   priority?: TaskPriority;
   status?: TaskStatus;
+  propertyAddress?: string;
+  propertyId?: string;
 }): Promise<string> {
   try {
     const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_UPDATE, taskData);

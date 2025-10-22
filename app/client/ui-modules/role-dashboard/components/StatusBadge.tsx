@@ -12,9 +12,9 @@ export function StatusBadge({ status, className = "" }: StatusBadgeProps) {
     switch (status) {
       // PropertyStatus values
       case PropertyStatus.OCCUPIED:
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-red-100 text-red-800";
       case PropertyStatus.VACANT:
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-green-100 text-green-800";
       
       // ListingStatus values
       case ListingStatus.DRAFT:
@@ -30,7 +30,7 @@ export function StatusBadge({ status, className = "" }: StatusBadgeProps) {
   };
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeClass(status)} ${className}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(status)} ${className}`}>
       {status.toUpperCase()}
     </span>
   );

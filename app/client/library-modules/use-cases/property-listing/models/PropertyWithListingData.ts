@@ -24,6 +24,8 @@ export type PropertyWithListingData = {
   locationLatitude: number;
   locationLongitude: number;
   listing_status: string;
+  startlease_date: Date;
+  endlease_date: Date;
   lease_term: string;
   propertyListingInspections: {
     _id: string;

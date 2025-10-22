@@ -36,7 +36,7 @@ export default function FormPropertyDetails({
               <FormItem className="py-2">
                 <FormLabel>Bedrooms</FormLabel>
                 <FormControl>
-                  <Input placeholder="2" type="number" {...field} />
+                  <Input placeholder="2" type="number" min={0} max={100} {...field} />
                 </FormControl>
 
                 <FormMessage />
@@ -53,7 +53,7 @@ export default function FormPropertyDetails({
               <FormItem className="py-2">
                 <FormLabel>Bathrooms</FormLabel>
                 <FormControl>
-                  <Input placeholder="2" type="number" {...field} />
+                  <Input placeholder="2" type="number" min={0} max={100} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -69,7 +69,7 @@ export default function FormPropertyDetails({
               <FormItem className="py-2">
                 <FormLabel>Space (m²)</FormLabel>
                 <FormControl>
-                  <Input placeholder="1200" type="number" {...field} />
+                  <Input placeholder="1200" type="number" min={0} max={10000} {...field} />
                 </FormControl>
 
                 <FormMessage />
@@ -86,7 +86,7 @@ export default function FormPropertyDetails({
               <FormItem className="py-2">
                 <FormLabel>Parking Spaces</FormLabel>
                 <FormControl>
-                  <Input placeholder="2" type="number" {...field} />
+                  <Input placeholder="2" type="number" min={0} max={100} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

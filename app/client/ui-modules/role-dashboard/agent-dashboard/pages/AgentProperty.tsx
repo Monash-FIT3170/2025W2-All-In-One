@@ -37,9 +37,9 @@ export function AgentProperty(): React.JSX.Element {
 const STATUS_COLOURS: Record<string, string> = {
     ALL: "bg-gray-200 text-slate-800 hover:bg-gray-500",
     [ListingStatus.DRAFT]: "bg-orange-100 hover:bg-gray-200",
-    [PropertyStatus.VACANT]: "bg-red-100 hover:bg-gray-200",
-    [PropertyStatus.OCCUPIED]: "bg-blue-100 hover:bg-gray-200",
-    [ListingStatus.CLOSED]: "bg-green-100 hover:bg-gray-200"
+    [PropertyStatus.VACANT]: "bg-green-100 hover:bg-gray-200",
+    [PropertyStatus.OCCUPIED]: "bg-red-100 hover:bg-gray-200",
+    [ListingStatus.CLOSED]: "bg-blue-100 hover:bg-gray-200"
 }
   useEffect(() => {
     dispatch(fetchAgentPropertiesWithListingData());
