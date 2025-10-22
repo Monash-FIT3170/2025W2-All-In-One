@@ -16,6 +16,7 @@ import { useNavigate } from "react-router";
 import { PropertyWithListingDataAndNames } from "../../landlord-dashboard/state/landlord-properties-slice";
 import { NavigationPath } from "/app/client/navigation";
 import { List } from "lucide-react";
+import { LoadingSpinner } from "../../../common/LoadingSpinner";
 
 export function AgentProperty(): React.JSX.Element {
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
@@ -95,7 +96,7 @@ const STATUS_COLOURS: Record<string, string> = {
 
           {/* Properties list / states */}
           <div className="text-gray-500 text-sm italic">
-            {isLoading && <p>Loading properties...</p>}
+            {isLoading && <p><LoadingSpinner message="Loading properties..." size="md" /></p>}
             {!isLoading && !error && propertiesWithListingData.length === 0 && (
               <p>No properties to display yet.</p>
             )}

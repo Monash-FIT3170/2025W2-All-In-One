@@ -10,6 +10,7 @@ import {
 import DashboardCards from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/TenantDashboardCard";
 import PropertyDetails from "../components/PropertyDetails";
 import { fetchTenantPropertyWithListingData } from "../state/reducers/tenant-property-slice";
+import { LoadingSpinner } from "../../../common/LoadingSpinner";
 
 function TenantDashboard() {
   const dispatch = useAppDispatch();
@@ -32,14 +33,7 @@ function TenantDashboard() {
   }, [dispatch, currentUser?.userId]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full border-b-2 border-blue-600 h-16 w-16 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading your dashboard..." size="md" />;
   }
 
   return (

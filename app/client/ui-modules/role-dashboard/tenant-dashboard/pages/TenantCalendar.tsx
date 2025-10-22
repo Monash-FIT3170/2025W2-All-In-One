@@ -19,6 +19,7 @@ import { TaskStatus } from "/app/shared/task-status-identifier";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { getTodayAUDate, getTodayISODate } from "/app/client/library-modules/utils/date-utils";
 import { Tenant } from "/app/client/library-modules/domain-models/user/Tenant";
+import { LoadingSpinner } from "../../../common/LoadingSpinner";
 
 export function TenantCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch(); 
@@ -168,14 +169,7 @@ export function TenantCalendar(): React.JSX.Element {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full border-b-2 border-blue-600 h-16 w-16 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading calendar...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading your calendar..." size="md" />;
   }
 
 
