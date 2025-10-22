@@ -356,7 +356,7 @@ const updatePropertyData = {
 // If there is an error, it throws an InvalidDataError
 // The method is wrapped in a Meteor method so it can be called from the client
 
-const propertySearchMethod = {
+export const propertySearchMethod = {
   //
   [MeteorMethodIdentifier.PROPERTY_SEARCH]: async (
     query: string // query string to search for properties
@@ -494,6 +494,17 @@ const getLandlordDashboardMethod = {
   },
 };
 
+
+export async function getTenantIdByPropertyId(propertyId: string): Promise<string | undefined> {
+  const property = await PropertyCollection.findOneAsync({ propertyId });
+
+  if(!property) return "";
+
+  return property.tenant_id;
+}
+
+
+
 Meteor.methods({
   ...propertyGetMethod,
   ...propertyInsertMethod,
@@ -507,3 +518,4 @@ Meteor.methods({
   ...propertyGetAllMethod,
   ...propertySearchMethod,
 });
+
