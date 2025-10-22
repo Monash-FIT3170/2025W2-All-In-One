@@ -26,6 +26,7 @@ import {
 import { fetchPropertiesForLandlordCalendar } from "../../landlord-dashboard/state/landlord-calendar-slice";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { fetchLandlordCalendarMarkersForDate } from "../../landlord-dashboard/state/landlord-calendar-slice";
+import { LoadingSpinner } from "../../../common/LoadingSpinner";
 export function LandlordCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const currentLandlord = useAppSelector(
@@ -205,16 +206,7 @@ export function LandlordCalendar(): React.JSX.Element {
   };
 
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full border-b-2 border-blue-600 h-16 w-16 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading calendar...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingSpinner message="Loading your calendar..." size="md" />;
 
   return (
     <div className="min-h-screen">

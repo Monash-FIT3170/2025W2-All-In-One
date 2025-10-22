@@ -40,16 +40,19 @@ export const fetchLandlordProperties = createAsyncThunk(
         properties.map(async (property) => {
           try {
             return await getPropertyWithListingDataUseCase(property.propertyId);
-          } catch (error) {
+          } catch {
             console.warn(`No listing found for property ${property.propertyId}`);
-            // Return property with default listing values
+            // Return property with default listing values (edge case)
             return {
               ...property,
               image_urls: [],
               locationLatitude: 0,
               locationLongitude: 0,
               listing_status: "DRAFT",
-              propertyListingInspections: []
+              startlease_date: new Date(0),
+              endlease_date: new Date(0),
+              lease_term: "",
+              propertyListingInspections: [],
             } as PropertyWithListingData;
           }
         })
@@ -67,7 +70,7 @@ export const fetchLandlordProperties = createAsyncThunk(
               const tenant = await getTenantById(property.tenantId);
               const tenantProfile = await getProfileDataById(tenant.profileDataId);
               tenantName = `${tenantProfile.firstName} ${tenantProfile.lastName}`;
-            } catch (error) {
+            } catch {
               console.warn(`Failed to fetch tenant name for property ${property.propertyId}`);
             }
           }
@@ -78,7 +81,7 @@ export const fetchLandlordProperties = createAsyncThunk(
               const agent = await getAgentById(property.agentId);
               const agentProfile = await getProfileDataById(agent.profileDataId);
               agentName = `${agentProfile.firstName} ${agentProfile.lastName}`;
-            } catch (error) {
+            } catch {
               console.warn(`Failed to fetch agent name for property ${property.propertyId}`);
             }
           }

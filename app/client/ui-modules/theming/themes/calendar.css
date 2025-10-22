@@ -11,7 +11,7 @@ td.fc-daygrid-day.selected-day::before {
   left: 2px;
   right: 2px;
   bottom: 2px;
-  border: 2px solid black;
+  /* border: 2px solid black; */
   border-radius: 6px;
   pointer-events: none;
   z-index: 1;
