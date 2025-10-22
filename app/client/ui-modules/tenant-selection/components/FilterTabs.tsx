@@ -39,39 +39,31 @@ export function FilterTabs({
     return filter.charAt(0).toUpperCase() + filter.slice(1);
   };
 
-  const getFilterColour = (filter: FilterType, isActive: boolean) => {
-    const baseColors = {
-      [FilterType.ALL]: "text-gray-700 hover:bg-gray-300",
-      [FilterType.ACCEPTED]: "text-green-700 hover:bg-green-100",
-      [FilterType.REJECTED]: "text-red-700 hover:bg-red-100",
-      [FilterType.REVIEW_REQUIRED]: "text-yellow-700 hover:bg-yellow-100",
-    };
-
-    const activeColours = {
-      [FilterType.ALL]: "bg-gray-300",
-      [FilterType.ACCEPTED]: "bg-green-200",
-      [FilterType.REJECTED]: "bg-red-200",
-      [FilterType.REVIEW_REQUIRED]: "bg-yellow-200",
-    };
-
-    return twMerge(
-      "w-full text-left px-3 py-2 text-sm rounded transition-colors duration-200",
-      baseColors[filter],
-      isActive && activeColours[filter]
-    );
+  const filterColours: Record<FilterType, { base: string; active: string }> = {
+    [FilterType.ALL]: {
+      base: "text-gray-700 hover:bg-gray-300",
+      active: "bg-gray-300",
+    },
+    [FilterType.ACCEPTED]: {
+      base: "text-green-700 hover:bg-green-100",
+      active: "bg-green-200",
+    },
+    [FilterType.REJECTED]: {
+      base: "text-red-700 hover:bg-red-100",
+      active: "bg-red-200",
+    },
+    [FilterType.REVIEW_REQUIRED]: {
+      base: "text-yellow-700 hover:bg-yellow-100",
+      active: "bg-yellow-200",
+    },
   };
 
-  const getActiveButtonColour = (filter: FilterType) => {
-    switch (filter) {
-      case FilterType.ACCEPTED:
-        return "bg-green-100 text-green-800";
-      case FilterType.REJECTED:
-        return "bg-red-100 text-red-800";
-      case FilterType.REVIEW_REQUIRED:
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+  const getFilterColour = (filter: FilterType, isActive: boolean) => {
+    return twMerge(
+      "w-full text-left px-3 py-2 text-sm rounded transition-colors duration-200",
+      filterColours[filter].base,
+      isActive && filterColours[filter].active
+    );
   };
 
   return (
@@ -82,7 +74,8 @@ export function FilterTabs({
             <button
               className={twMerge(
                 "flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200",
-                getActiveButtonColour(activeFilter)
+                filterColours[activeFilter].base,
+                filterColours[activeFilter].active
               )}
             >
               <span>
