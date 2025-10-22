@@ -24,7 +24,10 @@ export function FilterTabs({
   const isLandlord = userRole === Role.LANDLORD;
   const isAgent = userRole === Role.AGENT;
 
-  const availableFilters: FilterType[] = [FilterType.ALL];
+  const availableFilters: FilterType[] = [
+    FilterType.ALL,
+    FilterType.REVIEW_REQUIRED,
+  ];
 
   if (isAgent || isLandlord) {
     availableFilters.push(FilterType.ACCEPTED, FilterType.REJECTED);
@@ -32,7 +35,30 @@ export function FilterTabs({
 
   const getLabel = (filter: FilterType) => {
     if (filter === FilterType.ACCEPTED && isLandlord) return "Approved";
+    if (filter === FilterType.REVIEW_REQUIRED) return "Review Required";
     return filter.charAt(0).toUpperCase() + filter.slice(1);
+  };
+
+  const getFilterColour = (filter: FilterType, isActive: boolean) => {
+    const baseColors = {
+      [FilterType.ALL]: "text-gray-700 hover:bg-gray-300",
+      [FilterType.ACCEPTED]: "text-green-700 hover:bg-green-100",
+      [FilterType.REJECTED]: "text-red-700 hover:bg-red-100",
+      [FilterType.REVIEW_REQUIRED]: "text-yellow-700 hover:bg-yellow-100",
+    };
+
+    const activeColours = {
+      [FilterType.ALL]: "bg-gray-300",
+      [FilterType.ACCEPTED]: "bg-green-200",
+      [FilterType.REJECTED]: "bg-red-200",
+      [FilterType.REVIEW_REQUIRED]: "bg-yellow-200",
+    };
+
+    return twMerge(
+      "w-full text-left px-3 py-2 text-sm rounded transition-colors duration-200",
+      baseColors[filter],
+      isActive && activeColours[filter]
+    );
   };
 
   return (
@@ -56,12 +82,7 @@ export function FilterTabs({
                 <button
                   key={filter}
                   onClick={() => onFilterChange(filter)}
-                  className={twMerge(
-                    "w-full text-left px-3 py-2 text-sm rounded",
-                    activeFilter === filter
-                      ? "bg-blue-50 text-blue-800"
-                      : "text-gray-700 hover:bg-gray-400 transition-colors duration-200"
-                  )}
+                  className={getFilterColour(filter, activeFilter === filter)}
                 >
                   {getLabel(filter)}
                 </button>
