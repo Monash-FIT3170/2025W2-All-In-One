@@ -27,6 +27,7 @@ export enum NavigationPath {
   TenantSearchProperties = "/tenant-search-properties",
   AboutPage = "/about",
   PrivacyPolicyPage = "/privacy-policy",
+  TermsPage = "/terms",
 }
 
 export const BACK_ROUTES = {
