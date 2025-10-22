@@ -6,6 +6,7 @@ import {
   ListingSummary,
 } from "./components/ListingSummary";
 import { PropertyDescription } from "/app/client/ui-modules/common/property-components/PropertyDescription";
+import { ListingDates } from "./components/ListingDates";
 import { LeftCircularArrowIcon } from "/app/client/ui-modules/theming/icons/LeftCircularArrowIcon";
 import { RightCircularArrowIcon } from "/app/client/ui-modules/theming/icons/RightCircularArrowIcon";
 import { ImageCarousel } from "../theming/components/ImageCarousel";
@@ -63,6 +64,7 @@ import { TenantApplicationStatus } from "/app/shared/api-models/tenant-applicati
 import DeleteDraftListingButton from "./components/DeleteDraftListingButton";
 import { DeleteDraftListingModal } from "./components/DeleteDraftListingModal";
 import { deleteDraftListingAsync } from "./state/reducers/property-listing-slice";
+import { LoadingSpinner } from "../common/LoadingSpinner";
 
 export function PropertyListingPage({
   className = "",
@@ -112,6 +114,9 @@ export function PropertyListingPage({
           propertyStatusText={state.propertyStatusText}
           propertyStatusPillVariant={state.propertyStatusPillVariant}
           propertyDescription={state.propertyDescription}
+          startLeaseDate={state.startLeaseDate}
+          endLeaseDate={state.endLeaseDate}
+          leaseTerm={state.leaseTerm}
           propertyFeatures={state.propertyFeatures}
           propertyType={state.propertyType}
           propertyLandArea={state.propertyLandArea}
@@ -209,6 +214,9 @@ function ListingPageContent({
   propertyStatusText,
   propertyStatusPillVariant,
   propertyDescription,
+  startLeaseDate,
+  endLeaseDate,
+  leaseTerm,
   propertyFeatures,
   propertyType,
   propertyLandArea,
@@ -249,6 +257,9 @@ function ListingPageContent({
   propertyStatusText: string;
   propertyStatusPillVariant: PropertyStatusPillVariant;
   propertyDescription: string;
+  startLeaseDate: Date;
+  endLeaseDate: Date;
+  leaseTerm: string;
   propertyFeatures: string[];
   propertyType: string;
   propertyLandArea: string;
@@ -364,6 +375,9 @@ function ListingPageContent({
       />
       <ListingDetails
         propertyDescription={propertyDescription}
+        startLeaseDate={startLeaseDate}
+        endLeaseDate={endLeaseDate}
+        leaseTerm={leaseTerm}
         mapUiState={mapUiState}
         inspectionBookingUiStateList={inspectionBookingUiStateList}
         onBook={(inspectionId: string) => {
@@ -440,7 +454,11 @@ function ListingPageContentLoadingSkeleton({
 }: {
   className?: string;
 }): React.JSX.Element {
-  return <p className={className}>Loading...</p>;
+  return (
+    <div className={className}>
+      <LoadingSpinner message="Loading property details..." size="md" />
+    </div>
+  );
 }
 
 function TopBar({
@@ -582,6 +600,9 @@ function ListingHero({
 
 function ListingDetails({
   propertyDescription,
+  startLeaseDate,
+  endLeaseDate,
+  leaseTerm,
   mapUiState,
   inspectionBookingUiStateList,
   onBook,
@@ -592,6 +613,9 @@ function ListingDetails({
   tenantId,
 }: {
   propertyDescription: string;
+  startLeaseDate: Date;
+  endLeaseDate: Date;
+  leaseTerm: string;
   mapUiState: PropertyMapUiState;
   inspectionBookingUiStateList: InspectionBookingListUiState[];
   onBook: (inspectionId: string) => void;
@@ -606,6 +630,12 @@ function ListingDetails({
       <div className="flex-1 flex flex-col">
         <PropertyDescription
           description={propertyDescription}
+          className="mb-4"
+        />
+        <ListingDates
+          startLeaseDate={startLeaseDate}
+          endLeaseDate={endLeaseDate}
+          leaseTerm={leaseTerm}
           className="mb-4"
         />
         <PropertyInspections
@@ -709,7 +739,8 @@ function ListingModalEditor({
     description: state.propertyDescription,
     summary_description: state.summaryDescription,
     images: [], // Placeholder, as we don't have image files in the current state
-    available_dates: new Date(),
+    startlease_date: new Date(),
+    endlease_date: new Date(),
     lease_term: state.leaseTerm,
     suburb: state.suburb,
     monthly_rent: state.monthlyRent,

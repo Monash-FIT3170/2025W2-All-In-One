@@ -7,13 +7,15 @@ import {
   selectCalendarMarkers,
   deleteCalendarTask,
   updateAgentCalendarTaskStatus,
+  updateAgentCalendarTask,
 } from "../state/agent-calendar-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
-import { AddTaskModal } from "../components/AddTaskModal";
+import { TaskModal } from "../components/TaskModal";
 import { apiCreateTaskForAgent } from "/app/client/library-modules/apis/task/task-api";
 import { PropertyOption, TaskData } from "../components/TaskFormSchema";
 import { TaskStatus } from "/app/shared/task-status-identifier";
+import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { UpcomingTasks } from "../../components/UpcomingTask";
 import { CalendarTasksList } from "../../components/CalendarTasksList";
 import { TaskMap, TaskMapUiState } from "../components/TaskMap";
@@ -38,6 +40,8 @@ export function AgentCalendar(): React.JSX.Element {
   const [selectedDate, setSelectedDate] = useState<string | null>(getTodayAUDate());
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(getTodayISODate());
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [properties, setProperties] = useState<PropertyOption[]>([]);
   const [mapUiState, setMapUiState] = useState<TaskMapUiState>({ markers: [] });
 
@@ -112,33 +116,63 @@ export function AgentCalendar(): React.JSX.Element {
   }, [tasks]);
 
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
+  const handleOpenModal = () => {
+    setModalMode('add');
+    setTaskToEdit(null);
+    setIsModalOpen(true);
+  };
 
-  const handleTaskSubmit = async (taskData: TaskData) => {
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTaskToEdit(null);
+  };
+
+  const handleEditTask = (task: Task) => {
+    setModalMode('edit');
+    setTaskToEdit(task);
+    setIsModalOpen(true);
+  };
+
+  const handleTaskSubmit = async (taskData: TaskData, taskId?: string) => {
     if (!currentUser?.userId) {
       console.error("No current user found");
       return;
     }
 
     try {
-      const apiData = {
-        name: taskData.name,
-        description: taskData.description,
-        dueDate: new Date(taskData.dueDate),
-        priority: taskData.priority,
-        userId: currentUser.userId,
-        propertyAddress: taskData.propertyAddress,
-        propertyId: taskData.propertyId || "",
-      };
+      if (taskId) {
+        // Edit mode
+        await dispatch(updateAgentCalendarTask({
+          taskId,
+          name: taskData.name,
+          description: taskData.description,
+          dueDate: new Date(taskData.dueDate),
+          priority: taskData.priority,
+          propertyAddress: taskData.propertyAddress,
+          propertyId: taskData.propertyId,
+        }));
+        console.log("Task updated successfully");
+      } else {
+        // Add mode
+        const apiData = {
+          name: taskData.name,
+          description: taskData.description,
+          dueDate: new Date(taskData.dueDate),
+          priority: taskData.priority,
+          userId: currentUser.userId,
+          propertyAddress: taskData.propertyAddress,
+          propertyId: taskData.propertyId || "",
+        };
 
-      const createdTaskId = await apiCreateTaskForAgent(apiData);
-      console.log("Task created successfully with ID:", createdTaskId);
+        const createdTaskId = await apiCreateTaskForAgent(apiData);
+        console.log("Task created successfully with ID:", createdTaskId);
+      }
 
       setIsModalOpen(false);
+      setTaskToEdit(null);
       dispatch(fetchAgentCalendarTasks(currentUser.userId));
     } catch (error) {
-      console.error("Error creating task:", error);
+      console.error("Error saving task:", error);
     }
   };
 
@@ -188,19 +222,22 @@ export function AgentCalendar(): React.JSX.Element {
               />
 
               <div className="mt-4">
-                <h2 className="text-lg font-semibold">
-                  {selectedDate ? selectedDate : getTodayAUDate()}
-                </h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold">
+                    {selectedDate ? selectedDate : getTodayAUDate()}
+                  </h2>
+                  <Button onClick={handleOpenModal}>Add Task</Button>
+                </div>
                 <CalendarTasksList 
                   tasks={tasks}
                   selectedDateISO={selectedDateISO}
                   showPropertyAddress={true}
                   onDeleteTask={handleDeleteTask}
                   onUpdateTaskStatus={handleTaskStatusUpdate}
+                  onEditTask={handleEditTask}
                 />
                 <br />
                 <TaskMap mapUiState={mapUiState} className="mb-3" />
-                <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
             <UpcomingTasks tasks={tasks} showViewAllButton={false} />
@@ -208,11 +245,13 @@ export function AgentCalendar(): React.JSX.Element {
         </div>
       </div>
 
-      <AddTaskModal
+      <TaskModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSubmit={handleTaskSubmit}
-        properties={properties} // pass the fetched properties
+        properties={properties}
+        mode={modalMode}
+        task={taskToEdit}
       />
     </div>
   );

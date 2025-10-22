@@ -27,14 +27,23 @@ function SettingsPageBase({
 }): React.JSX.Element {
 
   if (SettingsPageUiState.isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full border-b-2 border-blue-600 h-16 w-16 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading settings...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="p-5 space-y-6">
-      <SettingsAccountPreferences />
-      <SettingsSecurityPreferences />
-      <SettingsAccountDeactivation/>
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-1 p-5 space-y-6">
+        <SettingsAccountPreferences />
+        <SettingsSecurityPreferences />
+        <SettingsAccountDeactivation/>
+      </div>
     </div>
   );
 }
