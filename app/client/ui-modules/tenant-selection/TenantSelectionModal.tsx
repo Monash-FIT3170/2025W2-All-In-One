@@ -60,6 +60,19 @@ export const TenantSelectionModal = (
           TenantApplicationStatus.FINAL_REJECTED,
           TenantApplicationStatus.BACKGROUND_CHECK_FAILED,
         ].includes(app.status);
+
+      case FilterType.REVIEW_REQUIRED:
+        if (props.role === Role.AGENT) {
+          return [
+            TenantApplicationStatus.UNDETERMINED,
+            TenantApplicationStatus.BACKGROUND_CHECK_PENDING,
+          ].includes(app.status);
+        } else if (props.role === Role.LANDLORD) {
+          return [
+            TenantApplicationStatus.LANDLORD_REVIEW,
+            TenantApplicationStatus.FINAL_REVIEW,
+          ].includes(app.status);
+        }
       default: //all
         return true;
     }
