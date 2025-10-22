@@ -84,5 +84,6 @@ export enum MeteorMethodIdentifier {
 	LOGIN_HISTORY_GET_FOR_USER = "loginHistory.getForUser",
 	VALIDATE_PASSWORD = "password.validate",
 	ADD_TENANT_TO_INSPECTION = "inspection.addTenant",
+  LEASE_AGREEMENT_SEARCH = "LEASE_AGREEMENT_SEARCH",
 	ACCOUNT_EMAIL_UPDATE = "account.email.update",
 }

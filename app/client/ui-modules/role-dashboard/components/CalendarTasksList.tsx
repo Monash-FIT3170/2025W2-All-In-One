@@ -8,8 +8,9 @@ interface CalendarTasksListProps {
   tasks: Task[];
   selectedDateISO: string | null;
   showPropertyAddress?: boolean; // true for Agent/Landlord, false for Tenant
-  onDeleteTask?: (taskId: string) => void; // Callback for delete functionality
+  onDeleteTask?: (taskId: string) => void; // Callback for delete functionalit
   onUpdateTaskStatus?: (taskId: string, status: TaskStatus) => void; // Callback for status update functionality
+  onEditTask?: (task: Task) => void; // Callback for edit functionalit
 }
 
 export function CalendarTasksList({
@@ -17,7 +18,8 @@ export function CalendarTasksList({
   selectedDateISO,
   showPropertyAddress = true,
   onDeleteTask,
-  onUpdateTaskStatus
+  onUpdateTaskStatus,
+  onEditTask
 }: CalendarTasksListProps): React.JSX.Element {
   const targetDate = selectedDateISO || getTodayISODate();
   const filteredTasks = tasks.filter((task) => task.dueDate === targetDate);
@@ -83,16 +85,28 @@ export function CalendarTasksList({
                 )}
               </div>
             </div>
-            {onDeleteTask && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => onDeleteTask(task.taskId)}
-                className="ml-2 text-xs"
-              >
-                Delete
-              </Button>
-            )}
+            <div className="flex gap-2 ml-2">
+              {onEditTask && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onEditTask(task)}
+                  className="text-xs"
+                >
+                  Edit
+                </Button>
+              )}
+              {onDeleteTask && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => onDeleteTask(task.taskId)}
+                  className="text-xs"
+                >
+                  Delete
+                </Button>
+              )}
+            </div>
           </div>
         </li>
       ))}

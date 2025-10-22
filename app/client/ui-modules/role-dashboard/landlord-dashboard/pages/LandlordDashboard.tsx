@@ -13,12 +13,14 @@ import {
   selectLandlordProperties,
   fetchLandlordProperties
 } from "../state/landlord-properties-slice";
+import { LoadingSpinner } from "../../../common/LoadingSpinner";
 
 export function LandlordDashboard(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const properties = useAppSelector(selectLandlordProperties);
   const tasks = useAppSelector(selectTasks);
   const dashboardData = useAppSelector(selectLandlordDashboard);
+  const isLoading = useAppSelector((state) => state.landlordDashboard.isLoading); 
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
   useEffect(() => {
     if (currentUser?.userId) {
@@ -30,6 +32,9 @@ export function LandlordDashboard(): React.JSX.Element {
   }, [currentUser]);
 
   console.log(currentUser);
+  if (isLoading) {
+    return <LoadingSpinner message="Loading your dashboard..." size="md" />;
+  }
 
   return (
     <div className="min-h-screen">

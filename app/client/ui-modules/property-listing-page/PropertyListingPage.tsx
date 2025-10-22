@@ -64,6 +64,7 @@ import { TenantApplicationStatus } from "/app/shared/api-models/tenant-applicati
 import DeleteDraftListingButton from "./components/DeleteDraftListingButton";
 import { DeleteDraftListingModal } from "./components/DeleteDraftListingModal";
 import { deleteDraftListingAsync } from "./state/reducers/property-listing-slice";
+import { LoadingSpinner } from "../common/LoadingSpinner";
 
 export function PropertyListingPage({
   className = "",
@@ -453,7 +454,11 @@ function ListingPageContentLoadingSkeleton({
 }: {
   className?: string;
 }): React.JSX.Element {
-  return <p className={className}>Loading...</p>;
+  return (
+    <div className={className}>
+      <LoadingSpinner message="Loading property details..." size="md" />
+    </div>
+  );
 }
 
 function TopBar({
