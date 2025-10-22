@@ -2,6 +2,7 @@ import { Meteor } from "meteor/meteor";
 import { ApiTask } from "/app/shared/api-models/task/ApiTask";
 import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { TaskPriority } from "/app/shared/task-priority-identifier";
+import { TaskStatus } from "/app/shared/task-status-identifier";
 
 
 export async function apiGetTaskById(id: string): Promise<ApiTask> {
@@ -54,6 +55,9 @@ export async function apiUpdateTask(taskData: {
   description?: string;
   dueDate?: Date;
   priority?: TaskPriority;
+  status?: TaskStatus;
+  propertyAddress?: string;
+  propertyId?: string;
 }): Promise<string> {
   try {
     const result = await Meteor.callAsync(MeteorMethodIdentifier.TASK_UPDATE, taskData);

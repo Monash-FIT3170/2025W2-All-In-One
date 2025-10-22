@@ -24,9 +24,9 @@ function getAvatarInitials(name: string): string {
 
 // Helper function to generate display name from profile
 function getDisplayName(profile: ApiProfileData | undefined, roleType: string, id: string): string {
-  return profile 
+  return profile
     ? `${profile.firstName} ${profile.lastName}`.trim()
-    : `${roleType} ${id.slice(-4)}`;
+    : roleType;
 }
 
 // Convert API conversation to domain model
@@ -36,7 +36,7 @@ function convertApiConversationToDomain(
   displayName?: string,
   displayRole?: string
 ): Conversation {
-  const name = displayName || `User ${apiConversation.agentId?.slice(-4) || 'Unknown'}`;
+  const name = displayName || (apiConversation.tenantId ? 'Tenant' : apiConversation.agentId ? 'Agent' : apiConversation.landlordId ? 'Landlord' : 'User');
   const role = displayRole || "User";
   
   // Calculate timestamp - only show if there's an actual message
@@ -138,9 +138,19 @@ export function convertApiConversationsToAgentView(
 export function convertApiConversationsToTenantView(
   apiConversations: ApiConversation[],
   tenantId: string,
-  agentProfile?: ApiProfileData
+  agentProfiles?: Map<string, ApiProfileData> | ApiProfileData
 ): Conversation[] {
   return apiConversations.map(apiConversation => {
+    let agentProfile: ApiProfileData | undefined;
+
+    if (agentProfiles instanceof Map) {
+      // Multiple agent profiles
+      agentProfile = apiConversation.agentId ? agentProfiles.get(apiConversation.agentId) : undefined;
+    } else {
+      // Single agent profile (backward compatibility)
+      agentProfile = agentProfiles;
+    }
+
     const name = getDisplayName(agentProfile, "Agent", apiConversation.agentId);
     return convertApiConversationToDomain(apiConversation, tenantId, name, "Agent");
   });

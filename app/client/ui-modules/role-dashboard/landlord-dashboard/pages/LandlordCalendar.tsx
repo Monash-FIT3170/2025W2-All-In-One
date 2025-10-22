@@ -6,13 +6,16 @@ import {
   fetchLandlordCalendarTasks,
   selectLandlordCalendarMarkers,
   deleteLandlordCalendarTask,
+  updateLandlordCalendarTaskStatus,
+  updateLandlordCalendarTask,
 } from "../../landlord-dashboard/state/landlord-calendar-slice";
 import { Calendar } from "../../../theming/components/Calendar";
 import { Button } from "../../../theming-shadcn/Button";
-import { AddTaskModal } from "../../agent-dashboard/components/AddTaskModal";
+import { TaskModal } from "../../agent-dashboard/components/TaskModal";
 import { apiCreateTaskForLandlord } from "/app/client/library-modules/apis/task/task-api";
 import { PropertyOption, TaskData } from "../../agent-dashboard/components/TaskFormSchema";
 import { TaskStatus } from "/app/shared/task-status-identifier";
+import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { UpcomingTasks } from "../../components/UpcomingTask";
 import { CalendarTasksList } from "../../components/CalendarTasksList";
 import { TaskMap, TaskMapUiState } from "../../agent-dashboard/components/TaskMap";
@@ -23,6 +26,7 @@ import {
 import { fetchPropertiesForLandlordCalendar } from "../../landlord-dashboard/state/landlord-calendar-slice";
 import { Landlord } from "/app/client/library-modules/domain-models/user/Landlord";
 import { fetchLandlordCalendarMarkersForDate } from "../../landlord-dashboard/state/landlord-calendar-slice";
+import { LoadingSpinner } from "../../../common/LoadingSpinner";
 export function LandlordCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const currentLandlord = useAppSelector(
@@ -33,9 +37,11 @@ export function LandlordCalendar(): React.JSX.Element {
   const loading = useAppSelector(selectLandlordCalendarLoading);
   const markers = useAppSelector(selectLandlordCalendarMarkers);
 
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(getTodayAUDate());
+  const [selectedDateISO, setSelectedDateISO] = useState<string | null>(getTodayISODate());
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [properties, setProperties] = useState<PropertyOption[]>([]);
   const [mapUiState, setMapUiState] = useState<TaskMapUiState>({ markers: [] });
 
@@ -77,34 +83,96 @@ export function LandlordCalendar(): React.JSX.Element {
     setSelectedDateISO(iso);
   };
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
+  const handleOpenModal = () => {
+    setModalMode('add');
+    setTaskToEdit(null);
+    setIsModalOpen(true);
+  };
 
-  const handleTaskSubmit = async (taskData: TaskData) => {
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTaskToEdit(null);
+  };
+
+  const handleEditTask = (task: Task) => {
+    setModalMode('edit');
+    setTaskToEdit(task);
+    setIsModalOpen(true);
+  };
+
+  // 
+  const toISODateOnly = (d: string | Date) => {
+    const dt = typeof d === "string" ? new Date(d) : d;
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, "0");
+    const day = String(dt.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  type Priority = "low" | "medium" | "high";
+
+  // maps badges of tasks for each date
+  const dateBadges = React.useMemo(() => {
+    const map: Record<string, { total: number; counts: Partial<Record<Priority, number>> }> = {};
+    for (const t of tasks as any[]) {
+      if (!t?.dueDate) continue;
+      
+      const iso = toISODateOnly(t.dueDate);
+      
+      const p: Priority = (t.priority as Priority) ?? "medium";
+      
+      map[iso] ??= { total: 0, counts: {} };
+      
+      map[iso].total += 1;
+      
+      map[iso].counts[p] = (map[iso].counts[p] ?? 0) + 1;
+    
+    }
+    return map;
+  }, [tasks]);
+
+
+  const handleTaskSubmit = async (taskData: TaskData, taskId?: string) => {
     if (!currentUser?.userId) {
       console.error("No current user found");
       return;
     }
 
     try {
-      const apiData = {
-        name: taskData.name,
-        description: taskData.description,
-        dueDate: new Date(taskData.dueDate),
-        priority: taskData.priority,
-        userId: currentUser.userId,
-        propertyAddress: taskData.propertyAddress,
-        propertyId: taskData.propertyId || "",
-      };
+      if (taskId) {
+        // Edit mode
+        await dispatch(updateLandlordCalendarTask({
+          taskId,
+          name: taskData.name,
+          description: taskData.description,
+          dueDate: new Date(taskData.dueDate),
+          priority: taskData.priority,
+          propertyAddress: taskData.propertyAddress,
+          propertyId: taskData.propertyId,
+        }));
+        console.log("Task updated successfully");
+      } else {
+        // Add mode
+        const apiData = {
+          name: taskData.name,
+          description: taskData.description,
+          dueDate: new Date(taskData.dueDate),
+          priority: taskData.priority,
+          userId: currentUser.userId,
+          propertyAddress: taskData.propertyAddress,
+          propertyId: taskData.propertyId || "",
+        };
 
-      const createdTaskId = await apiCreateTaskForLandlord(apiData);
-      console.log("Task created successfully with ID:", createdTaskId);
+        const createdTaskId = await apiCreateTaskForLandlord(apiData);
+        console.log("Task created successfully with ID:", createdTaskId);
+      }
       
       setIsModalOpen(false);
+      setTaskToEdit(null);
       // Refresh calendar tasks to show the newly created task
       dispatch(fetchLandlordCalendarTasks());
     } catch (error) {
-      console.error("Error creating task:", error);
+      console.error("Error saving task:", error);
     }
   };
 
@@ -125,8 +193,20 @@ export function LandlordCalendar(): React.JSX.Element {
     }
   };
 
+  const handleTaskStatusUpdate = async (taskId: string, status: TaskStatus) => {
+    try {
+      await dispatch(updateLandlordCalendarTaskStatus({
+        taskId,
+        status
+      }));
+      console.log(`Task ${taskId} status updated to ${status}`);
+    } catch (error) {
+      console.error("Failed to update task status:", error);
+    }
+  };
 
-  if (loading) return <div>Loading...</div>;
+
+  if (loading) return <LoadingSpinner message="Loading your calendar..." size="md" />;
 
   return (
     <div className="min-h-screen">
@@ -139,21 +219,26 @@ export function LandlordCalendar(): React.JSX.Element {
               <Calendar
                 selectedDateISO={selectedDateISO}
                 onDateSelect={handleDateSelection}
+                dateBadges={dateBadges}
               />
 
               <div className="mt-4">
-                <h2 className="text-lg font-semibold">
-                  {selectedDate ? selectedDate : getTodayAUDate()}
-                </h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold">
+                    {selectedDate ? selectedDate : getTodayAUDate()}
+                  </h2>
+                  <Button onClick={handleOpenModal}>Add Task</Button>
+                </div>
                 <CalendarTasksList 
                   tasks={tasks}
                   selectedDateISO={selectedDateISO}
                   showPropertyAddress={true}
                   onDeleteTask={handleDeleteTask}
+                  onUpdateTaskStatus={handleTaskStatusUpdate}
+                  onEditTask={handleEditTask}
                 />
                 <br />
                 <TaskMap mapUiState={mapUiState} />
-                <Button onClick={handleOpenModal}>Add Task</Button>
               </div>
             </div>
             <UpcomingTasks tasks={tasks} showViewAllButton={false} />
@@ -161,11 +246,13 @@ export function LandlordCalendar(): React.JSX.Element {
         </div>
       </div>
 
-      <AddTaskModal
+      <TaskModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSubmit={handleTaskSubmit}
-        properties={properties} // pass the fetched properties
+        properties={properties}
+        mode={modalMode}
+        task={taskToEdit}
       />
     </div>
   );

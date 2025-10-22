@@ -2,8 +2,9 @@ import { updateTenantApplicationStatus, updateTenantApplicationLinkedTaskId } fr
 import { TaskPriority } from "/app/shared/task-priority-identifier";
 import { TenantApplicationStatus } from "/app/shared/api-models/tenant-application/TenantApplicationStatus";
 import { TenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication";
-import { createTaskForLandlord, updateTaskForLandlord } from "../../domain-models/task/repositories/task-repository";
+import { createTaskForLandlord, updateTaskForLandlord } from "../../../domain-models/task/repositories/task-repository";
 import { calculateDueDate } from "/app/client/library-modules/utils/date-utils";
+import { apiGetLandlordByLandlordId } from "/app/client/library-modules/apis/user/user-role-api";
 
 /*WILL SEPARATE THESE USE CASES INTO SEPARATE FILES LATER*/
 
@@ -20,6 +21,10 @@ export async function sendAcceptedApplicationsToLandlordUseCase(
   validateTaskInputs(propertyId, landlordId);
   ensureNonEmptyApplications(acceptedApplications, 'No accepted applications to send to landlord')
 
+  // Get landlord's user ID from landlord ID
+  const landlord = await apiGetLandlordByLandlordId(landlordId);
+  const landlordUserId = landlord.userAccountId;
+
   // Create task for landlord
   const taskName = `Review ${acceptedApplications.length} Tenant Application(s)`;
   const taskDescription = `Review ${acceptedApplications.length} accepted tenant application(s) for property at ${streetNumber} ${street}, ${suburb}, ${province} ${postcode}. Applicants: ${acceptedApplications.map((app: TenantApplication) => app.applicantName).join(', ')}`;
@@ -33,7 +38,7 @@ export async function sendAcceptedApplicationsToLandlordUseCase(
     priority: TaskPriority.MEDIUM,
     propertyAddress: `${streetNumber} ${street}, ${suburb}, ${province} ${postcode}`,
     propertyId: propertyId,
-    userId: landlordId,
+    userId: landlordUserId,
   });
 
   // Update all accepted applications to LANDLORD_REVIEW status

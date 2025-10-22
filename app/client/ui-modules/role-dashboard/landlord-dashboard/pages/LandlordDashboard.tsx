@@ -6,26 +6,35 @@ import { UpcomingTasks } from "../../components/UpcomingTask";
 import { MyProperties } from "../components/MyProperties";
 import {
   selectTasks,
-  selectProperties,
   fetchLandlordDetails,
   selectLandlordDashboard,
 } from "../state/landlord-dashboard-slice";
+import {
+  selectLandlordProperties,
+  fetchLandlordProperties
+} from "../state/landlord-properties-slice";
+import { LoadingSpinner } from "../../../common/LoadingSpinner";
 
 export function LandlordDashboard(): React.JSX.Element {
   const dispatch = useAppDispatch();
-  const properties = useAppSelector(selectProperties);
+  const properties = useAppSelector(selectLandlordProperties);
   const tasks = useAppSelector(selectTasks);
   const dashboardData = useAppSelector(selectLandlordDashboard);
+  const isLoading = useAppSelector((state) => state.landlordDashboard.isLoading); 
   const currentUser = useAppSelector((state) => state.currentUser.authUser);
   useEffect(() => {
     if (currentUser?.userId) {
       dispatch(fetchLandlordDetails());
+      dispatch(fetchLandlordProperties(currentUser.userId));
     } else {
       console.warn("No user ID found. Please log in to view the dashboard.");
     }
   }, [currentUser]);
 
   console.log(currentUser);
+  if (isLoading) {
+    return <LoadingSpinner message="Loading your dashboard..." size="md" />;
+  }
 
   return (
     <div className="min-h-screen">

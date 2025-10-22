@@ -318,26 +318,33 @@ const propertyGetAllByAgentId = {
 
 const updatePropertyData = {
   [MeteorMethodIdentifier.PROPERTY_DATA_UPDATE]: async (
-    property: PropertyUpdateData
+    property: PropertyUpdateData & { property_status_id?: string }
   ): Promise<void> => {
+    const updateFields: any = {
+      apartment_number: property.apartment_number,
+      streetnumber: property.streetnumber,
+      streetname: property.streetname,
+      suburb: property.suburb,
+      province: property.province,
+      postcode: property.postcode,
+      description: property.description,
+      summary_description: property.summaryDescription,
+      bathrooms: property.bathrooms,
+      bedrooms: property.bedrooms,
+      parking: property.parking,
+      features: property.features,
+      type: property.type,
+      area: property.area,
+      landlord_id: property.landlordId,
+    };
+
+    // Add property_status_id if provided
+    if (property.property_status_id) {
+      updateFields.property_status_id = property.property_status_id;
+    }
+
     await PropertyCollection.updateAsync(property.propertyId, {
-      $set: {
-        apartment_number: property.apartment_number,
-        streetnumber: property.streetnumber,
-        streetname: property.streetname,
-        suburb: property.suburb,
-        province: property.province,
-        postcode: property.postcode,
-        description: property.description,
-        summary_description: property.summaryDescription,
-        bathrooms: property.bathrooms,
-        bedrooms: property.bedrooms,
-        parking: property.parking,
-        features: property.features,
-        type: property.type,
-        area: property.area,
-        landlord_id: property.landlordId,
-      },
+      $set: updateFields,
     });
   },
 };

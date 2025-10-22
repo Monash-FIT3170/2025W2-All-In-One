@@ -30,12 +30,16 @@ export async function apiInsertPropertyListing(
   imageUrls: string[],
   status: ListingStatus,
   inspectionIds: string[],
-  leaseTerm: string,
+  startLeaseDate: Date,
+  endLeaseDate: Date,
+  leaseTerm: string
 ) {
   const data: ApiInsertListingPayload = {
     property_id: propertyId,
     image_urls: imageUrls,
     inspection_ids: inspectionIds,
+    startlease_date: startLeaseDate,
+    endlease_date: endLeaseDate,
     lease_term: leaseTerm,
   };
   const insertedListing: string = await Meteor.callAsync(
@@ -56,6 +60,13 @@ export async function apiGetListingStatusByName(name: string): Promise<string> {
 export async function apiSubmitDraftListing(propertyId: string): Promise<void> {
   await Meteor.callAsync(
     MeteorMethodIdentifier.LISTING_SUBMIT_DRAFT,
+    propertyId
+  );
+}
+
+export async function apiDeleteDraftListing(propertyId: string): Promise<void> {
+  await Meteor.callAsync(
+    MeteorMethodIdentifier.LISTING_DELETE_DRAFT,
     propertyId
   );
 }
@@ -98,11 +109,13 @@ export async function apiInsertPropertyListingInspections(
 
 export const addTenantToInspectionApi = async (
   inspectionId: string,
-  tenantId: string
+  tenantId: string,
+  propertyId: string
 ): Promise<PropertyListingInspectionDocument> => {
   return await Meteor.callAsync(
     MeteorMethodIdentifier.ADD_TENANT_TO_INSPECTION,
     inspectionId,
-    tenantId
+    tenantId,
+    propertyId
   );
 };

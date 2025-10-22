@@ -3,9 +3,11 @@ import { Meteor } from 'meteor/meteor';
 import { useTracker } from 'meteor/react-meteor-data';
 import { Mongo } from "meteor/mongo";
 import { useAppDispatch, useAppSelector } from '/app/client/store';
-import { 
-  setConversationsFromSubscription, 
+import {
+  setConversationsFromSubscription,
   setMessagesFromSubscription,
+  updateConversationMetadata,
+  selectAllConversations,
 } from '../state/reducers/messages-slice';
 import { Role } from '/app/shared/user-role-identifier';
 import { Agent } from '/app/client/library-modules/domain-models/user/Agent';
@@ -37,10 +39,13 @@ function isLandlord(user: unknown): user is Landlord {
 // Hook for managing messaging subscriptions and real-time updates
 export function useMessagingSubscriptions(activeConversationId: string | null) {
   const dispatch = useAppDispatch();
-  
+
   // Get current user info for determining message ownership
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const authUser = useAppSelector((state) => state.currentUser.authUser);
+
+  // Get conversations from Redux to check for generic names
+  const reduxConversations = useAppSelector(selectAllConversations);
   
   // Determine current user ID and role info
   let currentUserId: string | undefined;
@@ -111,8 +116,8 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
         propertyId: conv.propertyId,
         lastMessage: conv.lastMessage ? {
           text: conv.lastMessage.text,
-          timestamp: conv.lastMessage.timestamp instanceof Date 
-            ? conv.lastMessage.timestamp.toISOString() 
+          timestamp: conv.lastMessage.timestamp instanceof Date
+            ? conv.lastMessage.timestamp.toISOString()
             : conv.lastMessage.timestamp,
           senderId: conv.lastMessage.senderId
         } : undefined,
@@ -121,11 +126,21 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
         createdAt: conv.createdAt ? (conv.createdAt instanceof Date ? conv.createdAt.toISOString() : conv.createdAt) : new Date().toISOString(),
         updatedAt: conv.updatedAt ? (conv.updatedAt instanceof Date ? conv.updatedAt.toISOString() : conv.updatedAt) : new Date().toISOString()
       }));
-      
-      dispatch(setConversationsFromSubscription({ 
-        conversations: apiConversations, 
-        currentUserId 
+
+      // First update conversations
+      dispatch(setConversationsFromSubscription({
+        conversations: apiConversations,
+        currentUserId
       }));
+
+      // Then check if metadata update is needed
+      const hasGenericNames = apiConversations.some(conv =>
+        conv.tenantId && !conv.agentId && !conv.landlordId // Generic conversation without full participant info
+      );
+
+      if (hasGenericNames) {
+        dispatch(updateConversationMetadata());
+      }
     }
   }, [conversations, conversationsReady, dispatch, currentUserId]);
 
@@ -142,14 +157,28 @@ export function useMessagingSubscriptions(activeConversationId: string | null) {
         timestamp: msg.timestamp instanceof Date ? msg.timestamp.toISOString() : msg.timestamp,
         isRead: msg.isRead
       }));
-      
-      dispatch(setMessagesFromSubscription({ 
-        conversationId: activeConversationId, 
-        messages: apiMessages, 
-        currentUserId 
+
+      dispatch(setMessagesFromSubscription({
+        conversationId: activeConversationId,
+        messages: apiMessages,
+        currentUserId
       }));
     }
   }, [messages, messagesReady, activeConversationId, dispatch, currentUserId]);
+
+  // Check for generic conversation names and trigger metadata update
+  useEffect(() => {
+    if (reduxConversations.length > 0) {
+      const hasGenericNames = reduxConversations.some(conv =>
+        conv.name.startsWith('User ') && conv.name.length <= 10
+      );
+
+      if (hasGenericNames) {
+        console.log("Detected conversations with generic names, updating metadata");
+        dispatch(updateConversationMetadata());
+      }
+    }
+  }, [reduxConversations, dispatch]);
 
   return {
     conversationsReady,

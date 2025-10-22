@@ -254,6 +254,78 @@ export const removeActiveUser = createAsyncThunk(
 );
 
 /**
+ * Selects a conversation by setting it as active, resetting unread count, and adding user to active users
+ * This combines the common operations performed when a user selects/opens a conversation
+ */
+export const selectConversation = createAsyncThunk(
+  "messages/selectConversation",
+  async (conversationId: string, { dispatch, getState, rejectWithValue }) => {
+    try {
+      // Validate conversation ID using helper function
+      validateConversationId(conversationId);
+
+      const state = getState() as { currentUser: { currentUser: Agent | Tenant | Landlord | null; authUser: { role: Role } | null } };
+      const currentUser = state.currentUser.currentUser;
+      const authUser = state.currentUser.authUser;
+
+      // Validate user authentication and get user context
+      const userContext = validateAndGetUserContext(currentUser, authUser);
+
+      // First, set the active conversation (synchronous UI update)
+      dispatch(setActiveConversation(conversationId));
+
+      // Then perform the async operations in parallel for better performance
+      const [resetResult, addResult] = await Promise.allSettled([
+        resetUnreadCountRepo(conversationId, userContext.userId),
+        apiAddActiveUser(conversationId, userContext.userId)
+      ]);
+
+      // Handle results - log errors but don't fail the entire operation
+      if (resetResult.status === 'rejected') {
+        console.error("Error resetting unread count:", resetResult.reason);
+      }
+      if (addResult.status === 'rejected') {
+        console.error("Error adding active user:", addResult.reason);
+      }
+
+      return { conversationId, userId: userContext.userId };
+    } catch (error) {
+      console.error("Error selecting conversation:", error);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to select conversation");
+    }
+  }
+);
+
+/**
+ * Updates conversation metadata (names, avatars) for conversations that need profile data
+ * Called when new conversations appear via real-time subscriptions
+ */
+export const updateConversationMetadata = () => (dispatch: any, getState: any) => {
+  const state = getState() as { messages: MessagesState; currentUser: { currentUser: Agent | Tenant | Landlord | null; authUser: { role: Role } | null } };
+  const currentUser = state.currentUser.currentUser;
+  const authUser = state.currentUser.authUser;
+  const conversations = state.messages.conversations;
+
+  // Validate user authentication
+  if (!currentUser || !authUser) {
+    return;
+  }
+
+  // Find conversations that need metadata updates (have generic names like "User C8Hd")
+  const conversationsNeedingUpdate = conversations.filter(conv =>
+    conv.name.startsWith('User ') && conv.name.length <= 10 // Generic names are short
+  );
+
+  if (conversationsNeedingUpdate.length === 0) {
+    return;
+  }
+
+  // For all roles, dispatch fetchConversations to get proper metadata
+  // This ensures profile data is fetched and conversation names are updated
+  dispatch(fetchConversations());
+};
+
+/**
  * Redux Slice Definition
  * Contains reducers for synchronous state updates and real-time subscription handling
  */
@@ -329,11 +401,11 @@ export const messagesSlice = createSlice({
      * Converts API format to UI format and preserves existing conversation metadata
      */
     setConversationsFromSubscription(state, action: PayloadAction<{ conversations: ApiConversation[]; currentUserId: string }>) {
-      
+
       // Helper function to generate user avatars from names
       const getAvatarInitials = (name: string) => {
         const parts = name.split(' ');
-        return parts.length > 1 
+        return parts.length > 1
           ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
           : `${parts[0][0]}${parts[0][1] || ''}`.toUpperCase();
       };
@@ -342,13 +414,13 @@ export const messagesSlice = createSlice({
       const uiConversations: Conversation[] = action.payload.conversations.map(doc => {
         // Try to preserve existing conversation data (name, role) if available
         const existingConversation = state.conversations.find(c => c.id === doc.conversationId);
-        
+
         // Calculate unread count for current user
         let unreadCount = 0;
         if (doc.unreadCounts && action.payload.currentUserId) {
           unreadCount = doc.unreadCounts[action.payload.currentUserId] || 0;
         }
-        
+
         // Determine timestamp - only show timestamp if there's an actual message
         let timestamp = '';
         if (doc.lastMessage?.timestamp && doc.lastMessage?.text && doc.lastMessage.text.trim() !== '') {
@@ -356,10 +428,10 @@ export const messagesSlice = createSlice({
         } else {
           timestamp = '';
         }
-        
+
         return {
           id: doc.conversationId,
-          name: existingConversation?.name || `User ${doc.tenantId?.slice(-4) || doc.agentId?.slice(-4) || 'Unknown'}`,
+          name: existingConversation?.name || (doc.tenantId ? 'Tenant' : doc.agentId ? 'Agent' : doc.landlordId ? 'Landlord' : 'User'),
           role: existingConversation?.role || (doc.tenantId ? "Tenant" : doc.agentId ? "Agent" : "User"),
           avatar: existingConversation?.avatar || getAvatarInitials(existingConversation?.name || 'User'),
           lastMessage: doc.lastMessage?.text || "No messages yet",
@@ -367,7 +439,7 @@ export const messagesSlice = createSlice({
           unreadCount,
         };
       });
-      
+
       state.conversations = uiConversations;
     },
 

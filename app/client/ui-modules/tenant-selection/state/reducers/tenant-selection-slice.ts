@@ -8,20 +8,20 @@ import { Role } from "/app/shared/user-role-identifier";
 import {
   updateTenantApplicationStatus
 } from "/app/client/library-modules/domain-models/tenant-application/repositories/tenant-application-repository";
-import { LoadTenantApplicationsUseCase } from "/app/client/library-modules/use-cases/tenant-application/LoadTenantApplicationsUseCase";
+import { LoadTenantApplicationsUseCase } from "../../../../library-modules/use-cases/tenant-application/LoadTenantApplicationsUseCase";
 
 import {
   sendAcceptedApplicationsToLandlordUseCase,
   sendBackgroundPassedToLandlordUseCase
-} from "../../../../library-modules/use-cases/tenant-application/SendTenantApplicationToLandlordUseCase";
-import { createTenantApplicationUseCase } from "/app/client/library-modules/use-cases/tenant-application/CreateTenantApplicationUseCase";
+} from "../../../../library-modules/use-cases/tenant-application/workflow/SendTenantApplicationToLandlordUseCase";
+import { createTenantApplicationUseCase } from "../../../../library-modules/use-cases/tenant-application/CreateTenantApplicationUseCase";
 import {
   sendApprovedApplicationsToAgentUseCase,
   sendFinalApprovedApplicationToAgentUseCase
-} from "/app/client/library-modules/use-cases/tenant-application/SendTenantApplicationToAgentUseCase";
-import { agentAcceptApplication, agentRejectApplication, landLordApproveApplication, landLordRejectApplication } from "../../../../library-modules/use-cases/tenant-application/AcceptOrRejectTenantApplicationUseCase.ts";
+} from "../../../../library-modules/use-cases/tenant-application/workflow/SendTenantApplicationToAgentUseCase";
+import { agentAcceptApplication, agentRejectApplication, landLordApproveApplication, landLordRejectApplication } from "../../../../library-modules/use-cases/tenant-application/decision-making/AcceptOrRejectTenantApplicationUseCase.ts";
 import { AppDispatch } from "/app/client/store";
-import { ResetTenantApplicationDecisionUseCase } from "/app/client/library-modules/use-cases/tenant-application/ResetTenantApplicationDecisionUseCase";
+import { ResetTenantApplicationDecisionUseCase } from "../../../../library-modules/use-cases/tenant-application/decision-making/ResetTenantApplicationDecisionUseCase";
 
 const initialState: TenantSelectionUiState = {
   applicationsByProperty: {},
@@ -360,6 +360,13 @@ export const tenantSelectionSlice = createSlice({
     setCurrentStep: (state, action) => {
       state.currentStep = action.payload;
     },
+    setApplicationsFromSubscription: (state, action) => {
+      const { propertyId, applications } = action.payload;
+      if (!state.applicationsByProperty[propertyId]) {
+        state.applicationsByProperty[propertyId] = [];
+      }
+      state.applicationsByProperty[propertyId] = applications;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -592,6 +599,7 @@ export const {
   setFilter,
   clearError,
   setCurrentStep,
+  setApplicationsFromSubscription
 } = tenantSelectionSlice.actions;
 
 export const selectTenantSelectionState = (state: RootState) => state.tenantSelection;
@@ -622,6 +630,11 @@ export const selectHasBackgroundPassedApplicationsForProperty = (state: RootStat
 export const selectHasFinalApprovedApplicationForProperty = (state: RootState, propertyId: string) => {
   const applications = selectApplicationsForProperty(state, propertyId);
   return applications.some((app: DomainTenantApplication) => app.status === TenantApplicationStatus.FINAL_APPROVED);
+};
+
+export const selectHasTenantChosenForProperty = (state: RootState, propertyId: string) => {
+  const applications = selectApplicationsForProperty(state, propertyId);
+  return applications.some((app: DomainTenantApplication) => app.status === TenantApplicationStatus.TENANT_CHOSEN);
 };
 
 export const selectFilteredApplications = (state: RootState, propertyId: string) => {

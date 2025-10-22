@@ -1,5 +1,5 @@
 import React from "react";
-import { CardWidget } from "../../role-dashboard/components/CardWidget";
+import { CardWidget } from "../../common/CardWidget";
 import {
   selectIsEditing,
   selectProfileData,
@@ -17,9 +17,15 @@ interface Props {
 
   isEditing: boolean;
   onChange: (field: keyof Props["profile"], value: string) => void;
+  errors: Record<string, string>;
 }
 
-export function EmploymentInfoCard({ profile, isEditing, onChange }: Props) {
+export function EmploymentInfoCard({
+  profile,
+  isEditing,
+  onChange,
+  errors,
+}: Props) {
   const fields: {
     label: string;
     key: keyof Props["profile"];
@@ -32,6 +38,9 @@ export function EmploymentInfoCard({ profile, isEditing, onChange }: Props) {
   return (
     <CardWidget
       title="Employment Information"
+      className={
+        isEditing ? "ring-2 ring-blue-500 bg-blue-50" : ""
+      }
       value=""
       subtitle="Your current employment details"
     >
@@ -44,6 +53,7 @@ export function EmploymentInfoCard({ profile, isEditing, onChange }: Props) {
             editing={isEditing}
             onChange={(val) => onChange(key, val)}
             type={type}
+            error={errors[key]}
           />
         ))}
       </div>
