@@ -9,7 +9,7 @@ import {
 } from "../state/reducers/tenant-dashboard-slice";
 import DashboardCards from "/app/client/ui-modules/role-dashboard/tenant-dashboard/components/TenantDashboardCard";
 import PropertyDetails from "../components/PropertyDetails";
-import { fetchTenantPropertyWithListingData } from "../state/reducers/tenant-property-slice";
+import { fetchTenantPropertyWithListingData, load } from "../state/reducers/tenant-property-slice";
 import { LoadingSpinner } from "../../../common/LoadingSpinner";
 
 function TenantDashboard() {
@@ -24,13 +24,15 @@ function TenantDashboard() {
     if (currentUser?.userId) {
       dispatch(fetchTenantDetails(currentUser.userId));
       dispatch(fetchTenantPropertyWithListingData());
-      
-      // TODO: When backend is implemented, fetch and update messages and lease status:
-      // Example:
-      // dispatch(setMessagesCount(actualMessagesCount));
-      // dispatch(setLeaseStatus({ kind: LeaseStatusKind.Active, monthsRemaining: 9 }));
     }
   }, [dispatch, currentUser?.userId]);
+
+  // Load property listing data including lease term when property is available
+  useEffect(() => {
+    if (property?.propertyId) {
+      dispatch(load(property.propertyId));
+    }
+  }, [dispatch, property?.propertyId]);
 
   if (isLoading) {
     return <LoadingSpinner message="Loading your dashboard..." size="md" />;

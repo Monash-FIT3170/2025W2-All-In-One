@@ -70,6 +70,7 @@ interface TenantPropertyState {
   error: string | null;
   hasProperty: boolean;
   fetchError: string | null;
+  leaseTerm: string;
 }
 
 const initialState: TenantPropertyState = {
@@ -117,7 +118,8 @@ const initialState: TenantPropertyState = {
   propertiesWithListingData: [],
   error: null,
   hasProperty: false,
-  fetchError: null
+  fetchError: null,
+  leaseTerm: ""
 };
 
 export const submitDraftListingAsync = createAsyncThunk(
@@ -231,6 +233,7 @@ export const tenantPropertySlice = createSlice({
         })
       );
       state.listingImageUrls = action.payload.image_urls;
+      state.leaseTerm = action.payload.lease_term;
 
       state.shouldShowLoadingState = false;
       state.landlords = action.payload.landlords;
