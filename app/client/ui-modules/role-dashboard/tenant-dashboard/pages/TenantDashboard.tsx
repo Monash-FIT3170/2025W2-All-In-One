@@ -23,11 +23,6 @@ function TenantDashboard() {
     if (currentUser?.userId) {
       dispatch(fetchTenantDetails(currentUser.userId));
       dispatch(fetchTenantPropertyWithListingData());
-      
-      // TODO: When backend is implemented, fetch and update messages and lease status:
-      // Example:
-      // dispatch(setMessagesCount(actualMessagesCount));
-      // dispatch(setLeaseStatus({ kind: LeaseStatusKind.Active, monthsRemaining: 9 }));
     }
   }, [dispatch, currentUser?.userId]);
 

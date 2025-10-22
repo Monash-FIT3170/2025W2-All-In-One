@@ -36,16 +36,24 @@ function DashboardCards({ rentAmount, tasks = [] }: DashboardCardsProps) {
     return isWithinInterval(due, { start, end });
   }).length;
 
-  // Determine lease display values based on enum
-  const leaseValue =
-    leaseStatusKind === LeaseStatusKind.NotAvailable
-      ? "N/A"
-      : `${leaseMonthsRemaining} months`;
+  // Determine lease display values based on lease status
+  const getLeaseDisplayInfo = () => {
+    switch (leaseStatusKind) {
+      case LeaseStatusKind.Active:
+        return {
+          value: `${leaseMonthsRemaining} months`,
+          subtitle: "Remaining on current lease",
+        };
+      case LeaseStatusKind.NotAvailable:
+      default:
+        return {
+          value: "N/A",
+          subtitle: "Lease information not available",
+        };
+    }
+  };
 
-  const leaseSubtitle =
-    leaseStatusKind === LeaseStatusKind.NotAvailable
-      ? "Not available yet"
-      : "Remaining on current lease";
+  const leaseInfo = getLeaseDisplayInfo();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
@@ -57,8 +65,8 @@ function DashboardCards({ rentAmount, tasks = [] }: DashboardCardsProps) {
 
       <CardWidget
         title="Lease Status"
-        value={leaseValue}
-        subtitle={leaseSubtitle}
+        value={leaseInfo.value}
+        subtitle={leaseInfo.subtitle}
       />
 
       <CardWidget
