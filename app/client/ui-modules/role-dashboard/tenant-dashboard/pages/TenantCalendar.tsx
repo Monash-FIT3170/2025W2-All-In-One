@@ -19,6 +19,7 @@ import { TaskStatus } from "/app/shared/task-status-identifier";
 import { Task } from "/app/client/library-modules/domain-models/task/Task";
 import { getTodayAUDate, getTodayISODate } from "/app/client/library-modules/utils/date-utils";
 import { Tenant } from "/app/client/library-modules/domain-models/user/Tenant";
+import { LoadingSpinner } from "../../../common/LoadingSpinner";
 
 export function TenantCalendar(): React.JSX.Element {
   const dispatch = useAppDispatch(); 
