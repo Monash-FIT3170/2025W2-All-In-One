@@ -1,94 +1,74 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { FilterType } from '../enums/FilterType';
-import { FilterIcon } from './FilterIcon';
-import { Role } from '/app/shared/user-role-identifier';
-import { UserAccount } from '/app/client/library-modules/domain-models/user/UserAccount';
-
+import React from "react";
+import { twMerge } from "tailwind-merge";
+import { FilterType } from "../enums/FilterType";
+import { FilterIcon } from "./FilterIcon";
+import { Role } from "/app/shared/user-role-identifier";
+import { UserAccount } from "/app/client/library-modules/domain-models/user/UserAccount";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "../../theming-shadcn/Popover";
 
 type FilterTabsProps = {
   activeFilter: FilterType;
   onFilterChange: (filter: FilterType) => void;
   userRole?: UserAccount["role"];
-}
+};
 
-export function FilterTabs({ activeFilter, onFilterChange, userRole }: FilterTabsProps): React.JSX.Element {
+export function FilterTabs({
+  activeFilter,
+  onFilterChange,
+  userRole,
+}: FilterTabsProps): React.JSX.Element {
   const isLandlord = userRole === Role.LANDLORD;
   const isAgent = userRole === Role.AGENT;
+
+  const availableFilters: FilterType[] = [FilterType.ALL];
+
+  if (isAgent || isLandlord) {
+    availableFilters.push(FilterType.ACCEPTED, FilterType.REJECTED);
+  }
+
+  const getLabel = (filter: FilterType) => {
+    if (filter === FilterType.ACCEPTED && isLandlord) return "Approved";
+    return filter.charAt(0).toUpperCase() + filter.slice(1);
+  };
 
   return (
     <div className="px-4 pt-4">
       <div className="flex items-center justify-between mb-4">
-        <div className="flex bg-gray-100 rounded-lg p-1">
-          <button
-            onClick={() => onFilterChange(FilterType.ALL)}
-            className={twMerge(
-              "px-4 py-2 text-sm font-medium rounded-md transition-all duration-200",
-              activeFilter === FilterType.ALL
-                ? "bg-white text-gray-900 shadow-sm border border-gray-200"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-            )}
-          >
-            All
-          </button>
-          {isAgent && (
-            <>
-              <button
-                onClick={() => onFilterChange(FilterType.REJECTED)}
-                className={twMerge(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-all duration-200",
-                  activeFilter === FilterType.REJECTED
-                    ? "bg-white text-gray-900 shadow-sm border border-gray-200"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                )}
-              >
-                Rejected
-              </button>
-              <button
-                onClick={() => onFilterChange(FilterType.ACCEPTED)}
-                className={twMerge(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-all duration-200",
-                  activeFilter === FilterType.ACCEPTED
-                    ? "bg-white text-gray-900 shadow-sm border border-gray-200"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                )}
-              >
-                Accepted
-              </button>
-            </>
-          )}
-
-          {isLandlord && (
-            <>
-              <button
-                onClick={() => onFilterChange(FilterType.REJECTED)}
-                className={twMerge(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-all duration-200",
-                  activeFilter === FilterType.REJECTED
-                    ? "bg-white text-gray-900 shadow-sm border border-gray-200"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                )}
-              >
-                Rejected
-              </button>
-              <button
-                onClick={() => onFilterChange(FilterType.ACCEPTED)}
-                className={twMerge(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-all duration-200",
-                  activeFilter === FilterType.ACCEPTED
-                    ? "bg-white text-gray-900 shadow-sm border border-gray-200"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                )}
-              >
-                Approved
-              </button>
-            </>
-          )}
-        </div>
-        {/* Filter Icon */}
-        <button className="text-gray-400 hover:text-gray-600 p-2 rounded-md hover:bg-gray-100 transition-colors">
-          <FilterIcon />
-        </button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="flex bg-gray-100 rounded-lg p-1 hover:bg-gray-50">
+              <span>
+                Filter{" "}
+                {activeFilter !== FilterType.ALL
+                  ? `(${getLabel(activeFilter)})`
+                  : ""}
+              </span>
+              <FilterIcon />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="end" sideOffset={8} className="w-48 p-1">
+            <div className="space-y-1">
+              {availableFilters.map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => onFilterChange(filter)}
+                  className={twMerge(
+                    "w-full text-left px-3 py-2 text-sm rounded",
+                    activeFilter === filter
+                      ? "bg-blue-50 text-blue-800"
+                      : "text-gray-700 hover:bg-gray-400 transition-colors duration-200"
+                  )}
+                >
+                  {getLabel(filter)}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );
