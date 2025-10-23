@@ -99,6 +99,10 @@ export const propertyListingSlice = createSlice({
         state.bookedPropertyListingInspections.push(index);
       }
     },
+    updatePropertyStatusToOccupied: (state) => {
+      state.propertyStatusText = "occupied";
+      state.propertyStatusPillVariant = PropertyStatusPillVariant.OCCUPIED;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(load.pending, (state) => {
@@ -230,7 +234,7 @@ export const propertyListingSlice = createSlice({
   },
 });
 
-export const { addBookedPropertyListingInspection } =
+export const { addBookedPropertyListingInspection, updatePropertyStatusToOccupied } =
   propertyListingSlice.actions;
 
 function getPropertyAreaDisplayString(area: number): string {

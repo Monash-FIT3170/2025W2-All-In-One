@@ -6,6 +6,7 @@ import {
   setEmail,
   setPassword,
   signinUser,
+  clearMessage,
 } from "./state/reducers/signin-form-slice";
 import { useRoleBasedRedirect } from "./hooks/useRoleBasedRedirect";
 
@@ -37,6 +38,11 @@ export const SigninForm = () => {
       // else: do nothing, let useEffect handle dashboard redirect
     }
   };
+
+  // Clear any leftover messages when component mounts
+  useEffect(() => {
+    dispatch(clearMessage());
+  }, [dispatch]);
 
   // Redirect to dashboard after login if no "from" and user is authenticated
   useEffect(() => {
