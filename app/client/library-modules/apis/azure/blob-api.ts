@@ -3,6 +3,18 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { BlobUploadCommonResponse } from "@azure/storage-blob";
 
 export async function uploadFileHandler(blob: Blob, blobName: string): Promise<UploadResult>{
+    if (Meteor.isDevelopment) {
+      console.warn("Development mode: Creating blob URL instead of uploading.");
+      
+      // In development mode, create blob URL to preserve actual uploaded image
+      return {
+          blobName: `dev-${Date.now()}-${blobName}`,
+          success: true as const,
+          url: URL.createObjectURL(blob),
+          response: {} as BlobUploadCommonResponse // Mock response for development
+      };
+    }
+
     const uint8Array = await blobToUint8Array(blob)
 
     const uploadResult: UploadResult = await Meteor.callAsync(MeteorMethodIdentifier.BLOB_UPLOAD_FILE, uint8Array, blobName,blob.type)

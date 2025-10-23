@@ -203,7 +203,7 @@ export function ProfilePage(): React.JSX.Element {
                                         setProfileImage(imageUrl);
                                         
                                         setNotification({
-                                            message: "Profile image updated successfully!",
+                                            message: "Profile image uploaded successfully!",
                                             type: "success",
                                         });
                                     } catch (error) {
