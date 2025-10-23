@@ -76,7 +76,7 @@ export function ProfilePage(): React.JSX.Element {
         if (notification) {
             const timer = setTimeout(() => {
                 setNotification(null);
-            }, 300000); // Auto-dismiss after 5 minutes
+            }, 5000); // Auto-dismiss after 5 seconds
 
             return () => clearTimeout(timer);
         }
@@ -146,6 +146,10 @@ export function ProfilePage(): React.JSX.Element {
                 message: "Profile saved successfully!",
                 type: "success",
             });
+            
+            setTimeout(() => {
+                setNotification(null);
+            }, 3000);
         }
     };
 
@@ -171,6 +175,8 @@ export function ProfilePage(): React.JSX.Element {
                                     tempProfileImage ?? profile.profilePicture
                                 }
                                 isUploading={isUploading}
+                                firstName={profile.firstName}
+                                lastName={profile.lastName}
                                 onImageChange={async (file) => {
                                     setIsUploading(true);
                                     setNotification(null); // Clear previous notifications
@@ -206,12 +212,20 @@ export function ProfilePage(): React.JSX.Element {
                                             message: "Profile image uploaded successfully!",
                                             type: "success",
                                         });
+                                        
+                                        setTimeout(() => {
+                                            setNotification(null);
+                                        }, 3000);
                                     } catch (error) {
                                         console.error("Image upload failed:", error);
                                         setNotification({
                                             message: `Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`,
                                             type: "error",
                                         });
+                                        
+                                        setTimeout(() => {
+                                            setNotification(null);
+                                        }, 5000);
                                     } finally {
                                         setIsUploading(false);
                                     }

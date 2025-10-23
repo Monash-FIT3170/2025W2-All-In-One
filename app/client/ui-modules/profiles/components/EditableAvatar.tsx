@@ -14,6 +14,8 @@ interface EditableAvatarProps {
   editing: boolean;
   onImageChange?: (file: File) => void;
   isUploading?: boolean;
+  firstName?: string;
+  lastName?: string;
 }
 
 export function EditableAvatar({
@@ -21,6 +23,8 @@ export function EditableAvatar({
   editing,
   onImageChange,
   isUploading = false,
+  firstName,
+  lastName,
 }: EditableAvatarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null); // acts as invisible file input selecvt
 
@@ -60,11 +64,9 @@ export function EditableAvatar({
             className="w-24 h-24 object-cover rounded-full"
           />
           <AvatarFallback>
-            <img
-              src="/images/test-image.png"
-              alt="Fallback Image"
-              className="w-24 h-24 object-cover rounded-full"
-            />
+            <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-2xl font-medium">
+              {firstName && lastName ? `${firstName.charAt(0)}${lastName.charAt(0)}` : '??'}
+            </div>
           </AvatarFallback>
         </Avatar>
 
