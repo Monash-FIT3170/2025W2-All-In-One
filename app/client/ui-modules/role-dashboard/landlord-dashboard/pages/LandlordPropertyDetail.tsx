@@ -10,6 +10,8 @@ import { useTenantApplicationSubscriptions } from '/app/client/ui-modules/tenant
 import { TenantSelectionModal } from "/app/client/ui-modules/tenant-selection/TenantSelectionModal";
 import { Role } from "/app/shared/user-role-identifier";
 import { useAppSelector } from "/app/client/store";
+import { DynamicMap } from "../../../common/map/DynamicMap";
+import { BasicMarker } from "../../../common/map/markers/BasicMarker";
 
 export function LandlordPropertyDetail(): React.JSX.Element {
   const navigate = useNavigate();
@@ -191,12 +193,14 @@ export function LandlordPropertyDetail(): React.JSX.Element {
               {/* Location */}
               <div className="bg-white border border-gray-200 rounded-lg p-4">
                 <h3 className="text-base font-semibold mb-3">Location</h3>
-                <div className="h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-3">
-                  <svg className="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 616 0z" />
-                  </svg>
-                </div>
+                <DynamicMap
+                  initialMapCoordinates={{
+                      initialLatitude: passedProperty.locationLatitude,
+                      initialLongitude: passedProperty.locationLongitude
+                  }}
+                  markers={[<BasicMarker key={0} latitude={passedProperty.locationLatitude} longitude={passedProperty.locationLongitude} />]}
+                  className="h-64 w-full mb-3"
+                />
                 <div className="flex items-start">
                   <svg className="h-4 w-4 text-gray-400 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
