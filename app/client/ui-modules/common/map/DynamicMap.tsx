@@ -38,7 +38,6 @@ export function DynamicMap({
   initialMapCoordinates: InitialMapCoordinates;
   defaultZoom?: MapZoom;
   markers?: Array<React.JSX.Element>;
-  sizeClassName?: string;
   className?: string;
 }): React.JSX.Element {
   const defaultSizeClassName = "h-64 w-96";
