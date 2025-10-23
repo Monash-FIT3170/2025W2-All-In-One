@@ -32,6 +32,7 @@ export function ProfilePage(): React.JSX.Element {
     const [tempProfileImage, setProfileImage] = React.useState<string | null>(
         null
     );
+    const [isUploading, setIsUploading] = React.useState(false);
 
     const [localProfile, setLocalProfile] = React.useState(profile);
     const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -137,6 +138,7 @@ export function ProfilePage(): React.JSX.Element {
                     profile: localProfile,
                 })
             ).unwrap();
+            console.log("Profile saved, updating current user profile data:", updated);
             dispatch(setCurrentProfileData(updated));
             dispatch(setEditing(false));
             setErrors({});
@@ -168,27 +170,51 @@ export function ProfilePage(): React.JSX.Element {
                                 imageUrl={
                                     tempProfileImage ?? profile.profilePicture
                                 }
+                                isUploading={isUploading}
                                 onImageChange={async (file) => {
-                                    const blobName = `${Date.now()}-${
-                                        file.name
-                                    }`; // gives it the time of creation for uniqueness (not sure if needed)
+                                    setIsUploading(true);
+                                    setNotification(null); // Clear previous notifications
+                                    
+                                    try {
+                                        const blobName = `${Date.now()}-${
+                                            file.name
+                                        }`; // gives it the time of creation for uniqueness (not sure if needed)
 
-                                    const uploadedImage =
-                                        await uploadFileHandler(file, blobName);
-
-                                    if (!uploadedImage.success)
-                                        throw new Error(
-                                            "Upload failed or no URL returned"
+                                        // Add timeout to prevent hanging uploads
+                                        const uploadPromise = uploadFileHandler(file, blobName);
+                                        const timeoutPromise = new Promise((_, reject) => 
+                                            setTimeout(() => reject(new Error('Upload timeout after 30 seconds')), 30000)
                                         );
 
-                                    const imageUrl =
-                                        uploadedImage.url ?? tempProfileImage;
+                                        const uploadedImage = await Promise.race([uploadPromise, timeoutPromise]) as any;
 
-                                    setLocalProfile((prev) => ({
-                                        ...prev,
-                                        profilePicture: imageUrl,
-                                    }));
-                                    setProfileImage(imageUrl);
+                                        if (!uploadedImage.success) {
+                                            throw new Error(
+                                                uploadedImage.error || "Upload failed or no URL returned"
+                                            );
+                                        }
+
+                                        const imageUrl = uploadedImage.url ?? tempProfileImage;
+
+                                        setLocalProfile((prev) => ({
+                                            ...prev,
+                                            profilePicture: imageUrl,
+                                        }));
+                                        setProfileImage(imageUrl);
+                                        
+                                        setNotification({
+                                            message: "Profile image updated successfully!",
+                                            type: "success",
+                                        });
+                                    } catch (error) {
+                                        console.error("Image upload failed:", error);
+                                        setNotification({
+                                            message: `Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                                            type: "error",
+                                        });
+                                    } finally {
+                                        setIsUploading(false);
+                                    }
                                 }}
                             />
 
