@@ -1,5 +1,8 @@
 import { createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import { RootState } from "/app/client/store";
+import { updatePropertyStatusToOccupied, load } from "/app/client/ui-modules/property-listing-page/state/reducers/property-listing-slice";
+import { fetchAgentPropertiesWithListingData } from "/app/client/ui-modules/role-dashboard/agent-dashboard/state/agent-property-slice";
+import { fetchLandlordProperties } from "/app/client/ui-modules/role-dashboard/landlord-dashboard/state/landlord-properties-slice";
 import { TenantApplication as DomainTenantApplication } from "/app/client/library-modules/domain-models/tenant-application/TenantApplication"
 import { TenantApplicationStatus } from "../../../../../shared/api-models/tenant-application/TenantApplicationStatus";
 import { FilterType } from "../../enums/FilterType";
@@ -170,13 +173,14 @@ export const sendApprovedApplicationsToAgentAsync = createAsyncThunk(
 // Send final approved application to agent (Step 4 -> Step 5)
 export const sendFinalApprovedApplicationToAgentAsync = createAsyncThunk(
   "tenantSelection/sendFinalApprovedApplicationToAgent",
-  async (_, { getState }) => {
+  async (_, { getState, dispatch }) => {
     const state = getState() as RootState;
     const { propertyId, propertyLandlordId, streetNumber, street, suburb, province, postcode } = state.propertyListing;
+    const { authUser } = state.currentUser;
     const apps = state.tenantSelection.applicationsByProperty[propertyId] || [];
     const finalApproved = apps.filter(a => a.status === TenantApplicationStatus.FINAL_APPROVED);
 
-    return await sendFinalApprovedApplicationToAgentUseCase(
+    const result = await sendFinalApprovedApplicationToAgentUseCase(
       propertyId,
       propertyLandlordId,
       streetNumber,
@@ -186,6 +190,21 @@ export const sendFinalApprovedApplicationToAgentAsync = createAsyncThunk(
       postcode,
       finalApproved
     );
+
+    // Update property status to occupied immediately
+    dispatch(updatePropertyStatusToOccupied());
+
+    // Reload the current property listing data to show updated status
+    dispatch(load(propertyId));
+
+    // Refresh property lists for agents and landlords to show updated status
+    if (authUser?.role === Role.AGENT && authUser.userId) {
+      dispatch(fetchAgentPropertiesWithListingData());
+    } else if (authUser?.role === Role.LANDLORD && authUser.userId) {
+      dispatch(fetchLandlordProperties(authUser.userId));
+    }
+
+    return result;
   }
 );
 

@@ -27,6 +27,9 @@ export const signinFormSlice = createSlice({
     setMessage(state, action: PayloadAction<string>) {
       state.message = action.payload;
     },
+    clearMessage(state) {
+      state.message = "";
+    },
     setLoading(state, action: PayloadAction<boolean>) {
       state.isLoading = action.payload;
     },
@@ -101,7 +104,7 @@ export const signinUser = createAsyncThunk<
   }
 });
 
-export const { setEmail, setPassword, setMessage, setLoading, clearForm } =
+export const { setEmail, setPassword, setMessage, clearMessage, setLoading, clearForm } =
   signinFormSlice.actions;
 
 export const selectSigninFormUIState = (state: RootState) => state.signinForm;

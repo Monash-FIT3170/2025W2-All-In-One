@@ -12,6 +12,7 @@ import { Role } from "/app/shared/user-role-identifier";
 import { AppDispatch, RootState } from "/app/client/store";
 import { ProfileData } from "/app/client/library-modules/domain-models/user/ProfileData";
 import { getProfileDataById } from "/app/client/library-modules/domain-models/user/role-repositories/profile-data-repository";
+import { clearMessage } from "./signin-form-slice";
 
 type RoleProfile = Agent | Tenant | Landlord;
 
@@ -90,7 +91,7 @@ export const loadCurrentUser = createAsyncThunk<
 export const signoutUser = createAsyncThunk<
   void,
   void,
-  { rejectValue: string }
+  { rejectValue: string; dispatch: AppDispatch }
 >("auth/signout", async (_, { dispatch, rejectWithValue }) => {
   return new Promise((resolve, reject) => {
     Meteor.logout((error) => {
@@ -103,6 +104,8 @@ export const signoutUser = createAsyncThunk<
         reject(rejectWithValue(errorMessage));
       } else {
         dispatch(clearCurrentUser());
+        // Clear any leftover signin messages
+        dispatch(clearMessage());
         resolve();
       }
     });
