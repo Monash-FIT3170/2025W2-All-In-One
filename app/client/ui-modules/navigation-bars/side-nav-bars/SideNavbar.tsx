@@ -28,6 +28,11 @@ export function RoleSideNavBar({ isOpen, onClose }: RoleSideNavBarProps) {
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const authUser = useAppSelector((state) => state.currentUser.authUser);
   const profileData = useAppSelector((state) => state.currentUser.profileData);
+  
+  // Debug logging
+  React.useEffect(() => {
+    console.log("SideNavbar profileData:", profileData);
+  }, [profileData]);
 
   const firstName = profileData?.firstName || "Unknown";
   const lastName = profileData?.lastName || "User";
@@ -69,6 +74,7 @@ export function RoleSideNavBar({ isOpen, onClose }: RoleSideNavBarProps) {
               firstName={firstName}
               lastName={lastName}
               title={title}
+              profileImage={profileData?.profilePicture}
             />
           </div>
         </SidebarFooter>

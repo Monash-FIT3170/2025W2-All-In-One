@@ -3,6 +3,21 @@ import { MeteorMethodIdentifier } from "/app/shared/meteor-method-identifier";
 import { BlobUploadCommonResponse } from "@azure/storage-blob";
 
 export async function uploadFileHandler(blob: Blob, blobName: string): Promise<UploadResult>{
+    if (Meteor.isDevelopment) {
+        const base64 = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.readAsDataURL(blob);
+        });
+        
+        return {
+            blobName: `dev-${Date.now()}-${blobName}`,
+            success: true as const,
+            url: base64,
+            response: {} as BlobUploadCommonResponse // Mock response for development
+        };
+    }
+
     const uint8Array = await blobToUint8Array(blob)
 
     const uploadResult: UploadResult = await Meteor.callAsync(MeteorMethodIdentifier.BLOB_UPLOAD_FILE, uint8Array, blobName,blob.type)
@@ -12,15 +27,20 @@ export async function uploadFileHandler(blob: Blob, blobName: string): Promise<U
 export async function uploadFilesHandler(blobs: File[], blobNamePrefix: BlobNamePrefix): Promise<UploadResults>{
   
   if (Meteor.isDevelopment) {
-    console.warn("Development mode: Creating blob URLs instead of uploading.");
-    
-    // In development mode, create blob URLs to preserve actual uploaded images
     const developmentResults: UploadResults = {
-      success: blobs.map(file => ({
-        blobName: `${blobNamePrefix}dev-${Date.now()}-${file.name}`,
-        success: true as const,
-        url: URL.createObjectURL(file),
-        response: {} as BlobUploadCommonResponse // Mock response for development
+      success: await Promise.all(blobs.map(async file => {
+        const base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(file);
+        });
+        
+        return {
+          blobName: `${blobNamePrefix}dev-${Date.now()}-${file.name}`,
+          success: true as const,
+          url: base64,
+          response: {} as BlobUploadCommonResponse // Mock response for development
+        };
       })),
       failed: []
     };

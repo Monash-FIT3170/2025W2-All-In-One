@@ -13,17 +13,23 @@ interface EditableAvatarProps {
   imageUrl?: string;
   editing: boolean;
   onImageChange?: (file: File) => void;
+  isUploading?: boolean;
+  firstName?: string;
+  lastName?: string;
 }
 
 export function EditableAvatar({
   imageUrl,
   editing,
   onImageChange,
+  isUploading = false,
+  firstName,
+  lastName,
 }: EditableAvatarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null); // acts as invisible file input selecvt
 
   const handleClick = () => {
-    if (editing && fileInputRef.current) {
+    if (editing && !isUploading && fileInputRef.current) {
       fileInputRef.current.click(); // clicks hidden input if on editing mode
     }
   };
@@ -58,17 +64,19 @@ export function EditableAvatar({
             className="w-24 h-24 object-cover rounded-full"
           />
           <AvatarFallback>
-            <img
-              src="/images/test-image.png"
-              alt="Fallback Image"
-              className="w-24 h-24 object-cover rounded-full"
-            />
+            <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-2xl font-medium">
+              {firstName && lastName ? `${firstName.charAt(0)}${lastName.charAt(0)}` : '??'}
+            </div>
           </AvatarFallback>
         </Avatar>
 
         {editing && (
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition">
-            <span className="text-white text-sm">Edit</span>
+            {isUploading ? (
+              <span className="text-white text-sm">Uploading...</span>
+            ) : (
+              <span className="text-white text-sm">Edit</span>
+            )}
           </div>
         )}
 

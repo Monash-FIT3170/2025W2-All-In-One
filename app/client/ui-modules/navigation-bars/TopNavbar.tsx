@@ -30,6 +30,10 @@ export function TopNavbar({
   const currentUser = useAppSelector((state) => state.currentUser.currentUser);
   const profileData = useAppSelector((state) => state.currentUser.profileData);
   const authUser = useAppSelector((state) => state.currentUser.authUser);
+  
+  React.useEffect(() => {
+    console.log("TopNavbar profileData:", profileData);
+  }, [profileData]);
   const notificationTasks = useAppSelector(selectNotificationTasks);
   const unreadMessageCount = useAppSelector(selectUnreadMessageCount);
 
@@ -97,6 +101,7 @@ export function TopNavbar({
                   firstName={profileData.firstName}
                   lastName={profileData.lastName}
                   title={authUser.role || "User"}
+                  profileImage={profileData.profilePicture}
                 />
               </div>
               <Button
